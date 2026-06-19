@@ -21,7 +21,7 @@ export const usePostWishLink = () => {
   } = useMutation({
     mutationFn: (url: string) => postWishLink(url),
     onSuccess: () => {
-      logAnalyticsEvent(ANALYTICS_EVENT.WISH_ADD, { source: 'link' });
+      logAnalyticsEvent(ANALYTICS_EVENT.WISH_ADD_COMPLETE, { source: 'link' });
       queryClient.invalidateQueries({ queryKey: ['wishlists'] });
       if (pathname !== ROUTES.ARCHIVE_BASE) router.push(ROUTES.ARCHIVE('wish'));
     },

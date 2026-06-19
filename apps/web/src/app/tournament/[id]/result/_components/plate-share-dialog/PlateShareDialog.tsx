@@ -53,7 +53,7 @@ function PlateShareDialog({
     });
 
     if (result === 'shared' || result === 'copied') {
-      logAnalyticsEvent(ANALYTICS_EVENT.PLAY_LINK_SHARE, {
+      logAnalyticsEvent(ANALYTICS_EVENT.RESULT_SHARE_CLICK, {
         tournament_id: tournamentId,
         method: result,
       });

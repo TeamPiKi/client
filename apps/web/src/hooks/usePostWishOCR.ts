@@ -21,7 +21,7 @@ export const usePostWishOCR = () => {
   } = useMutation({
     mutationFn: (formData: FormData) => postWishOCR(formData),
     onSuccess: () => {
-      logAnalyticsEvent(ANALYTICS_EVENT.WISH_ADD, { source: 'ocr' });
+      logAnalyticsEvent(ANALYTICS_EVENT.WISH_ADD_COMPLETE, { source: 'ocr' });
       queryClient.invalidateQueries({ queryKey: ['wishlists'] });
       router.push(ROUTES.ARCHIVE('wish'));
     },
