@@ -7,8 +7,12 @@ import { toast } from 'sonner';
 import { ENDPOINTS } from '@/consts/api';
 import { ROUTES } from '@/consts/route';
 import { CLIENT_TYPE } from '@/consts/webBridge';
-import type { NotificationSsePayloadT, TournamentItemParsedSsePayloadT } from '@/types/notification';
-import { getCookie, setCookie } from '@/utils/cookie';
+import type {
+  NotificationSsePayloadT,
+  TournamentItemParsedSsePayloadT,
+} from '@/types/notification';
+import { getCookie } from '@/utils/cookie';
+import { refreshClientToken } from '@/utils/refreshClientToken';
 import { isWebview } from '@/utils/webBridge';
 
 const MAX_RETRY_DELAY_MS = 30_000;
@@ -78,32 +82,18 @@ export const useNotificationSSE = (enabled: boolean) => {
             return;
           }
           if (response.status === 401) {
-            // 토큰 만료 시 클라이언트사이드에서 refresh 후 재연결
+            // 토큰 만료 시 공유 refresh 함수를 통해 갱신 후 재연결.
+            // 단일 진입점 — page request / API 호출과 같은 dedupe 큐를 공유한다.
+            // (직접 fetch 로 호출하면 동시 다발 race 로 백엔드가 401/500 거부 → 사용자 로그아웃)
             try {
-              const refreshRes = await fetch(ENDPOINTS.AUTH_TOKEN_REFRESH, {
-                method: 'POST',
-                credentials: 'include',
-              });
-              if (!refreshRes.ok) {
-                cancelled = true;
-                throw new Error('unauthorized');
-              }
-              if (isWebview()) {
-                const body = await refreshRes.json();
-                const { access_token: newAccessToken, refresh_token: newRefreshToken } =
-                  body.data;
-                if (newAccessToken && newRefreshToken) {
-                  setCookie('access_token', newAccessToken, { hours: 1 });
-                  setCookie('refresh_token', newRefreshToken, { days: 14 });
-                }
-              }
-              // refresh 성공 → onerror backoff로 재연결
+              await refreshClientToken();
+              // refresh 성공 → onerror backoff 로 재연결
               throw new Error('token-refreshed');
             } catch (err) {
-              if (err instanceof Error && err.message === 'unauthorized') {
-                cancelled = true;
-              }
-              throw err;
+              if (err instanceof Error && err.message === 'token-refreshed') throw err;
+              // refresh 실패 (만료 등) → 연결 중단
+              cancelled = true;
+              throw new Error('unauthorized');
             }
           }
           throw new Error(`SSE open failed: ${response.status}`);
