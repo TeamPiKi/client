@@ -15,6 +15,7 @@ import { useGetTournament } from '../../_common/_hooks/useGetTournament';
 import { useCountdown } from '../_hooks/useCountdown';
 import { usePostTournamentStart } from '../_hooks/usePostTournamentStart';
 import { useScrollToLast } from '../_hooks/useScrollToLast';
+import { hasSentInvite } from '../_utils/inviteSentSession';
 import DepositClosedDialog from './deposit-closed-dialog/DepositClosedDialog';
 import MemberJoinConfirmDialog from './member-join-confirm-dialog/MemberJoinConfirmDialog';
 import OwnerStartedDialog from './owner-started-dialog/OwnerStartedDialog';
@@ -52,10 +53,6 @@ function TournamentCreateClient({ tournamentId }: TournamentCreateClientProps) {
   const ownerStarted = pending?.ownerStarted ?? false;
   const depositDeadline = pending?.inviteExpiresAt ?? '';
   const { isExpired } = useCountdown(depositDeadline);
-  // 담기 마감 = 초대 코드 만료 시점 (둘은 동일 정책으로 운영).
-  // 단, 주최자는 만료 영향 없이 본인 토너먼트에 후보를 담을 수 있다.
-  // ownerStarted 면 어차피 시작 흐름으로 넘어가야 하므로 마감 처리하지 않는다.
-  const isDepositClosed = !tournamentData.isOwner && !ownerStarted && isExpired;
   const participants = (pending?.participants ?? []).map(p => ({
     user: {
       id: p.userId,
@@ -65,6 +62,17 @@ function TournamentCreateClient({ tournamentId }: TournamentCreateClientProps) {
     itemCount: p.itemCount,
   }));
   const hasFriends = participants.length > 1;
+  // 협업 의도가 표명된 토너먼트만 담기 마감 정책을 적용한다.
+  // - 친구가 합류했거나 (디바이스 변경에 무관)
+  // - "초대 링크 보내기" 를 한 번이라도 눌렀거나 (혼자라도 초대 의도 있음, localStorage)
+  // 어느 쪽도 아니면 혼자 천천히 담는 시나리오라 타이머/마감 모달이 의미 없다.
+  const isCollaborative = hasFriends || hasSentInvite(tournamentId);
+  // 담기 마감 = 초대 코드 만료 시점 (둘은 동일 정책으로 운영).
+  // 단, 주최자는 만료 영향 없이 본인 토너먼트에 후보를 담을 수 있다.
+  // ownerStarted 면 어차피 시작 흐름으로 넘어가야 하므로 마감 처리하지 않는다.
+  // 협업 의도가 없는 토너먼트는 만료 자체를 무시한다.
+  const isDepositClosed =
+    !tournamentData.isOwner && !ownerStarted && isExpired && isCollaborative;
 
   const participantImageMap = new Map(
     (pending?.participants ?? []).map(p => [p.userId, p.profileImage])
@@ -86,10 +94,15 @@ function TournamentCreateClient({ tournamentId }: TournamentCreateClientProps) {
 
   // 담기 마감 직후 주최자에게 노출되는 자동 안내 모달.
   // 만료 시점에 자동 오픈, 사용자가 닫으면 다시 띄우지 않는다.
+  // 협업 의도가 없는 토너먼트(혼자 + 초대 미발송)는 띄우지 않는다.
   const [isDepositClosedDialogOpen, setIsDepositClosedDialogOpen] = useState(false);
   const [hasDismissedDepositClosed, setHasDismissedDepositClosed] = useState(false);
   const shouldShowDepositClosedDialog =
-    tournamentData.isOwner && !ownerStarted && isExpired && !hasDismissedDepositClosed;
+    tournamentData.isOwner &&
+    !ownerStarted &&
+    isExpired &&
+    isCollaborative &&
+    !hasDismissedDepositClosed;
   if (shouldShowDepositClosedDialog && !isDepositClosedDialogOpen) {
     setIsDepositClosedDialogOpen(true);
   }
@@ -146,7 +159,7 @@ function TournamentCreateClient({ tournamentId }: TournamentCreateClientProps) {
             participants={participants}
             inviteCode={pending?.inviteCode ?? ''}
             inviteExpiresAt={pending?.inviteExpiresAt ?? ''}
-            {...(!ownerStarted && !isDepositClosed && { depositDeadline })}
+            {...(isCollaborative && !ownerStarted && !isDepositClosed && { depositDeadline })}
           />
         </div>
       </div>
@@ -187,6 +200,7 @@ function TournamentCreateClient({ tournamentId }: TournamentCreateClientProps) {
         open={isDepositClosedDialogOpen}
         onOpenChange={handleDepositClosedOpenChange}
         onStart={handleStartFromDepositClosed}
+        onContinue={() => handleDepositClosedOpenChange(false)}
         itemCount={itemCount}
         isPending={isPostTournamentStartPending}
       />

@@ -12,6 +12,7 @@ import { parseServerLocalDateTime } from '@/utils/formatDate';
 import { share } from '@/utils/share';
 
 import { usePatchInviteExpiry } from '../../_hooks/usePatchInviteExpiry';
+import { markInviteSent } from '../../_utils/inviteSentSession';
 import InviteExpiresPicker from './InviteExpiresPicker';
 
 type InviteFriendsDialogProps = {
@@ -100,6 +101,8 @@ function InviteFriendsDialog({
     });
 
     if (result === 'shared' || result === 'copied') {
+      // 협업 의도 표명 — 이 시점 이후부터 담기 마감 카운트다운/모달이 의미를 가진다.
+      markInviteSent(tournamentId);
       logAnalyticsEvent(ANALYTICS_EVENT.FRIEND_INVITE_SEND, {
         tournament_id: tournamentId,
         method: result,
