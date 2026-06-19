@@ -16,21 +16,55 @@ const handleGuestLogin = async () => {
   return nextResponse;
 };
 
+/**
+ * 같은 process 안에서 동일 refresh_token 으로 동시 호출되는 refresh 요청을 dedupe.
+ *
+ * 백엔드가 refresh_token rotation 정책(이전 토큰 즉시 무효) 을 쓰기 때문에,
+ * 페이지 진입 시 RSC payload + page request 등 동시 다발 요청이 각자 refresh 를 호출하면
+ * 첫 번째만 성공하고 두 번째부터 401 거부되어 사용자가 로그인 페이지로 튕긴다.
+ *
+ * key: refresh_token 값 그대로 사용 (다른 사용자는 다른 토큰)
+ * value: 진행 중인 refresh 응답 Promise — 결과를 공유한다.
+ *
+ * 주의:
+ *  - Edge runtime / serverless 환경에서는 process 가 짧게 살거나 인스턴스가 여러 개라
+ *    완벽한 dedupe 은 불가. 그래도 대부분의 동시 요청은 동일 process 에서 발생하므로 효과적.
+ *  - rotation 으로 새 토큰이 발급되면 다음 호출은 새 key 라 자동으로 새 entry 생성.
+ *  - finally 에서 entry 를 제거해 메모리 누수 방지.
+ */
+const inflightRefreshByToken = new Map<
+  string,
+  Promise<Awaited<ReturnType<typeof postTokenRefreshServer>>>
+>();
+
+const refreshTokenDedupe = (refreshToken: string, cookieHeader: string) => {
+  const existing = inflightRefreshByToken.get(refreshToken);
+  if (existing) return existing;
+
+  const promise = postTokenRefreshServer(cookieHeader).finally(() => {
+    inflightRefreshByToken.delete(refreshToken);
+  });
+  inflightRefreshByToken.set(refreshToken, promise);
+  return promise;
+};
+
 const handleTokenRefresh = async (request: NextRequest) => {
   const { pathname, search } = request.nextUrl;
 
   const cookieMap = new Map(
     request.cookies.getAll().map(cookie => [cookie.name, cookie.value] as const)
   );
+  const cookieHeader = [...cookieMap.entries()]
+    .map(([name, value]) => `${name}=${value}`)
+    .join('; ');
+  const refreshTokenValue = cookieMap.get('refresh_token') ?? '';
 
   try {
     /**
      * 토큰 갱신 요청
-     * - 쿠키 옵션 제거 후 key, value만 추출하여 페이지로 전달
+     * - 동일 refresh_token 에 대한 동시 호출은 한 번만 백엔드를 때리고 결과를 공유 (rotation 대응)
      */
-    const response = await postTokenRefreshServer(
-      [...cookieMap.entries()].map(([name, value]) => `${name}=${value}`).join('; ')
-    );
+    const response = await refreshTokenDedupe(refreshTokenValue, cookieHeader);
 
     /**
      * 페이지 요청에서는 쿠키 옵션을 필요로 하지 않음
@@ -63,7 +97,28 @@ const handleTokenRefresh = async (request: NextRequest) => {
     setCookieHeaders.forEach(cookie => nextResponse.headers.append('set-cookie', cookie));
 
     return nextResponse;
-  } catch {
+  } catch (error) {
+    /**
+     * dedupe 가 잡지 못한 race condition 의 마지막 안전망:
+     * - 다른 process 가 같은 refresh_token 으로 먼저 성공했을 수도 있다
+     * - 잠깐 기다린 뒤 들어온 요청의 새로운 쿠키(브라우저가 미들웨어를 다시 태우며 보낸 것) 가
+     *   이미 다음 라운드의 새 access_token 이면 그걸로 통과시킨다
+     *
+     * 실제 fix 는 백엔드의 rotation grace period; 이건 임시 우회.
+     */
+    const isUnauthorized =
+      error && typeof error === 'object' && 'response' in error
+        ? (error as { response?: { status?: number } }).response?.status === 401
+        : false;
+
+    if (isUnauthorized) {
+      await new Promise(resolve => setTimeout(resolve, 200));
+      const freshAccess = request.cookies.get('access_token');
+      if (freshAccess && isTokenValid(freshAccess.value)) {
+        return NextResponse.next();
+      }
+    }
+
     return NextResponse.redirect(new URL(getLoginPath(`${pathname}${search}`), request.url));
   }
 };
