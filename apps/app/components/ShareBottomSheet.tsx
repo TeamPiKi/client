@@ -14,7 +14,7 @@ export default function ShareBottomSheet(props: ShareExtensionProps) {
   );
 }
 
-function ShareBottomSheetContent({ url }: ShareExtensionProps) {
+function ShareBottomSheetContent({ url, text }: ShareExtensionProps) {
   const [sheetStatus, setSheetStatus] = useState<'loading' | 'success' | 'error'>('loading');
 
   const handleOpenWishlist = () => {
@@ -23,7 +23,17 @@ function ShareBottomSheetContent({ url }: ShareExtensionProps) {
   };
 
   useEffect(() => {
-    if (!url) {
+    /**
+     * NOTE: 웹은 url, 앱은 text로 링크와 상품 설명이 함께 오는 경우가 많음
+     *
+     * ex)
+     * - 웹: {"rootTag":11,"initialProps":{"pixelRatio":3,"initialViewWidth":390,"url":"https://29cm.onelink.me/1080201211/sacus9l2","initialViewHeight":844,"fontScale":0.8823529411764706},"fabric":true}
+     * - 앱: {"rootTag":11,"initialProps":{"pixelRatio":3,"initialViewWidth":390,"fontScale":0.8823529411764706,"initialViewHeight":844,"text":"[제작/빅사이즈]이블렛 케이닌 쿨링 리본 뷔스티에 미니원피스 제이스타일\nhttps://s.zigzag.kr/XWnpU1fuZx"},"fabric":true}
+     */
+    const urlFromText = text?.match(/https?:\/\/[^\s]+/)?.[0]?.replace(/[),.]+$/, '');
+    const productUrl = url ?? urlFromText;
+
+    if (!productUrl) {
       setSheetStatus('error');
       return;
     }
@@ -31,7 +41,7 @@ function ShareBottomSheetContent({ url }: ShareExtensionProps) {
     let isMounted = true;
 
     const registerWish = async () => {
-      const result = await postWishLinkFromShare(url);
+      const result = await postWishLinkFromShare(productUrl);
 
       if (!isMounted) return;
 
@@ -48,7 +58,7 @@ function ShareBottomSheetContent({ url }: ShareExtensionProps) {
     return () => {
       isMounted = false;
     };
-  }, [url]);
+  }, [url, text]);
 
   if (sheetStatus === 'loading')
     return (
@@ -134,11 +144,11 @@ type SheetContainerProps = {
 };
 
 function SheetContainer({ children, onDimPress }: SheetContainerProps) {
-  const { bottom } = useSafeAreaInsets();
+  const { top, bottom } = useSafeAreaInsets();
 
   return (
     <View style={styles.wrapper}>
-      {onDimPress && <Pressable style={StyleSheet.absoluteFill} onPress={onDimPress} />}
+      <Pressable style={[styles.dim, { top: -top }]} onPress={onDimPress} disabled={!onDimPress} />
       <View style={[styles.sheet, { paddingBottom: bottom }]}>{children}</View>
     </View>
   );
@@ -181,6 +191,12 @@ const styles = StyleSheet.create({
   wrapper: {
     flex: 1,
     justifyContent: 'flex-end',
+  },
+  dim: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
     backgroundColor: '#00000066',
   },
   sheet: {
