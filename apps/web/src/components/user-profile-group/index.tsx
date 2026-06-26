@@ -1,5 +1,5 @@
-import Image from 'next/image';
-
+import BaseImage from '@/components/base-image';
+import Skeleton from '@/components/skeleton';
 import { cn } from '@/utils/cn';
 
 type UserProfileGroupProps = {
@@ -23,7 +23,13 @@ function UserProfileGroup({ profileImageUrls, max = 3, className }: UserProfileG
             index === visibleProfileImageUrls.length - 1 && overflowCount <= 0 ? '' : '-mr-2'
           )}
         >
-          <Image src={url} alt="참여자 프로필" fill sizes="27px" className="object-cover" />
+          <BaseImage
+            src={url}
+            alt="참여자 프로필"
+            sizes="27px"
+            className="object-cover"
+            loadingFallback={<Skeleton shape="circle" className="absolute inset-0" />}
+          />
         </span>
       ))}
       {overflowCount > 0 && (

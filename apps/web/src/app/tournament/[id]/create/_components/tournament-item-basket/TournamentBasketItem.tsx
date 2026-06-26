@@ -1,6 +1,7 @@
 import Image from 'next/image';
 
 import ProductImage from '@/app/tournament/[id]/create/_components/product-image';
+import { Z_INDEX } from '@/consts/zIndex';
 import { useGetMe } from '@/hooks/useGetMe';
 import { cn } from '@/utils/cn';
 
@@ -43,7 +44,7 @@ function TournamentBasketItem({
       {friendImageUrl && (
         <div
           className="absolute -right-1 -bottom-0.5 overflow-hidden rounded-full border-2 border-white"
-          style={{ width: '35%', height: '35%' }}
+          style={{ width: '35%', height: '35%', zIndex: Z_INDEX.BASE_IMAGE + 10 }}
         >
           <Image src={friendImageUrl} alt="친구 프로필" fill className="object-cover" />
         </div>

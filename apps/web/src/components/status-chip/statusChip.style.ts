@@ -3,7 +3,7 @@ import { type VariantProps, cva } from 'class-variance-authority';
 import { TOURNAMENT_STATUS } from '@/consts/tournament';
 
 export const statusChipStyles = cva(
-  'inline-flex w-[67px] items-center justify-center gap-1 rounded-lg px-2 py-1 caption-1-semibold',
+  'inline-flex w-[67px] shrink-0 items-center justify-center gap-1 rounded-lg px-2 py-1 caption-1-semibold',
   {
     variants: {
       status: {

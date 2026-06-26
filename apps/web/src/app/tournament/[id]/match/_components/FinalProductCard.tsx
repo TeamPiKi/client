@@ -1,4 +1,5 @@
 import BaseImage from '@/components/base-image';
+import { Z_INDEX } from '@/consts/zIndex';
 
 import type { ProductT } from '../../_common/_types/tournament';
 
@@ -11,7 +12,10 @@ function FinalProductCard({ imageUrl, name, price, isPicked, onClick }: FinalPro
   return (
     <button type="button" onClick={onClick} className="relative w-[148px] cursor-pointer text-left">
       {isPicked && (
-        <div className="absolute top-0 left-1/2 z-10 flex size-[60px] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-blue-500 shadow-lg">
+        <div
+          className="absolute top-0 left-1/2 flex size-[60px] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-blue-500 shadow-lg"
+          style={{ zIndex: Z_INDEX.BASE_IMAGE + 10 }}
+        >
           <span className="-rotate-12 body-1-bold text-white">Pick!</span>
         </div>
       )}
@@ -22,7 +26,7 @@ function FinalProductCard({ imageUrl, name, price, isPicked, onClick }: FinalPro
               src={imageUrl}
               alt={name}
               sizes="(max-width: 480px) 45vw, 200px"
-              priority
+              preload
               className="object-cover"
             />
           )}

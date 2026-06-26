@@ -1,11 +1,13 @@
 'use client';
 
+import dynamic from 'next/dynamic';
 import type { ComponentProps, ReactNode } from 'react';
 
-import Spinner from '@/components/spinner';
 import { cn } from '@/utils/cn';
 
 import { type ButtonStyleProps, buttonStyles } from './button.style';
+
+const Spinner = dynamic(() => import('@/components/spinner'), { ssr: false });
 
 type ButtonProps = Omit<ComponentProps<'button'>, 'children'> &
   ButtonStyleProps & {

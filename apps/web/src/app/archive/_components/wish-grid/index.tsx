@@ -18,7 +18,7 @@ type WishGridProps = {
 function WishGrid({ items, isDeleteMode = false, selectedIds, onToggleSelect }: WishGridProps) {
   return (
     <div className="grid grid-cols-2 gap-x-2 gap-y-3">
-      {items.map(item => {
+      {items.map((item, index) => {
         if (item.status === 'FAILED')
           return (
             <Link href={ROUTES.WISH_EDIT(item.id)} key={item.id}>
@@ -53,7 +53,12 @@ function WishGrid({ items, isDeleteMode = false, selectedIds, onToggleSelect }: 
 
         return (
           <Link href={ROUTES.WISH_EDIT(item.id)} key={item.id}>
-            <WishCard key={item.id} name={item.name} price={item.price} imageUrl={item.imageUrl} />
+            <WishCard
+              name={item.name}
+              price={item.price}
+              imageUrl={item.imageUrl}
+              preload={index < 4} // 4개 이미지 로딩 전까지는 preload
+            />
           </Link>
         );
       })}

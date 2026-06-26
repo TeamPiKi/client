@@ -152,7 +152,7 @@ const ReceiptDrawMachine = forwardRef<ReceiptDrawMachineHandleT, ReceiptDrawMach
             src={ReceiptPrinterImg}
             alt="영수증 기계"
             className="h-full w-full object-contain"
-            priority
+            preload
           />
           <div className="absolute inset-x-0 bottom-0 h-1.25" ref={slotBarRef} />
         </div>

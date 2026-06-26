@@ -46,7 +46,10 @@ function TournamentCard({
       <div className="flex items-start justify-between">
         <div className="flex items-center gap-2">
           <StatusChip status={status} />
-          <Link href={HREF[status]} className="heading-1 text-text-neutral-primary hover:underline">
+          <Link
+            href={HREF[status]}
+            className="line-clamp-1 heading-1 text-text-neutral-primary hover:underline"
+          >
             {name}
           </Link>
         </div>

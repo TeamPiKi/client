@@ -5,7 +5,7 @@ import {
 } from '@piki/core';
 import CookieManager from '@react-native-cookies/cookies';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { AppState, KeyboardAvoidingView, Linking, Platform } from 'react-native';
+import { AppState, Linking, Platform } from 'react-native';
 import type { WebView } from 'react-native-webview';
 import Webview from 'react-native-webview';
 
@@ -123,10 +123,7 @@ function Page() {
   const { onWebViewLoadEnd, onWebViewLoadError } = useSplashScreenController();
 
   return (
-    <KeyboardAvoidingView
-      style={{ flex: 1, backgroundColor: 'white' }}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-    >
+    <>
       {isSynced && (
         <Webview
           ref={webviewRef}
@@ -142,7 +139,7 @@ function Page() {
           startInLoadingState
         />
       )}
-    </KeyboardAvoidingView>
+    </>
   );
 }
 

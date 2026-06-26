@@ -2,9 +2,14 @@
 
 import TournamentCard from '@/components/tournament-card';
 import { useGetTournamentList } from '@/hooks/useGetTournamentList';
+import type { TournamentStatusT } from '@/types/tournament';
 
-function TorunamentList() {
-  const { tournamentListData } = useGetTournamentList(['PENDING', 'IN_PROGRESS']);
+type Props = {
+  statuses: TournamentStatusT[];
+};
+
+function TournamentListClient({ statuses }: Props) {
+  const { tournamentListData } = useGetTournamentList(statuses);
 
   if (tournamentListData.length === 0) return null;
 
@@ -27,4 +32,4 @@ function TorunamentList() {
   );
 }
 
-export default TorunamentList;
+export default TournamentListClient;

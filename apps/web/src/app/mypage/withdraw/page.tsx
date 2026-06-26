@@ -36,7 +36,7 @@ async function MypageWithdrawPage() {
           width={Basket.width}
           height={Basket.height}
           className="h-auto w-[calc(100%-34px)] max-w-[318px]"
-          priority
+          preload
         />
       </div>
 

@@ -1,24 +1,13 @@
-import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
-
-import { getTournamentList } from '@/apis/getTournamentList';
 import PikiLogo from '@/assets/images/piki-logo.svg';
 import BottomTabBar from '@/components/bottom-tab-bar';
 import { Header, HeaderIcon } from '@/components/header';
-import { getQueryClient } from '@/utils/queryClient';
 
 import AddWishHomeDialog from './_components/AddWishHomeDialog';
 import CreateTournamentDialog from './_components/CreateTournamentDialog';
 import InviteTournamentButton from './_components/InviteTournamentButton';
-import TorunamentList from './_components/TournamentList';
+import TournamentList from './_components/tournament-list';
 
-async function HomePage() {
-  const queryClient = getQueryClient();
-
-  await queryClient.prefetchQuery({
-    queryKey: ['tournamentList', ['PENDING', 'IN_PROGRESS']],
-    queryFn: () => getTournamentList(['PENDING', 'IN_PROGRESS']),
-  });
-
+function HomePage() {
   return (
     <div className="relative flex min-h-dvh flex-col bg-gray-50 px-5 pt-padding-top pb-32">
       {/* 상단 헤더 */}
@@ -52,9 +41,7 @@ async function HomePage() {
         </section>
 
         {/* 진행 중인 토너먼트 */}
-        <HydrationBoundary state={dehydrate(queryClient)}>
-          <TorunamentList />
-        </HydrationBoundary>
+        <TournamentList />
       </main>
 
       {/* 하단 네비게이션 */}

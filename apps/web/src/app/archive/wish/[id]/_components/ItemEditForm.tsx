@@ -44,7 +44,7 @@ function ItemEditForm({
   const { deleteWishMutation, isDeleteWishPending } = useDeleteWish(wishId);
   const { postWishRefreshMutation, isPostWishRefreshPending } = usePostWishRefresh(wishId);
 
-  const isReadyActionPending = isDeleteWishPending || isPostWishRefreshPending;
+  const isActionPending = isDeleteWishPending || isPostWishRefreshPending || isPatchWishPending;
 
   const trimmedName = name.trim();
   const parsedPrice = parsePriceToNumber(price);
@@ -56,7 +56,7 @@ function ItemEditForm({
       trimmedName !== initialName.trim() ||
       formatPrice(price) !== initialPriceFormatted ||
       selectedImage !== null;
-    if (!isChanged || isPatchWishPending || !selectedImage) return;
+    if (!isChanged || isActionPending || !selectedImage) return;
 
     patchWishMutation({
       name: trimmedName,
@@ -66,13 +66,13 @@ function ItemEditForm({
   };
 
   const handleDelete = () => {
-    if (isReadyActionPending) return;
+    if (isActionPending) return;
 
     deleteWishMutation();
   };
 
   const handleRefresh = () => {
-    if (isReadyActionPending) return;
+    if (isActionPending) return;
 
     postWishRefreshMutation();
   };
@@ -117,7 +117,7 @@ function ItemEditForm({
             size="lg"
             className="flex-1"
             isLoading={isDeleteWishPending}
-            disabled={isPostWishRefreshPending}
+            disabled={isPostWishRefreshPending || isPatchWishPending}
             onClick={handleDelete}
           >
             삭제하기
@@ -128,7 +128,7 @@ function ItemEditForm({
             size="lg"
             className="flex-1"
             isLoading={isPostWishRefreshPending}
-            disabled={isDeleteWishPending}
+            disabled={isDeleteWishPending || isPatchWishPending}
             onClick={handleRefresh}
           >
             다시 불러오기
@@ -139,10 +139,21 @@ function ItemEditForm({
       {itemStatus === 'FAILED' && (
         <BottomCta className="bg-bg-layer-basement py-3">
           <Button
+            variant="secondary"
+            size="lg"
+            className="flex-1"
+            isLoading={isDeleteWishPending}
+            disabled={isPostWishRefreshPending || isPatchWishPending}
+            onClick={handleDelete}
+          >
+            삭제하기
+          </Button>
+
+          <Button
             variant="primary"
             size="lg"
             isLoading={isPatchWishPending}
-            disabled={isDeleteWishPending || !isValid}
+            disabled={isDeleteWishPending || isPostWishRefreshPending || !isValid}
             className="flex-1"
             onClick={handleSave}
           >

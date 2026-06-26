@@ -8,7 +8,7 @@ import ProfileHeaderIcon from './ProfileHeaderIcon';
 
 type Props = {
   left?: React.ReactNode;
-  center?: string;
+  center?: React.ReactNode;
   right?: React.ReactNode;
 
   leftClassName?: string;
