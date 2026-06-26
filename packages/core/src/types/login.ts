@@ -33,3 +33,13 @@ export type SocialLoginErrorMessageT = {
 export type SocialLoginErrorPayloadT = {
   detail: string;
 };
+
+/** 웹 → 앱 토큰 갱신 알림 */
+export type WebReqTokenRefreshedMessageT = {
+  type: typeof WEBBRIDGE_MESSAGE_TYPE.WEB_REQ_TOKEN_REFRESHED;
+  payload: TokenRefreshedPayloadT;
+};
+export type TokenRefreshedPayloadT = {
+  accessToken: string;
+  refreshToken: string;
+};

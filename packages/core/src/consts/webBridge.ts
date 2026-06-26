@@ -35,6 +35,9 @@ export const WEBBRIDGE_MESSAGE_TYPE = {
 
   /** 분석 관련 — 웹뷰에서 발생한 사용자 행동을 네이티브 Firebase Analytics 로 전달 */
   WEB_REQ_LOG_ANALYTICS_EVENT: 'WEB_REQ_LOG_ANALYTICS_EVENT',
+
+  /** 토큰 갱신 — 웹에서 토큰 갱신 후 앱 SecureStore 동기화 */
+  WEB_REQ_TOKEN_REFRESHED: 'WEB_REQ_TOKEN_REFRESHED',
 } as const;
 
 export const PUSH_NOTIFICATION_TYPE = {

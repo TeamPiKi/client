@@ -1,10 +1,11 @@
+import { WEBBRIDGE_MESSAGE_TYPE } from '@piki/core';
 import axios from 'axios';
 
 import { ENDPOINTS } from '@/consts/api';
 import { CLIENT_TYPE } from '@/consts/webBridge';
 
 import { setCookie } from './cookie';
-import { isWebview } from './webBridge';
+import { WebBridge, isWebview } from './webBridge';
 
 /**
  * 클라이언트 측 토큰 갱신 — 모든 클라 코드(axios interceptor / SSE / 그 외)는
@@ -52,6 +53,10 @@ const performRefresh = async (): Promise<void> => {
     if (newAccessToken && newRefreshToken) {
       setCookie('access_token', newAccessToken, { hours: 1 });
       setCookie('refresh_token', newRefreshToken, { days: 14 });
+      WebBridge.postMessage({
+        type: WEBBRIDGE_MESSAGE_TYPE.WEB_REQ_TOKEN_REFRESHED,
+        payload: { accessToken: newAccessToken, refreshToken: newRefreshToken },
+      });
     }
   }
 };
