@@ -18,7 +18,11 @@ import { useWebDeepLink } from '@/hooks/useWebDeepLink';
 import { useWebviewCookieSync } from '@/hooks/useWebviewCookieSync';
 import { logAnalyticsEvent, logAppOpenEvent } from '@/utils/analytics';
 import { handleOpenImagePicker } from '@/utils/handleImage';
-import { handleRequestPushPermission, syncPushStatusToWeb } from '@/utils/pushNotification';
+import {
+  handleRequestPushPermission,
+  setAppBadgeCount,
+  syncPushStatusToWeb,
+} from '@/utils/pushNotification';
 import { TokenStorage } from '@/utils/tokenStorage';
 import { WebBridge } from '@/utils/webBridge';
 
@@ -110,6 +114,10 @@ function Page() {
 
         case WEBBRIDGE_MESSAGE_TYPE.WEB_REQ_LOG_ANALYTICS_EVENT:
           await logAnalyticsEvent(message.payload.name, message.payload.params);
+          return;
+
+        case WEBBRIDGE_MESSAGE_TYPE.WEB_REQ_SET_BADGE:
+          await setAppBadgeCount(message.payload.count);
           return;
 
         default:

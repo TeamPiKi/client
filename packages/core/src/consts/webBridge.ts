@@ -38,6 +38,9 @@ export const WEBBRIDGE_MESSAGE_TYPE = {
 
   /** 토큰 갱신 — 웹에서 토큰 갱신 후 앱 SecureStore 동기화 */
   WEB_REQ_TOKEN_REFRESHED: 'WEB_REQ_TOKEN_REFRESHED',
+
+  /** 뱃지 관련 — 웹이 읽음 처리 후 앱 아이콘 뱃지 수를 동기화 */
+  WEB_REQ_SET_BADGE: 'WEB_REQ_SET_BADGE',
 } as const;
 
 export const PUSH_NOTIFICATION_TYPE = {

@@ -49,6 +49,7 @@ export type {
   WebReqOpenNotificationSettingsMessageT,
   WebReqPushPermissionMessageT,
   WebReqPushPermissionStatusMessageT,
+  WebReqSetBadgeMessageT,
 } from './types/pushNotification';
 export type { WebBridgeMessageT, WebReqReadyMessageT } from './types/webBridge';
 

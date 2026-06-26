@@ -36,6 +36,12 @@ export type FcmTokenPayloadT = {
   deviceId: string | null;
 };
 
+/** 웹 → 앱: 앱 아이콘 뱃지 수 설정 */
+export type WebReqSetBadgeMessageT = {
+  type: typeof WEBBRIDGE_MESSAGE_TYPE.WEB_REQ_SET_BADGE;
+  payload: { count: number };
+};
+
 /** 앱 → 웹: 푸시 알림 탭 딥링크 */
 export type AppReqDeepLinkMessageT = {
   type: typeof WEBBRIDGE_MESSAGE_TYPE.APP_REQ_DEEP_LINK;

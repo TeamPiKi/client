@@ -1,19 +1,30 @@
 import { fetchEventSource } from '@microsoft/fetch-event-source';
+import { WEBBRIDGE_MESSAGE_TYPE } from '@piki/core';
 import { useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef } from 'react';
 import { toast } from 'sonner';
 
+import { getNotifications } from '@/app/notification/_apis/getNotifications';
 import { ENDPOINTS } from '@/consts/api';
 import { ROUTES } from '@/consts/route';
 import { CLIENT_TYPE } from '@/consts/webBridge';
-import type {
-  NotificationSsePayloadT,
-  TournamentItemParsedSsePayloadT,
-} from '@/types/notification';
+import type { NotificationSsePayloadT, SilentSyncSsePayloadT } from '@/types/notification';
 import { getCookie } from '@/utils/cookie';
 import { refreshClientToken } from '@/utils/refreshClientToken';
-import { isWebview } from '@/utils/webBridge';
+import { WebBridge, isWebview } from '@/utils/webBridge';
+
+const syncBadgeWithServer = () => {
+  if (!isWebview()) return;
+  getNotifications({ size: 1 })
+    .then(result => {
+      WebBridge.postMessage({
+        type: WEBBRIDGE_MESSAGE_TYPE.WEB_REQ_SET_BADGE,
+        payload: { count: result.unreadCount },
+      });
+    })
+    .catch(() => {});
+};
 
 const MAX_RETRY_DELAY_MS = 30_000;
 
@@ -100,10 +111,23 @@ export const useNotificationSSE = (enabled: boolean) => {
         },
 
         onmessage: event => {
-          if (event.event === 'tournament-item-parsed') {
+          if (event.event === 'silent-sync') {
             try {
-              const payload = JSON.parse(event.data) as TournamentItemParsedSsePayloadT;
-              queryClient.invalidateQueries({ queryKey: ['tournament', payload.tournamentId] });
+              const payload = JSON.parse(event.data) as SilentSyncSsePayloadT;
+              switch (payload.type) {
+                case 'TOURNAMENT_ITEM_PARSED':
+                  queryClient.invalidateQueries({ queryKey: ['tournament', payload.tournamentId] });
+                  break;
+                case 'UNREAD_COUNT_CHANGED':
+                  void queryClient.refetchQueries({ queryKey: ['notifications'], type: 'all' });
+                  if (isWebview()) {
+                    WebBridge.postMessage({
+                      type: WEBBRIDGE_MESSAGE_TYPE.WEB_REQ_SET_BADGE,
+                      payload: { count: payload.unreadCount },
+                    });
+                  }
+                  break;
+              }
             } catch {
               // malformed JSON — 무시
             }
@@ -113,6 +137,8 @@ export const useNotificationSSE = (enabled: boolean) => {
           if (event.event === 'notification') {
             try {
               const payload = JSON.parse(event.data) as NotificationSsePayloadT;
+              void queryClient.refetchQueries({ queryKey: ['notifications'], type: 'all' });
+              syncBadgeWithServer();
               const deepLink = resolveDeepLink(payload);
               const action = deepLink
                 ? { label: '바로가기', onClick: () => router.push(deepLink) }

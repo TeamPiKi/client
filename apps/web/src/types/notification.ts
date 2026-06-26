@@ -3,16 +3,26 @@ export type NotificationTypeT =
   | 'TOURNAMENT_ITEM_ADDED'
   | 'TOURNAMENT_ITEM_DELETED'
   | 'TOURNAMENT_STARTED'
+  | 'TOURNAMENT_PLAYED_FROM_LINK'
+  | 'TOURNAMENT_COMPLETED'
+  | 'TOURNAMENT_RESULT_READY'
   | 'ITEM_PARSING_COMPLETED'
-  | 'ITEM_PARSING_FAILED';
+  | 'ITEM_PARSING_FAILED'
+  | 'ANNOUNCEMENT';
 
 export type NotificationKindT = 'WISH' | 'TOURNAMENT';
 
-export type TournamentItemParsedSsePayloadT = {
-  tournamentId: number;
-  tournamentItemId: number;
-  status: 'READY' | 'FAILED';
-};
+export type SilentSyncSsePayloadT =
+  | {
+      type: 'TOURNAMENT_ITEM_PARSED';
+      tournamentId: number;
+      tournamentItemId: number;
+      status: 'READY' | 'FAILED';
+    }
+  | {
+      type: 'UNREAD_COUNT_CHANGED';
+      unreadCount: number;
+    };
 
 export type NotificationSsePayloadT = {
   id: number;

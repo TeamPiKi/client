@@ -20,6 +20,7 @@ import type {
   WebReqOpenNotificationSettingsMessageT,
   WebReqPushPermissionMessageT,
   WebReqPushPermissionStatusMessageT,
+  WebReqSetBadgeMessageT,
 } from './pushNotification';
 import type { AppResShareIntentMessageT } from './shareIntent';
 
@@ -41,7 +42,8 @@ export type WebBridgeMessageT =
   | AppReqDeepLinkMessageT
   | WebReqLogoutMessageT
   | WebReqLogAnalyticsEventMessageT
-  | WebReqTokenRefreshedMessageT;
+  | WebReqTokenRefreshedMessageT
+  | WebReqSetBadgeMessageT;
 
 /** 웹이 페이지 hydrate 완료 후 RN에게 메시지 수신 준비됨을 알리는 메시지 */
 export type WebReqReadyMessageT = {

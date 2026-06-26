@@ -125,6 +125,7 @@
           ]
         }
       ],
+      "expo-notifications",
       "expo-secure-store",
       "@react-native-firebase/app",
       "@react-native-firebase/messaging",
@@ -134,7 +135,8 @@
         {
           "ios": {
             "useFrameworks": "static",
-            "forceStaticLinking": ["RNFBApp", "RNFBMessaging", "RNFBAnalytics"]
+            "forceStaticLinking": ["RNFBApp", "RNFBMessaging", "RNFBAnalytics"],
+            "deploymentTarget": "16.4"
           },
           "android": {
             "extraMavenRepos": ["https://devrepo.kakao.com/nexus/content/groups/public/"]
