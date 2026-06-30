@@ -146,9 +146,7 @@ const handleTokenRefresh = async (request: NextRequest) => {
         nextResponse.headers.append('set-cookie', `access_token=${bodyAccess}; ${cookieOptions}`);
         nextResponse.headers.append('set-cookie', `refresh_token=${bodyRefresh}; ${cookieOptions}`);
       }
-    } else {
-      setCookieHeaders.forEach(cookie => nextResponse.headers.append('set-cookie', cookie));
-    }
+    } else setCookieHeaders.forEach(cookie => nextResponse.headers.append('set-cookie', cookie));
 
     return nextResponse;
   } catch {
