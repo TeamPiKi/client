@@ -30,10 +30,10 @@ export const useWebviewCookieSync = () => {
 
           if (refreshResponse.ok) {
             const refreshBody = (await refreshResponse.json()) as {
-              data: { accessToken: string; refreshToken: string };
+              data: { access_token: string; refresh_token: string };
             };
-            accessToken = refreshBody.data.accessToken;
-            refreshToken = refreshBody.data.refreshToken;
+            accessToken = refreshBody.data.access_token;
+            refreshToken = refreshBody.data.refresh_token;
             await TokenStorage.setTokens(accessToken, refreshToken);
           } else if (refreshResponse.status === 401) {
             /** 죽은 토큰(SecureStore + WebView 쿠키) 정리 —  */

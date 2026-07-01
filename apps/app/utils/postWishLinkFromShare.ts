@@ -39,12 +39,12 @@ export const postWishLinkFromShare = async (
 
       /** 토큰 갱신 후 토큰 저장 */
       const refreshBody = (await refreshResponse.json()) as {
-        data: { accessToken: string; refreshToken: string };
+        data: { access_token: string; refresh_token: string };
       };
-      await TokenStorage.setTokens(refreshBody.data.accessToken, refreshBody.data.refreshToken);
+      await TokenStorage.setTokens(refreshBody.data.access_token, refreshBody.data.refresh_token);
 
       /** 위시 등록 재시도 */
-      postWishResponse = await postWishLink(productUrl, refreshBody.data.accessToken);
+      postWishResponse = await postWishLink(productUrl, refreshBody.data.access_token);
     }
 
     if (!postWishResponse.ok) return { ok: false, message: '요청 처리 중 오류가 발생했습니다.' };
