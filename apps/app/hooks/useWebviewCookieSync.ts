@@ -36,8 +36,9 @@ export const useWebviewCookieSync = () => {
             refreshToken = refreshBody.data.refreshToken;
             await TokenStorage.setTokens(accessToken, refreshToken);
           } else if (refreshResponse.status === 401) {
-            /** 죽은 토큰 정리 — 웹 로그인 플로우가 새 세션을 처리하도록 */
+            /** 죽은 토큰(SecureStore + WebView 쿠키) 정리 —  */
             await TokenStorage.clearTokens();
+            await CookieManager.clearAll(Platform.OS === 'ios');
             accessToken = null;
             refreshToken = null;
           }
