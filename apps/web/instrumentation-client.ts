@@ -16,8 +16,11 @@ Sentry.init({
   replaysOnErrorSampleRate: 1.0,
   integrations: [
     Sentry.replayIntegration({
-      maskAllText: true,
-      blockAllMedia: true,
+      /** 소셜 로그인만이라 민감 입력 없음 — [data-sentry-mask](이메일)만 마스킹하고 나머진 노출 */
+      maskAllText: false,
+      blockAllMedia: false,
+      maskAllInputs: false,
+      mask: ['[data-sentry-mask]'],
     }),
   ],
   /** PII 기본 마스킹 */
