@@ -36,7 +36,14 @@ serverApi.interceptors.response.use(
       (error.code === 'ERR_NETWORK' || (typeof status === 'number' && status >= 500));
 
     if (shouldReport) {
-      captureError(error, {
+      const method = error.config?.method?.toUpperCase() ?? 'UNKNOWN';
+      const path = error.config?.url?.split('?')[0] ?? 'unknown';
+
+      /** 디코/대시보드 제목을 알아보기 쉽게 (원본 axios 정보는 extra 유지) */
+      const apiError = new Error(`API ${status ?? error.code} ${method} ${path}`);
+      apiError.name = 'ApiError';
+
+      captureError(apiError, {
         tags: { source: 'api-server' },
         extra: {
           url: error.config?.url,
