@@ -8,6 +8,10 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { AppState, Linking, Platform } from 'react-native';
 import type { WebView } from 'react-native-webview';
 import Webview from 'react-native-webview';
+import type {
+  WebViewErrorEvent,
+  WebViewHttpErrorEvent,
+} from 'react-native-webview/lib/WebViewTypes';
 
 import { USER_AGENT } from '@/constants/userAgent';
 import { useShareIntent } from '@/hooks/useShareIntent';
@@ -17,6 +21,7 @@ import { useWebBridgeMessage } from '@/hooks/useWebBridgeMessage';
 import { useWebDeepLink } from '@/hooks/useWebDeepLink';
 import { useWebviewCookieSync } from '@/hooks/useWebviewCookieSync';
 import { logAnalyticsEvent, logAppOpenEvent } from '@/utils/analytics';
+import { captureError } from '@/utils/captureError';
 import { handleOpenImagePicker } from '@/utils/handleImage';
 import {
   handleRequestPushPermission,
@@ -130,6 +135,30 @@ function Page() {
   const { onMessage } = useWebBridgeMessage(handleWebMessage);
   const { onWebViewLoadEnd, onWebViewLoadError } = useSplashScreenController();
 
+  /** WebView 로드 실패(네이티브 측) 수집 + 기존 스플래시 처리 유지 */
+  const handleWebViewError = useCallback(
+    (event: WebViewErrorEvent) => {
+      const { nativeEvent } = event;
+      captureError(new Error(`WebView load error: ${nativeEvent.description}`), {
+        tags: { source: 'webview' },
+        extra: { url: nativeEvent.url, code: nativeEvent.code },
+      });
+      onWebViewLoadError();
+    },
+    [onWebViewLoadError]
+  );
+
+  /** WebView HTTP 5xx 응답만 수집 */
+  const handleWebViewHttpError = useCallback((event: WebViewHttpErrorEvent) => {
+    const { nativeEvent } = event;
+    if (nativeEvent.statusCode >= 500) {
+      captureError(new Error(`WebView HTTP ${nativeEvent.statusCode}: ${nativeEvent.url}`), {
+        tags: { source: 'webview' },
+        extra: { url: nativeEvent.url, statusCode: nativeEvent.statusCode },
+      });
+    }
+  }, []);
+
   return (
     <>
       {isSynced && (
@@ -140,7 +169,8 @@ function Page() {
           source={{ uri: webviewUri }}
           onMessage={onMessage}
           onLoadEnd={onWebViewLoadEnd}
-          onError={onWebViewLoadError}
+          onError={handleWebViewError}
+          onHttpError={handleWebViewHttpError}
           allowsBackForwardNavigationGestures
           cacheEnabled
           webviewDebuggingEnabled={__DEV__}

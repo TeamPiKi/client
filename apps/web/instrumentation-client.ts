@@ -22,6 +22,17 @@ Sentry.init({
   ],
   /** PII 기본 마스킹 */
   sendDefaultPii: false,
+  /** 브라우저 확장·네트워크 취소 등 우리 코드와 무관한 노이즈 제외 */
+  ignoreErrors: [
+    'Network Error',
+    'Failed to fetch',
+    'Load failed',
+    'AbortError',
+    'The operation was aborted',
+    'ResizeObserver loop limit exceeded',
+    'ResizeObserver loop completed with undelivered notifications',
+    'Non-Error promise rejection captured',
+  ],
 });
 
 export const onRouterTransitionStart = Sentry.captureRouterTransitionStart;

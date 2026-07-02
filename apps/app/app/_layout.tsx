@@ -10,18 +10,7 @@ import 'react-native-reanimated';
 import PushNotificationProvider from '@/components/PushNotificationProvider';
 import { SplashScreenControllerProvider } from '@/hooks/useSplashScreenController';
 
-/** 배포 환경(production/staging/dev). Sentry 는 production/staging 에서만 수집 (dev·로컬 비활성) */
-const stage = process.env.EXPO_PUBLIC_STAGE;
-
-Sentry.init({
-  dsn: process.env.EXPO_PUBLIC_SENTRY_DSN,
-  environment: stage,
-  enabled: stage === 'production' || stage === 'staging',
-  /** Performance(Tracing)는 초기엔 off */
-  tracesSampleRate: 0,
-  /** PII 기본 마스킹 (Session Replay 는 web 만, 앱은 에러/크래시만) */
-  sendDefaultPii: false,
-});
+/** Sentry 초기화는 진입점 index.js(initSentry)에서 수행 — 여기선 wrap 만 적용 */
 
 initializeKakaoSDK(process.env.EXPO_PUBLIC_KAKAO_NATIVE_APP_KEY ?? '');
 

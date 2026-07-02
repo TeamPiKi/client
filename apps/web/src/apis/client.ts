@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/nextjs';
 import type { AxiosError } from 'axios';
 import axios from 'axios';
 
@@ -5,6 +6,7 @@ import { QUERY_ACTION } from '@/consts/queryAction';
 import { ROUTES } from '@/consts/route';
 import { CLIENT_TYPE } from '@/consts/webBridge';
 import type { ApiErrorResponseT } from '@/types/api';
+import { captureError } from '@/utils/captureError';
 import { getCookie } from '@/utils/cookie';
 import { getLoginPath } from '@/utils/loginRedirect';
 import { refreshClientToken } from '@/utils/refreshClientToken';
@@ -39,6 +41,9 @@ clientApi.interceptors.response.use(
         await refreshClientToken();
         return clientApi(originalRequest);
       } catch (refreshError) {
+        /** 세션 만료 — Sentry 유저 컨텍스트 해제 */
+        Sentry.setUser(null);
+
         if (typeof window !== 'undefined') {
           const loginRedirectDisabled =
             window.location.pathname === ROUTES.LOGIN ||
@@ -54,6 +59,25 @@ clientApi.interceptors.response.use(
         }
         return Promise.reject(refreshError);
       }
+    }
+
+    /** 5xx·네트워크 오류만 수집 (4xx는 예상된 흐름이라 제외) */
+    const status = error.response?.status;
+    const shouldReport =
+      error.code !== 'ERR_CANCELED' &&
+      (error.code === 'ERR_NETWORK' || (typeof status === 'number' && status >= 500));
+
+    if (shouldReport) {
+      captureError(error, {
+        tags: { source: 'api-client' },
+        extra: {
+          url: originalRequest?.url,
+          method: originalRequest?.method,
+          status,
+          code: error.code,
+          detail: error.response?.data?.detail,
+        },
+      });
     }
 
     return Promise.reject(error);
