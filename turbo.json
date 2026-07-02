@@ -15,9 +15,9 @@
         "CI",
         "NEXT_RUNTIME",
         "NEXT_PUBLIC_STAGE",
-        "NEXT_PUBLIC_SENTRY_DSN",
-        "SENTRY_AUTH_TOKEN"
+        "NEXT_PUBLIC_SENTRY_DSN"
       ],
+      "passThroughEnv": ["SENTRY_AUTH_TOKEN"],
       "outputs": [".next/**", "!.next/cache/**"]
     },
     "lint": {
