@@ -97,28 +97,7 @@ const handleTokenRefresh = async (request: NextRequest) => {
     setCookieHeaders.forEach(cookie => nextResponse.headers.append('set-cookie', cookie));
 
     return nextResponse;
-  } catch (error) {
-    /**
-     * dedupe 가 잡지 못한 race condition 의 마지막 안전망:
-     * - 다른 process 가 같은 refresh_token 으로 먼저 성공했을 수도 있다
-     * - 잠깐 기다린 뒤 들어온 요청의 새로운 쿠키(브라우저가 미들웨어를 다시 태우며 보낸 것) 가
-     *   이미 다음 라운드의 새 access_token 이면 그걸로 통과시킨다
-     *
-     * 실제 fix 는 백엔드의 rotation grace period; 이건 임시 우회.
-     */
-    const isUnauthorized =
-      error && typeof error === 'object' && 'response' in error
-        ? (error as { response?: { status?: number } }).response?.status === 401
-        : false;
-
-    if (isUnauthorized) {
-      await new Promise(resolve => setTimeout(resolve, 200));
-      const freshAccess = request.cookies.get('access_token');
-      if (freshAccess && isTokenValid(freshAccess.value)) {
-        return NextResponse.next();
-      }
-    }
-
+  } catch {
     return NextResponse.redirect(new URL(getLoginPath(`${pathname}${search}`), request.url));
   }
 };
