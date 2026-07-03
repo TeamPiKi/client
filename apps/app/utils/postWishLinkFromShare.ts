@@ -35,7 +35,11 @@ export const postWishLinkFromShare = async (
       /** 토큰 만료 시 토큰 갱신 */
       const refreshResponse = await postTokenRefresh(refreshToken);
 
-      if (!refreshResponse.ok) return { ok: false, message: '로그인이 만료됐어요' };
+      if (!refreshResponse.ok) {
+        /** 죽은 토큰으로 재시도가 반복되지 않도록 정리 */
+        if (refreshResponse.status === 401) await TokenStorage.clearTokens();
+        return { ok: false, message: '로그인이 만료됐어요' };
+      }
 
       /** 토큰 갱신 후 토큰 저장 */
       const refreshBody = (await refreshResponse.json()) as {
