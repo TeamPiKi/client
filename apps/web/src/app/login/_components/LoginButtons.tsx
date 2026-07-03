@@ -11,12 +11,10 @@ import GoogleIcon from '@/assets/icons/social/google.svg';
 import KakaoIcon from '@/assets/icons/social/kakao.svg';
 import Spinner from '@/components/spinner';
 import { QUERY_ACTION } from '@/consts/queryAction';
-import { ROUTES } from '@/consts/route';
 import { useNativeLoginResult } from '@/hooks/useNativeLoginResult';
-import { getRouteType } from '@/utils/getRouteType';
 import {
   getLoginPath,
-  getLoginRedirectPath,
+  getPostLoginRedirectPath,
   isValidLoginRedirectPath,
   setLoginRedirectPath,
 } from '@/utils/loginRedirect';
@@ -115,15 +113,7 @@ function LoginButtons({ redirect, action, canReuseGuestSession }: LoginButtonsPr
       setIsGuestRefreshing(true);
       try {
         await refreshClientToken();
-        /** 회원 전용 경로면 홈으로 보내고 도착 시 안내 토스트 노출 */
-        const redirectPath = getLoginRedirectPath();
-        const isMemberOnly =
-          getRouteType(redirectPath.split('?')[0] ?? redirectPath) === 'MEMBER_ONLY';
-        router.replace(
-          isMemberOnly
-            ? `${ROUTES.HOME}?${QUERY_ACTION.KEY}=${QUERY_ACTION.VALUE.MEMBER_ONLY}`
-            : redirectPath
-        );
+        router.replace(getPostLoginRedirectPath());
         return;
       } catch {
         /** 갱신 실패 시 새 게스트 발급 */
