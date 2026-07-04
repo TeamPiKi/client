@@ -208,17 +208,17 @@ jobs:
           [PR] $TITLE_LINK
 
 
-          🔥 연관 이슈
+          🔥 **연관 이슈**
           $ISSUE_TEXT
 
 
-          📝 작업 요약
+          📝 **작업 요약**
           $SUMMARY
 
 
           **Author**: ${{ steps.pr.outputs.author }}
-          **branch**: $HEAD_REF -> $BASE_REF
-          **reviewer**: $REVIEWER_TEXT
+          **Branch**: $HEAD_REF -> $BASE_REF
+          **Reviewer**: $REVIEWER_TEXT
           EOF
           )
           # Discord content 2000자 제한 — 넘치면 POST 가 400 → 실패. 여유 두고 1900자로 자른다 (러너 UTF-8 로케일 char 기준).
