@@ -5,6 +5,7 @@ import { Header, HeaderIcon } from '@/components/header';
 import AddWishHomeDialog from './_components/AddWishHomeDialog';
 import CreateTournamentDialog from './_components/CreateTournamentDialog';
 import InviteTournamentButton from './_components/InviteTournamentButton';
+import MemberOnlyToast from './_components/MemberOnlyToast';
 import TournamentList from './_components/tournament-list';
 
 function HomePage() {
@@ -48,6 +49,8 @@ function HomePage() {
       <div className="fixed bottom-[40px] left-1/2 z-20 -translate-x-1/2">
         <BottomTabBar />
       </div>
+
+      <MemberOnlyToast />
     </div>
   );
 }

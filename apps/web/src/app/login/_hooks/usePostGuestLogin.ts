@@ -3,7 +3,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 
 import { setCookie } from '@/utils/cookie';
-import { getLoginRedirectPath } from '@/utils/loginRedirect';
+import { getPostLoginRedirectPath } from '@/utils/loginRedirect';
 import { WebBridge, isWebview } from '@/utils/webBridge';
 
 import { postGuestLogin } from '../_apis/postGuestLogin';
@@ -26,7 +26,7 @@ export const usePostGuestLogin = () => {
         });
       }
 
-      router.replace(getLoginRedirectPath());
+      router.replace(getPostLoginRedirectPath());
     },
   });
 
