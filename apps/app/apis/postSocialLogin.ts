@@ -26,17 +26,25 @@ export const postSocialLogin = async (
     throw error;
   }
 
-  const data = await response.json();
+  let data: { data: SocialLoginSuccessPayloadT; detail?: string } | null = null;
+  try {
+    data = await response.json();
+  } catch {
+    /** 바디가 JSON이 아님 (프록시 HTML 에러 페이지·빈 바디 등) — data는 null 유지 */
+  }
+
   if (!response.ok) {
     /** 5xx 서버 오류만 수집 (4xx는 예상된 흐름이라 제외) */
     if (response.status >= 500) {
-      captureError(new Error(`postSocialLogin ${response.status}: ${data.detail ?? 'unknown'}`), {
+      captureError(new Error(`postSocialLogin ${response.status}: ${data?.detail ?? 'unknown'}`), {
         tags: { source: 'api', api: 'postSocialLogin', provider },
         extra: { status: response.status },
       });
     }
-    throw new Error(data.detail ?? '로그인에 실패했습니다.');
+    throw new Error(data?.detail ?? '로그인에 실패했습니다.');
   }
+
+  if (!data) throw new Error('서버 응답을 해석할 수 없습니다.');
 
   return data.data;
 };
