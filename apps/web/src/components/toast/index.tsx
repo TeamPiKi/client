@@ -4,14 +4,15 @@ import { Toaster as Sonner, type ToasterProps } from 'sonner';
 
 import { AlertIconFill, CheckCircledIconFill, WarningIconFill } from '@/assets/icons/fill';
 
-/**
- * 토스트 하단 offset.
- * sonner의 `offset` prop은 데스크탑/모바일 둘 다 동일하게 적용되어,
- * `mobileOffset`과 별개로 컨테이너 기본 위치를 제어한다.
- */
-const TOAST_OFFSET = '90px';
+import { TOAST_OFFSET } from './toast.const';
+import { useToastOffsetStore } from './useToastOffset';
 
 const Toaster = ({ ...props }: ToasterProps) => {
+  // 하단 고정 UI(탭바 등)가 등록한 override 중 가장 최근 값 사용
+  const offset = useToastOffsetStore(
+    state => state.overrides.at(-1)?.offset ?? TOAST_OFFSET.DEFAULT
+  );
+
   return (
     <Sonner
       visibleToasts={1}
@@ -38,8 +39,8 @@ const Toaster = ({ ...props }: ToasterProps) => {
       }
       position="bottom-center"
       // 데스크탑/모바일 동일하게 적용
-      offset={{ bottom: TOAST_OFFSET }}
-      mobileOffset={{ bottom: TOAST_OFFSET }}
+      offset={{ bottom: offset }}
+      mobileOffset={{ bottom: offset }}
       toastOptions={{
         classNames: {
           toast: '!border-none',
