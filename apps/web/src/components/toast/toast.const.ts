@@ -5,7 +5,7 @@
  */
 export const TOAST_OFFSET = {
   /** 하단 in-flow 버튼 영역(~88px) 기준 기본값 */
-  DEFAULT: '90px',
+  DEFAULT: '95px',
   /** Bottom Tab Bar(bottom 40px + pill ~68px) + 여백 12px */
-  ABOVE_TAB_BAR: '120px',
+  ABOVE_TAB_BAR: '115px',
 } as const;
