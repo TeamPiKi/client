@@ -5,13 +5,51 @@ import { postGuestLoginServer } from './app/login/_apis/postGuestLogin';
 import { isTokenValid } from './utils/auth';
 import { getRouteType } from './utils/getRouteType';
 import { getLoginPath } from './utils/loginRedirect';
+import { isWebview } from './utils/webBridge';
 
-const handleGuestLogin = async () => {
+const handleGuestLogin = async (request: NextRequest) => {
   const response = await postGuestLoginServer();
-  const nextResponse = NextResponse.next();
+  const isApp = isWebview(request.headers.get('user-agent'));
+  const setCookieHeaders = response.headers['set-cookie'] ?? [];
 
-  const setCookieHeader = response.headers['set-cookie'];
-  setCookieHeader?.forEach(cookie => nextResponse.headers.append('set-cookie', cookie));
+  /** app: 토큰이 응답 body(camelCase) 로, web: Set-Cookie 로 온다 */
+  const { accessToken: bodyAccess, refreshToken: bodyRefresh } = response.data?.data ?? {};
+
+  /** 발급된 토큰을 현재 요청 쿠키에 주입 */
+  const cookieMap = new Map(
+    request.cookies.getAll().map(cookie => [cookie.name, cookie.value] as const)
+  );
+  if (isApp) {
+    if (bodyAccess) cookieMap.set('access_token', bodyAccess);
+    if (bodyRefresh) cookieMap.set('refresh_token', bodyRefresh);
+  } else {
+    setCookieHeaders.forEach(setCookie => {
+      const nameValue = setCookie.split(';')[0] ?? '';
+      const separatorIndex = nameValue.indexOf('=');
+      if (separatorIndex === -1) return;
+
+      const name = nameValue.slice(0, separatorIndex).trim();
+      const value = nameValue.slice(separatorIndex + 1).trim();
+      cookieMap.set(name, value);
+    });
+  }
+
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set(
+    'cookie',
+    [...cookieMap.entries()].map(([name, value]) => `${name}=${value}`).join('; ')
+  );
+
+  const nextResponse = NextResponse.next({ request: { headers: requestHeaders } });
+
+  /** 쿠키 저장 — app: body 토큰을 직접 / web: 백엔드 Set-Cookie 그대로 */
+  if (isApp) {
+    if (bodyAccess && bodyRefresh) {
+      const cookieOptions = `Path=/; SameSite=Lax${process.env.NODE_ENV === 'production' ? '; Secure' : ''}`;
+      nextResponse.headers.append('set-cookie', `access_token=${bodyAccess}; ${cookieOptions}`);
+      nextResponse.headers.append('set-cookie', `refresh_token=${bodyRefresh}; ${cookieOptions}`);
+    }
+  } else setCookieHeaders.forEach(cookie => nextResponse.headers.append('set-cookie', cookie));
 
   return nextResponse;
 };
@@ -50,6 +88,7 @@ const refreshTokenDedupe = (refreshToken: string, cookieHeader: string) => {
 
 const handleTokenRefresh = async (request: NextRequest) => {
   const { pathname, search } = request.nextUrl;
+  const isApp = isWebview(request.headers.get('user-agent'));
 
   const cookieMap = new Map(
     request.cookies.getAll().map(cookie => [cookie.name, cookie.value] as const)
@@ -71,15 +110,23 @@ const handleTokenRefresh = async (request: NextRequest) => {
      * 쿠키 옵션 제거 후 key, value만 추출하여 페이지로 전달
      */
     const setCookieHeaders = response.headers['set-cookie'] ?? [];
-    setCookieHeaders.forEach(setCookie => {
-      const nameValue = setCookie.split(';')[0] ?? '';
-      const separatorIndex = nameValue.indexOf('=');
-      if (separatorIndex === -1) return;
+    /** app: 토큰이 응답 body(snake_case) 로, web: Set-Cookie 로 온다 */
+    const { access_token: bodyAccess, refresh_token: bodyRefresh } = response.data?.data ?? {};
 
-      const name = nameValue.slice(0, separatorIndex).trim();
-      const value = nameValue.slice(separatorIndex + 1).trim();
-      cookieMap.set(name, value);
-    });
+    if (isApp) {
+      if (bodyAccess) cookieMap.set('access_token', bodyAccess);
+      if (bodyRefresh) cookieMap.set('refresh_token', bodyRefresh);
+    } else {
+      setCookieHeaders.forEach(setCookie => {
+        const nameValue = setCookie.split(';')[0] ?? '';
+        const separatorIndex = nameValue.indexOf('=');
+        if (separatorIndex === -1) return;
+
+        const name = nameValue.slice(0, separatorIndex).trim();
+        const value = nameValue.slice(separatorIndex + 1).trim();
+        cookieMap.set(name, value);
+      });
+    }
 
     const requestHeaders = new Headers(request.headers);
     requestHeaders.set(
@@ -90,11 +137,16 @@ const handleTokenRefresh = async (request: NextRequest) => {
     if (getRouteType(pathname) === 'MEMBER_ONLY')
       requestHeaders.set('x-redirect-path', `${pathname}${search}`);
 
-    /** 갱신된 쿠키 페이지 요청에 전달 */
     const nextResponse = NextResponse.next({ request: { headers: requestHeaders } });
 
-    /** 서버에서 받아온 쿠키 브라우저에 저장 */
-    setCookieHeaders.forEach(cookie => nextResponse.headers.append('set-cookie', cookie));
+    /** 쿠키 저장 — app: body 토큰을 직접 / web: 백엔드 Set-Cookie 그대로 */
+    if (isApp) {
+      if (bodyAccess && bodyRefresh) {
+        const cookieOptions = `Path=/; SameSite=Lax${process.env.NODE_ENV === 'production' ? '; Secure' : ''}`;
+        nextResponse.headers.append('set-cookie', `access_token=${bodyAccess}; ${cookieOptions}`);
+        nextResponse.headers.append('set-cookie', `refresh_token=${bodyRefresh}; ${cookieOptions}`);
+      }
+    } else setCookieHeaders.forEach(cookie => nextResponse.headers.append('set-cookie', cookie));
 
     return nextResponse;
   } catch {
@@ -124,7 +176,7 @@ export const proxy = async (request: NextRequest) => {
     if (refreshToken) return await handleTokenRefresh(request);
 
     /** access(X), refresh(X): 자동 게스트 로그인 */
-    return await handleGuestLogin();
+    return await handleGuestLogin(request);
   }
 
   if (routeType === 'MEMBER_ONLY' || routeType === 'AUTHORIZED') {
