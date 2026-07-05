@@ -1,3 +1,5 @@
+import { postTokenRefresh } from '@/apis/postTokenRefresh';
+
 import { TokenStorage } from './tokenStorage';
 
 type PostWishLinkFromShareResultT = { ok: true } | { ok: false; message: string };
@@ -11,16 +13,6 @@ const postWishLink = async (productUrl: string, accessToken: string) =>
       Authorization: `Bearer ${accessToken}`,
     },
     body: JSON.stringify({ url: productUrl }),
-  });
-
-const postTokenRefresh = async (refreshToken: string) =>
-  fetch(`${process.env.EXPO_PUBLIC_API_URL}/api/v1/auth/token/refresh`, {
-    method: 'POST',
-    headers: {
-      'X-Client-Type': 'app',
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ refreshToken }),
   });
 
 /** Share Extension에서 링크로 위시 등록 */
@@ -43,16 +35,20 @@ export const postWishLinkFromShare = async (
       /** 토큰 만료 시 토큰 갱신 */
       const refreshResponse = await postTokenRefresh(refreshToken);
 
-      if (!refreshResponse.ok) return { ok: false, message: '로그인이 만료됐어요' };
+      if (!refreshResponse.ok) {
+        /** 죽은 토큰으로 재시도가 반복되지 않도록 정리 */
+        if (refreshResponse.status === 401) await TokenStorage.clearTokens();
+        return { ok: false, message: '로그인이 만료됐어요' };
+      }
 
       /** 토큰 갱신 후 토큰 저장 */
       const refreshBody = (await refreshResponse.json()) as {
-        data: { accessToken: string; refreshToken: string };
+        data: { access_token: string; refresh_token: string };
       };
-      await TokenStorage.setTokens(refreshBody.data.accessToken, refreshBody.data.refreshToken);
+      await TokenStorage.setTokens(refreshBody.data.access_token, refreshBody.data.refresh_token);
 
       /** 위시 등록 재시도 */
-      postWishResponse = await postWishLink(productUrl, refreshBody.data.accessToken);
+      postWishResponse = await postWishLink(productUrl, refreshBody.data.access_token);
     }
 
     if (!postWishResponse.ok) return { ok: false, message: '요청 처리 중 오류가 발생했습니다.' };

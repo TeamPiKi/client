@@ -1,5 +1,7 @@
+import { QUERY_ACTION } from '@/consts/queryAction';
 import type { QueryActionValueT } from '@/consts/queryAction';
 import { ROUTES } from '@/consts/route';
+import { getRouteType } from '@/utils/getRouteType';
 
 const LOGIN_REDIRECT_STORAGE_KEY = 'login_redirect';
 
@@ -32,6 +34,17 @@ export const clearLoginRedirectPath = () => {
   if (typeof window === 'undefined') return;
 
   sessionStorage.removeItem(LOGIN_REDIRECT_STORAGE_KEY);
+};
+
+/** 로그인 성공 후 이동할 경로 반환 — 회원 전용 경로면 홈으로 보내고 안내 토스트 파라미터를 붙인다 */
+export const getPostLoginRedirectPath = (): string => {
+  const redirectPath = getLoginRedirectPath();
+  const isMemberOnly =
+    getRouteType(redirectPath.split('?')[0] ?? redirectPath) === 'MEMBER_ONLY';
+
+  if (isMemberOnly) return `${ROUTES.HOME}?${QUERY_ACTION.KEY}=${QUERY_ACTION.VALUE.MEMBER_ONLY}`;
+
+  return redirectPath;
 };
 
 export const getLoginPath = (redirectPath: string | null, action?: QueryActionValueT): string => {
