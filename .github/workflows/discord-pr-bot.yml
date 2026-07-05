@@ -475,14 +475,35 @@ jobs:
       - name: Pin parent on open (열린 PR 채널 상단 고정)
         # 열린(리뷰 대기) PR 부모를 채널 상단에 고정해 눈에 띄게 한다. 고정은 채널당 50개 한도라, 초과 시
         # PUT 이 실패해도(경고만) 알림 본체엔 영향을 주지 않는다. 닫힐 때 아래 스텝이 해제한다.
-        if: (github.event.action == 'opened' || github.event.action == 'reopened') && steps.post_parent.outputs.message_id != ''
+        # reopened 는 메타가 이미 있어 post_parent 가 스킵되므로, 부모 id 를 find_meta 로 폴백해 재고정한다.
+        if: (github.event.action == 'opened' || github.event.action == 'reopened') && (steps.post_parent.outputs.message_id != '' || steps.find_meta.outputs.message_id != '')
         shell: bash
         run: |
           MSG_ID="${{ steps.post_parent.outputs.message_id }}"
+          [ -z "$MSG_ID" ] && MSG_ID="${{ steps.find_meta.outputs.message_id }}"
+          CH_ID="${{ steps.find_meta.outputs.channel_id }}"
+          [ -z "$CH_ID" ] && CH_ID="$DISCORD_CHANNEL_ID"
           CODE=$(curl -s -o /dev/null -w '%{http_code}' -X PUT \
-            "$DISCORD_API/channels/$DISCORD_CHANNEL_ID/pins/$MSG_ID" \
+            "$DISCORD_API/channels/$CH_ID/pins/$MSG_ID" \
             -H "Authorization: Bot $DISCORD_BOT_TOKEN")
           [ "$CODE" = "204" ] && echo "고정됨" || echo "::warning::고정 실패 (HTTP $CODE) - 채널 고정 50개 한도일 수 있음"
+
+      - name: Restore thread on reopen (재오픈 시 스레드 복구)
+        # 종료 시 아래 스텝이 스레드를 archived·locked 로 잠그고 이름에 🗑️ 프리픽스를 단다. 재오픈되면 그대로일 경우
+        # 이후 synchronize 답글이 잠긴 스레드라 실패하므로, unarchive·unlock 하고 이름을 원래 형식(프리픽스 없음)으로 되돌린다.
+        if: github.event.action == 'reopened' && steps.find_meta.outputs.thread_id != ''
+        env:
+          PR_TITLE: ${{ steps.pr.outputs.pr_title }}
+        shell: bash
+        run: |
+          THREAD_ID="${{ steps.find_meta.outputs.thread_id }}"
+          NEW_NAME=$(printf 'PR #%s %s' "${{ steps.pr.outputs.pr_number }}" "$PR_TITLE" | cut -c1-90)
+          CODE=$(curl -s -o /dev/null -w '%{http_code}' -X PATCH \
+            "$DISCORD_API/channels/$THREAD_ID" \
+            -H "Authorization: Bot $DISCORD_BOT_TOKEN" \
+            -H "Content-Type: application/json; charset=utf-8" \
+            --data "$(jq -n --arg name "$NEW_NAME" '{name:$name, archived:false, locked:false}')")
+          [ "$CODE" = "200" ] && echo "스레드 복구됨: $NEW_NAME" || echo "::warning::스레드 복구 실패 (HTTP $CODE)"
 
       - name: Unpin and archive thread on close (종료 시 정리)
         # 머지/종료 시: 부모 고정 해제 + 스레드 이름에 결과 프리픽스(✅/🗑️) + archive·lock 으로 정리한다.
