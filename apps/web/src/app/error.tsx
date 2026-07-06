@@ -1,6 +1,8 @@
 'use client';
 
+import * as Sentry from '@sentry/nextjs';
 import Link from 'next/link';
+import { useEffect } from 'react';
 
 import { WarningIconFill } from '@/assets/icons';
 import { ROUTES } from '@/consts/route';
@@ -10,7 +12,11 @@ type Props = {
   reset: () => void;
 };
 
-function Error({ reset }: Props) {
+function Error({ error, reset }: Props) {
+  useEffect(() => {
+    Sentry.captureException(error);
+  }, [error]);
+
   return (
     <div className="flex h-full flex-col items-center gap-6 bg-bg-layer-basement pt-40">
       <div className="flex flex-col items-center gap-4">
