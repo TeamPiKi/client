@@ -44,7 +44,14 @@ export const postSocialLogin = async (
     throw new Error(data?.detail ?? '로그인에 실패했습니다.');
   }
 
-  if (!data) throw new Error('서버 응답을 해석할 수 없습니다.');
+  if (!data) {
+    /** 2xx인데 본문이 비었거나 깨짐 — 예상 못 한 이상 응답이라 수집 */
+    captureError(new Error(`postSocialLogin ${response.status}: empty/invalid body`), {
+      tags: { source: 'api', api: 'postSocialLogin', provider },
+      extra: { status: response.status },
+    });
+    throw new Error('서버 응답을 해석할 수 없습니다.');
+  }
 
   return data.data;
 };
