@@ -11,8 +11,13 @@
         "VERCEL_GIT_COMMIT_REF",
         "VERCEL_GIT_REPO_OWNER",
         "VERCEL_GIT_REPO_SLUG",
-        "GITHUB_TOKEN"
+        "GITHUB_TOKEN",
+        "CI",
+        "NEXT_RUNTIME",
+        "NEXT_PUBLIC_STAGE",
+        "NEXT_PUBLIC_SENTRY_DSN"
       ],
+      "passThroughEnv": ["SENTRY_AUTH_TOKEN"],
       "outputs": [".next/**", "!.next/cache/**"]
     },
     "lint": {
