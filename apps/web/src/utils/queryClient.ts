@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/nextjs';
 import { MutationCache, QueryCache, QueryClient, environmentManager } from '@tanstack/react-query';
 import { isAxiosError } from 'axios';
 import { cache } from 'react';
@@ -20,7 +21,7 @@ const makeQueryClient = () => {
         /** 5xx·네트워크는 전역이 단독 처리 (개별 onError는 5xx를 건드리지 않음) */
         if (!status || status >= 500) {
           toast.error(getApiErrorMessage(error));
-          // Sentry.captureException(error); // TODO: 센트리 PR 머지 후 추가
+          Sentry.captureException(error);
           return;
         }
 
@@ -32,7 +33,7 @@ const makeQueryClient = () => {
     /** query — 데이터 fetch 실패: 토스트 X, 로깅만 (표시는 boundary/isError가 담당) */
     queryCache: new QueryCache({
       onError: _error => {
-        // Sentry.captureException(_error); // TODO: 센트리 PR 머지 후 추가
+        Sentry.captureException(_error);
       },
     }),
     defaultOptions: {
