@@ -32,7 +32,9 @@ function ProfileSection() {
         <div className="min-w-0 flex-1">
           <p className="truncate body-1-bold text-text-neutral-primary">{userData.nickname}</p>
           {userData.identityType === 'MEMBER' && (
-            <p className="truncate body-2-medium text-text-neutral-tertiary">{userData.email}</p>
+            <p className="truncate body-2-medium text-text-neutral-tertiary" data-sentry-mask>
+              {userData.email}
+            </p>
           )}
         </div>
 

@@ -1,3 +1,5 @@
+import { withSentryConfig } from '@sentry/nextjs';
+
 import { getWebVersion } from './config/getWebVersion.mjs';
 
 /** @type {import('next').NextConfig} */
@@ -59,4 +61,17 @@ const nextConfig = async () => {
   };
 };
 
-export default nextConfig;
+export default withSentryConfig(nextConfig, {
+  org: 'piki-92',
+  project: 'piki-web',
+  /** SENTRY_AUTH_TOKEN 이 있을 때만 소스맵 업로드 (CI/Vercel env 주입) */
+  silent: !process.env.CI,
+  /** 소스맵 업로드 후 클라이언트 번들에서 제거 (원본 코드 노출 방지) */
+  sourcemaps: {
+    deleteSourcemapsAfterUpload: true,
+  },
+  /** Sentry SDK 디버그 로그 제거로 번들 크기 절감 */
+  bundleSizeOptimizations: {
+    excludeDebugStatements: true,
+  },
+});
