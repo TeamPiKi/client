@@ -6,8 +6,6 @@ import { createPortal } from 'react-dom';
 
 import HeartIconFill from '@/assets/icons/fill/heart.svg';
 import HomeIconFill from '@/assets/icons/fill/home.svg';
-import { TOAST_OFFSET } from '@/components/toast/toast.const';
-import { useToastOffset } from '@/components/toast/useToastOffset';
 import { ROUTES } from '@/consts/route';
 
 const TABS = [
@@ -18,8 +16,6 @@ const TABS = [
 function BottomTabBar() {
   const router = useRouter();
   const pathname = usePathname();
-  // 탭바가 렌더되는 페이지는 토스트가 탭바 위에 뜨도록 offset 등록
-  useToastOffset(TOAST_OFFSET.ABOVE_TAB_BAR);
   const isClient = useSyncExternalStore(
     () => () => {},
     () => true,
@@ -39,7 +35,11 @@ function BottomTabBar() {
           />,
           document.body
         )}
-      <div className="inline-flex items-center rounded-[100px] bg-white p-1 shadow-[0_0_8px_0_rgba(0,0,0,0.04)]">
+      <div
+        // 탭바가 렌더된 페이지에서 토스트가 탭바 위에 뜨도록 하는 마커 (globals.css 참고)
+        data-bottom-tab-bar
+        className="inline-flex items-center rounded-[100px] bg-white p-1 shadow-[0_0_8px_0_rgba(0,0,0,0.04)]"
+      >
         {TABS.map(({ label, icon: Icon, href }) => {
           const isActive =
             label === '보관'
