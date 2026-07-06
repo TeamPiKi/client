@@ -5,11 +5,12 @@ import { Toaster as Sonner, type ToasterProps } from 'sonner';
 import { AlertIconFill, CheckCircledIconFill, WarningIconFill } from '@/assets/icons/fill';
 
 /**
- * 토스트 하단 offset.
+ * 토스트 하단 offset 기본값 (하단 in-flow 버튼 영역 ~88px 기준).
  * sonner의 `offset` prop은 데스크탑/모바일 둘 다 동일하게 적용되어,
  * `mobileOffset`과 별개로 컨테이너 기본 위치를 제어한다.
+ * Bottom Tab Bar 가 있는 페이지는 globals.css 의 `:has([data-bottom-tab-bar])` 규칙이 덮어쓴다.
  */
-const TOAST_OFFSET = '146px';
+const TOAST_OFFSET = '95px';
 
 const Toaster = ({ ...props }: ToasterProps) => {
   return (
