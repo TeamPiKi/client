@@ -179,3 +179,18 @@ body {
 html[data-app] {
   --spacing-padding-top: max(env(safe-area-inset-top) + 14px, 47px);
 }
+
+/**
+ * Bottom Tab Bar 위로 토스트 띄우기.
+ *
+ * 탭바 pill(`data-bottom-tab-bar` 마커, bottom 40px + 높이 ~68px)이 렌더된 페이지에서만
+ * sonner 토스트의 하단 offset 을 올린다. 기본값은 Toaster(components/toast)의 `offset` prop.
+ *
+ * sonner 는 offset prop 을 토스터 엘리먼트의 인라인 CSS 변수로 심고,
+ * 뷰포트 600px 초과에서는 `--offset-bottom`, 이하에서는 `--mobile-offset-bottom` 을
+ * 사용하므로 두 변수 모두 `!important` 로 덮어야 한다.
+ */
+body:has([data-bottom-tab-bar]) [data-sonner-toaster][data-y-position='bottom'] {
+  --offset-bottom: 115px !important;
+  --mobile-offset-bottom: 115px !important;
+}
