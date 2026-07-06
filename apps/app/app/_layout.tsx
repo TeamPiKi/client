@@ -1,5 +1,6 @@
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { initializeKakaoSDK } from '@react-native-kakao/core';
+import * as Sentry from '@sentry/react-native';
 import { Stack } from 'expo-router';
 import { ShareIntentProvider } from 'expo-share-intent';
 import * as SplashScreen from 'expo-splash-screen';
@@ -8,6 +9,8 @@ import 'react-native-reanimated';
 
 import PushNotificationProvider from '@/components/PushNotificationProvider';
 import { SplashScreenControllerProvider } from '@/hooks/useSplashScreenController';
+
+/** Sentry 초기화는 진입점 index.js(initSentry)에서 수행 — 여기선 wrap 만 적용 */
 
 initializeKakaoSDK(process.env.EXPO_PUBLIC_KAKAO_NATIVE_APP_KEY ?? '');
 
@@ -34,4 +37,4 @@ function RootLayout() {
   );
 }
 
-export default RootLayout;
+export default Sentry.wrap(RootLayout);

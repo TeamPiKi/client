@@ -1,5 +1,5 @@
 // eslint-disable-next-line @typescript-eslint/no-require-imports
-const { getDefaultConfig } = require('expo/metro-config');
+const { getSentryExpoConfig } = require('@sentry/react-native/metro');
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const { withShareExtension } = require('expo-share-extension/metro');
 // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -8,7 +8,8 @@ const path = require('path');
 const projectRoot = __dirname;
 const workspaceRoot = path.resolve(projectRoot, '../..');
 
-const config = getDefaultConfig(projectRoot);
+/** Sentry 소스맵(Debug ID) 생성을 위해 getDefaultConfig 대신 사용 */
+const config = getSentryExpoConfig(projectRoot);
 
 config.watchFolders = [workspaceRoot];
 config.resolver.nodeModulesPaths = [

@@ -32,15 +32,16 @@ const Toaster = ({ ...props }: ToasterProps) => {
           '--normal-bg': 'var(--color-gray-700)',
           '--normal-text': 'var(--color-text-neutral-inverse)',
           '--border-radius': 'var(--radius-xl)',
-          // sonner 컨테이너 width 변수 — 토스트 카드 폭을 결정 (기본 356px)
-          // 앱 max-w-120(480px)에서 좌우 20px 여백 제외한 값
-          '--width': '440px',
+          '--width': 'min(440px, calc(100vw - 40px))',
+          width: 'min(440px, calc(100vw - 40px))',
+          left: '50%',
+          right: 'auto',
+          transform: 'translateX(-50%)',
         } as React.CSSProperties
       }
       position="bottom-center"
-      // 데스크탑/모바일 동일하게 적용
       offset={{ bottom: TOAST_OFFSET }}
-      mobileOffset={{ bottom: TOAST_OFFSET }}
+      mobileOffset={{ left: 0, right: 0, bottom: TOAST_OFFSET }}
       toastOptions={{
         classNames: {
           toast: '!border-none',

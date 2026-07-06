@@ -1,6 +1,8 @@
 'use client';
 
+import * as Sentry from '@sentry/nextjs';
 import Link from 'next/link';
+import { useEffect } from 'react';
 
 import { ROUTES } from '@/consts/route';
 import '@/styles/globals.css';
@@ -12,6 +14,10 @@ type Props = {
 
 // TODO: 임시 글로벌 에러 페이지 - 디자인 변경 필요
 export default function GlobalError({ error, reset }: Props) {
+  useEffect(() => {
+    Sentry.captureException(error);
+  }, [error]);
+
   return (
     <html lang="ko" className="h-full bg-gray-100">
       <body className="mx-auto my-0 h-full max-w-120 bg-white antialiased">
