@@ -135,7 +135,9 @@ jobs:
               state=$(echo "$res" | jq -r '.state // "unknown"')
               if [ "$state" = "open" ]; then emoji="🟢"; elif [ "$state" = "closed" ]; then emoji="⚫"; else emoji="❓"; fi
               link="https://github.com/$REPO/issues/$num"
-              line="$emoji [#$num]($link)"
+              # URL 을 <> 로 감싸 Discord 임베드 카드를 억제한다(클릭은 유지). 이슈 카드가 커서 부모 카드 본문을
+              # 밀어내므로, 연관 이슈는 링크만 남기고 카드는 PR(부모 타이틀 링크)만 뜨게 한다.
+              line="$emoji [#$num](<$link>)"
               if [ -z "$issue_text" ]; then issue_text="$line"; else issue_text=$(printf "%s\n%s" "$issue_text" "$line"); fi
             done <<< "$issues"
             [ -z "$issue_text" ] && issue_text="없음"
