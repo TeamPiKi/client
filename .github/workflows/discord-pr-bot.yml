@@ -1,6 +1,8 @@
 name: Discord PR Bot
 
 on:
+  # 기존 열린 PR 스레드에 팀원을 일괄 추가(백필)하는 수동 실행용. Actions → Run workflow.
+  workflow_dispatch:
   pull_request:
     types:
       - opened
@@ -21,6 +23,7 @@ concurrency:
 
 jobs:
   notify-discord:
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     # metadata 코멘트는 PR(=issue #N)에 다는데, 대상이 PR 이라 생성엔 pull-requests write 가 필요하다
     # (issues:write 만으론 403 Resource not accessible). 연관 이슈(close #N) 상태 조회는 issues:read.
@@ -132,7 +135,9 @@ jobs:
               state=$(echo "$res" | jq -r '.state // "unknown"')
               if [ "$state" = "open" ]; then emoji="🟢"; elif [ "$state" = "closed" ]; then emoji="⚫"; else emoji="❓"; fi
               link="https://github.com/$REPO/issues/$num"
-              line="$emoji [#$num]($link)"
+              # URL 을 <> 로 감싸 Discord 임베드 카드를 억제한다(클릭은 유지). 이슈 카드가 커서 부모 카드 본문을
+              # 밀어내므로, 연관 이슈는 링크만 남기고 카드는 PR(부모 타이틀 링크)만 뜨게 한다.
+              line="$emoji [#$num](<$link>)"
               if [ -z "$issue_text" ]; then issue_text="$line"; else issue_text=$(printf "%s\n%s" "$issue_text" "$line"); fi
             done <<< "$issues"
             [ -z "$issue_text" ] && issue_text="없음"
@@ -270,6 +275,14 @@ jobs:
           if [ -z "$THREAD_ID" ]; then
             echo "Discord thread create failed"; echo "$TRESP"; exit 1
           fi
+
+          # 팀 전원을 스레드 멤버로 추가 — 공개 스레드는 멤버만 사이드바에 뜨므로, DISCORD_USER_MAP 의 모든
+          # discord id 를 넣어 팀 전원 사이드바에 노출한다(멘션과 달리 조용히 목록에만 올림). 실패해도 무해.
+          echo "$DISCORD_USER_MAP" | jq -r '.[]?' | while read -r uid; do
+            [ -z "$uid" ] && continue
+            curl -s -o /dev/null -X PUT "$DISCORD_API/channels/$THREAD_ID/thread-members/$uid" \
+              -H "Authorization: Bot $DISCORD_BOT_TOKEN"
+          done
 
           echo "message_id=$MESSAGE_ID" >> "$GITHUB_OUTPUT"
           echo "thread_id=$THREAD_ID" >> "$GITHUB_OUTPUT"
@@ -535,3 +548,37 @@ jobs:
               --data "$(jq -n --arg name "$NEW_NAME" '{name:$name, archived:true, locked:true}')")
             [ "$CODE" = "200" ] && echo "스레드 정리됨: $NEW_NAME" || echo "::warning::스레드 정리 실패 (HTTP $CODE)"
           fi
+
+  backfill-thread-members:
+    # 기존 열린 PR 들의 스레드에 팀원(DISCORD_USER_MAP)을 일괄 추가하는 수동 백필. Actions 에서 Run workflow 로 실행.
+    # 공개 스레드는 멤버만 사이드바에 뜨므로, 이 봇 변경 이전에 만들어진 스레드를 팀 전원 사이드바에 노출시킨다.
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: read
+      issues: read
+    env:
+      DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
+      DISCORD_USER_MAP: ${{ secrets.DISCORD_USER_MAP }}
+      DISCORD_API: https://discord.com/api/v10
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - name: Add team members to all open PR threads
+        shell: bash
+        run: |
+          [ -n "$DISCORD_USER_MAP" ] || DISCORD_USER_MAP='{}'
+          PRS=$(gh api "repos/${{ github.repository }}/pulls?state=open&per_page=100" --jq '.[].number')
+          for pr in $PRS; do
+            # 각 PR 의 메타 주석에서 thread_id 추출 (find_meta 와 같은 JSON 마커 매칭).
+            COMMENTS=$(curl -s -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" \
+              "https://api.github.com/repos/${{ github.repository }}/issues/$pr/comments")
+            META=$(echo "$COMMENTS" | jq -r '.[]? | objects | select((.body // "") | test("discord-pr-bot:\\s*\\{")) | .body' | tail -n 1)
+            THREAD_ID=$(echo "$META" | grep -oP 'discord-pr-bot:\s*\K\{[^}]*\}' | jq -r '.thread_id // empty' 2>/dev/null || true)
+            if [ -z "$THREAD_ID" ]; then echo "PR #$pr: 스레드 메타 없음, 건너뜀"; continue; fi
+            echo "$DISCORD_USER_MAP" | jq -r '.[]?' | while read -r uid; do
+              [ -z "$uid" ] && continue
+              curl -s -o /dev/null -X PUT "$DISCORD_API/channels/$THREAD_ID/thread-members/$uid" \
+                -H "Authorization: Bot $DISCORD_BOT_TOKEN"
+            done
+            echo "PR #$pr (thread $THREAD_ID): 팀원 추가 완료"
+          done
