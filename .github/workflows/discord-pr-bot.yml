@@ -144,8 +144,7 @@ jobs:
             echo "$issue_text"
           }
 
-          # PR 본문의 ## 작업 요약(FE 관례) 또는 ## Task(서버 STAR) 섹션 불릿을 "• ..." 요약으로(없으면 "요약 없음").
-          # 팀원 PR 은 작업 요약, STAR 로 쓴 PR 은 Task 를 쓰므로 둘 다 인식한다. 순수(인자만).
+          # PR 본문의 ## 작업 요약 섹션 불릿을 "• ..." 요약으로(없으면 "요약 없음"). 순수(인자만).
           build_summary() {
             local pr_body="$1"
             printf '%s\n' "$pr_body" | awk '
@@ -154,7 +153,7 @@ jobs:
                 if (in_task == 1) exit
                 r = $0
                 sub(/^##[[:space:]]+/, "", r)
-                ok = (match(r, /^작업 요약([^A-Za-z]|$)/) || match(r, /[[:space:]]작업 요약([^A-Za-z]|$)/) || match(r, /^[Tt][Aa][Ss][Kk]([^A-Za-z]|$)/) || match(r, /[[:space:]][Tt][Aa][Ss][Kk]([^A-Za-z]|$)/))
+                ok = (match(r, /^작업 요약([^A-Za-z]|$)/) || match(r, /[[:space:]]작업 요약([^A-Za-z]|$)/))
                 if (ok) { in_task=1; next }
                 next
               }
