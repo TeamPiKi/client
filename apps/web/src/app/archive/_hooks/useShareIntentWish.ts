@@ -10,9 +10,8 @@ import { toast } from 'sonner';
 
 import { usePostWishLink } from '@/hooks/usePostWishLink';
 import { useWebBridgeMessage } from '@/hooks/useWebBridgeMessage';
+import { URL_PATTERN, extractUrlFromText } from '@/utils/extractUrl';
 import { WebBridge, isWebview } from '@/utils/webBridge';
-
-const URL_PATTERN = /^https?:\/\/.+/i;
 
 const getUrlFromShareIntent = (payload: ShareIntentPayloadT): string | null => {
   if (payload.webUrl) {
@@ -20,10 +19,7 @@ const getUrlFromShareIntent = (payload: ShareIntentPayloadT): string | null => {
     if (URL_PATTERN.test(trimmedWebUrl)) return trimmedWebUrl;
   }
 
-  if (payload.text) {
-    const matchedUrl = payload.text.match(/https?:\/\/[^\s]+/i)?.[0];
-    if (matchedUrl && URL_PATTERN.test(matchedUrl)) return matchedUrl;
-  }
+  if (payload.text) return extractUrlFromText(payload.text);
 
   return null;
 };
