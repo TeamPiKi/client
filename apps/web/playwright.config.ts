@@ -1,19 +1,21 @@
 import { defineConfig, devices } from '@playwright/test';
 
+import { MOCK_API_URL } from './e2e/consts';
+
 const BASE_URL = 'http://localhost:3000';
 
 /**
- * SSR(serverApi baseURL / next.config rewrites)이 실서버에 닿지 않도록 죽은 로컬 주소를 강제.
- * SSR prefetch는 즉시 실패하고, 브라우저 재요청은 page.route 목으로 처리된다(결정성 보장).
+ * NEXT_PUBLIC_API_URL 을 로컬 목 스텁 주소로 강제해 실서버 접근을 차단한다(결정성 보장).
+ * - SSR(serverApi/RSC 레이아웃) 발 요청 → globalSetup 이 띄우는 목 스텁 서버가 응답
+ * - 브라우저 발 요청 → mockApiFixture 의 page.route 목이 응답
  *
  * 로컬 주의: 실서버 API로 이미 떠 있는 dev 서버를 reuseExistingServer로 재사용하면
- * SSR prefetch가 실서버에 닿을 수 있다. 완전 결정적 실행은 dev 서버를 내리고
+ * SSR 요청이 실서버에 닿을 수 있다. 완전 결정적 실행은 dev 서버를 내리고
  * `NEXT_PUBLIC_API_URL=http://127.0.0.1:4010 pnpm build && CI=1 pnpm test:e2e` 사용.
  */
-const DEAD_API_URL = 'http://127.0.0.1:4010';
-
 export default defineConfig({
   testDir: './e2e',
+  globalSetup: './e2e/setup/globalSetup.ts',
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
@@ -45,6 +47,6 @@ export default defineConfig({
     url: BASE_URL,
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,
-    env: { NEXT_PUBLIC_API_URL: DEAD_API_URL },
+    env: { NEXT_PUBLIC_API_URL: MOCK_API_URL },
   },
 });

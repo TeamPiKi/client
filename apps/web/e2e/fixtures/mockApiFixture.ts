@@ -29,9 +29,8 @@ export type ApiMockT = {
  * - `**\/api/v1/**` 라우트 하나를 선점하고 pathname(쿼리스트링 무시) + method 로 매칭한다.
  * - 사용 규칙: `api.get(...)` 등록 후 `page.goto(...)` 호출.
  * - 목킹되지 않은 /api/v1 요청은 500 으로 실패시키고 테스트 말미에 단언한다 — 누락 목 즉시 감지.
- * - SSR(serverApi) 요청은 브라우저 발이 아니라 여기서 못 잡는다. playwright.config.ts 가
- *   NEXT_PUBLIC_API_URL 을 죽은 주소로 강제해 SSR prefetch 는 조용히 실패하고,
- *   클라이언트 재요청이 이 목으로 처리된다.
+ * - SSR(serverApi·RSC 레이아웃) 요청은 브라우저 발이 아니라 여기서 못 잡는다.
+ *   globalSetup 이 띄우는 목 스텁 서버(e2e/setup/mockApiServer.ts)가 대신 응답한다.
  */
 export const test = base.extend<{ api: ApiMockT }>({
   /** 2번째 인자는 Playwright fixture 의 use — react-hooks lint 오인을 피해 provide 로 명명 */
@@ -45,6 +44,17 @@ export const test = base.extend<{ api: ApiMockT }>({
       path: ENDPOINTS.AUTH_TOKEN_REFRESH,
       status: 200,
       body: createApiSuccess({ access_token: null, refresh_token: null }),
+    });
+
+    /** 헤더 알림 아이콘(AlarmHeaderIcon)이 전 페이지에서 호출 — 빈 알림 기본 제공 */
+    entries.push({
+      method: 'GET',
+      path: ENDPOINTS.NOTIFICATIONS,
+      status: 200,
+      body: {
+        ...createApiSuccess({ items: [], unreadCount: 0 }),
+        pageResponse: { nextCursor: null, hasNext: false },
+      },
     });
 
     await page.route('**/api/v1/**', route => {
