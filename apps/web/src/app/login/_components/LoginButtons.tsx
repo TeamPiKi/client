@@ -38,6 +38,7 @@ function LoginButtons({ redirect, action, canReuseGuestSession }: LoginButtonsPr
 
   const [isGuestRefreshing, setIsGuestRefreshing] = useState(false);
   const [nativePendingProvider, setNativePendingProvider] = useState<SocialProviderT | null>(null);
+  const [webPendingProvider, setWebPendingProvider] = useState<SocialProviderT | null>(null);
 
   const { postGuestLoginMutation, isPostGuestLoginPending } = usePostGuestLogin();
   const handleNativeLoginSettled = useCallback(() => setNativePendingProvider(null), []);
@@ -66,7 +67,8 @@ function LoginButtons({ redirect, action, canReuseGuestSession }: LoginButtonsPr
   }, [action, validRedirect, router]);
 
   const isGuestPending = isPostGuestLoginPending || isGuestRefreshing;
-  const isAnyPending = isGuestPending || nativePendingProvider !== null;
+  const activePendingProvider = nativePendingProvider ?? webPendingProvider;
+  const isAnyPending = isGuestPending || activePendingProvider !== null;
 
   const postNativeMessage = (provider: SocialProviderT) => {
     if (!isWebview()) return false;
@@ -79,31 +81,24 @@ function LoginButtons({ redirect, action, canReuseGuestSession }: LoginButtonsPr
     return true;
   };
 
-  const handleKakaoLogin = () => {
-    if (postNativeMessage('kakao')) return;
+  const handleSocialLogin = async (provider: SocialProviderT) => {
+    if (postNativeMessage(provider)) return;
 
     setLoginRedirectPath(validRedirect);
-    getAuthUrl('kakao', validRedirect).then(({ url }) => {
+    setWebPendingProvider(provider);
+    try {
+      const { url } = await getAuthUrl(provider, validRedirect);
       window.location.href = url;
-    });
+    } catch {
+      toast.error('요청을 처리하지 못했어요. 다시 시도해 주세요.');
+    } finally {
+      setWebPendingProvider(null);
+    }
   };
 
-  const handleGoogleLogin = () => {
-    if (postNativeMessage('google')) return;
-
-    setLoginRedirectPath(validRedirect);
-    getAuthUrl('google', validRedirect).then(({ url }) => {
-      window.location.href = url;
-    });
-  };
-
-  const handleAppleLogin = async () => {
-    if (postNativeMessage('apple')) return;
-
-    setLoginRedirectPath(validRedirect);
-    const { url } = await getAuthUrl('apple', validRedirect);
-    window.location.href = url;
-  };
+  const handleKakaoLogin = () => handleSocialLogin('kakao');
+  const handleGoogleLogin = () => handleSocialLogin('google');
+  const handleAppleLogin = () => handleSocialLogin('apple');
 
   const handleGuestLogin = async () => {
     setLoginRedirectPath(validRedirect);
@@ -131,24 +126,24 @@ function LoginButtons({ redirect, action, canReuseGuestSession }: LoginButtonsPr
         variant="google"
         icon={<GoogleIcon width={20} height={20} aria-hidden />}
         label="구글 계정으로 시작하기"
-        isLoading={nativePendingProvider === 'google'}
-        disabled={isAnyPending && nativePendingProvider !== 'google'}
+        isLoading={activePendingProvider === 'google'}
+        disabled={isAnyPending && activePendingProvider !== 'google'}
         onClick={handleGoogleLogin}
       />
       <SocialLoginButton
         variant="apple"
         icon={<AppleIcon width={20} height={20} aria-hidden />}
         label="Apple로 시작하기"
-        isLoading={nativePendingProvider === 'apple'}
-        disabled={isAnyPending && nativePendingProvider !== 'apple'}
+        isLoading={activePendingProvider === 'apple'}
+        disabled={isAnyPending && activePendingProvider !== 'apple'}
         onClick={handleAppleLogin}
       />
       <SocialLoginButton
         variant="kakao"
         icon={<KakaoIcon width={20} height={20} aria-hidden />}
         label="카카오로 시작하기"
-        isLoading={nativePendingProvider === 'kakao'}
-        disabled={isAnyPending && nativePendingProvider !== 'kakao'}
+        isLoading={activePendingProvider === 'kakao'}
+        disabled={isAnyPending && activePendingProvider !== 'kakao'}
         onClick={handleKakaoLogin}
       />
 
