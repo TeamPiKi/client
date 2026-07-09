@@ -12,6 +12,7 @@
       "usesAppleSignIn": true,
       "supportsTablet": false,
       "bundleIdentifier": "day.no30s.piki",
+      "googleServicesFile": "./GoogleService-Info.plist",
       "entitlements": {
         "aps-environment": "development", // NOTE: 배포할때 'production'으로 변경
         "com.apple.security.application-groups": ["group.day.no30s.piki"],
@@ -41,6 +42,7 @@
     },
     "android": {
       "package": "day.no30s.piki",
+      "googleServicesFile": "./google-services.json",
       "adaptiveIcon": {
         "backgroundColor": "#A2DEFF",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
