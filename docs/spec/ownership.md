@@ -13,12 +13,12 @@
 
 ## 경계 요약
 
-- **위시 + 소셜로그인** = 소영 (담기 · 목록 · 상세 · 위시→토너먼트 담기 · 로그인 진입/소셜 교환)
+- **위시** = 소영 (담기 · 목록 · 상세 · 위시→토너먼트 담기)
 - **토너먼트** = `시작(start)` 버튼 기준 2분할
   - **시작 前 — 구성·소셜** (초대/참여/참여자/마감/시작) = **하은**
   - **시작 後 — 플레이·결과** (대진/결과/그룹) = **영찬**
 - **알림·실시간(SSE/FCM)·웹뷰 브릿지** = 하은
-- **토큰 인프라 · 계정 · 플랫폼 + 공동 리뷰** = 선아 (인터셉터·refresh·세션, 마이페이지, 공유 인프라 스튜어드십)
+- **토큰 인프라 · 소셜로그인 · 계정 · 플랫폼 + 공동 리뷰** = 선아 (인터셉터·refresh·세션, `/login`·`/auth/callback`, 마이페이지, 공유 인프라 스튜어드십)
 - **홈** = 소영 (허브: 위시담기 + 토너먼트 진입 런처)
 
 > ⚠️ create 화면 안에 초대·참여자·마감·시작 등 **소셜 로직이 통째로 들어있어**, "준비 vs 소셜"로 나누면 한 화면을 둘이 건드리게 된다. 그래서 소셜을 create와 묶어 하은이, 실제 플레이는 영찬이 갖는다.
@@ -36,8 +36,8 @@
 | **토큰 인프라** (`apis/client.ts`·`apis/server.ts` 인터셉터, `refreshClientToken`, `proxy.ts`) | refresh race · 401 재시도 · 세션 리다이렉트 (딥빌드 1개) |
 | `/mypage` · `/mypage/edit` · `/mypage/withdraw` (+layouts)                                     | 마이페이지                                               |
 | `/(legal)/privacy` · `/(legal)/terms`                                                          | 약관 (설정 영역)                                         |
-| `/login` (+layout)                                                                             | 로그인 진입 · `getAuthUrl` · 게스트로그인 (소영 그대로)  |
-| `/auth/callback/[provider]`                                                                    | 소셜 교환 (`postSocialLogin`) — 선아 공동 리뷰           |
+| `/login` (+layout)                                                                             | 로그인 진입 · `getAuthUrl` · 게스트로그인                |
+| `/auth/callback/[provider]`                                                                    | 소셜 교환 (`postSocialLogin`)                            |
 
 ### 🟢 소영 — 위시 + 홈
 
@@ -80,7 +80,6 @@
 | `/tournament/[id]` (layout) + `_common`(`getTournament`, `deleteTournamentItem`)               | 선아           | 하은·영찬                     | 토너먼트 공용 데이터 척추 (시작 前/後 공통)                                                                   |
 | `components/get-item-dialog` (위시 담기 엔진)                                                  | 소영           | 소영(홈/archive)·하은(create) | 인터페이스 변경 시 하은에 공지                                                                                |
 | `create/by-wish` → `postTournamentItemsByWish` · `useGetTournament`                            | 하은/공용      | 소영                          | by-wish는 소영 소유지만 이 write API는 하은 소유 → 시그니처 변경 시 공지                                      |
-| `/login`·`/auth/callback` (소영) ↔ 토큰 인터셉터/refresh (선아)                                | 소영·선아 공동 | 소영                          | **토큰 발급 시점이 seam** — 발급 前(소셜 교환)=소영, 發급 後(저장·갱신·인터셉터)=선아. 인증 변경 시 상호 리뷰 |
 | `components/common/*`, `consts/route`·`consts/api`, `types/*`                                  | 선아           | 전원                          | 공통 UI·라우트·API 상수·도메인 타입                                                                           |
 | `webBridge` **계약(프로토콜)** (`utils/webBridge`, `consts/webBridge`, `types/webBridge`)      | 선아           | 하은·소영                     | 계약은 선아 오너, **구현(FCM/SSE)은 하은**                                                                    |
 | API client / 토큰 (`apis/client.ts`, `apis/server.ts`, `utils/refreshClientToken`, `proxy.ts`) | 선아           | 전원                          | 인터셉터·토큰 갱신 (파급력 최상)                                                                              |
