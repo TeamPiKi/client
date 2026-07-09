@@ -4,21 +4,23 @@
 
 <img width="4341" height="1447" alt="2" src="https://github.com/user-attachments/assets/192fd4e8-f28c-464c-a82d-9f05fd05b0f1" />
 
+[웹 링크](https://piki.day/) | [iOS 앱 링크](https://apps.apple.com/kr/app/piki-%EA%B0%99%EC%9D%B4-%EA%B3%A0%EB%A5%B4%EB%8A%94-%EC%87%BC%ED%95%91-%ED%86%A0%EB%84%88%EB%A8%BC%ED%8A%B8/id6777101805) | [Android 앱 링크](https://play.google.com/store/apps/details?id=day.no30s.piki&pcampaignid=web_share)
+
 ### Pick Together, Shop Better
+
+
 
 **쌓인 위시리스트에서 먼저 살 것을 골라주는 소비 결정 서비스**
 
 여러 쇼핑 플랫폼에 흩어진 위시템을 한곳에 모아, 1:1 토너먼트로 비교하고
 친구와 함께 골라 "지금 살 하나"를 결정해요.
 
-[![Website](https://img.shields.io/badge/Website-piki.day-38A5FF?style=flat-square)](https://piki.day)
+
 
 ![Next JS](https://img.shields.io/badge/Next-black.svg?style=for-the-badge&logo=next.js&logoColor=white)
 ![Expo](https://img.shields.io/badge/expo-1C1E24.svg?style=for-the-badge&logo=expo&logoColor=white)
 ![Turborepo](https://img.shields.io/badge/turborepo-%23EF4444.svg?style=for-the-badge&logo=turborepo&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/typescript-%23007ACC.svg?style=for-the-badge&logo=typescript&logoColor=white)
-
-**삼십대 없는 팀** · 2026.03 – 현재
 
 </div>
 
