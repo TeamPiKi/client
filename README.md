@@ -1,8 +1,8 @@
 <div align="center">
 
-<!-- 🎬 (Piki 로고 이미지) -->
-
 # Piki
+
+<img width="4341" height="1447" alt="2" src="https://github.com/user-attachments/assets/192fd4e8-f28c-464c-a82d-9f05fd05b0f1" />
 
 ### Pick Together, Shop Better
 
