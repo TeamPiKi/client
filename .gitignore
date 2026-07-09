@@ -15,6 +15,11 @@ node_modules
 # Testing
 coverage
 
+# Playwright
+test-results/
+playwright-report/
+playwright/.auth/
+
 # Turbo
 .turbo
 

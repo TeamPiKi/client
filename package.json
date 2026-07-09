@@ -10,6 +10,7 @@
     "install:web": "pnpm --filter piki-web install",
     "dev:web": "pnpm --filter piki-web dev",
     "build:web": "pnpm --filter piki-web build",
+    "test:e2e": "pnpm --filter piki-web test:e2e",
     "install:app": "pnpm --filter piki-app install",
     "dev:app": "pnpm --filter piki-app start"
   },
