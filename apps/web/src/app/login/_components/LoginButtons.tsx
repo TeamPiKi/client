@@ -91,7 +91,6 @@ function LoginButtons({ redirect, action, canReuseGuestSession }: LoginButtonsPr
       window.location.href = url;
     } catch {
       toast.error('요청을 처리하지 못했어요. 다시 시도해 주세요.');
-    } finally {
       setWebPendingProvider(null);
     }
   };
