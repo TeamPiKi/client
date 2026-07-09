@@ -3,6 +3,7 @@ import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
 import { ROUTES } from '@/consts/route';
+import { getApiErrorMessage } from '@/utils/getApiErrorMessage';
 
 import { postTournamentItemsByWish } from '../_apis/postTournamentItemsByWish';
 
@@ -19,8 +20,10 @@ export const usePostTournamentItemsByWish = (tournamentId: number) => {
       queryClient.invalidateQueries({ queryKey: ['tournament', tournamentId] });
       router.push(`${ROUTES.TOURNAMENT_CREATE(tournamentId)}?scrollToLast=true`);
     },
-    onError: () => {
-      toast.error('위시템 추가에 실패했어요. 잠시 후 다시 시도해주세요.');
+    onError: error => {
+      toast.error(
+        getApiErrorMessage(error, '위시템 추가에 실패했어요. 잠시 후 다시 시도해주세요.')
+      );
     },
   });
 

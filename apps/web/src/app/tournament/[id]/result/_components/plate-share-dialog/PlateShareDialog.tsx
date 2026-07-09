@@ -8,6 +8,7 @@ import { Drawer, DrawerContent, DrawerDescription, DrawerTitle } from '@/compone
 import Spinner from '@/components/spinner';
 import { ANALYTICS_EVENT } from '@/consts/analytics';
 import { logAnalyticsEvent } from '@/utils/analytics';
+import { getApiErrorMessage } from '@/utils/getApiErrorMessage';
 import { share } from '@/utils/share';
 
 import { usePostPlayLink } from '../../_hooks/usePostPlayLink';
@@ -40,8 +41,10 @@ function PlateShareDialog({
     if (!hasExistingPlayLink) {
       try {
         await postPlayLinkMutation();
-      } catch {
-        toast.warning('공유 링크를 생성하지 못했어요. 다시 시도해주세요.');
+      } catch (error) {
+        toast.warning(
+          getApiErrorMessage(error, '공유 링크를 생성하지 못했어요. 다시 시도해주세요.')
+        );
         return;
       }
     }
