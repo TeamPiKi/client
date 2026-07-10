@@ -40,7 +40,15 @@ function Page() {
 
   const handleWebviewUriChange = useCallback((uri: string) => setWebviewUri(uri), []);
 
-  useWebDeepLink(handleWebviewUriChange);
+  /** warm start 딥링크 — 이미 로드된 웹뷰에 경로만 전달해 SPA 전환 (문서 리로드 방지) */
+  const handleWarmStartNavigate = useCallback((path: string) => {
+    WebBridge.postMessage({
+      type: WEBBRIDGE_MESSAGE_TYPE.APP_REQ_NAVIGATE,
+      payload: { path },
+    });
+  }, []);
+
+  useWebDeepLink({ onColdStart: handleWebviewUriChange, onWarmStart: handleWarmStartNavigate });
 
   useEffect(() => {
     WebBridge.setRef(webviewRef);

@@ -32,6 +32,8 @@ export const WEBBRIDGE_MESSAGE_TYPE = {
 
   /** 딥링크 관련 */
   APP_REQ_DEEP_LINK: 'APP_REQ_DEEP_LINK',
+  /** 앱 → 웹: 이미 로드된 웹뷰에서 경로 이동 (warm start 딥링크 SPA 전환용) */
+  APP_REQ_NAVIGATE: 'APP_REQ_NAVIGATE',
 
   /** 분석 관련 — 웹뷰에서 발생한 사용자 행동을 네이티브 Firebase Analytics 로 전달 */
   WEB_REQ_LOG_ANALYTICS_EVENT: 'WEB_REQ_LOG_ANALYTICS_EVENT',
