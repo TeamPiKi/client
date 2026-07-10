@@ -1,9 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { isAxiosError } from 'axios';
 import { useState } from 'react';
 import { toast } from 'sonner';
-
-import type { ApiErrorResponseT } from '@/types/api';
 
 import { deleteWishes } from '../_apis/deleteWishes';
 
@@ -20,11 +17,6 @@ export const useWishlistDelete = () => {
         queryClient.invalidateQueries({ queryKey: ['wish', wishId] });
       });
       toast.success('선택한 위시를 삭제했어요');
-    },
-    onError: error => {
-      if (!isAxiosError<ApiErrorResponseT>(error) || !error.response) return;
-
-      // TODO: 에러처리
     },
   });
 
