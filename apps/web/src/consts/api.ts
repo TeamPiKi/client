@@ -29,7 +29,6 @@ export const ENDPOINTS = {
   TOURNAMENT_ITEMS_FROM_WISH: (id: number) => `/api/v1/tournaments/${id}/items/wish`,
   TOURNAMENT_PLAY_LINK: (id: number) => `/api/v1/tournaments/${id}/play-link`,
   TOURNAMENT_JOIN: (id: number) => `/api/v1/tournaments/${id}/join`,
-  TOURNAMENT_JOIN_GUEST: (id: number) => `/api/v1/tournaments/${id}/join/guest`,
   TOURNAMENT_INVITE: (id: number) => `/api/v1/tournaments/${id}/invite`,
   TOURNAMENT_INVITE_PREVIEW: (id: number) => `/api/v1/tournaments/${id}/invite-preview`,
   TOURNAMENT_INVITE_PREVIEW_BY_CODE: '/api/v1/tournaments/by-invite-code',
