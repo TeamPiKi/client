@@ -7,4 +7,6 @@ export const Z_INDEX = {
 
   DIALOG: 50,
   DRAWER: 50,
+
+  NAVIGATION_OVERLAY: 60,
 };
