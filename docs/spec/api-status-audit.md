@@ -1,33 +1,63 @@
 # API Status Code 프론트 대응 전수조사
 
 > `api-json.json`(OpenAPI 스펙)에 정의된 모든 엔드포인트의 status code를 기준으로, 웹 프론트(`apps/web`)의 실제 대응 여부를 조사한 결과입니다.
-> 범례: ✅ 대응됨 · ⚠️ 부분/애매(status 구분 없이 뭉뚱그림 등) · ❌ 미대응(무처리·주석·dead code) · N/A 프론트 무관
+> 범례: ✅ 대응됨 · ⚠️ 부분/애매(status 구분 없이 뭉뚱그림·전역 fallback만 등) · ❌ 미대응(무처리·dead code·전역 안전망 밖) · N/A 프론트 무관
 
 ## 전역 동작 (공통 전제)
 
 - **401**: `apis/client.ts` 인터셉터가 토큰 refresh 후 자동 재시도, 실패 시 로그인 리다이렉트 → clientApi 호출은 사실상 401 전역 커버. **단 `serverApi`(SSR)에는 응답 인터셉터가 없어** 서버 렌더 경로의 4xx/5xx는 그대로 throw.
-- **잡히지 않은 throw / 5xx**: Next.js error boundary(`app/error.tsx`, `app/global-error.tsx`)의 "오류가 발생했어요" 페이지로 fallback.
+- **Mutation 전역 안전망** (`utils/queryClient.ts` `MutationCache.onError`):
+  - **5xx·네트워크**: 항상 `getApiErrorMessage` 토스트 + Sentry (개별 `onError` 유무와 무관)
+  - **4xx**: 개별 `onError`가 **없으면** generic fallback 토스트 · **있으면** 전역이 양보 → 미처리 status는 토스트 없음
+  - **401**: 이중 토스트 방지를 위해 전역 스킵 (인터셉터가 처리)
+- **잡히지 않은 throw / 5xx (query·비-mutation)**: Next.js error boundary(`app/error.tsx`, `app/global-error.tsx`)의 "오류가 발생했어요" 페이지로 fallback.
 - **`useSuspenseQuery` 기반 GET**: per-status 처리 없이 에러 시 error boundary로 fallback.
-- **일반 `useQuery`/`useInfiniteQuery`**: QueryClient에 `throwOnError` 미설정(`utils/queryClient.ts`) → 에러가 boundary로도 안 가고, 컴포넌트가 `isError`를 안 보면 빈 상태로 표시될 수 있음.
+- **일반 `useQuery`/`useInfiniteQuery`**: QueryClient에 `throwOnError` 미설정(`utils/queryClient.ts`) → 에러가 boundary로도 안 가고, 컴포넌트가 `isError`를 안 보면 빈 상태로 표시될 수 있음. **QueryCache.onError는 Sentry 로깅만** (토스트 없음).
 - **에러 토스트**: sonner(`@/components/toast`), 주로 `error.response.data.detail`을 그대로 노출.
 
 ---
 
 ## 🚨 반드시 손봐야 할 미대응 (❌) 요약
 
+> mutation 분류 기준: `MutationCache.onError` 전역 안전망과의 관계. **로컬 맞춤 UX 없음** ≠ **사용자 피드백 완전 부재**.
+
+### A. 로컬 맞춤 UX 없음 (전역 fallback 토스트는 보장)
+
+개별 `onError` 없음 → 4xx는 `detail` generic 토스트, 5xx·네트워크는 전역 토스트. **status별 분기·라우팅·UI 복구는 없음.**
+
 | 위치 | 문제 |
 | --- | --- |
-| `useDeleteTournament.ts:31-33` | 토너먼트 삭제 실패(403/404/409/5xx) onError가 **주석 처리(`// TODO`)** — 실패 시 피드백 전무 |
-| `useDeleteWishes.ts:24-28` | 위시 다건 삭제 실패(400/403) onError가 **`// TODO`만** — 무처리 |
-| `usePostWishRefresh.ts` | 위시 새로고침 실패(400/403/404/409) **onError 자체가 없음** — 조용히 삼킴 |
-| `usePostRecordMatch` / `useTournament.ts` | 매치 결과 기록 실패(모든 4xx) onError 전무 — 낙관적 진행/`console.error`만 |
-| `usePostTournamentStart` (클라 버튼) | start 400/403/404 미처리 (409는 서버 매치 진입 경로에서만 복구) |
-| `usePostCreateTournament` | 토너먼트 생성 400 미처리 |
-| **502 미대응** | `usePostWishOCR`·`usePatchWish`·`usePostTournamentOCR`·`usePatchTournamentItem` 모두 `status===500`만 처리 → **502는 어느 분기도 안 탐** |
-| `usePostGuestLogin` (클라) | 게스트 로그인 실패 onError 없음 — 무피드백 |
-| `getAuthUrl` 사용부 (`LoginButtons`) | OAuth URL 조회 실패(400 등) `.catch`/try 없음 — 무피드백 |
-| `usePostNotificationsRead` / `useGetNotifications` | 읽음 처리·목록 조회 400 무처리 |
-| `useFcmTokenSync` | FCM 등록 실패 `.catch(console.error)`만 |
+| `useDeleteTournament.ts` | 삭제 실패(403/404/409 등) — 전역 generic 토스트만, 권한/상태별 안내·복구 없음 |
+| `useDeleteWishes.ts` | 다건 삭제 실패(400/403) — 동일 |
+| `usePostWishRefresh.ts` | 새로고침 실패(400/403/404/409) — 동일 |
+| `usePostRecordMatch` / `useTournament.ts` | 매치 기록 4xx — 전역 토스트는 있으나 **낙관적 UI 진행**으로 화면·서버 상태 불일치 가능 |
+| `usePostTournamentStart` (클라 버튼) | start 400/403/404 — generic 토스트만 (409는 서버 매치 진입 경로에서만 복구) |
+| `usePostCreateTournament` | 생성 400 — generic 토스트만 |
+| `usePostGuestLogin` (클라) | 게스트 로그인 실패 — generic 토스트만, 로그인 유도·재시도 UX 없음 |
+| `usePostNotificationsRead` | 읽음 400 — generic 토스트만 (낙관적 이동은 없으나 invalidate 전 실패 시 배지 불일치 가능) |
+
+### B. onError 부분 처리 → 특정 4xx가 전역까지 차단되어 무피드백
+
+개별 `onError`가 존재하면 전역이 4xx를 양보함. **분기에 안 걸린 status는 토스트 없음.** (5xx·네트워크는 §전역 안전망이 처리)
+
+| 위치 | 미처리 status |
+| --- | --- |
+| `usePatchWish` | **400** (403/404/409만 로컬 처리) |
+| `usePostWishOCR` | 400·403 외 4xx (예: 일부 엣지 4xx) |
+| `usePostTournamentOCR` | 400/403/404/409 외 4xx |
+
+### C. 사용자 피드백 완전 부재 (mutation 전역 안전망 미적용)
+
+| 위치 | 문제 |
+| --- | --- |
+| `getAuthUrl` 사용부 (`LoginButtons`) | mutation 아님 — OAuth URL 조회 실패(400 등) `.catch`/try 없음 → unhandled rejection, UI 피드백 없음 |
+| `useGetNotifications` | query — `throwOnError`·`isError` 미사용 → 400 시 빈 목록으로 보일 수 있음 (토스트·boundary 없음) |
+| `useFcmTokenSync` | mutation 아님 — `postFcmToken(...).catch(console.error)`만, 사용자 UI 대응 없음 |
+
+### D. 미구현·Dead code
+
+| 위치 | 문제 |
+| --- | --- |
 | **미구현 엔드포인트** | `GET /wishlists/{id}/history`(가격 히스토리), `GET /image-proxy`, `GET /announcements`, `GET /announcements/{id}`, `GET /tournaments/{id}/play-link-info` — 호출 코드 자체 없음 |
 | **Dead code** | `POST /tournaments/{id}/join/guest` — api/훅 정의만 있고 소비처 없음 |
 
@@ -52,7 +82,7 @@
 
 ### POST /api/v1/auth/guest · 201
 - 201: ✅ `['me']` invalidate + (웹뷰) 쿠키/브릿지 저장 + redirect / 서버는 미인증 시 자동 게스트 로그인
-- 실패: ❌ 클라 훅 `usePostGuestLogin`에 onError 없음 → 무피드백
+- 실패: ⚠️ 클라 훅 `usePostGuestLogin`에 로컬 onError 없음 → 4xx는 전역 generic 토스트, 맞춤 UX(재시도·로그인 유도) 없음
 
 ### POST /api/v1/auth/apple/notifications · 200, 401, 502
 - N/A: 서버-서버 웹훅(Apple→백엔드), 프론트에 호출 코드 없음
@@ -62,7 +92,7 @@
 
 ### GET /api/v1/auth/{provider}/url · 200, 400
 - 200: ✅ 반환 url로 이동(kakao/google/apple)
-- 400: ❌ `.catch`/try 없는 프로미스 체인 — 실패 시 unhandled rejection, 무피드백
+- 400: ❌ mutation 아님 — `.catch`/try 없는 프로미스 체인 → unhandled rejection, UI 피드백 없음
 
 ---
 
@@ -81,12 +111,12 @@
 
 ### DELETE /api/v1/wishlists (다건 삭제) · 200, 400, 401, 403
 - 200: ✅ invalidate + 성공 토스트 "선택한 위시를 삭제했어요"
-- 400 / 403: ❌ onError에 `// TODO: 에러처리`만 — 무처리
+- 400 / 403: ⚠️ 로컬 onError 없음 → 4xx 전역 generic 토스트 (status별 분기·복구 없음)
 - 401: ✅ 전역 인터셉터
 
 ### POST /api/v1/wishlists/{wishId}/refresh (새로고침) · 200, 400, 401, 403, 404, 409
 - 200: ✅ invalidate + `router.back()`
-- 400 / 403 / 404 / 409: ❌ **onError 자체가 없음** → 에러 조용히 삼킴
+- 400 / 403 / 404 / 409: ⚠️ 로컬 onError 없음 → 4xx 전역 generic 토스트 (status별 분기·복구 없음)
 - 401: ✅ 전역 인터셉터
 
 ### POST /api/v1/wishlists/images (이미지 등록/OCR) · 201, 400, 401, 403, 502
@@ -94,7 +124,7 @@
 - 400: ✅ `detail` 토스트(개수/형식/크기 초과)
 - 401: ✅ 전역 인터셉터
 - 403: ✅ detail 토스트 + (게스트) 로그인 페이지 replace
-- 502: ❌ 미대응 — 400/403만 분기, 5xx는 무처리(throw도 없음)
+- 502: ✅ 전역 `MutationCache.onError`가 `status>=500` 토스트 처리 (로컬 onError는 400/403만 분기)
 
 ### GET /api/v1/wishlists/{wishId} (단건) · 200, 401, 403, 404
 - 200: ✅ data 반환
@@ -108,10 +138,10 @@
 
 ### PATCH /api/v1/wishlists/{wishId} (복구/추출 보정) · 200, 400, 401, 403, 404, 409, 502
 - 200: ✅ invalidate + `router.back()`
-- 400: ❌ onError 분기(403/404/409/500)에 400 없음 — 무처리
+- 400: ❌ onError가 403/404/409만 처리 → **400은 전역도 양보해 토스트 없음**
 - 401: ✅ 전역 인터셉터
 - 403 / 404 / 409: ✅ detail 토스트 + archive replace
-- 502: ❌ 미대응 — `status===500`만 처리, 502는 안 걸림
+- 502: ✅ 전역 `MutationCache.onError`가 `status>=500` 토스트 처리
 
 ### GET /api/v1/wishlists/{wishId}/history (가격 히스토리) · 200, 401, 403, 404
 - ❌ **프론트 미구현** — ENDPOINTS 상수·api·hook 전무 (기존 'history'는 전부 토너먼트 기록)
@@ -125,12 +155,12 @@
 
 ### POST /api/v1/tournaments (생성) · 201, 400, 401
 - 201: ✅ analytics + list invalidate + create 이동
-- 400: ❌ 훅 onError 없음 → throw
+- 400: ⚠️ 로컬 onError 없음 → 4xx 전역 generic 토스트
 - 401: ✅ 전역
 
 ### POST /api/v1/tournaments/{id}/start · 200, 400, 401, 403, 404, 409
 - 200: ✅ 응답 tournamentId로 라우팅
-- 400 / 403 / 404: ❌ 두 경로(서버 매치 진입·클라 버튼) 모두 미처리
+- 400 / 403 / 404: ⚠️ 클라 버튼 경로(`usePostTournamentStart`) 로컬 onError 없음 → 4xx 전역 generic 토스트
 - 401: ✅ 전역
 - 409: ⚠️ **서버 매치 진입 경로만** 최신 상태 재조회로 복구, **클라 버튼 경로는 미처리**
 
@@ -141,7 +171,7 @@
 
 ### POST /api/v1/tournaments/{id}/matches (매치 결과) · 200, 400, 401, 403, 404, 409
 - 200: ✅ 캐시 갱신/라운드 전환/결승 시 result 이동
-- 400 / 401 / 403 / 404 / 409: ❌ onError 전무 — 낙관적 진행, 조회 실패는 `console.error`만
+- 400 / 401 / 403 / 404 / 409: ⚠️ 로컬 onError 없음 → 4xx 전역 generic 토스트. **낙관적 UI 진행**으로 화면·서버 상태 불일치 가능 (`console.error`는 refetch 실패 시에만)
 
 ### POST /api/v1/tournaments/{id}/join (인증 참여) · 200, 400, 401, 404, 409
 - 200: ✅ create 페이지(WELCOME_JOIN)로 이동
@@ -166,7 +196,7 @@
 - 400: ✅ detail 토스트
 - 401: ✅ 전역
 - 403 / 404 / 409: ✅ 토스트 + `router.replace(HOME)`
-- 502: ❌ 미대응 — `status===500`만 처리, 502 무피드백
+- 502: ✅ 전역 `MutationCache.onError`가 `status>=500` 토스트 처리
 
 ### POST /api/v1/tournaments/{sourceId}/from-play-link · 200, 401, 404, 409
 - 200: ✅ 상태별 라우팅(create/match/result)
@@ -186,7 +216,7 @@
 - 400: ✅ `status<500` → detail 토스트
 - 401: ✅ 전역
 - 403 / 404 / 409: ✅ 토스트 + create replace
-- 502: ⚠️ `status<500` 조건에서 제외 → 토스트 없이 throw → error boundary
+- 502: ✅ 전역 `MutationCache.onError`가 `status>=500` 토스트 처리 (로컬 onError는 `status<500` 분기 후 미매칭 시 throw)
 
 ### PATCH /api/v1/tournaments/{id}/invite (초대 마감 수정) · 200, 400, 401, 403, 404, 409
 - 200: ✅ invalidate + 성공 토스트
@@ -199,7 +229,7 @@
 ### DELETE /api/v1/tournaments/{id} · 200, 401, 403, 404, 409
 - 200: ✅ invalidate + 성공 토스트
 - 401: ✅ 전역
-- 403 / 404 / 409 / 5xx: ❌ **onError가 주석 처리(`// TODO: 에러 처리`)** — 완전 미대응
+- 403 / 404 / 409 / 5xx: ⚠️ 로컬 onError 없음 → 4xx 전역 generic 토스트, 5xx 전역 토스트 (status별 분기·복구 없음)
 
 ### GET /api/v1/tournaments/{id}/play-link-info · 200, 404, 409
 - ❌ **프론트 미구현** — 상수·호출 코드 없음
@@ -236,7 +266,7 @@
 - 401: ✅ 전역
 - 409(닉네임 중복 등): ⚠️ detail 토스트로 통합(닉네임은 제출 전 사전검증으로 도달 드묾)
 - 413(이미지 용량 초과): ⚠️ **클라 사전 용량검증 없음** — 서버 413 detail 토스트에만 의존
-- 502: ⚠️ response 있으면 detail 토스트, 네트워크성으로 response 없으면 early return → 무처리
+- 502: ⚠️ response 있으면 로컬·전역 토스트 중복 가능 · 네트워크성(`!response`)은 전역 `MutationCache`가 처리
 
 ### GET /api/v1/users/nickname/check · 200, 400, 401
 - 200: ✅ `available` 판정, false면 인라인 에러 "이미 사용 중인 닉네임이에요."
@@ -249,12 +279,12 @@
 
 ### POST /api/v1/notifications/read · 200, 400, 401
 - 200: ✅ `['notifications']` invalidate + 웹뷰 badge 업데이트
-- 400: ❌ onError 미정의 — 무처리(읽음 표시/이동만 낙관적 진행)
+- 400: ⚠️ 로컬 onError 없음 → 4xx 전역 generic 토스트 (낙관적 이동 없음, invalidate 실패 시 배지 불일치 가능)
 - 401: ✅ 전역
 
 ### GET /api/v1/notifications · 200, 400, 401
 - 200: ✅ items/unreadCount/커서 페이지네이션
-- 400: ❌ throwOnError 미설정 + isError 미참조 — 에러 시 빈 상태로 표시될 수 있음
+- 400: ❌ query — `throwOnError`·`isError` 미사용 → 빈 목록으로 표시될 수 있음 (토스트·boundary 없음)
 - 401: ✅ 전역
 
 ### GET /api/v1/notifications/subscribe (SSE) · 200, 401
@@ -264,7 +294,7 @@
 
 ### POST /api/v1/fcm/tokens (등록/갱신) · 200, 400, 401
 - 200: ✅ `device_id` 쿠키 저장
-- 400: ❌ `.catch(console.error)`만 — 사용자 UI 대응 없음
+- 400: ❌ mutation 아님 — `.catch(console.error)`만, 사용자 UI 대응 없음
 - 401: ✅ 전역
 
 ### DELETE /api/v1/fcm/tokens (기기 해제) · 200, 400, 401
@@ -296,8 +326,6 @@
 > `apps/web/src` 전체에서 `TODO`/`FIXME` 주석을 수집한 목록입니다. 위 status 대응과 별개로 남아있는 작업들입니다.
 
 ### 에러 처리 관련 (위 status 조사와 직접 연결)
-- `app/archive/_hooks/useDeleteWishes.ts:27` — `// TODO: 에러처리` (위시 다건 삭제 실패 미대응)
-- `hooks/useDeleteTournament.ts:28` — `// TODO: 에러 처리` (토너먼트 삭제 실패 미대응)
 - `app/tournament/[id]/layout.tsx:32` — `notFound(); // TODO: 아직 미정` (토너먼트 404 처리 방식 미확정)
 - `app/invite/[id]/_components/InviteClient.tsx:134` — 409가 초대 코드 만료·이미 참여·이미 시작 등 여러 경우인데 **서버가 에러코드를 안 내려줘** 단일 타입으로만 처리 중 (동적 타입 분기 필요)
 

@@ -17,7 +17,7 @@
 
 ## 처리 계층 (요청 하나가 실패했을 때 걸리는 순서)
 
-```
+```text
 ① 전역 인터셉터   apis/client.ts            → 401 자동 refresh / 재시도 / 로그인 redirect
 ② Layout 가드     app/**/layout.tsx (SSR)   → 진입 시점 인증·권한 차단 (getMe 등)
 ③ 전역 MutationCache onError  utils/queryClient.ts
