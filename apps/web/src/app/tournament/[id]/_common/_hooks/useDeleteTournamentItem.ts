@@ -43,8 +43,6 @@ export const useDeleteTournamentItem = (tournamentId: number, tournamentItemId: 
           toast.error(clientErrorMessage);
           if (pathname !== ROUTES.TOURNAMENT_CREATE(tournamentId))
             router.replace(ROUTES.TOURNAMENT_CREATE(tournamentId));
-        } else if (status === 500) {
-          toast.error('서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
         }
       },
     });
