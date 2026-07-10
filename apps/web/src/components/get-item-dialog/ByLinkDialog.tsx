@@ -93,7 +93,6 @@ function ByLinkDialog({ type, open, onOpenChange }: ByLinkProps) {
             aria-invalid={hasError}
             {...(hasError ? { helperText: 'https://로 시작하는 URL을 입력해주세요.' } : {})}
             autoFocus
-            inputMode="url"
           />
           <Button
             size="lg"
