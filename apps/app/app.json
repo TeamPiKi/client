@@ -2,7 +2,7 @@
   "expo": {
     "name": "PiKi",
     "slug": "piki",
-    "version": "1.0.1",
+    "version": "1.0.4",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "piki",
@@ -165,23 +165,7 @@
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "576644de-9cba-4457-82a2-562f7dd89d92",
-        "build": {
-          "experimental": {
-            "ios": {
-              "appExtensions": [
-                {
-                  "targetName": "PiKiShareExtension",
-                  "bundleIdentifier": "day.no30s.piki.ShareExtension",
-                  "entitlements": {
-                    "com.apple.security.application-groups": ["group.day.no30s.piki"],
-                    "keychain-access-groups": ["$(AppIdentifierPrefix)group.day.no30s.piki"]
-                  }
-                }
-              ]
-            }
-          }
-        }
+        "projectId": "576644de-9cba-4457-82a2-562f7dd89d92"
       }
     },
     "owner": "no-30s"

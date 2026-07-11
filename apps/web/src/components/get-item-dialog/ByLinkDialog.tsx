@@ -105,7 +105,6 @@ function ByLinkDialog({ type, open, onOpenChange }: ByLinkProps) {
             aria-invalid={hasError}
             {...(hasError ? { helperText: '올바른 URL 형식으로 입력해주세요.' } : {})}
             autoFocus
-            inputMode="url"
           />
           <Button
             size="lg"

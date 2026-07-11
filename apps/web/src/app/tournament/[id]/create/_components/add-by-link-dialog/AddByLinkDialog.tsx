@@ -76,7 +76,6 @@ function AddByLinkDialog({ open, onOpenChange, onSubmit }: AddByLinkDialogProps)
             aria-invalid={hasError}
             {...(hasError ? { helperText: '올바른 URL 형식으로 입력해주세요.' } : {})}
             autoFocus
-            inputMode="url"
           />
           <Button size="lg" variant="primary" disabled={isEmpty} onClick={handleSubmit}>
             후보 바구니에 담기
