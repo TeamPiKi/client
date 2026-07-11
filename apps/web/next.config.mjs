@@ -40,6 +40,20 @@ const nextConfig = async () => {
       ];
     },
 
+    /** iOS Universal Link, Android App Link 검증 파일은 application/json으로 확장자 지정 */
+    async headers() {
+      return [
+        {
+          source: '/.well-known/apple-app-site-association',
+          headers: [{ key: 'Content-Type', value: 'application/json' }],
+        },
+        {
+          source: '/.well-known/assetlinks.json',
+          headers: [{ key: 'Content-Type', value: 'application/json' }],
+        },
+      ];
+    },
+
     /** NOTE: 실기기 테스트 시 LAN IP를 .env.local의 NEXT_PUBLIC_DEV_ORIGIN에 추가 */
     allowedDevOrigins: process.env.NEXT_PUBLIC_DEV_ORIGIN
       ? [process.env.NEXT_PUBLIC_DEV_ORIGIN]
