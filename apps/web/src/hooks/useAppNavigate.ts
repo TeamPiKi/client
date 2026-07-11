@@ -43,7 +43,7 @@ export const useAppNavigate = () => {
     if (!isNavigatePending) return;
     const timer = setTimeout(() => setTargetPathname(null), OVERLAY_TIMEOUT_MS);
     return () => clearTimeout(timer);
-  }, [isNavigatePending]);
+  }, [isNavigatePending, targetPathname]);
 
   return { isNavigatePending };
 };
