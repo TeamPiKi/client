@@ -34,6 +34,8 @@ import { WebBridge } from '@/utils/webBridge';
 function Page() {
   const webviewRef = useRef<WebView | null>(null);
   const [webviewUri, setWebviewUri] = useState(process.env.EXPO_PUBLIC_WEB_URL);
+  const [isWebViewLoaded, setIsWebViewLoaded] = useState(false);
+  const [pendingWarmStartPath, setPendingWarmStartPath] = useState<string | null>(null);
 
   const { handleLogin } = useSocialLogin();
   const { isSynced } = useWebviewCookieSync();
@@ -41,12 +43,18 @@ function Page() {
   const handleWebviewUriChange = useCallback((uri: string) => setWebviewUri(uri), []);
 
   /** warm start 딥링크 — 이미 로드된 웹뷰에 경로만 전달해 SPA 전환 (문서 리로드 방지) */
-  const handleWarmStartNavigate = useCallback((path: string) => {
-    WebBridge.postMessage({
-      type: WEBBRIDGE_MESSAGE_TYPE.APP_REQ_NAVIGATE,
-      payload: { path },
-    });
-  }, []);
+  const handleWarmStartNavigate = useCallback(
+    (path: string) => {
+      if (!isSynced || !isWebViewLoaded || !webviewRef.current)
+        return setPendingWarmStartPath(path);
+
+      WebBridge.postMessage({
+        type: WEBBRIDGE_MESSAGE_TYPE.APP_REQ_NAVIGATE,
+        payload: { path },
+      });
+    },
+    [isSynced, isWebViewLoaded]
+  );
 
   useWebDeepLink({ onColdStart: handleWebviewUriChange, onWarmStart: handleWarmStartNavigate });
 
@@ -54,6 +62,17 @@ function Page() {
     WebBridge.setRef(webviewRef);
     return () => WebBridge.clearRef(webviewRef);
   }, []);
+
+  useEffect(() => {
+    if (!isSynced || !isWebViewLoaded || pendingWarmStartPath === null || !webviewRef.current)
+      return;
+
+    WebBridge.postMessage({
+      type: WEBBRIDGE_MESSAGE_TYPE.APP_REQ_NAVIGATE,
+      payload: { path: pendingWarmStartPath },
+    });
+    setPendingWarmStartPath(null);
+  }, [isSynced, isWebViewLoaded, pendingWarmStartPath]);
 
   // 앱 진입 시 GA4(Firebase Analytics) 세션 시작.
   useEffect(() => {
@@ -143,6 +162,11 @@ function Page() {
   const { onMessage } = useWebBridgeMessage(handleWebMessage);
   const { onWebViewLoadEnd, onWebViewLoadError } = useSplashScreenController();
 
+  const handleWebViewLoadEnd = useCallback(() => {
+    onWebViewLoadEnd();
+    setIsWebViewLoaded(true);
+  }, [onWebViewLoadEnd]);
+
   /** WebView 로드 실패(네이티브 측) 수집 + 기존 스플래시 처리 유지 */
   const handleWebViewError = useCallback(
     (event: WebViewErrorEvent) => {
@@ -176,7 +200,7 @@ function Page() {
           applicationNameForUserAgent={USER_AGENT}
           source={{ uri: webviewUri }}
           onMessage={onMessage}
-          onLoadEnd={onWebViewLoadEnd}
+          onLoadEnd={handleWebViewLoadEnd}
           onError={handleWebViewError}
           onHttpError={handleWebViewHttpError}
           allowsBackForwardNavigationGestures
