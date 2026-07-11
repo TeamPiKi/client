@@ -6,8 +6,7 @@ import { LinkIconFill } from '@/assets/icons';
 import Button from '@/components/button';
 import { Dialog, DialogContent, DialogTitle } from '@/components/dialog';
 import Input from '@/components/input';
-
-const URL_PATTERN = /^https?:\/\/.+/i;
+import { URL_PATTERN, extractUrlFromText } from '@/utils/extractUrl';
 
 type AddByLinkDialogProps = {
   open: boolean;
@@ -30,12 +29,15 @@ function AddByLinkDialog({ open, onOpenChange, onSubmit }: AddByLinkDialogProps)
   const handleSubmit = () => {
     if (isEmpty) return;
 
-    if (!URL_PATTERN.test(trimmedUrl)) {
+    // 상품 설명과 URL 이 함께 붙여넣어진 경우 URL 만 추출해 제출한다 (onPaste 를 타지 않은 경로 안전망).
+    const submitUrl = URL_PATTERN.test(trimmedUrl) ? trimmedUrl : extractUrlFromText(trimmedUrl);
+
+    if (!submitUrl) {
       setHasError(true);
       return;
     }
 
-    onSubmit?.(trimmedUrl);
+    onSubmit?.(submitUrl);
     onOpenChange(false);
     resetState();
   };
@@ -43,6 +45,15 @@ function AddByLinkDialog({ open, onOpenChange, onSubmit }: AddByLinkDialogProps)
   const handleChange = (value: string) => {
     setUrl(value);
     if (hasError) setHasError(false);
+  };
+
+  /** 상품 설명 + URL 형태로 붙여넣으면 URL 만 입력창에 반영한다 */
+  const handlePaste = (event: React.ClipboardEvent<HTMLInputElement>) => {
+    const extractedUrl = extractUrlFromText(event.clipboardData.getData('text'));
+    if (!extractedUrl) return;
+
+    event.preventDefault();
+    handleChange(extractedUrl);
   };
 
   return (
@@ -60,6 +71,7 @@ function AddByLinkDialog({ open, onOpenChange, onSubmit }: AddByLinkDialogProps)
             placeholder="복사한 링크를 입력해주세요."
             value={url}
             onChange={e => handleChange(e.target.value)}
+            onPaste={handlePaste}
             left={<LinkIconFill className="size-5" />}
             aria-invalid={hasError}
             {...(hasError ? { helperText: '올바른 URL 형식으로 입력해주세요.' } : {})}
