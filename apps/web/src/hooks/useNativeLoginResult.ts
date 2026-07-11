@@ -42,7 +42,12 @@ export const useNativeLoginResult = ({
       }
     };
 
+    /** RN → 웹 메시지는 iOS 에선 window, Android 에선 document 에 dispatch 된다 (react-native-webview 동작) */
     window.addEventListener('message', handler);
-    return () => window.removeEventListener('message', handler);
+    document.addEventListener('message', handler as EventListener);
+    return () => {
+      window.removeEventListener('message', handler);
+      document.removeEventListener('message', handler as EventListener);
+    };
   }, [onSettled, redirect, router]);
 };
