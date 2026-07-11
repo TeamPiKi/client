@@ -16,7 +16,10 @@ import { WebBridge, isWebview } from '@/utils/webBridge';
 const getUrlFromShareIntent = (payload: ShareIntentPayloadT): string | null => {
   if (payload.webUrl) {
     const trimmedWebUrl = payload.webUrl.trim();
+    // 단일 URL 이면 그대로, 설명 텍스트가 섞여 있으면 URL 만 추출
     if (URL_PATTERN.test(trimmedWebUrl)) return trimmedWebUrl;
+    const extractedFromWebUrl = extractUrlFromText(trimmedWebUrl);
+    if (extractedFromWebUrl) return extractedFromWebUrl;
   }
 
   if (payload.text) return extractUrlFromText(payload.text);

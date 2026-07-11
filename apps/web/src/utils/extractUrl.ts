@@ -1,5 +1,9 @@
-/** 사용자 입력/공유 텍스트의 URL 유효성 패턴 — http/https 허용 */
-export const URL_PATTERN = /^https?:\/\/.+/i;
+/**
+ * 사용자 입력/공유 텍스트의 URL 유효성 패턴 — http/https 허용.
+ * 전체 문자열이 공백 없는 단일 URL 일 때만 통과 (`$` anchor) —
+ * "URL + 설명" 혼합 텍스트는 여기서 걸러져 extractUrlFromText 로 추출한다.
+ */
+export const URL_PATTERN = /^https?:\/\/\S+$/i;
 
 /**
  * 텍스트에서 첫 번째 http(s) URL 을 추출한다.
