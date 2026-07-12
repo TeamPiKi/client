@@ -1,8 +1,11 @@
 import { useMutation } from '@tanstack/react-query';
+import { isAxiosError } from 'axios';
 import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 
 import { ANALYTICS_EVENT } from '@/consts/analytics';
 import { ROUTES } from '@/consts/route';
+import type { ApiErrorResponseT } from '@/types/api';
 import { logAnalyticsEvent } from '@/utils/analytics';
 
 import { postTournamentStart } from '../_apis/postTournamentStart';
@@ -22,6 +25,20 @@ export const usePostTournamentStart = (tournamentId: number) => {
           source_tournament_id: tournamentId,
         });
         router.push(ROUTES.TOURNAMENT_LOADING(nextTournamentId));
+      },
+      onError: error => {
+        if (!isAxiosError<ApiErrorResponseT>(error) || !error.response) return;
+
+        const { status, data } = error.response;
+
+        if (status === 409) {
+          router.push(ROUTES.TOURNAMENT_MATCH(tournamentId));
+          return;
+        }
+
+        if (status < 500) {
+          toast.error(data.detail ?? '요청을 처리하지 못했어요.');
+        }
       },
     });
 
