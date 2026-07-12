@@ -6,22 +6,6 @@ export type GetInvitePreviewResponseT = {
   participantCount: number;
 };
 
-export type PostJoinGuestRequestT = {
-  /** 영문 대문자 3 + 숫자 3 (서버 패턴: [A-Z]{3}\d{3}). 링크 직접 진입 시 생략 가능 */
-  inviteCode?: string;
-  /** 최대 10자 */
-  nickname: string;
-};
-
-export type PostJoinGuestResponseT = {
-  accessToken: string;
-  refreshToken: string;
-  userId: string;
-  nickname: string;
-  profileImage: string;
-  tournamentId: number;
-};
-
 export type PostJoinRequestT = {
   /** 영문 대문자 3 + 숫자 3 (서버 패턴: [A-Z]{3}\d{3}). 링크 직접 진입 시 생략 가능 */
   inviteCode?: string;

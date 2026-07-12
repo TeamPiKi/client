@@ -1,0 +1,25 @@
+{
+  "applinks": {
+    "details": [
+      {
+        "appIDs": ["AWV8LRP46J.day.no30s.piki"],
+        "components": [
+          {
+            "/": "/auth/callback/*",
+            "exclude": true,
+            "comment": "소셜 로그인 콜백 — 앱으로 가로채면 OAuth 흐름이 깨지므로 브라우저 유지"
+          },
+          {
+            "/": "/api/*",
+            "exclude": true,
+            "comment": "API / 백엔드 브릿지 — 앱으로 보내지 않음"
+          },
+          {
+            "/": "/*",
+            "comment": "그 외 모든 경로는 앱(PiKi)으로 연결"
+          }
+        ]
+      }
+    ]
+  }
+}

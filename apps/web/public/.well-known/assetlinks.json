@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "day.no30s.piki",
+      "sha256_cert_fingerprints": [
+        "41:AD:D6:D6:46:D1:80:4B:D3:BF:03:D6:C6:4F:38:ED:02:A3:2F:3D:7A:18:48:4E:23:76:7A:F5:D7:7E:7B:C8"
+      ]
+    }
+  }
+]
