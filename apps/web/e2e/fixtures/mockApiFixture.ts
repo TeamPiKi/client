@@ -89,6 +89,13 @@ export const test = base.extend<{ api: ApiMockT }>({
       route.fulfill({ status: 200, headers: { 'content-type': 'text/event-stream' }, body: '' })
     );
 
+    /**
+     * dev 전용 react-grab 오버레이(layout.tsx의 unpkg 스크립트) 차단.
+     * - 주입된 오버레이가 trace 스냅샷 페인트를 통째로 막아 뷰어가 빈 화면이 된다
+     * - 테스트 중 외부 CDN 의존 제거 (결정성). 프로덕션 빌드(CI)에는 원래 없음
+     */
+    await page.route('https://unpkg.com/**', route => route.abort());
+
     await provide({
       get: (path, data) =>
         entries.push({ method: 'GET', path, status: 200, body: createApiSuccess(data) }),
