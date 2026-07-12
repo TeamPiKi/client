@@ -2,7 +2,7 @@ import { WEBBRIDGE_MESSAGE_TYPE } from '@piki/core';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { useEffect } from 'react';
 
-import { isWebview, WebBridge } from '@/utils/webBridge';
+import { WebBridge, isWebview } from '@/utils/webBridge';
 
 import { getNotifications } from '../_apis/getNotifications';
 
