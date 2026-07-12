@@ -37,6 +37,7 @@ export type {
   WebReqLogoutMessageT,
   WebReqTokenRefreshedMessageT,
 } from './types/login';
+export type { AppReqNavigateMessageT, NavigatePayloadT } from './types/navigation';
 export type { ShareIntentFileT, ShareIntentMetaT, ShareIntentPayloadT } from './types/shareIntent';
 export type {
   AppReqDeepLinkMessageT,

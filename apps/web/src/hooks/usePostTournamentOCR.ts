@@ -40,8 +40,6 @@ export const usePostTournamentOCR = (tournamentId: number) => {
       else if (status === 403 || status === 404 || status === 409) {
         toast.error(clientErrorMessage);
         router.replace(ROUTES.HOME);
-      } else if (status === 500) {
-        toast.error('서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
       }
     },
   });
