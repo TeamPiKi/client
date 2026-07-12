@@ -26,8 +26,12 @@ const SSR_MOCK_ROUTES: Record<string, unknown> = {
   },
 };
 
+/**
+ * 스텁 서버를 띄운다. 이미 다른 세션(UI 모드 등)이 같은 포트에 띄워둔 경우
+ * null 을 반환하고 기존 서버를 재사용한다 — UI 모드를 켜둔 채 CLI 실행 시 크래시 방지.
+ */
 export const startMockApiServer = (port: number) =>
-  new Promise<http.Server>(resolve => {
+  new Promise<http.Server | null>((resolve, reject) => {
     const server = http.createServer((req, res) => {
       const pathname = new URL(req.url ?? '/', `http://127.0.0.1:${port}`).pathname;
       const body = SSR_MOCK_ROUTES[`${req.method} ${pathname}`];
@@ -48,6 +52,11 @@ export const startMockApiServer = (port: number) =>
 
       res.writeHead(200, { 'content-type': 'application/json' });
       res.end(JSON.stringify(body));
+    });
+
+    server.on('error', (error: NodeJS.ErrnoException) => {
+      if (error.code === 'EADDRINUSE') resolve(null);
+      else reject(error);
     });
 
     server.listen(port, '127.0.0.1', () => resolve(server));
