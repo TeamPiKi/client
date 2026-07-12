@@ -13,6 +13,8 @@ export const useGetNotifications = () => {
     hasNextPage,
     isFetchingNextPage,
     isPending,
+    isError,
+    refetch,
   } = useInfiniteQuery({
     queryKey: ['notifications'],
     queryFn: ({ pageParam }) => getNotifications({ cursor: pageParam }),
@@ -38,5 +40,7 @@ export const useGetNotifications = () => {
     hasNextPage,
     isFetchingNextPage,
     isPending,
+    isError,
+    refetch,
   };
 };
