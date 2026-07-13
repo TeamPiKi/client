@@ -1,4 +1,4 @@
-<img width="7292" height="4092" alt="Group 2147226878" src="https://github.com/user-attachments/assets/52050744-68be-4338-ad94-5c6909c9f974" />
+<img alt="PiKi 배너" src="./docs/images/banner.png" />
 
 # Saved a lot, bought nothing?
 `PiKi`는 쌓아둔 위시템을 토너먼트로 비교해 `직접 결정`하게 도와주는 서비스예요.
@@ -7,7 +7,7 @@
 <img alt="다운로드하기 App Store" src="https://toolbox.marketingtools.apple.com/api/v2/badges/download-on-the-app-store/white/en-us?releaseDate=1781049600" width='17%'/></a>
 
 <a href="https://play.google.com/store/apps/details?id=day.no30s.piki&pcampaignid=web_share">
-  <img alt="Google Play에서 다운로드" src="https://github.com/user-attachments/assets/59f6f42b-8574-4593-88c9-3111757b47a2" width='17%'/>
+  <img alt="Google Play에서 다운로드" src="./docs/images/google-play-badge.png" width='17%'/>
 </a>
 
 ### 모아서 
@@ -29,33 +29,33 @@
 
 | 앱 공유로 가져오기 | 이미지로 가져오기 | 링크로 가져오기 |
 | :---------------: | :---------: | :-----------: |
-| <img alt="앱 공유로 담기" src="https://github.com/user-attachments/assets/2b001de5-a8d5-46a7-b5f1-2e3841ff8fba" width="90%" /> | <img alt="이미지로 담기" src="https://github.com/user-attachments/assets/60b90ecb-433c-4572-a8f8-3fdc854e45bc" width="90%" /> | <img   alt="링크로 담기" src="https://github.com/user-attachments/assets/e6db0ea1-0f08-4bb2-8c31-2b95ada3c85f" width="90%" /> |
+| <img alt="앱 공유로 담기" src="./docs/images/import-share.gif" width="90%" /> | <img alt="이미지로 담기" src="./docs/images/import-image.gif" width="90%" /> | <img alt="링크로 담기" src="./docs/images/import-link.gif" width="90%" /> |
 
 ### 2. 친구 초대하기
 링크·초대 코드로 친구를 초대할 수 있어요. 혼자 고민하기보다, 함께 고르면 더 즐거워요.
  
-<img width="8064" height="7446" alt="친구 초대하기" src="https://github.com/user-attachments/assets/c9d3fd69-bbdb-4cea-91d4-9b3e356d0924" />
+<img alt="친구 초대하기" src="./docs/images/invite-friends.png" />
 
 ### 3. 토너먼트로 고르기
 토너먼트 시작 전, 담긴 후보를 **비슷한 가격대끼리 자동 매칭**해 공정한 1:1 대진표를 만들어요. <br/>
 이후 후보를 하나씩 선택하며 가장 갖고 싶은 아이템을 가려내고, 남은 선택 수와 대진표를 함께 보여줘 **결승까지 얼마나 왔는지** 한눈에 보이게 했어요.
 
-<img width="7290" height="4092" alt="토너먼트 후보 고르기" src="https://github.com/user-attachments/assets/f4505919-1148-41b2-b2d7-f2caa00103e6" />
+<img alt="토너먼트 후보 고르기" src="./docs/images/tournament.png" />
 
 ### 4. 결과 저장·공유하기
 결과를 **영수증 형태로 저장·공유**해요. 친구도 같은 토너먼트에 참여해 서로의 선택을 비교할 수 있어요.
 
-<img width="7293" height="4172" alt="결과 영수증 이미지" src="https://github.com/user-attachments/assets/f43745bc-66a2-4610-8910-b71ec1d52ac7" />
+<img alt="결과 영수증 이미지" src="./docs/images/receipt.png" />
 
 
 ## Tech Stacks
 
-<img width="2544" height="1136" src="https://github.com/user-attachments/assets/78e4fbb0-2531-41f5-bc0c-1e7931459620" />
+<img alt="기술 스택" src="./docs/images/tech-stack.png" />
 
 
 ## Architecture
 
-<img width="2000" height="1311" src="https://github.com/user-attachments/assets/b8c4f3ad-9619-4cd4-8874-ef4663deb552" />
+<img alt="아키텍처" src="./docs/images/architecture.png" />
 
 
 ## 🏡 팀원
