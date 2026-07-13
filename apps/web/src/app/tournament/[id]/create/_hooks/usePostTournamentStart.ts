@@ -7,6 +7,7 @@ import { ANALYTICS_EVENT } from '@/consts/analytics';
 import { ROUTES } from '@/consts/route';
 import type { ApiErrorResponseT } from '@/types/api';
 import { logAnalyticsEvent } from '@/utils/analytics';
+import { getApiErrorMessage } from '@/utils/getApiErrorMessage';
 
 import { postTournamentStart } from '../_apis/postTournamentStart';
 
@@ -29,7 +30,7 @@ export const usePostTournamentStart = (tournamentId: number) => {
       onError: error => {
         if (!isAxiosError<ApiErrorResponseT>(error) || !error.response) return;
 
-        const { status, data } = error.response;
+        const { status } = error.response;
 
         if (status === 409) {
           router.push(ROUTES.TOURNAMENT_MATCH(tournamentId));
@@ -37,7 +38,7 @@ export const usePostTournamentStart = (tournamentId: number) => {
         }
 
         if (status < 500) {
-          toast.error(data.detail ?? '요청을 처리하지 못했어요.');
+          toast.error(getApiErrorMessage(error));
         }
       },
     });
