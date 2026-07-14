@@ -45,14 +45,10 @@ export const usePatchTournamentItem = (tournamentId: number, tournamentItemId: n
          * 404: 토너먼트 or 토너먼트 아이템 존재하지 않음
          * 409: PENDING 상태 아닌 토너먼트
          */
-        if (status < 500) toast.error(clientErrorMessage);
-
         if (status === 403 || status === 404 || status === 409) {
+          toast.error(clientErrorMessage);
           router.replace(ROUTES.TOURNAMENT_CREATE(tournamentId));
-          return;
         }
-
-        throw error;
       },
     });
 

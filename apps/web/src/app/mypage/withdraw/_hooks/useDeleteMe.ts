@@ -5,6 +5,7 @@ import { toast } from 'sonner';
 
 import { ROUTES } from '@/consts/route';
 import { deleteCookie } from '@/utils/cookie';
+import { getApiErrorMessage } from '@/utils/getApiErrorMessage';
 import { WebBridge, isWebview } from '@/utils/webBridge';
 
 import { deleteMe } from '../_apis/deleteMe';
@@ -26,8 +27,8 @@ export const useDeleteMe = () => {
       queryClient.clear();
       router.replace(ROUTES.ROOT);
     },
-    onError: () => {
-      toast.error('잠시 후 다시 시도해주세요.');
+    onError: error => {
+      toast.error(getApiErrorMessage(error));
     },
   });
 
