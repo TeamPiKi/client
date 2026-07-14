@@ -44,6 +44,9 @@ const useTournament = ({ tournamentId, inProgress }: UseTournamentArgs) => {
     inProgress.remainingItems
   );
   const [transitionStage, setTransitionStage] = useState<TransitionStageT | null>(null);
+  // 카드 선택 락 해제용 — 매치가 바뀌지 않는 실패(결승/라운드 마지막 기록 실패)에서
+  // VsSection 을 remount 시켜 재선택을 가능하게 한다 (락은 useCardSelectionAnimation 내부 상태)
+  const [selectionEpoch, setSelectionEpoch] = useState(0);
   // SSR과 클라이언트 첫 렌더에서 동일한 페어 순서를 보장하기 위해, 마운트 후에만 셔플 적용
   // (Math.random 결과가 SSR/CSR 간 달라 hydration mismatch 발생)
   const isMounted = useSyncExternalStore(
@@ -103,6 +106,28 @@ const useTournament = ({ tournamentId, inProgress }: UseTournamentArgs) => {
     setRemainingItems(nextInProgress.remainingItems);
   };
 
+  const unlockSelection = () => setSelectionEpoch(prev => prev + 1);
+
+  /**
+   * 기록은 성공했고 다음 라운드 조회만 실패한 상태 — 재선택을 유도하면 같은 매치를
+   * 중복 기록하게 되므로, 조회(GET)만 다시 시도하는 액션을 토스트로 제공한다.
+   */
+  const showSyncRetryToast = () => {
+    toast.error('다음 라운드를 불러오지 못했어요.', {
+      // 이 토스트가 유일한 복구 수단이라 자동으로 사라지지 않게 유지 (id 로 중복 표시 방지)
+      id: 'tournament-sync-retry',
+      duration: Infinity,
+      action: {
+        label: '다시 시도',
+        onClick: () => {
+          syncWithServer()
+            .then(() => toast.dismiss('tournament-sync-retry'))
+            .catch(showSyncRetryToast);
+        },
+      },
+    });
+  };
+
   const handleSelect = (winner: TournamentItemT) => {
     if (!currentMatch) return;
 
@@ -119,8 +144,11 @@ const useTournament = ({ tournamentId, inProgress }: UseTournamentArgs) => {
     if (isFinalRound) {
       postRecordMatchMutation(matchBody, {
         onSuccess: () => router.push(ROUTES.TOURNAMENT_RESULT(tournamentId)),
-        // 낙관적 상태 변경이 없는 경로 — 현재 매치가 그대로 남아 있어 재선택으로 복구 가능
-        onError: () => toast.error('선택을 저장하지 못했어요. 다시 골라주세요.'),
+        // 낙관적 상태 변경이 없는 경로 — 매치는 그대로지만 카드 선택 락은 걸려 있어 명시적으로 푼다
+        onError: () => {
+          toast.error('선택을 저장하지 못했어요. 다시 골라주세요.');
+          unlockSelection();
+        },
       });
       return;
     }
@@ -132,18 +160,19 @@ const useTournament = ({ tournamentId, inProgress }: UseTournamentArgs) => {
           try {
             await syncWithServer();
           } catch {
-            // 기록은 이미 성공했고 조회만 실패한 상태 — 여기서 재선택을 유도하면
-            // 같은 매치를 중복 기록하게 되므로, 재조회 1회 재시도로 복구한다.
+            // 조회 실패 — 자동 1회 재시도 후에도 실패하면 수동 재시도 토스트로 전환
             try {
               await syncWithServer();
             } catch {
-              toast.error(
-                '다음 라운드를 불러오지 못했어요. 네트워크 확인 후 잠시 뒤 다시 시도해주세요.'
-              );
+              showSyncRetryToast();
             }
           }
         },
-        onError: () => toast.error('선택을 저장하지 못했어요. 다시 골라주세요.'),
+        // 기록 자체가 실패한 경로 — 매치는 그대로지만 카드 선택 락은 걸려 있어 명시적으로 푼다
+        onError: () => {
+          toast.error('선택을 저장하지 못했어요. 다시 골라주세요.');
+          unlockSelection();
+        },
       });
       return;
     }
@@ -195,6 +224,7 @@ const useTournament = ({ tournamentId, inProgress }: UseTournamentArgs) => {
     roundLabel,
     isFinalRound,
     transitionStage,
+    selectionEpoch,
     handleSelect,
     handleTransitionComplete,
   };
