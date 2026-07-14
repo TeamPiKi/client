@@ -1,8 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { isAxiosError } from 'axios';
 import { toast } from 'sonner';
 
-import type { ApiErrorResponseT } from '@/types/api';
+import { getApiErrorMessage } from '@/utils/getApiErrorMessage';
 
 import { patchMe } from '../_apis/patchMe';
 
@@ -21,9 +20,7 @@ export const usePatchMe = () => {
       await queryClient.invalidateQueries({ queryKey: ['me'] });
     },
     onError: error => {
-      if (!isAxiosError<ApiErrorResponseT>(error) || !error.response) return;
-
-      toast.error(error.response.data.detail);
+      toast.error(getApiErrorMessage(error));
     },
   });
 
