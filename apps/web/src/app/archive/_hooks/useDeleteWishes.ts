@@ -16,6 +16,8 @@ export const useWishlistDelete = () => {
       wishIds.forEach(wishId => {
         queryClient.invalidateQueries({ queryKey: ['wish', wishId] });
       });
+      setSelectedIds(new Set());
+      setIsDeleteMode(false);
       toast.success('선택한 위시를 삭제했어요');
     },
   });
@@ -34,14 +36,9 @@ export const useWishlistDelete = () => {
     });
   };
 
-  const handleConfirmDelete = async () => {
+  const handleConfirmDelete = () => {
     if (selectedIds.size === 0) return;
-    try {
-      deleteWishesMutation(Array.from(selectedIds));
-    } finally {
-      setSelectedIds(new Set());
-      setIsDeleteMode(false);
-    }
+    deleteWishesMutation(Array.from(selectedIds));
   };
 
   return {

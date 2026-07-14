@@ -1,157 +1,65 @@
-# Turborepo starter
+<img alt="PiKi 배너" src="./docs/images/banner.png" />
 
-This Turborepo starter is maintained by the Turborepo core team.
+# Saved a lot, bought nothing?
+`PiKi`는 쌓아둔 위시템을 토너먼트로 비교해 `직접 결정`하게 도와주는 서비스예요.
 
-## Using this example
+<a href="https://apps.apple.com/kr/app/piki-%EA%B0%99%EC%9D%B4-%EA%B3%A0%EB%A5%B4%EB%8A%94-%EC%87%BC%ED%95%91-%ED%86%A0%EB%84%88%EB%A8%BC%ED%8A%B8/id6777101805?itscg=30200&itsct=apps_box_badge&mttnsubad=6777101805">
+<img alt="다운로드하기 App Store" src="https://toolbox.marketingtools.apple.com/api/v2/badges/download-on-the-app-store/white/en-us?releaseDate=1781049600" width='17%'/></a>
 
-Run the following command:
+<a href="https://play.google.com/store/apps/details?id=day.no30s.piki&pcampaignid=web_share">
+  <img alt="Google Play에서 다운로드" src="./docs/images/google-play-badge.png" width='17%'/>
+</a>
 
-```sh
-npx create-turbo@latest
-```
+### 모아서 
+29CM, 무신사, 지그재그 어디서 발견했든 원하는 상품을 한곳에 모아보세요.
 
-## What's inside?
+### 비교해서
+모인 후보를 비슷한 가격대끼리 1:1 토너먼트로 붙여요.<br/>
+고민은 짧게, 선택은 둘 중 하나만! 라운드가 올라갈수록 내 취향이 선명해져요.
 
-This Turborepo includes the following packages/apps:
+### 함께
+친구를 초대해 같이 담고, 대신 골라주고, 때로는 모은 후보를 토너먼트째 선물해요. <br/>
+초대 링크 하나면 회원가입 없이 바로 참여할 수 있어요!
 
-### Apps and Packages
 
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@piki/typescript-config`: `tsconfig.json`s used throughout the monorepo
+## ✨ 주요 기능
 
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
+### 1. 위시템 가져오기
+29CM, 무신사, 지그재그 어디서 발견했든 원하는 상품을 PiKi에 바로 가져올 수 있어요. 
 
-### Utilities
+| 앱 공유로 가져오기 | 이미지로 가져오기 | 링크로 가져오기 |
+| :---------------: | :---------: | :-----------: |
+| <img alt="앱 공유로 담기" src="./docs/images/import-share.gif" width="90%" /> | <img alt="이미지로 담기" src="./docs/images/import-image.gif" width="90%" /> | <img alt="링크로 담기" src="./docs/images/import-link.gif" width="90%" /> |
 
-This Turborepo has some additional tools already setup for you:
+### 2. 친구 초대하기
+링크·초대 코드로 친구를 초대할 수 있어요. 혼자 고민하기보다, 함께 고르면 더 즐거워요.
+ 
+<img alt="친구 초대하기" src="./docs/images/invite-friends.png" />
 
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
+### 3. 토너먼트로 고르기
+토너먼트 시작 전, 담긴 후보를 **비슷한 가격대끼리 자동 매칭**해 공정한 1:1 대진표를 만들어요. <br/>
+이후 후보를 하나씩 선택하며 가장 갖고 싶은 아이템을 가려내고, 남은 선택 수와 대진표를 함께 보여줘 **결승까지 얼마나 왔는지** 한눈에 보이게 했어요.
 
-### Build
+<img alt="토너먼트 후보 고르기" src="./docs/images/tournament.png" />
 
-To build all apps and packages, run the following command:
+### 4. 결과 저장·공유하기
+결과를 **영수증 형태로 저장·공유**해요. 친구도 같은 토너먼트에 참여해 서로의 선택을 비교할 수 있어요.
 
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
+<img alt="결과 영수증 이미지" src="./docs/images/receipt.png" />
 
-```sh
-cd my-turborepo
-turbo build
-```
 
-Without global `turbo`, use your package manager:
+## Tech Stacks
 
-```sh
-cd my-turborepo
-npx turbo build
-yarn dlx turbo build
-pnpm exec turbo build
-```
+<img alt="기술 스택" src="./docs/images/tech-stack.png" />
 
-You can build a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
 
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
+## Architecture
 
-```sh
-turbo build --filter=docs
-```
+<img alt="아키텍처" src="./docs/images/architecture.png" />
 
-Without global `turbo`:
 
-```sh
-npx turbo build --filter=docs
-yarn exec turbo build --filter=docs
-pnpm exec turbo build --filter=docs
-```
+## 🏡 팀원
 
-### Develop
-
-To develop all apps and packages, run the following command:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
-
-```sh
-cd my-turborepo
-turbo dev
-```
-
-Without global `turbo`, use your package manager:
-
-```sh
-cd my-turborepo
-npx turbo dev
-yarn exec turbo dev
-pnpm exec turbo dev
-```
-
-You can develop a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
-
-```sh
-turbo dev --filter=web
-```
-
-Without global `turbo`:
-
-```sh
-npx turbo dev --filter=web
-yarn exec turbo dev --filter=web
-pnpm exec turbo dev --filter=web
-```
-
-### Remote Caching
-
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
-
-Turborepo can use a technique known as [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
-
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
-
-```sh
-cd my-turborepo
-turbo login
-```
-
-Without global `turbo`, use your package manager:
-
-```sh
-cd my-turborepo
-npx turbo login
-yarn exec turbo login
-pnpm exec turbo login
-```
-
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
-
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
-
-```sh
-turbo link
-```
-
-Without global `turbo`:
-
-```sh
-npx turbo link
-yarn exec turbo link
-pnpm exec turbo link
-```
-
-## Useful Links
-
-Learn more about the power of Turborepo:
-
-- [Tasks](https://turborepo.dev/docs/crafting-your-repository/running-tasks)
-- [Caching](https://turborepo.dev/docs/crafting-your-repository/caching)
-- [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching)
-- [Filtering](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters)
-- [Configuration Options](https://turborepo.dev/docs/reference/configuration)
-- [CLI Usage](https://turborepo.dev/docs/reference/command-line-reference)
+| <img src="https://github.com/iodio89.png" width="130" height="130" /> | <img src="https://github.com/soyeong0115.png" width="130" height="130" /> | <img src="https://github.com/kanghaeun.png" width="130" height="130" /> | <img src="https://github.com/ychany.png" width="130" height="130" /> |
+|:---------:|:---------:|:---------:|:---------:|
+| <a href="https://github.com/iodio89">정선아</a> | <a href="https://github.com/soyeong0115">박소영</a> | <a href="https://github.com/kanghaeun">강하은</a> | <a href="https://github.com/ychany">조영찬</a> |
