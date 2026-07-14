@@ -3,12 +3,17 @@
 import { type ImagePickerSuccessPayloadT, WEBBRIDGE_MESSAGE_TYPE } from '@piki/core';
 import type { ChangeEvent } from 'react';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { toast } from 'sonner';
 
 import { useWebBridgeMessage } from '@/hooks/useWebBridgeMessage';
 import { nativeImageToFile } from '@/utils/handleImage';
 import { WebBridge, isWebview } from '@/utils/webBridge';
 
 const DEFAULT_MAX_COUNT = 5;
+
+/** 서버 업로드 한도(413) 사전검증 — 초과 파일은 업로드 전에 걸러 왕복을 막는다 */
+const MAX_IMAGE_FILE_SIZE_MB = 5;
+const MAX_IMAGE_FILE_SIZE_BYTES = MAX_IMAGE_FILE_SIZE_MB * 1024 * 1024;
 
 type ImagePickerResultT = {
   files: File[];
@@ -50,9 +55,17 @@ export const useImagePicker = ({
 
   const handleImagesSelect = useCallback(
     async ({ files, skippedCount }: ImagePickerResultT) => {
+      // 서버 한도 초과 파일은 업로드 전에 걸러서 413 왕복을 막는다 (웹/웹뷰 공통 경로).
+      const validFiles = files.filter(file => file.size <= MAX_IMAGE_FILE_SIZE_BYTES);
+      const oversizedCount = files.length - validFiles.length;
+      if (oversizedCount > 0) {
+        toast.error(`${MAX_IMAGE_FILE_SIZE_MB}MB 이하 이미지만 업로드할 수 있어요.`);
+      }
+      if (validFiles.length === 0) return;
+
       setIsPending(true);
       try {
-        await onSuccess(files, skippedCount);
+        await onSuccess(validFiles, skippedCount);
       } catch (error) {
         const pickError =
           error instanceof Error ? error : new Error('이미지 처리 중 오류가 발생했습니다.');

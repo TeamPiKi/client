@@ -11,8 +11,7 @@ import Input from '@/components/input';
 import { ROUTES } from '@/consts/route';
 import { usePostWishLink } from '@/hooks/usePostWishLink';
 import type { ItemTypeT } from '@/types/item';
-
-const URL_PATTERN = /^https:\/\/.+/i;
+import { URL_PATTERN, extractUrlFromText } from '@/utils/extractUrl';
 
 type ByLinkProps = {
   type: ItemTypeT;
@@ -42,13 +41,16 @@ function ByLinkDialog({ type, open, onOpenChange }: ByLinkProps) {
   const handleSubmit = () => {
     if (isEmpty) return;
 
-    if (!URL_PATTERN.test(trimmedUrl)) {
+    // 상품 설명과 URL 이 함께 붙여넣어진 경우 URL 만 추출해 제출한다 (onPaste 를 타지 않은 경로 안전망).
+    const submitUrl = URL_PATTERN.test(trimmedUrl) ? trimmedUrl : extractUrlFromText(trimmedUrl);
+
+    if (!submitUrl) {
       setHasError(true);
       return;
     }
 
     if (type === 'wish')
-      postWishLinkMutation(trimmedUrl, {
+      postWishLinkMutation(submitUrl, {
         onSettled: () => {
           onOpenChange(false);
           resetState();
@@ -58,7 +60,7 @@ function ByLinkDialog({ type, open, onOpenChange }: ByLinkProps) {
         },
       });
     else
-      postTournamentItemLinkMutation(trimmedUrl, {
+      postTournamentItemLinkMutation(submitUrl, {
         onSettled: () => {
           onOpenChange(false);
           resetState();
@@ -69,6 +71,15 @@ function ByLinkDialog({ type, open, onOpenChange }: ByLinkProps) {
   const handleChange = (value: string) => {
     setUrl(value);
     if (hasError) setHasError(false);
+  };
+
+  /** 상품 설명 + URL 형태로 붙여넣으면 URL 만 입력창에 반영한다 */
+  const handlePaste = (event: React.ClipboardEvent<HTMLInputElement>) => {
+    const extractedUrl = extractUrlFromText(event.clipboardData.getData('text'));
+    if (!extractedUrl) return;
+
+    event.preventDefault();
+    handleChange(extractedUrl);
   };
 
   const handleOpenChange = (nextOpen: boolean) => {
@@ -89,11 +100,11 @@ function ByLinkDialog({ type, open, onOpenChange }: ByLinkProps) {
             placeholder="복사한 링크를 입력해주세요."
             value={url}
             onChange={event => handleChange(event.target.value)}
+            onPaste={handlePaste}
             left={<LinkIconFill className="size-5" />}
             aria-invalid={hasError}
-            {...(hasError ? { helperText: 'https://로 시작하는 URL을 입력해주세요.' } : {})}
+            {...(hasError ? { helperText: '올바른 URL 형식으로 입력해주세요.' } : {})}
             autoFocus
-            inputMode="url"
           />
           <Button
             size="lg"
