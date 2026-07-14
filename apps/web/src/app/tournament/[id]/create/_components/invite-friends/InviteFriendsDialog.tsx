@@ -86,7 +86,7 @@ function InviteFriendsDialog({
           setIsPickerOpen(false);
         },
         onError: error => {
-          toast.error(getApiErrorMessage(error, '마감 시각을 변경하지 못했어요.'));
+          toast.error(getApiErrorMessage(error));
         },
       }
     );

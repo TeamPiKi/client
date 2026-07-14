@@ -21,9 +21,7 @@ export const usePostTournamentItemsByWish = (tournamentId: number) => {
       router.push(`${ROUTES.TOURNAMENT_CREATE(tournamentId)}?scrollToLast=true`);
     },
     onError: error => {
-      toast.error(
-        getApiErrorMessage(error, '위시템 추가에 실패했어요. 잠시 후 다시 시도해주세요.')
-      );
+      toast.error(getApiErrorMessage(error));
     },
   });
 

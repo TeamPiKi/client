@@ -28,7 +28,7 @@ export const useDeleteMe = () => {
       router.replace(ROUTES.ROOT);
     },
     onError: error => {
-      toast.error(getApiErrorMessage(error, '잠시 후 다시 시도해주세요.'));
+      toast.error(getApiErrorMessage(error));
     },
   });
 

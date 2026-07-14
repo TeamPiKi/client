@@ -42,9 +42,7 @@ function PlateShareDialog({
       try {
         await postPlayLinkMutation();
       } catch (error) {
-        toast.warning(
-          getApiErrorMessage(error, '공유 링크를 생성하지 못했어요. 다시 시도해주세요.')
-        );
+        toast.warning(getApiErrorMessage(error));
         return;
       }
     }
