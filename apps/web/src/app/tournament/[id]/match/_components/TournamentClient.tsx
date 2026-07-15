@@ -19,6 +19,7 @@ function TournamentClient({ tournamentId, tournamentName, inProgress }: Tourname
     roundLabel,
     isFinalRound,
     transitionStage,
+    selectionEpoch,
     handleSelect,
     handleTransitionComplete,
   } = useTournament({ tournamentId, tournamentName, inProgress });
@@ -43,7 +44,8 @@ function TournamentClient({ tournamentId, tournamentName, inProgress }: Tourname
       <div className={`w-full ${isFinalRound ? 'mt-29' : 'mt-8'}`}>
         {currentMatch && (
           <VsSection
-            key={roundLabel}
+            // selectionEpoch: 기록 실패 시 remount 로 카드 선택 락을 풀어 재선택 가능하게 한다
+            key={`${roundLabel}-${selectionEpoch}`}
             left={currentMatch[0]}
             right={currentMatch[1]}
             isFinal={isFinalRound}
