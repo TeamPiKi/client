@@ -28,13 +28,13 @@ async function WishEditLayout({ children, params }: WishEditLayoutProps) {
 
     /** 아직 PROCESSING 상태인 경우에는 접근 불가 */
     if (wishData.item.status === 'PROCESSING' || wishData.item.status === 'PENDING')
-      redirect(ROUTES.ARCHIVE());
+      redirect(ROUTES.WISHLIST);
   } catch (error) {
     if (!isAxiosError<ApiErrorResponseT>(error)) throw error;
 
     /** 위시가 존재하지 않는 경우 */
     if (error.response?.status === 404)
-      redirect(ROUTES.ARCHIVE('wish'));
+      redirect(ROUTES.WISHLIST);
 
     throw error;
   }

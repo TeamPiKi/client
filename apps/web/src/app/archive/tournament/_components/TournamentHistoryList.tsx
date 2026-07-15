@@ -3,9 +3,14 @@
 import { TrophyIconFill } from '@/assets/icons';
 import TournamentCard from '@/components/tournament-card';
 import { useGetTournamentList } from '@/hooks/useGetTournamentList';
+import type { TournamentStatusT } from '@/types/tournament';
 
-function TournamentHistoryList() {
-  const { tournamentListData } = useGetTournamentList();
+type Props = {
+  statuses: TournamentStatusT[];
+};
+
+function TournamentHistoryList({ statuses }: Props) {
+  const { tournamentListData } = useGetTournamentList(statuses);
 
   if (tournamentListData.length === 0)
     return (

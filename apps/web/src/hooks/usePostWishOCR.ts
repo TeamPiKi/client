@@ -23,7 +23,7 @@ export const usePostWishOCR = () => {
     onSuccess: () => {
       logAnalyticsEvent(ANALYTICS_EVENT.WISH_ADD_COMPLETE, { source: 'ocr' });
       queryClient.invalidateQueries({ queryKey: ['wishlists'] });
-      router.push(ROUTES.ARCHIVE('wish'));
+      router.push(ROUTES.WISHLIST);
     },
     onError: error => {
       if (!isAxiosError<ApiErrorResponseT>(error) || !error.response) return;

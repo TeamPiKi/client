@@ -56,7 +56,7 @@ function ByLinkDialog({ type, open, onOpenChange }: ByLinkProps) {
           resetState();
         },
         onSuccess: () => {
-          router.push(ROUTES.ARCHIVE('wish'));
+          router.push(ROUTES.WISHLIST);
         },
       });
     else
