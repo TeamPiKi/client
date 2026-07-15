@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 import { ROUTES } from '@/consts/route';
 import type { ApiErrorResponseT } from '@/types/api';
 import type { PatchItemRequestT } from '@/types/item';
+import { getApiErrorMessage } from '@/utils/getApiErrorMessage';
 
 import { patchWish } from '../_apis/patchWish';
 
@@ -30,17 +31,13 @@ export const usePatchWish = (wishId: number) => {
     onError: error => {
       if (!isAxiosError<ApiErrorResponseT>(error) || !error.response) return;
 
-      const {
-        status,
-        data: { detail },
-      } = error.response;
-
-      const clientErrorMessage = detail ?? '요청을 처리하지 못했습니다.';
+      const { status } = error.response;
+      const errorMessage = getApiErrorMessage(error);
 
       if (status === 400) {
-        toast.error(clientErrorMessage);
+        toast.error(errorMessage);
       } else if (status === 403 || status === 404 || status === 409) {
-        toast.error(clientErrorMessage);
+        toast.error(errorMessage);
         router.replace(ROUTES.WISHLIST);
       }
     },

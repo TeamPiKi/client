@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 import { ROUTES } from '@/consts/route';
 import type { ApiErrorResponseT } from '@/types/api';
 import type { PatchItemRequestT } from '@/types/item';
+import { getApiErrorMessage } from '@/utils/getApiErrorMessage';
 
 import { patchTournamentItem } from '../_apis/patchTournamentItem';
 
@@ -33,12 +34,7 @@ export const usePatchTournamentItem = (tournamentId: number, tournamentItemId: n
       onError: error => {
         if (!isAxiosError<ApiErrorResponseT>(error) || !error.response) return;
 
-        const {
-          status,
-          data: { detail },
-        } = error.response;
-
-        const clientErrorMessage = detail ?? '요청을 처리하지 못했습니다.';
+        const { status } = error.response;
 
         /**
          * 403: 토너먼트 참여 권한 없음
@@ -46,7 +42,7 @@ export const usePatchTournamentItem = (tournamentId: number, tournamentItemId: n
          * 409: PENDING 상태 아닌 토너먼트
          */
         if (status === 403 || status === 404 || status === 409) {
-          toast.error(clientErrorMessage);
+          toast.error(getApiErrorMessage(error));
           router.replace(ROUTES.TOURNAMENT_CREATE(tournamentId));
         }
       },

@@ -3,6 +3,7 @@ import { isAxiosError } from 'axios';
 import { toast } from 'sonner';
 
 import type { ApiErrorResponseT } from '@/types/api';
+import { getApiErrorMessage } from '@/utils/getApiErrorMessage';
 
 import { postTournamentItemLink } from '../_apis/postTournamentItemLink';
 
@@ -18,14 +19,8 @@ export const usePostTournamentItemLink = (tournamentId: number) => {
       onError: error => {
         if (!isAxiosError<ApiErrorResponseT>(error) || !error.response) return;
 
-        const {
-          status,
-          data: { detail },
-        } = error.response;
-
-        if (status < 500) {
-          const clientErrorMessage = detail ?? '요청을 처리하지 못했습니다.';
-          toast.error(clientErrorMessage);
+        if (error.response.status < 500) {
+          toast.error(getApiErrorMessage(error));
           return;
         }
 

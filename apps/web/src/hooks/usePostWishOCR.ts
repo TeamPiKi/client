@@ -8,6 +8,7 @@ import { ANALYTICS_EVENT } from '@/consts/analytics';
 import { ROUTES } from '@/consts/route';
 import type { ApiErrorResponseT } from '@/types/api';
 import { logAnalyticsEvent } from '@/utils/analytics';
+import { getApiErrorMessage } from '@/utils/getApiErrorMessage';
 import { getLoginPath } from '@/utils/loginRedirect';
 
 export const usePostWishOCR = () => {
@@ -33,9 +34,9 @@ export const usePostWishOCR = () => {
        * 400: 이미지 개수/형식/크기 초과
        * 403: 게스트인 경우
        */
-      if (error.response.status === 400) toast.error(error.response.data.detail);
+      if (error.response.status === 400) toast.error(getApiErrorMessage(error));
       else if (error.response.status === 403) {
-        toast.error(error.response.data.detail);
+        toast.error(getApiErrorMessage(error));
         router.replace(getLoginPath(`${window.location.pathname}${window.location.search}`));
       }
     },

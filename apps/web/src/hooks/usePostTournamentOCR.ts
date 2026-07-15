@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 import { postTournamentOCR } from '@/apis/postTournamentOCR';
 import { ROUTES } from '@/consts/route';
 import type { ApiErrorResponseT } from '@/types/api';
+import { getApiErrorMessage } from '@/utils/getApiErrorMessage';
 
 export const usePostTournamentOCR = (tournamentId: number) => {
   const router = useRouter();
@@ -23,12 +24,8 @@ export const usePostTournamentOCR = (tournamentId: number) => {
     onError: error => {
       if (!isAxiosError<ApiErrorResponseT>(error) || !error.response) return;
 
-      const {
-        status,
-        data: { detail },
-      } = error.response;
-
-      const clientErrorMessage = detail ?? '요청을 처리하지 못했습니다.';
+      const { status } = error.response;
+      const errorMessage = getApiErrorMessage(error);
 
       /**
        * 400: 이미지 개수/형식/크기 초과
@@ -36,9 +33,9 @@ export const usePostTournamentOCR = (tournamentId: number) => {
        * 404: 토너먼트 존재하지 않음
        * 409: PENDING 상태 아닌 토너먼트
        */
-      if (status === 400) toast.error(clientErrorMessage);
+      if (status === 400) toast.error(errorMessage);
       else if (status === 403 || status === 404 || status === 409) {
-        toast.error(clientErrorMessage);
+        toast.error(errorMessage);
         router.replace(ROUTES.HOME);
       }
     },

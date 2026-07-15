@@ -8,6 +8,7 @@ import { ANALYTICS_EVENT } from '@/consts/analytics';
 import { ROUTES } from '@/consts/route';
 import type { ApiErrorResponseT } from '@/types/api';
 import { logAnalyticsEvent } from '@/utils/analytics';
+import { getApiErrorMessage } from '@/utils/getApiErrorMessage';
 
 export const usePostWishLink = () => {
   const router = useRouter();
@@ -28,14 +29,8 @@ export const usePostWishLink = () => {
     onError: error => {
       if (!isAxiosError<ApiErrorResponseT>(error) || !error.response) return;
 
-      const {
-        status,
-        data: { detail },
-      } = error.response;
-
-      if (status < 500) {
-        const clientErrorMessage = detail ?? '요청을 처리하지 못했습니다.';
-        toast.error(clientErrorMessage);
+      if (error.response.status < 500) {
+        toast.error(getApiErrorMessage(error));
         return;
       }
 
