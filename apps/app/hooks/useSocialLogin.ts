@@ -3,6 +3,7 @@ import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { login as kakaoLogin } from '@react-native-kakao/user';
 import * as AppleAuthentication from 'expo-apple-authentication';
 import { useCallback } from 'react';
+import { Platform } from 'react-native';
 
 import { postSocialLogin } from '@/apis/postSocialLogin';
 import { TokenStorage } from '@/utils/tokenStorage';
@@ -11,6 +12,15 @@ import { WebBridge } from '@/utils/webBridge';
 export const useSocialLogin = () => {
   const handleLogin = useCallback(async (provider: SocialProviderT) => {
     try {
+      // 웹에서 버튼을 숨기지만, 혹시 요청이 들어와도 iOS 전용 모듈 호출 전에 방어한다.
+      if (provider === 'apple' && Platform.OS !== 'ios') {
+        WebBridge.postMessage({
+          type: WEBBRIDGE_MESSAGE_TYPE.SOCIAL_LOGIN_ERROR,
+          payload: { detail: 'Apple 로그인은 iOS에서만 지원해요.' },
+        });
+        return;
+      }
+
       let accessToken: string;
 
       if (provider === 'kakao') {

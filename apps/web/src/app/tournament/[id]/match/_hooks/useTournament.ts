@@ -3,6 +3,7 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { useMemo, useRef, useState, useSyncExternalStore } from 'react';
+import { toast } from 'sonner';
 
 import { ROUTES } from '@/consts/route';
 import type { TournamentItemT } from '@/types/tournament';
@@ -43,6 +44,9 @@ const useTournament = ({ tournamentId, inProgress }: UseTournamentArgs) => {
     inProgress.remainingItems
   );
   const [transitionStage, setTransitionStage] = useState<TransitionStageT | null>(null);
+  // 카드 선택 락 해제용 — 매치가 바뀌지 않는 실패(결승/라운드 마지막 기록 실패)에서
+  // VsSection 을 remount 시켜 재선택을 가능하게 한다 (락은 useCardSelectionAnimation 내부 상태)
+  const [selectionEpoch, setSelectionEpoch] = useState(0);
   // SSR과 클라이언트 첫 렌더에서 동일한 페어 순서를 보장하기 위해, 마운트 후에만 셔플 적용
   // (Math.random 결과가 SSR/CSR 간 달라 hydration mismatch 발생)
   const isMounted = useSyncExternalStore(
@@ -67,6 +71,63 @@ const useTournament = ({ tournamentId, inProgress }: UseTournamentArgs) => {
   const isFinalRound = currentRound === 2;
   const isLastMatchInRound = pairs.length === 1;
 
+  /**
+   * 서버 권위 상태로 재동기화.
+   * - 낙관적 업데이트가 서버와 어긋났을 때 (매치 기록 실패) 롤백 용도
+   * - 라운드 전환 조회 실패 시 재시도 용도
+   * 라운드가 넘어간 상태면 기존 전환 UX(준결승/결승 바텀시트)를 그대로 태운다.
+   */
+  const syncWithServer = async () => {
+    const next = await getTournament(tournamentId);
+    queryClient.setQueryData(['tournament', tournamentId], next);
+
+    if (next.status === 'COMPLETED') {
+      router.replace(ROUTES.TOURNAMENT_RESULT(tournamentId));
+      return;
+    }
+    if (next.status !== 'IN_PROGRESS' || !next.inProgress) return;
+
+    const nextInProgress = next.inProgress;
+
+    // 라운드 전환 — 서버의 실제 다음 라운드 수 기준으로 바텀시트 판단
+    // (currentRound / 2 계산은 홀수 강에서 틀릴 수 있어 서버 응답만 신뢰)
+    if (nextInProgress.currentRound !== currentRound) {
+      const stage = getTransitionStage(nextInProgress.currentRound);
+
+      if (stage !== 'toNext') {
+        // 준결승/결승 바텀시트 — ref에 저장하고 시트 표시
+        pendingNextRoundRef.current = nextInProgress;
+        setTransitionStage(stage);
+        return;
+      }
+    }
+
+    setCurrentRound(nextInProgress.currentRound);
+    setRemainingItems(nextInProgress.remainingItems);
+  };
+
+  const unlockSelection = () => setSelectionEpoch(prev => prev + 1);
+
+  /**
+   * 기록은 성공했고 다음 라운드 조회만 실패한 상태 — 재선택을 유도하면 같은 매치를
+   * 중복 기록하게 되므로, 조회(GET)만 다시 시도하는 액션을 토스트로 제공한다.
+   */
+  const showSyncRetryToast = () => {
+    toast.error('다음 라운드를 불러오지 못했어요.', {
+      // 이 토스트가 유일한 복구 수단이라 자동으로 사라지지 않게 유지 (id 로 중복 표시 방지)
+      id: 'tournament-sync-retry',
+      duration: Infinity,
+      action: {
+        label: '다시 시도',
+        onClick: () => {
+          syncWithServer()
+            .then(() => toast.dismiss('tournament-sync-retry'))
+            .catch(showSyncRetryToast);
+        },
+      },
+    });
+  };
+
   const handleSelect = (winner: TournamentItemT) => {
     if (!currentMatch) return;
 
@@ -83,44 +144,58 @@ const useTournament = ({ tournamentId, inProgress }: UseTournamentArgs) => {
     if (isFinalRound) {
       postRecordMatchMutation(matchBody, {
         onSuccess: () => router.push(ROUTES.TOURNAMENT_RESULT(tournamentId)),
-      });
-      return;
-    }
-
-    // 라운드 마지막 매치 — 서버의 실제 다음 라운드 수 기준으로 바텀시트 판단
-    // (currentRound / 2 계산은 홀수 강에서 틀릴 수 있어 서버 응답만 신뢰)
-    if (isLastMatchInRound) {
-      postRecordMatchMutation(matchBody, {
-        onSuccess: async () => {
-          try {
-            const next = await getTournament(tournamentId);
-            queryClient.setQueryData(['tournament', tournamentId], next);
-
-            if (next.status !== 'IN_PROGRESS' || !next.inProgress) return;
-
-            const nextInProgress = next.inProgress;
-            const stage = getTransitionStage(nextInProgress.currentRound);
-
-            if (stage === 'toNext') {
-              setCurrentRound(nextInProgress.currentRound);
-              setRemainingItems(nextInProgress.remainingItems);
-              return;
-            }
-
-            // 준결승/결승 바텀시트 — ref에 저장하고 시트 표시
-            pendingNextRoundRef.current = nextInProgress;
-            setTransitionStage(stage);
-          } catch (error) {
-            // 네트워크 오류 등으로 실패해도 UI가 멈추지 않도록 — 사용자가 다시 시도하면 재조회됨
-            console.error('[useTournament] 라운드 전환 데이터 조회 실패:', error);
-          }
+        // 낙관적 상태 변경이 없는 경로 — 매치는 그대로지만 카드 선택 락은 걸려 있어 명시적으로 푼다
+        onError: () => {
+          toast.error('선택을 저장하지 못했어요. 다시 골라주세요.');
+          unlockSelection();
         },
       });
       return;
     }
 
-    // 일반 라운드 — 낙관적 진행 (성공/실패와 무관하게 다음 매치로)
-    postRecordMatchMutation(matchBody);
+    // 라운드 마지막 매치 — 기록 성공 후 서버 재조회로 다음 라운드 진입
+    if (isLastMatchInRound) {
+      postRecordMatchMutation(matchBody, {
+        onSuccess: async () => {
+          try {
+            await syncWithServer();
+          } catch {
+            // 조회 실패 — 자동 1회 재시도 후에도 실패하면 수동 재시도 토스트로 전환
+            try {
+              await syncWithServer();
+            } catch {
+              showSyncRetryToast();
+            }
+          }
+        },
+        // 기록 자체가 실패한 경로 — 매치는 그대로지만 카드 선택 락은 걸려 있어 명시적으로 푼다
+        onError: () => {
+          toast.error('선택을 저장하지 못했어요. 다시 골라주세요.');
+          unlockSelection();
+        },
+      });
+      return;
+    }
+
+    // 일반 라운드 — 낙관적 진행 (기록 요청과 동시에 다음 매치로)
+    postRecordMatchMutation(matchBody, {
+      // 기록 실패 시 낙관적으로 제거한 페어를 복구해 클라/서버 상태 정합을 맞춘다.
+      onError: async () => {
+        toast.error('선택을 저장하지 못했어요. 다시 골라주세요.');
+        try {
+          await syncWithServer();
+        } catch {
+          // 재조회마저 실패 — 로컬에서 페어만 복원 (pairByPriceAsc 가 재정렬하므로 순서 무관)
+          setRemainingItems(prev => {
+            const existingIds = new Set(prev.map(item => item.tournamentItemId));
+            const restored = [first, second].filter(
+              item => !existingIds.has(item.tournamentItemId)
+            );
+            return [...prev, ...restored];
+          });
+        }
+      },
+    });
 
     // 현재 매치 페어를 remainingItems에서 제거 (서버 동작과 동일)
     setRemainingItems(prev =>
@@ -149,6 +224,7 @@ const useTournament = ({ tournamentId, inProgress }: UseTournamentArgs) => {
     roundLabel,
     isFinalRound,
     transitionStage,
+    selectionEpoch,
     handleSelect,
     handleTransitionComplete,
   };

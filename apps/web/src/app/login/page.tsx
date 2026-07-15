@@ -1,3 +1,5 @@
+import { WEBVIEW_UA_TOKEN } from '@piki/core';
+import { headers } from 'next/headers';
 import Link from 'next/link';
 
 import { getMe } from '@/apis/getMe';
@@ -20,6 +22,14 @@ async function LoginPage({ searchParams }: LoginPageProps) {
     .catch(() => null);
   const canReuseGuestSession = user?.identityType === 'GUEST';
 
+  /**
+   * Android 웹뷰에서는 Apple 로그인 미노출.
+   * 앱의 Apple 로그인은 iOS 전용 네이티브 모듈(expo-apple-authentication)로 처리되어
+   * Android 에서 선택 시 항상 실패한다. (일반 Android 브라우저는 웹 OAuth 라 정상 동작)
+   */
+  const userAgent = (await headers()).get('user-agent') ?? '';
+  const isAndroidWebview = userAgent.includes(WEBVIEW_UA_TOKEN) && /android/i.test(userAgent);
+
   return (
     <div className="flex min-h-dvh flex-col items-center bg-gray-50 px-4 pt-padding-top pb-10">
       <div className="mt-15 flex flex-col items-center gap-6">
@@ -34,6 +44,7 @@ async function LoginPage({ searchParams }: LoginPageProps) {
           redirect={redirectParam ?? null}
           action={action ?? null}
           canReuseGuestSession={canReuseGuestSession}
+          showAppleLogin={!isAndroidWebview}
         />
 
         <p className="mt-9 text-center font-features-['ss10'_on] text-[11px] leading-[150%] font-medium tracking-[-0.232px] text-text-neutral-tertiary">

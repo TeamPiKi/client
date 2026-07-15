@@ -44,8 +44,13 @@ export function useWebBridgeMessage(handler: (messageData: WebBridgeMessageT) =>
       }
     };
 
+    /** RN → 웹 메시지는 iOS 에선 window, Android 에선 document 에 dispatch 된다 (react-native-webview 동작) */
     window.addEventListener('message', listener);
+    document.addEventListener('message', listener as EventListener);
 
-    return () => window.removeEventListener('message', listener);
+    return () => {
+      window.removeEventListener('message', listener);
+      document.removeEventListener('message', listener as EventListener);
+    };
   }, []);
 }

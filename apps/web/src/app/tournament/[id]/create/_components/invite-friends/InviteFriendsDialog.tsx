@@ -9,6 +9,7 @@ import { Drawer, DrawerContent, DrawerDescription, DrawerTitle } from '@/compone
 import { ANALYTICS_EVENT } from '@/consts/analytics';
 import { logAnalyticsEvent } from '@/utils/analytics';
 import { parseServerLocalDateTime } from '@/utils/formatDate';
+import { getApiErrorMessage } from '@/utils/getApiErrorMessage';
 import { share } from '@/utils/share';
 
 import { usePatchInviteExpiry } from '../../_hooks/usePatchInviteExpiry';
@@ -84,8 +85,8 @@ function InviteFriendsDialog({
           toast.success('초대 마감 시각이 변경되었어요.');
           setIsPickerOpen(false);
         },
-        onError: () => {
-          toast.error('마감 시각을 변경하지 못했어요.');
+        onError: error => {
+          toast.error(getApiErrorMessage(error));
         },
       }
     );
