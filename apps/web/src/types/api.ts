@@ -1,13 +1,15 @@
+import type { ErrorCodeT } from '@piki/core';
+
 // 공통 성공 응답 타입
 export type ApiResponseT<T> = {
   data: T;
-  detail: string;
-  code: string;
+  detail: string; // NOTE: 삭제 예정
+  code: null;
 };
 
 // 공통 에러 응답 타입
 export type ApiErrorResponseT = {
   data: null;
-  detail: string;
-  code: string;
+  detail: string; // NOTE: 삭제 예정
+  code: ErrorCodeT | (string & {});
 };
