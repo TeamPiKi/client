@@ -1,11 +1,11 @@
-import WishlistLayout from '../_components/WishlistLayout';
-import WishContent from '../_components/wish-content';
+import ArchivePageLayout from '../_common/_components/ArchivePageLayout';
+import WishContent from './_components/WishContent';
 
 async function ArchiveWishPage() {
   return (
-    <WishlistLayout title="위시리스트">
+    <ArchivePageLayout title="위시리스트">
       <WishContent />
-    </WishlistLayout>
+    </ArchivePageLayout>
   );
 }
 

@@ -33,8 +33,7 @@ async function WishEditLayout({ children, params }: WishEditLayoutProps) {
     if (!isAxiosError<ApiErrorResponseT>(error)) throw error;
 
     /** 위시가 존재하지 않는 경우 */
-    if (error.response?.status === 404)
-      redirect(ROUTES.WISHLIST);
+    if (error.response?.status === 404) redirect(ROUTES.WISHLIST);
 
     throw error;
   }

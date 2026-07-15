@@ -4,7 +4,7 @@ import { toast } from 'sonner';
 
 import { deleteWishes } from '../_apis/deleteWishes';
 
-export const useWishlistDelete = () => {
+export const useDeleteWishes = () => {
   const [isDeleteMode, setIsDeleteMode] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
 

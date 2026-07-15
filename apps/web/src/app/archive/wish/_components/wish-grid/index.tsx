@@ -1,11 +1,11 @@
 import Link from 'next/link';
 
-import WishCard from '@/app/archive/_components/wish-grid/WishCard';
-import WishFailedCard from '@/app/archive/_components/wish-grid/WishFailedCard';
 import { CheckboxEmptyIconFill, CheckboxSelectedIconFill } from '@/assets/icons';
+import WishCard from '@/components/common/wish-card';
 import { ROUTES } from '@/consts/route';
+import type { WishItemT } from '@/types/wish';
 
-import type { WishItemT } from '../../_types/wish';
+import WishFailedCard from './WishFailedCard';
 import WishProcessingCard from './WishProcessingCard';
 
 type WishGridProps = {

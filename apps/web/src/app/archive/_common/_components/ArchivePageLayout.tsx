@@ -5,7 +5,7 @@ type Props = {
   children: React.ReactNode;
 };
 
-function WishlistLayout({ title, children }: Props) {
+function ArchivePageLayout({ title, children }: Props) {
   return (
     <div className="flex min-h-dvh flex-col bg-bg-layer-basement px-5">
       <div className="sticky top-0 z-20 inline-flex w-full flex-col items-start gap-5 bg-bg-layer-basement pt-padding-top pb-6">
@@ -28,4 +28,4 @@ function WishlistLayout({ title, children }: Props) {
   );
 }
 
-export default WishlistLayout;
+export default ArchivePageLayout;
