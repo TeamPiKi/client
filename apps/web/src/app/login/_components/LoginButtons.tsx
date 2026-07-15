@@ -30,9 +30,16 @@ type LoginButtonsProps = {
   action: string | null;
   /** 살아있는 게스트 세션 보유 여부 — 서버에서 httpOnly 쿠키 확인 후 전달 */
   canReuseGuestSession: boolean;
+  /** Android 웹뷰에서는 false — 네이티브 Apple 로그인이 iOS 전용이라 미노출 */
+  showAppleLogin: boolean;
 };
 
-function LoginButtons({ redirect, action, canReuseGuestSession }: LoginButtonsProps) {
+function LoginButtons({
+  redirect,
+  action,
+  canReuseGuestSession,
+  showAppleLogin,
+}: LoginButtonsProps) {
   const router = useRouter();
   const validRedirect = isValidLoginRedirectPath(redirect) ? redirect : null;
 
@@ -129,14 +136,16 @@ function LoginButtons({ redirect, action, canReuseGuestSession }: LoginButtonsPr
         disabled={isAnyPending && activePendingProvider !== 'google'}
         onClick={handleGoogleLogin}
       />
-      <SocialLoginButton
-        variant="apple"
-        icon={<AppleIcon width={20} height={20} aria-hidden />}
-        label="Apple로 시작하기"
-        isLoading={activePendingProvider === 'apple'}
-        disabled={isAnyPending && activePendingProvider !== 'apple'}
-        onClick={handleAppleLogin}
-      />
+      {showAppleLogin && (
+        <SocialLoginButton
+          variant="apple"
+          icon={<AppleIcon width={20} height={20} aria-hidden />}
+          label="Apple로 시작하기"
+          isLoading={activePendingProvider === 'apple'}
+          disabled={isAnyPending && activePendingProvider !== 'apple'}
+          onClick={handleAppleLogin}
+        />
+      )}
       <SocialLoginButton
         variant="kakao"
         icon={<KakaoIcon width={20} height={20} aria-hidden />}
