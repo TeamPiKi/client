@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 
+import Button from '@/components/button';
 import { Header, HeaderIcon } from '@/components/header';
 import Spacing from '@/components/spacing';
 import { formatTimeKo } from '@/utils/formatDate';
@@ -24,6 +25,7 @@ function NotificationContent() {
     notificationsData,
     isPending,
     isError,
+    isFetchNextPageError,
     refetch,
     fetchNextPage,
     hasNextPage,
@@ -33,7 +35,10 @@ function NotificationContent() {
     usePostNotificationsRead();
   const isEmpty = !isPending && notificationsData.length === 0;
 
-  const bottomRef = useIntersectionObserver(fetchNextPage, !!hasNextPage && !isFetchingNextPage);
+  const bottomRef = useIntersectionObserver(
+    fetchNextPage,
+    !!hasNextPage && !isFetchingNextPage && !isFetchNextPageError
+  );
 
   const handleNotificationClick = (notification: (typeof notificationsData)[number]) => {
     if (isPostNotificationsReadPending) return;
@@ -55,7 +60,8 @@ function NotificationContent() {
   );
 
   function renderContent() {
-    if (isError) return <NotificationErrorState onRetry={() => refetch()} />;
+    if (isError && !isFetchNextPageError)
+      return <NotificationErrorState onRetry={() => refetch()} />;
     if (isEmpty)
       return <NotificationEmptyState onOpenNotificationSettings={openNotificationSettings} />;
 
@@ -79,7 +85,16 @@ function NotificationContent() {
             ))}
           </ul>
         </div>
-        <div ref={bottomRef} />
+        {isFetchNextPageError ? (
+          <div className="flex flex-col items-center gap-2 py-2">
+            <p className="body-2-medium text-text-neutral-tertiary">알림을 더 불러오지 못했어요</p>
+            <Button variant="secondary" size="sm" onClick={() => fetchNextPage()}>
+              다시 시도
+            </Button>
+          </div>
+        ) : (
+          <div ref={bottomRef} />
+        )}
       </div>
     );
   }

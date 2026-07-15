@@ -14,6 +14,7 @@ export const useGetNotifications = () => {
     isFetchingNextPage,
     isPending,
     isError,
+    isFetchNextPageError,
     refetch,
   } = useInfiniteQuery({
     queryKey: ['notifications'],
@@ -41,6 +42,7 @@ export const useGetNotifications = () => {
     isFetchingNextPage,
     isPending,
     isError,
+    isFetchNextPageError,
     refetch,
   };
 };
