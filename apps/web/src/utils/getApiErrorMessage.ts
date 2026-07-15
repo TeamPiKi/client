@@ -15,7 +15,7 @@ export const getApiErrorMessage = (error: unknown): string => {
 
   const { code, detail } = error.response?.data ?? {};
 
-  const messageByCode = ERROR_MESSAGE_MAP[code ?? ''];
+  const messageByCode = (ERROR_MESSAGE_MAP as Record<string, string>)[code ?? ''];
   if (messageByCode) return messageByCode;
 
   const status = error.response?.status;

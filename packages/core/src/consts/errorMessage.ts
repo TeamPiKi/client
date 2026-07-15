@@ -1,5 +1,5 @@
 /** 서버 에러 코드 → 사용자용 에러 메시지 */
-export const ERROR_MESSAGE_MAP: Record<string, string> = {
+export const ERROR_MESSAGE_MAP = {
   /** 공통 4xx */
   'COMMON-UNAUTHORIZED': '로그인이 필요해요.',
   'COMMON-FORBIDDEN': '접근할 수 없는 페이지예요.',
