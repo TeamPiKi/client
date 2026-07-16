@@ -1,21 +1,21 @@
-import WishGrid from '@/app/archive/_components/wish-grid';
 import { HeartIconFill } from '@/assets/icons';
+import type { WishItemT } from '@/types/wish';
 
-import type { WishItemT } from '../_types/wish';
+import WishGrid from './wish-grid';
 
-type WishlistTabContentProps = {
+type WishGridContentProps = {
   items: WishItemT[];
   isDeleteMode?: boolean;
   selectedIds?: Set<number>;
   onToggleSelect?: (id: number) => void;
 };
 
-function WishlistTabContent({
+function WishGridContent({
   items,
   isDeleteMode,
   selectedIds,
   onToggleSelect,
-}: WishlistTabContentProps) {
+}: WishGridContentProps) {
   if (items.length === 0) {
     return (
       <div className="flex flex-1 flex-col items-center justify-center gap-3">
@@ -35,4 +35,4 @@ function WishlistTabContent({
   );
 }
 
-export default WishlistTabContent;
+export default WishGridContent;

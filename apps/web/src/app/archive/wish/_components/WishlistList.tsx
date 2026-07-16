@@ -7,7 +7,7 @@ import { useSSEFallback } from '@/hooks/useSSEFallback';
 import { hasParsingItems } from '@/utils/item';
 
 import WishCardSkeleton from './WishCardSkeleton';
-import WishlistTabContent from './WishlistTabContent';
+import WishGridContent from './WishGridContent';
 
 type WishlistListProps = {
   isDeleteMode: boolean;
@@ -37,7 +37,7 @@ function WishlistList({ isDeleteMode, selectedIds, onToggleSelect }: WishlistLis
 
   return (
     <>
-      <WishlistTabContent
+      <WishGridContent
         items={wishlistData}
         isDeleteMode={isDeleteMode}
         selectedIds={selectedIds}

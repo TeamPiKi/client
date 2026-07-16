@@ -42,7 +42,7 @@ const resolveDeepLink = (payload: NotificationSsePayloadT): string | null => {
       if (kind === 'TOURNAMENT' && tournamentId != null) {
         return `${ROUTES.TOURNAMENT_CREATE(tournamentId)}?scrollToLast=true`;
       }
-      return ROUTES.ARCHIVE_BASE;
+      return ROUTES.WISHLIST;
     default:
       return null;
   }

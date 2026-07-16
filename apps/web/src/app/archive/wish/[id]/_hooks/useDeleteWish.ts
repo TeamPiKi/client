@@ -17,7 +17,7 @@ export const useDeleteWish = (wishId: number) => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['wishlists'] });
       toast.success('위시 상품이 삭제되었습니다.');
-      router.replace(ROUTES.ARCHIVE());
+      router.replace(ROUTES.WISHLIST);
     },
     onError: error => {
       if (!isAxiosError<ApiErrorResponseT>(error) || !error.response) return;

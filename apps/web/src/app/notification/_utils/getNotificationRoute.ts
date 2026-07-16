@@ -22,7 +22,7 @@ export const getNotificationRoute = (
       if (extra?.kind === 'TOURNAMENT' && extra.tournamentId) {
         return ROUTES.TOURNAMENT_CREATE(extra.tournamentId);
       }
-      return ROUTES.ARCHIVE();
+      return ROUTES.WISHLIST;
     case 'ANNOUNCEMENT':
       return null;
   }

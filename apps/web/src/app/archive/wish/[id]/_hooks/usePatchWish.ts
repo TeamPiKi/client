@@ -41,7 +41,7 @@ export const usePatchWish = (wishId: number) => {
         toast.error(clientErrorMessage);
       } else if (status === 403 || status === 404 || status === 409) {
         toast.error(clientErrorMessage);
-        router.replace(ROUTES.ARCHIVE());
+        router.replace(ROUTES.WISHLIST);
       }
     },
   });
