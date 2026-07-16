@@ -22,9 +22,6 @@ async function LoginPage({ searchParams }: LoginPageProps) {
   const role = getRoleFromToken(accessToken);
   if (role === 'MEMBER' && action !== QUERY_ACTION.VALUE.SESSION_EXPIRED) redirect(ROUTES.HOME);
 
-  /** 살아있는 게스트 세션 재활용 가능 여부 */
-  const canReuseGuestSession = role === 'GUEST';
-
   /**
    * Android 웹뷰에서는 Apple 로그인 미노출.
    * 앱의 Apple 로그인은 iOS 전용 네이티브 모듈(expo-apple-authentication)로 처리되어
@@ -46,7 +43,6 @@ async function LoginPage({ searchParams }: LoginPageProps) {
         <LoginButtons
           redirect={redirectParam ?? null}
           action={action ?? null}
-          canReuseGuestSession={canReuseGuestSession}
           showAppleLogin={!isAndroidWebview}
         />
 
