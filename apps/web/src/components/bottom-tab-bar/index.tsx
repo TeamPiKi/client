@@ -51,9 +51,13 @@ const DRAG_THRESHOLD = 6;
 /** 드래그 릴리즈 후 스냅 애니메이션이 자리잡은 뒤 라우팅하기까지 지연 (ms) */
 const NAVIGATE_DELAY = 280;
 
-/** 스프링 오버슈트 이징 — 리퀴드 글래스 바운스 */
+/** 스프링 오버슈트 이징 — 리퀴드 글래스 바운스 (짧은 거리 전용, 오버슈트 36%) */
 const SPRING_EASE =
   'linear(0, 0.62 3.7%, 1.03 7.2%, 1.28 11%, 1.36 14%, 1.32 20%, 1.14 29%, 1.02 37%, 0.97 44%, 0.99 62%, 1)';
+
+/** 프레스 슬라이드 이징 — 여러 칸을 건너도 목표를 크게 지나치지 않는 약한 스프링 (오버슈트 7%) */
+const SLIDE_EASE =
+  'linear(0, 0.5 7.6%, 0.84 15%, 1.04 24%, 1.07 32%, 1.05 40%, 1.01 54%, 0.99 68%, 1)';
 
 const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
 
@@ -98,24 +102,37 @@ function BottomTabBar() {
     const indicator = indicatorRef.current;
     if (!bar || !indicator || activeIndex < 0) return;
 
-    const startLeft = indexToLeft(activeIndex);
     const pressX = event.clientX - bar.getBoundingClientRect().left;
-    // 활성 탭(버블) 위에서 시작한 프레스만 드래그 대상 — 다른 탭 프레스는 Link 탭으로 처리
-    if (pressX < startLeft || pressX > startLeft + TAB_WIDTH) return;
+    const pressIndex = leftToIndex(pressX - TAB_WIDTH / 2);
+    const pressLeft = indexToLeft(pressIndex);
 
     isGrabbingRef.current = true;
     setIsGrabbing(true);
 
-    const startX = event.clientX;
-    let left = startLeft;
+    // 어느 탭을 누르든 버블이 눌린 탭으로 미끄러져 온 뒤 드래그 대상이 됨
+    const isMovingToRight = pressLeft >= indexToLeft(activeIndex);
+    indicator.style.transitionProperty = 'left, right';
+    indicator.style.transitionDuration = '0.3s, 0.3s';
+    indicator.style.transitionTimingFunction = `${SLIDE_EASE}, ${SLIDE_EASE}`;
+    indicator.style.transitionDelay = isMovingToRight ? '0.06s, 0s' : '0s, 0.06s';
+    indicator.style.left = `${pressLeft}px`;
+    indicator.style.right = `${BAR_WIDTH - pressLeft - TAB_WIDTH}px`;
+
+    let left = pressLeft;
+    let anchorLeft = pressLeft;
+    let anchorX = event.clientX;
     let lastX = event.clientX;
 
     const handleMove = (e: PointerEvent) => {
-      const totalDx = e.clientX - startX;
-      if (!isDraggedRef.current && Math.abs(totalDx) < DRAG_THRESHOLD) return;
-      isDraggedRef.current = true;
+      if (!isDraggedRef.current) {
+        if (Math.abs(e.clientX - event.clientX) < DRAG_THRESHOLD) return;
+        isDraggedRef.current = true;
+        // 이동 애니메이션 중 드래그가 시작되면 현재 렌더 위치에서 이어받아 점프 방지
+        anchorLeft = indicator.getBoundingClientRect().left - bar.getBoundingClientRect().left;
+        anchorX = e.clientX;
+      }
 
-      left = clamp(startLeft + totalDx, BAR_PADDING, indexToLeft(TABS.length - 1));
+      left = clamp(anchorLeft + (e.clientX - anchorX), BAR_PADDING, indexToLeft(TABS.length - 1));
       indicator.style.transition = 'none';
       indicator.style.left = `${left}px`;
       indicator.style.right = `${BAR_WIDTH - left - TAB_WIDTH}px`;
@@ -154,7 +171,15 @@ function BottomTabBar() {
       const glint = glintRef.current;
       if (glint) glint.style.translate = '';
 
-      if (!isDraggedRef.current) return;
+      if (!isDraggedRef.current) {
+        // 탭: 버블은 이미 눌린 탭으로 이동 중 — 내비게이션은 여기서 처리하고 Link 클릭은 차단
+        const pressTab = TABS[pressIndex];
+        if (pressTab && pressIndex !== activeIndex) {
+          isDraggedRef.current = true;
+          navigateTimerRef.current = setTimeout(() => router.push(pressTab.href), NAVIGATE_DELAY);
+        }
+        return;
+      }
 
       // 가까운 탭으로 스냅 — 진행 방향 가장자리가 먼저 늘어나는 액체 스프링
       const targetIndex = leftToIndex(left);
@@ -187,8 +212,9 @@ function BottomTabBar() {
       onPointerLeave={() => !isGrabbingRef.current && setIsPressed(false)}
       onPointerCancel={() => !isGrabbingRef.current && setIsPressed(false)}
       onClickCapture={e => {
-        // 드래그로 끝난 제스처의 클릭은 Link 내비게이션으로 이어지지 않도록 차단
+        // 드래그·탭 제스처의 내비게이션은 릴리즈에서 처리하므로 Link 클릭은 차단 (제스처당 1회)
         if (!isDraggedRef.current) return;
+        isDraggedRef.current = false;
         e.preventDefault();
         e.stopPropagation();
       }}
