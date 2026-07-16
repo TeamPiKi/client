@@ -1,8 +1,10 @@
 import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
 
 import { getMe } from '@/apis/getMe';
+import BottomTabBar from '@/components/bottom-tab-bar';
 import { Header, HeaderIcon } from '@/components/header';
 import Spacing from '@/components/spacing';
+import { Z_INDEX } from '@/consts/zIndex';
 import { getQueryClient } from '@/utils/queryClient';
 
 import AccountInfoSection from './_components/AccountInfoSection';
@@ -21,7 +23,7 @@ async function MypagePage() {
       <Header left={<HeaderIcon name="BACK" />} center="설정" centerClassName="title-1" />
       <Spacing size={48} />
 
-      <main className="hide-scrollbar flex flex-1 flex-col overflow-y-auto pb-9">
+      <main className="hide-scrollbar flex flex-1 flex-col overflow-y-auto pb-32">
         {/** 프로필 */}
         <HydrationBoundary state={dehydrate(queryClient)}>
           <ProfileSection />
@@ -35,6 +37,14 @@ async function MypagePage() {
 
         <AppVersionFooter />
       </main>
+
+      {/* 하단 네비게이션 */}
+      <div
+        className="fixed bottom-10 left-1/2 -translate-x-1/2"
+        style={{ zIndex: Z_INDEX.BOTTOM_TAB_BAR }}
+      >
+        <BottomTabBar />
+      </div>
     </div>
   );
 }
