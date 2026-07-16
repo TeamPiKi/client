@@ -46,10 +46,10 @@ const BAR_PADDING = 4;
 const TAB_STEP = TAB_WIDTH + TAB_GAP;
 /** 바 안쪽 전체 너비 (px) — 인디케이터 right 값 계산용 */
 const BAR_WIDTH = BAR_PADDING * 2 + TABS.length * TAB_WIDTH + (TABS.length - 1) * TAB_GAP;
-/** 이 거리(px) 이상 움직이면 탭이 아니라 드래그로 판정 */
-const DRAG_THRESHOLD = 6;
-/** 드래그 릴리즈 후 스냅 애니메이션이 자리잡은 뒤 라우팅하기까지 지연 (ms) */
-const NAVIGATE_DELAY = 280;
+/** 이 거리(px) 이상 움직이면 탭이 아니라 드래그로 판정 — 손떨림 탭이 드래그로 빠지지 않을 만큼 */
+const DRAG_THRESHOLD = 12;
+/** 릴리즈 후 버블이 유리인 채 착지를 마치고 무광 전환·라우팅되기까지 지연 (ms) */
+const NAVIGATE_DELAY = 380;
 
 /** 스프링 오버슈트 이징 — 리퀴드 글래스 바운스 (짧은 거리 전용, 오버슈트 36%) */
 const SPRING_EASE =
@@ -80,6 +80,7 @@ function BottomTabBar() {
   const isDraggedRef = useRef(false);
   const isGrabbingRef = useRef(false);
   const navigateTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const lensOffTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const [isPressed, setIsPressed] = useState(false);
   const [isGrabbing, setIsGrabbing] = useState(false);
@@ -89,6 +90,7 @@ function BottomTabBar() {
   useEffect(
     () => () => {
       if (navigateTimerRef.current) clearTimeout(navigateTimerRef.current);
+      if (lensOffTimerRef.current) clearTimeout(lensOffTimerRef.current);
     },
     []
   );
@@ -107,12 +109,14 @@ function BottomTabBar() {
     const pressLeft = indexToLeft(pressIndex);
 
     isGrabbingRef.current = true;
+    // 프레스 즉시 렌즈로 변신 — 유리인 채 이동하고, 착지 후에 무광으로 돌아옴
+    if (lensOffTimerRef.current) clearTimeout(lensOffTimerRef.current);
     setIsGrabbing(true);
 
     // 어느 탭을 누르든 버블이 눌린 탭으로 미끄러져 온 뒤 드래그 대상이 됨
     const isMovingToRight = pressLeft >= indexToLeft(activeIndex);
     indicator.style.transitionProperty = 'left, right';
-    indicator.style.transitionDuration = '0.3s, 0.3s';
+    indicator.style.transitionDuration = '0.5s, 0.5s';
     indicator.style.transitionTimingFunction = `${SLIDE_EASE}, ${SLIDE_EASE}`;
     indicator.style.transitionDelay = isMovingToRight ? '0.06s, 0s' : '0s, 0.06s';
     indicator.style.left = `${pressLeft}px`;
@@ -158,8 +162,9 @@ function BottomTabBar() {
       window.removeEventListener('pointerup', handleUp);
       window.removeEventListener('pointercancel', handleUp);
       isGrabbingRef.current = false;
-      setIsGrabbing(false);
       setIsPressed(false);
+      // 렌즈는 유리인 채 착지를 마친 뒤에 무광으로 전환
+      lensOffTimerRef.current = setTimeout(() => setIsGrabbing(false), NAVIGATE_DELAY);
 
       const bubble = bubbleRef.current;
       if (bubble) {
@@ -225,8 +230,13 @@ function BottomTabBar() {
     >
       {/* 유리 레이어: 블러 + 채도 */}
       <div className="absolute inset-0 -z-30 rounded-full backdrop-blur-[8px] backdrop-saturate-150" />
-      {/* 틴트 레이어 */}
-      <div className="absolute inset-0 -z-20 rounded-full bg-white/40" />
+      {/* 틴트 레이어 — 평소엔 white/80, 렌즈 상태(홀드/드래그)에서만 투명해져 유리가 드러남 */}
+      <div
+        className={cn(
+          'absolute inset-0 -z-20 rounded-full transition-colors duration-200 ease-out',
+          isGrabbing ? 'bg-white/40' : 'bg-white/80'
+        )}
+      />
       {/* 반사광 레이어 */}
       <div className="absolute inset-0 -z-10 rounded-full shadow-[inset_2px_2px_1px_0_rgba(255,255,255,0.6),inset_-1px_-1px_1px_1px_rgba(255,255,255,0.4)]" />
       {/* 활성 탭 인디케이터 — 꾹 잡고 드래그해 다른 탭으로 옮길 수 있는 버블 */}
