@@ -1,6 +1,7 @@
 import PikiLogo from '@/assets/images/piki-logo.svg';
 import BottomTabBar from '@/components/bottom-tab-bar';
 import { Header, HeaderIcon } from '@/components/header';
+import { Z_INDEX } from '@/consts/zIndex';
 
 import AddWishHomeDialog from './_components/AddWishHomeDialog';
 import CreateTournamentDialog from './_components/CreateTournamentDialog';
@@ -46,7 +47,10 @@ function HomePage() {
       </main>
 
       {/* 하단 네비게이션 */}
-      <div className="fixed bottom-[40px] left-1/2 z-20 -translate-x-1/2">
+      <div
+        className="fixed bottom-[40px] left-1/2 -translate-x-1/2"
+        style={{ zIndex: Z_INDEX.BOTTOM_TAB_BAR }}
+      >
         <BottomTabBar />
       </div>
 
