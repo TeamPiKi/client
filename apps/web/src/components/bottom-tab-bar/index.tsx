@@ -72,6 +72,7 @@ function BottomTabBar() {
   const barRef = useRef<HTMLDivElement>(null);
   const indicatorRef = useRef<HTMLDivElement>(null);
   const bubbleRef = useRef<HTMLDivElement>(null);
+  const glintRef = useRef<HTMLDivElement>(null);
   const isDraggedRef = useRef(false);
   const isGrabbingRef = useRef(false);
   const navigateTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -119,14 +120,19 @@ function BottomTabBar() {
       indicator.style.left = `${left}px`;
       indicator.style.right = `${BAR_WIDTH - left - TAB_WIDTH}px`;
 
-      // 이동 속도만큼 진행 방향으로 늘어나는 스쿼시
+      // 이동 속도만큼 진행 방향으로 늘어나는 스쿼시 + 끌려가듯 기우는 스큐
+      const velocity = clamp(e.clientX - lastX, -10, 10);
+      const speed = Math.abs(velocity);
       const bubble = bubbleRef.current;
       if (bubble) {
-        const delta = Math.min(Math.abs(e.clientX - lastX), 10);
         bubble.style.transitionDuration = '0.1s';
         bubble.style.transitionTimingFunction = 'ease-out';
-        bubble.style.scale = `${1.25 + delta * 0.02} ${1.25 - delta * 0.02}`;
+        bubble.style.scale = `${1.25 + speed * 0.02} ${1.25 - speed * 0.02}`;
+        bubble.style.transform = `skewX(${-velocity * 0.6}deg)`;
       }
+      // 반사광은 이동 반대편으로 밀리며 잔상처럼 따라옴
+      const glint = glintRef.current;
+      if (glint) glint.style.translate = `${-velocity * 1.6}px 0`;
       lastX = e.clientX;
     };
 
@@ -141,9 +147,12 @@ function BottomTabBar() {
       const bubble = bubbleRef.current;
       if (bubble) {
         bubble.style.scale = '';
+        bubble.style.transform = '';
         bubble.style.transitionDuration = '';
         bubble.style.transitionTimingFunction = '';
       }
+      const glint = glintRef.current;
+      if (glint) glint.style.translate = '';
 
       if (!isDraggedRef.current) return;
 
@@ -184,16 +193,26 @@ function BottomTabBar() {
         e.stopPropagation();
       }}
       className={cn(
-        'relative isolate inline-flex h-[58px] touch-none items-center gap-2 rounded-full bg-white/80 p-1 shadow-[0px_4px_16px_0px_rgba(0,0,0,0.12)] backdrop-blur-md transition-transform duration-200 ease-out select-none',
+        'relative isolate inline-flex h-[58px] touch-none items-center gap-2 rounded-full p-1 shadow-[0px_6px_24px_0px_rgba(0,0,0,0.16)] transition-transform duration-200 ease-out select-none',
         isPressed && 'scale-102'
       )}
     >
+      {/* 유리 레이어: 블러 + 채도 */}
+      <div className="absolute inset-0 -z-30 rounded-full backdrop-blur-[8px] backdrop-saturate-150" />
+      {/* 틴트 레이어 */}
+      <div className="absolute inset-0 -z-20 rounded-full bg-white/40" />
+      {/* 반사광 레이어 */}
+      <div className="absolute inset-0 -z-10 rounded-full shadow-[inset_2px_2px_1px_0_rgba(255,255,255,0.6),inset_-1px_-1px_1px_1px_rgba(255,255,255,0.4)]" />
       {/* 활성 탭 인디케이터 — 꾹 잡고 드래그해 다른 탭으로 옮길 수 있는 버블 */}
       {activeIndex >= 0 && (
         <div
           ref={indicatorRef}
           aria-hidden
-          className="absolute top-1 bottom-1 -z-10"
+          className={cn(
+            'pointer-events-none absolute top-1 bottom-1',
+            // 잡는 동안엔 아이콘 위로 올라와 렌즈로 동작
+            isGrabbing ? 'z-10' : '-z-10'
+          )}
           style={{
             left: indexToLeft(activeIndex),
             right: BAR_WIDTH - indexToLeft(activeIndex) - TAB_WIDTH,
@@ -203,11 +222,28 @@ function BottomTabBar() {
           <div
             ref={bubbleRef}
             className={cn(
-              'size-full rounded-full bg-black/8 transition-transform duration-300',
-              isGrabbing && 'scale-125'
+              'relative size-full overflow-hidden rounded-full transition-[scale,transform,background-color,box-shadow,backdrop-filter] duration-300',
+              // 평소엔 무광 알약, 잡는 동안만 유리 렌즈로 전환
+              isGrabbing
+                ? 'scale-125 bg-white/2 shadow-[inset_1.5px_1.5px_1px_0_rgba(255,255,255,0.6),inset_-1px_-1px_1px_0_rgba(255,255,255,0.35),0_4px_12px_0_rgba(0,0,0,0.18)]'
+                : 'bg-black/8'
             )}
             style={{ transitionTimingFunction: SPRING_EASE }}
-          />
+          >
+            {/* 이동 시 반대편으로 밀리는 반사광 */}
+            <div
+              ref={glintRef}
+              className={cn(
+                'absolute inset-0 rounded-full transition-[translate,opacity] duration-200 ease-out',
+                isGrabbing ? 'opacity-100' : 'opacity-0'
+              )}
+              style={{
+                // 위쪽 테두리에만 붙는 얇은 반사광 — 중앙은 침범하지 않음
+                background:
+                  'radial-gradient(75% 45% at 40% -12%, rgba(255,255,255,0.55), transparent 55%)',
+              }}
+            />
+          </div>
         </div>
       )}
       {TABS.map(({ label, activeIcon: ActiveIcon, inactiveIcon: InactiveIcon, href }) => {
