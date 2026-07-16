@@ -13,6 +13,9 @@ const TABS = [
   { label: '보관', icon: HeartIconFill, href: ROUTES.WISHLIST },
 ] as const;
 
+const matchesTabPath = (pathname: string, basePath: string) =>
+  pathname === basePath || pathname.startsWith(`${basePath}/`);
+
 function BottomTabBar() {
   const router = useRouter();
   const pathname = usePathname();
@@ -43,9 +46,9 @@ function BottomTabBar() {
         {TABS.map(({ label, icon: Icon, href }) => {
           const isActive =
             label === '보관'
-              ? pathname.startsWith(ROUTES.WISHLIST) ||
-                pathname.startsWith(ROUTES.TOURNAMENT_HISTORY)
-              : pathname === href || pathname.startsWith(`${href}/`);
+              ? matchesTabPath(pathname, ROUTES.WISHLIST) ||
+                matchesTabPath(pathname, ROUTES.TOURNAMENT_HISTORY)
+              : matchesTabPath(pathname, href);
           return (
             <button
               key={label}

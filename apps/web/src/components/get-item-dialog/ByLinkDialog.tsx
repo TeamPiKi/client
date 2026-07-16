@@ -1,6 +1,6 @@
 'use client';
 
-import { useParams, useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import { useState } from 'react';
 
 import { usePostTournamentItemLink } from '@/app/tournament/[id]/create/_hooks/usePostTournamentItemLink';
@@ -8,7 +8,6 @@ import { LinkIconFill } from '@/assets/icons';
 import Button from '@/components/button';
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/dialog';
 import Input from '@/components/input';
-import { ROUTES } from '@/consts/route';
 import { usePostWishLink } from '@/hooks/usePostWishLink';
 import type { ItemTypeT } from '@/types/item';
 import { URL_PATTERN, extractUrlFromText } from '@/utils/extractUrl';
@@ -20,7 +19,6 @@ type ByLinkProps = {
 };
 
 function ByLinkDialog({ type, open, onOpenChange }: ByLinkProps) {
-  const router = useRouter();
   const { id: tournamentId } = useParams<{ id: string }>();
   const { postWishLinkMutation, isPostWishLinkPending } = usePostWishLink();
   const { postTournamentItemLinkMutation, isPostTournamentItemLinkPending } =
@@ -49,14 +47,12 @@ function ByLinkDialog({ type, open, onOpenChange }: ByLinkProps) {
       return;
     }
 
+    /** 성공 시 위시리스트 이동은 usePostWishLink 훅이 조건부로 처리 */
     if (type === 'wish')
       postWishLinkMutation(submitUrl, {
         onSettled: () => {
           onOpenChange(false);
           resetState();
-        },
-        onSuccess: () => {
-          router.push(ROUTES.WISHLIST);
         },
       });
     else
