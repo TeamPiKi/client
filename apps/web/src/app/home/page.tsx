@@ -13,14 +13,7 @@ function HomePage() {
   return (
     <div className="relative flex min-h-dvh flex-col bg-gray-50 px-5 pt-padding-top pb-32">
       {/* 상단 헤더 */}
-      <Header
-        right={
-          <>
-            <HeaderIcon name="PROFILE" />
-            <HeaderIcon name="ALARM" />
-          </>
-        }
-      />
+      <Header right={<HeaderIcon name="ALARM" />} />
       {/* 메인 컨텐츠 */}
       <main className="mt-[54px] flex w-full flex-col gap-12">
         {/* 로고 + CTA 영역 */}
