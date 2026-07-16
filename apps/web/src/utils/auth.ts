@@ -36,6 +36,6 @@ export const isTokenValid = (token: string) => {
 export const getRoleFromToken = (token?: string): UserIdentityTypeT | null => {
   if (!token || !isTokenValid(token)) return null;
 
-  const payload = decodeJwt(token);
-  return (payload?.role as UserIdentityTypeT | undefined) ?? null;
+  const role = decodeJwt(token)?.role;
+  return role === 'GUEST' || role === 'MEMBER' ? role : null;
 };
