@@ -1,14 +1,11 @@
-import { Suspense } from 'react';
-
 import { Header, HeaderIcon } from '@/components/header';
 
-import WishTab from './WishTab';
-
-type WishlistLayoutProps = {
+type Props = {
+  title: string;
   children: React.ReactNode;
 };
 
-function WishlistLayout({ children }: WishlistLayoutProps) {
+function ArchivePageLayout({ title, children }: Props) {
   return (
     <div className="flex min-h-dvh flex-col bg-bg-layer-basement px-5">
       <div className="sticky top-0 z-20 inline-flex w-full flex-col items-start gap-5 bg-bg-layer-basement pt-padding-top pb-6">
@@ -22,16 +19,13 @@ function WishlistLayout({ children }: WishlistLayoutProps) {
             }
           />
           <h1 className="text-[28px] leading-[137.5%] font-bold tracking-[-0.708px] text-text-neutral-primary">
-            내 보관함
+            {title}
           </h1>
         </div>
-        <Suspense>
-          <WishTab />
-        </Suspense>
       </div>
       {children}
     </div>
   );
 }
 
-export default WishlistLayout;
+export default ArchivePageLayout;

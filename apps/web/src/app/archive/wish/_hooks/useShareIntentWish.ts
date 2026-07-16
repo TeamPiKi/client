@@ -29,22 +29,26 @@ const getUrlFromShareIntent = (payload: ShareIntentPayloadT): string | null => {
 
 /** 앱 공유(ShareIntent)로 전달된 상품 URL을 위시리스트에 등록 */
 export const useShareIntentWish = () => {
-  const hasProcessedRef = useRef(false);
+  /** 같은 URL의 중복 전달만 방지 — 후속 공유는 계속 처리돼야 한다 */
+  const processedUrlsRef = useRef(new Set<string>());
 
   const { postWishLinkMutation } = usePostWishLink();
 
   const handleShareIntent = useCallback(
     (payload: ShareIntentPayloadT) => {
-      if (hasProcessedRef.current) return;
-
       const url = getUrlFromShareIntent(payload);
       if (!url) {
         toast.error('공유된 링크를 찾을 수 없어요');
         return;
       }
 
-      hasProcessedRef.current = true;
-      postWishLinkMutation(url);
+      if (processedUrlsRef.current.has(url)) return;
+
+      processedUrlsRef.current.add(url);
+      /** 실패한 URL은 잠금 해제해 재공유 시 다시 시도되도록 */
+      postWishLinkMutation(url, {
+        onError: () => processedUrlsRef.current.delete(url),
+      });
     },
     [postWishLinkMutation]
   );

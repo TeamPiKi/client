@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { isAxiosError } from 'axios';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
 import { postWishOCR } from '@/apis/postWishOCR';
@@ -12,6 +12,7 @@ import { getLoginPath } from '@/utils/loginRedirect';
 
 export const usePostWishOCR = () => {
   const router = useRouter();
+  const pathname = usePathname();
   const queryClient = useQueryClient();
 
   const {
@@ -23,7 +24,7 @@ export const usePostWishOCR = () => {
     onSuccess: () => {
       logAnalyticsEvent(ANALYTICS_EVENT.WISH_ADD_COMPLETE, { source: 'ocr' });
       queryClient.invalidateQueries({ queryKey: ['wishlists'] });
-      router.push(ROUTES.ARCHIVE('wish'));
+      if (pathname !== ROUTES.WISHLIST) router.push(ROUTES.WISHLIST);
     },
     onError: error => {
       if (!isAxiosError<ApiErrorResponseT>(error) || !error.response) return;
