@@ -1,6 +1,7 @@
 'use client';
 
-import { usePathname, useRouter } from 'next/navigation';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
 import {
   HeartIconFill,
@@ -40,7 +41,6 @@ const matchesTabPath = (pathname: string, basePath: string) =>
   pathname === basePath || pathname.startsWith(`${basePath}/`);
 
 function BottomTabBar() {
-  const router = useRouter();
   const pathname = usePathname();
 
   return (
@@ -52,10 +52,9 @@ function BottomTabBar() {
         const isActive = matchesTabPath(pathname, href);
         const Icon = isActive ? ActiveIcon : InactiveIcon;
         return (
-          <button
+          <Link
             key={label}
-            type="button"
-            onClick={() => router.push(href)}
+            href={href}
             className={`flex h-full w-[72px] cursor-pointer flex-col items-center justify-center rounded-full p-2 transition-colors ${
               isActive ? 'bg-black/8 text-gray-900' : 'text-gray-800'
             }`}
@@ -67,7 +66,7 @@ function BottomTabBar() {
             >
               {label}
             </span>
-          </button>
+          </Link>
         );
       })}
     </div>
