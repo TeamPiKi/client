@@ -1,3 +1,5 @@
+import type { UserIdentityTypeT } from '@/types/user';
+
 /** JWT 토큰 페이로드 추출 */
 const decodeJwt = (token: string) => {
   try {
@@ -28,4 +30,12 @@ export const isTokenValid = (token: string) => {
   const currentTime = Date.now();
 
   return currentTime < expiryTime;
+};
+
+/** access token 의 role(GUEST/MEMBER) 추출 — 만료·손상 토큰은 null */
+export const getRoleFromToken = (token?: string): UserIdentityTypeT | null => {
+  if (!token || !isTokenValid(token)) return null;
+
+  const payload = decodeJwt(token);
+  return (payload?.role as UserIdentityTypeT | undefined) ?? null;
 };
