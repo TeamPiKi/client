@@ -45,7 +45,10 @@ export const useShareIntentWish = () => {
       if (processedUrlsRef.current.has(url)) return;
 
       processedUrlsRef.current.add(url);
-      postWishLinkMutation(url);
+      /** 실패한 URL은 잠금 해제해 재공유 시 다시 시도되도록 */
+      postWishLinkMutation(url, {
+        onError: () => processedUrlsRef.current.delete(url),
+      });
     },
     [postWishLinkMutation]
   );

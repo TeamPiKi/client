@@ -47,17 +47,17 @@ function ByLinkDialog({ type, open, onOpenChange }: ByLinkProps) {
       return;
     }
 
-    /** 성공 시 위시리스트 이동은 usePostWishLink 훅이 조건부로 처리 */
+    /** 닫기/초기화는 성공 시에만 — 실패 시 URL을 고칠 수 있게 유지. 위시리스트 이동은 usePostWishLink 훅이 조건부로 처리 */
     if (type === 'wish')
       postWishLinkMutation(submitUrl, {
-        onSettled: () => {
+        onSuccess: () => {
           onOpenChange(false);
           resetState();
         },
       });
     else
       postTournamentItemLinkMutation(submitUrl, {
-        onSettled: () => {
+        onSuccess: () => {
           onOpenChange(false);
           resetState();
         },
