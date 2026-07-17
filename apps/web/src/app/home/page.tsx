@@ -11,7 +11,7 @@ import TournamentList from './_components/tournament-list';
 
 function HomePage() {
   return (
-    <div className="relative flex min-h-dvh flex-col bg-gray-50 px-5 pt-padding-top pb-32">
+    <div className="relative flex min-h-dvh flex-col bg-linear-to-b from-bg-layer-default to-bg-layer-default px-5 pt-padding-top pb-32">
       {/* 상단 헤더 */}
       <Header left={<PiKiLogo />} right={<HeaderIcon name="ALARM" />} />
 

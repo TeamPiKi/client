@@ -10,7 +10,7 @@ import {
   CODE_LENGTH,
   isValidInviteCodeFormat,
 } from '@/app/tournament/join/_utils/verifyInviteCode';
-import { LoginIconOutline } from '@/assets/icons';
+import { GroupIconFill } from '@/assets/icons';
 import Button from '@/components/button';
 import {
   Dialog,
@@ -101,14 +101,16 @@ function InviteTournamentDialog() {
   return (
     <>
       <Dialog open={open} onOpenChange={handleOpenChange}>
-        <DialogTrigger asChild>
+        <DialogTrigger asChild onClick={handleTriggerClick}>
           <button
             type="button"
-            onClick={handleTriggerClick}
-            className="flex h-[54px] w-full cursor-pointer items-center justify-center gap-2 rounded-[12px] bg-bg-layer-default px-9"
+            aria-label="새 토너먼트 만들기"
+            className="flex h-[104px] cursor-pointer flex-col rounded-2xl bg-gray-50 p-4"
           >
-            <LoginIconOutline className="size-6 text-icon-neutral-secondary" />
-            <span className="body-1-semibold text-text-neutral-primary">초대 토너먼트 입장</span>
+            <span className="text-left body-1-semibold whitespace-pre-line text-text-neutral-primary">
+              {'새 토너먼트\n만들기'}
+            </span>
+            <GroupIconFill className="size-7.5 self-end text-icon-neutral-secondary" />
           </button>
         </DialogTrigger>
         <DialogContent showCloseButton={false} className="flex flex-col gap-5 p-6">
