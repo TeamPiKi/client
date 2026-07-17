@@ -1,7 +1,7 @@
 'use client';
 
 import { QueryClientProvider } from '@tanstack/react-query';
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import dynamic from 'next/dynamic';
 import { type ReactNode } from 'react';
 
 import NavigationOverlay from '@/components/navigation-overlay';
@@ -11,6 +11,18 @@ import { useAppNavigate } from '@/hooks/useAppNavigate';
 import { useDeepLink } from '@/hooks/useDeepLink';
 import { useFcmTokenSync } from '@/hooks/useFcmTokenSync';
 import { getQueryClient } from '@/utils/queryClient';
+
+/** Production 빌드에서는 React Query Devtools 미포함 */
+const ReactQueryDevtools =
+  process.env.NODE_ENV === 'development'
+    ? dynamic(
+        () =>
+          import('@tanstack/react-query-devtools').then(mod => ({
+            default: mod.ReactQueryDevtools,
+          })),
+        { ssr: false }
+      )
+    : null;
 
 function FcmTokenSyncer() {
   useFcmTokenSync();
@@ -38,7 +50,7 @@ function Providers({ children }: Readonly<{ children: ReactNode }>) {
       {children}
       <NotificationSSEProvider />
       <Toaster />
-      <ReactQueryDevtools initialIsOpen={false} />
+      {ReactQueryDevtools && <ReactQueryDevtools initialIsOpen={false} />}
     </QueryClientProvider>
   );
 }

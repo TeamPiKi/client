@@ -102,7 +102,14 @@ function SplashClient() {
 
   return (
     <main
-      className={`relative h-dvh w-full ${isBackgroundShifted ? 'splash-bg-shift bg-gray-50' : 'bg-[#A2DEFF]'}`}
+      className="relative"
+      /** FOUC 방지하기 위해 인라인 스타일로 적용 */
+      style={{
+        height: '100dvh',
+        width: '100%',
+        backgroundColor: isBackgroundShifted ? 'var(--color-gray-50)' : '#A2DEFF',
+        transition: isBackgroundShifted ? 'background-color 0.7s ease-in-out' : 'none',
+      }}
     >
       {/**
        * 로그인 페이지와 동일한 레이아웃 앵커. 보이지 않지만 로고가 이동할 최종 좌표를 측정한다.

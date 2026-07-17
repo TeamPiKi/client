@@ -28,18 +28,11 @@ import SocialLoginButton from './SocialLoginButton';
 type LoginButtonsProps = {
   redirect: string | null;
   action: string | null;
-  /** 살아있는 게스트 세션 보유 여부 — 서버에서 httpOnly 쿠키 확인 후 전달 */
-  canReuseGuestSession: boolean;
   /** Android 웹뷰에서는 false — 네이티브 Apple 로그인이 iOS 전용이라 미노출 */
   showAppleLogin: boolean;
 };
 
-function LoginButtons({
-  redirect,
-  action,
-  canReuseGuestSession,
-  showAppleLogin,
-}: LoginButtonsProps) {
+function LoginButtons({ redirect, action, showAppleLogin }: LoginButtonsProps) {
   const router = useRouter();
   const validRedirect = isValidLoginRedirectPath(redirect) ? redirect : null;
 
@@ -106,21 +99,24 @@ function LoginButtons({
   const handleGoogleLogin = () => handleSocialLogin('google');
   const handleAppleLogin = () => handleSocialLogin('apple');
 
+  /**
+   * 게스트 로그인
+   *
+   * - 기존 게스트 세션 재활용 시도
+   * - 재활용 불가 시 새 게스트 발급
+   */
   const handleGuestLogin = async () => {
     setLoginRedirectPath(validRedirect);
 
-    /** 살아있는 게스트 세션이면 토큰만 갱신 */
-    if (canReuseGuestSession) {
-      setIsGuestRefreshing(true);
-      try {
-        await refreshClientToken();
-        router.replace(getPostLoginRedirectPath());
-        return;
-      } catch {
-        /** 갱신 실패 시 새 게스트 발급 */
-      } finally {
-        setIsGuestRefreshing(false);
-      }
+    setIsGuestRefreshing(true);
+    try {
+      await refreshClientToken();
+      router.replace(getPostLoginRedirectPath());
+      return;
+    } catch {
+      /** 세션 재활용 불가 */
+    } finally {
+      setIsGuestRefreshing(false);
     }
 
     postGuestLoginMutation();
