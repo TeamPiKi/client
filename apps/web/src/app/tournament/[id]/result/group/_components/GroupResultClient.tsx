@@ -109,9 +109,9 @@ function GroupResultClient({ tournamentId }: GroupResultClientProps) {
 
       <div className="mx-auto mt-5 flex w-full max-w-105 flex-1 flex-col px-5">
         <div className="relative flex w-full flex-col gap-2 bg-bg-layer-default pt-6 pb-6.25 filter-[drop-shadow(0px_2px_4px_rgba(0,0,0,0.12))]">
-          {/* PIKI 로고 + 헤드라인 */}
+          {/* PiKi 로고 + 헤드라인 */}
           <div className="relative flex flex-col items-center gap-2">
-            <PikiLogo aria-label="PIKI" className="h-14 w-19.25 shrink-0 text-gray-800" />
+            <PikiLogo aria-label="PiKi" className="h-14 w-19.25 shrink-0 text-gray-800" />
             <p
               className={cn(
                 kodeMono.className,

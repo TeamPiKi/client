@@ -34,7 +34,7 @@ async function LoginPage({ searchParams }: LoginPageProps) {
     <div className="flex min-h-dvh flex-col items-center bg-gray-50 px-4 pt-padding-top pb-10">
       <div className="mt-15 flex flex-col items-center gap-6">
         <PikiLogo
-          aria-label="PIKI"
+          aria-label="PiKi"
           className="h-[106px] w-[146px] shrink-0 text-text-neutral-primary"
         />
         <p className="animate-in text-center body-1-bold whitespace-pre-line text-text-neutral-secondary duration-500 fade-in-0">

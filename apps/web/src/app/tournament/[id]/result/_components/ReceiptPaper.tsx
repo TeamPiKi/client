@@ -66,9 +66,9 @@ const ReceiptPaper = forwardRef<HTMLDivElement, ReceiptPaperProps>(function Rece
         className="pointer-events-none absolute -top-6 left-0 h-15.25 w-full bg-linear-to-t from-white to-[#f9f9f9]"
       />
 
-      {/* PIKI 로고 + 헤드라인 */}
+      {/* PiKi 로고 + 헤드라인 */}
       <div className="relative flex flex-col items-center gap-2">
-        <PikiLogo aria-label="PIKI" className="h-14 w-19.25 shrink-0 text-gray-800" />
+        <PikiLogo aria-label="PiKi" className="h-14 w-19.25 shrink-0 text-gray-800" />
         <p
           className={cn(
             kodeMono.className,

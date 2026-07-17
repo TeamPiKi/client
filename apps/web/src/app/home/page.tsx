@@ -17,9 +17,9 @@ function HomePage() {
       <main className="mt-[54px] flex w-full flex-col gap-12">
         {/* 로고 + CTA 영역 */}
         <section className="flex flex-col items-center gap-12">
-          {/* PIKI 로고 */}
+          {/* PiKi 로고 */}
           <PikiLogo
-            aria-label="PIKI"
+            aria-label="PiKi"
             className="h-[106px] w-[146px] shrink-0 text-text-neutral-primary"
           />
           <h1 className="sr-only">PiKi</h1>

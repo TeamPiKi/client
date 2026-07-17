@@ -132,7 +132,7 @@ function SplashClient() {
         }}
       >
         <PikiLogo
-          aria-label="PIKI"
+          aria-label="PiKi"
           className="block h-[106px] w-[146px] shrink-0 text-text-neutral-primary"
         />
       </div>
