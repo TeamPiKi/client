@@ -1,9 +1,9 @@
 import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
 import { notFound } from 'next/navigation';
 
+import { parseIdParam } from '@/utils/parseIdParam';
 import { getQueryClient } from '@/utils/queryClient';
 
-import { parseTournamentId } from '../../_common/_utils/parseTournamentId';
 import { getGroupResult } from '../_apis/getGroupResult';
 import GroupResultClient from './_components/GroupResultClient';
 
@@ -13,7 +13,7 @@ type GroupResultPageProps = {
 
 async function GroupResultPage({ params }: GroupResultPageProps) {
   const { id } = await params;
-  const tournamentId = parseTournamentId(id);
+  const tournamentId = parseIdParam(id);
 
   if (tournamentId === null) notFound();
 
