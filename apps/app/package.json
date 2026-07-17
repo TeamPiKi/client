@@ -60,6 +60,7 @@
   "devDependencies": {
     "@expo/config-plugins": "~54.0.4",
     "@expo/plist": "~0.4.8",
+    "@sentry/cli": "2.55.0",
     "@types/react": "19.1.17",
     "eslint": "^9.39.1",
     "eslint-config-expo": "~10.0.0",
