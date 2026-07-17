@@ -25,11 +25,11 @@ function TournamentHistoryList({ statuses }: Props) {
       {tournamentListData.map(tournament => (
         <TournamentCard
           key={tournament.tournamentId}
+          imageUrls={tournament.thumbnailUrls}
           tournamentId={tournament.tournamentId}
           status={tournament.status}
           name={tournament.name}
           profileImageUrls={tournament.participantProfileImages}
-          imageUrls={[]} // TODO: 이미지 넣기
           participantCount={tournament.participantProfileImages.length}
         />
       ))}

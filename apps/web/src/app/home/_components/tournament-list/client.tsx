@@ -13,7 +13,7 @@ type Props = {
 };
 
 function TournamentListClient({ statuses }: Props) {
-  const { tournamentListData } = useGetTournamentList(statuses);
+  const { tournamentListData } = useGetTournamentList(statuses, 3);
 
   if (tournamentListData.length === 0) return null;
 
@@ -26,11 +26,10 @@ function TournamentListClient({ statuses }: Props) {
         </Link>
       </div>
 
-      {/** TEMP: slice로 3개만 보여줌. api limit 파라미터 추가되면 제거 필요 */}
-      {tournamentListData.slice(0, 3).map(tournament => (
+      {tournamentListData.map(tournament => (
         <TournamentCard
           key={tournament.tournamentId}
-          imageUrls={[]} // TODO: 이미지 넣기
+          imageUrls={tournament.thumbnailUrls}
           tournamentId={tournament.tournamentId}
           status={tournament.status}
           name={tournament.name}
