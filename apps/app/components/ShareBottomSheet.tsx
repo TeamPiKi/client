@@ -96,7 +96,7 @@ function ShareBottomSheetContent({ url, text }: ShareExtensionProps) {
           />
 
           <Image
-            source={require('@/assets/images/share-bottom-sheet/warning.png')}
+            source={require('@/assets/images/share-bottom-sheet/icon-error.png')}
             style={styles.icon}
           />
         </View>
