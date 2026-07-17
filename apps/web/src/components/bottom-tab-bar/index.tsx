@@ -234,8 +234,8 @@ function BottomTabBar() {
         )}
       >
         {/* 유리 레이어: 블러 + 채도 */}
-        <div className="absolute inset-0 -z-30 rounded-full backdrop-blur-[8px] backdrop-saturate-150" />
-        {/* 틴트 레이어 — 평소엔 white/80, 렌즈 상태(홀드/드래그)에서만 투명해져 유리가 드러남 */}
+        <div className="absolute inset-0 -z-30 rounded-full backdrop-blur-[3px] backdrop-saturate-120" />
+        {/* 틴트 레이어 — 평소엔 반투명 흰색, 렌즈 상태(홀드/드래그)에서만 더 투명해져 유리가 드러남 */}
         <div
           className={cn(
             'absolute inset-0 -z-20 rounded-full transition-colors duration-200 ease-out',
