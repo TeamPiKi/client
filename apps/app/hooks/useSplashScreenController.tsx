@@ -1,9 +1,19 @@
 import * as SplashScreen from 'expo-splash-screen';
-import { type ReactNode, createContext, useCallback, useContext, useEffect, useRef } from 'react';
+import {
+  type ReactNode,
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 
 const SPLASH_TIMEOUT_MS = 15_000;
 
 type SplashScreenControllerContextT = {
+  /** 웹뷰 로드 완료까지 표시하는 RN 스플래시 오버레이(SplashOverlay) 노출 여부 */
+  isSplashOverlayVisible: boolean;
   onWebViewLoadEnd: () => void;
   onWebViewLoadError: () => void;
 };
@@ -14,35 +24,50 @@ type Props = {
   children: ReactNode;
 };
 
-/** WebView 첫 로드 완료(또는 실패·타임아웃)까지 네이티브 스플래시 유지 */
+/**
+ * 스플래시 2단계 제어:
+ * 1. 네이티브(시스템) 스플래시 — 첫 렌더 직후 바로 숨긴다.
+ *    Android 12+ 시스템 스플래시는 로고를 저해상도 아이콘으로 그려 모서리가 뭉개지므로
+ *    노출을 최소화한다 (iOS 는 고품질이지만 동작 통일).
+ * 2. RN SplashOverlay — 웹뷰 첫 로드 완료(또는 실패·타임아웃)까지 동일한 화면을
+ *    고해상도로 이어서 표시한다.
+ */
 export function SplashScreenControllerProvider({ children }: Props) {
   const isHiddenRef = useRef(false);
+  const [isSplashOverlayVisible, setIsSplashOverlayVisible] = useState(true);
 
-  const hideSplash = useCallback(async () => {
+  // 첫 렌더가 커밋된 뒤(=RN 오버레이가 이미 그려진 뒤) 시스템 스플래시를 내려 전환 공백을 없앤다.
+  useEffect(() => {
+    void SplashScreen.hideAsync();
+  }, []);
+
+  const hideSplashOverlay = useCallback(() => {
     if (isHiddenRef.current) return;
 
     isHiddenRef.current = true;
-    await SplashScreen.hideAsync();
+    setIsSplashOverlayVisible(false);
   }, []);
 
   const onWebViewLoadEnd = useCallback(() => {
-    void hideSplash();
-  }, [hideSplash]);
+    hideSplashOverlay();
+  }, [hideSplashOverlay]);
 
   const onWebViewLoadError = useCallback(() => {
-    void hideSplash();
-  }, [hideSplash]);
+    hideSplashOverlay();
+  }, [hideSplashOverlay]);
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
-      void hideSplash();
+      hideSplashOverlay();
     }, SPLASH_TIMEOUT_MS);
 
     return () => clearTimeout(timeoutId);
-  }, [hideSplash]);
+  }, [hideSplashOverlay]);
 
   return (
-    <SplashScreenControllerContext.Provider value={{ onWebViewLoadEnd, onWebViewLoadError }}>
+    <SplashScreenControllerContext.Provider
+      value={{ isSplashOverlayVisible, onWebViewLoadEnd, onWebViewLoadError }}
+    >
       {children}
     </SplashScreenControllerContext.Provider>
   );
