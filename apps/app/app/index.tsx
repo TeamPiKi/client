@@ -5,7 +5,7 @@ import {
 } from '@piki/core';
 import CookieManager from '@react-native-cookies/cookies';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { AppState, Linking, Platform } from 'react-native';
+import { AppState, Linking, Platform, View } from 'react-native';
 import type { WebView } from 'react-native-webview';
 import Webview from 'react-native-webview';
 import type {
@@ -13,6 +13,7 @@ import type {
   WebViewHttpErrorEvent,
 } from 'react-native-webview/lib/WebViewTypes';
 
+import SplashOverlay from '@/components/SplashOverlay';
 import { USER_AGENT } from '@/constants/userAgent';
 import { useShareIntent } from '@/hooks/useShareIntent';
 import { useSocialLogin } from '@/hooks/useSocialLogin';
@@ -160,7 +161,8 @@ function Page() {
   );
 
   const { onMessage } = useWebBridgeMessage(handleWebMessage);
-  const { onWebViewLoadEnd, onWebViewLoadError } = useSplashScreenController();
+  const { isSplashOverlayVisible, onWebViewLoadEnd, onWebViewLoadError } =
+    useSplashScreenController();
 
   const handleWebViewLoadEnd = useCallback(() => {
     onWebViewLoadEnd();
@@ -192,7 +194,7 @@ function Page() {
   }, []);
 
   return (
-    <>
+    <View style={{ flex: 1 }}>
       {isSynced && (
         <Webview
           ref={webviewRef}
@@ -209,7 +211,9 @@ function Page() {
           startInLoadingState
         />
       )}
-    </>
+      {/* 웹뷰 준비 전까지 네이티브 스플래시를 고해상도로 이어받는 오버레이 */}
+      {isSplashOverlayVisible && <SplashOverlay />}
+    </View>
   );
 }
 
