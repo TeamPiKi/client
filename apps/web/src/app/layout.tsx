@@ -1,31 +1,11 @@
 import { GoogleAnalytics } from '@next/third-parties/google';
 import { WEBVIEW_UA_TOKEN } from '@piki/core';
 import type { Metadata, Viewport } from 'next';
-import localFont from 'next/font/local';
 import { headers } from 'next/headers';
 import React from 'react';
 
 import Providers from '../components/Providers';
 import '../styles/globals.css';
-
-const pretendard = localFont({
-  src: '../assets/fonts/PretendardVariable.woff2',
-  display: 'swap',
-  weight: '45 920',
-  /** display:swap이므로 preload 명시적 false 설정 */
-  preload: false,
-  fallback: [
-    '-apple-system',
-    'BlinkMacSystemFont',
-    'Segoe UI',
-    'Roboto',
-    'Oxygen',
-    'Ubuntu',
-    'Cantarell',
-    'Helvetica Neue',
-    'sans-serif',
-  ],
-});
 
 export const metadata: Metadata = {
   title: 'PiKi - 같이 고르는 쇼핑 토너먼트',
@@ -55,10 +35,18 @@ async function RootLayout({
   return (
     <html
       lang="ko"
-      className={`${pretendard.className} h-full overflow-hidden antialiased`}
+      className="h-full overflow-hidden antialiased"
       {...(isWebview && { 'data-app': '' })}
     >
       <head>
+        {/** Pretendard Dynamic Subset CSS */}
+        <link rel="preconnect" href="https://cdn.jsdelivr.net" crossOrigin="anonymous" />
+        <link
+          rel="stylesheet"
+          as="style"
+          href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
+        />
+
         {process.env.NODE_ENV === 'development' && !isWebview && (
           <>
             {/* eslint-disable-next-line @next/next/no-sync-scripts */}
