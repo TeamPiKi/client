@@ -1,8 +1,8 @@
+import { GoogleAnalytics } from '@next/third-parties/google';
 import { WEBVIEW_UA_TOKEN } from '@piki/core';
 import type { Metadata, Viewport } from 'next';
 import localFont from 'next/font/local';
 import { headers } from 'next/headers';
-import { GoogleAnalytics } from '@next/third-parties/google';
 import React from 'react';
 
 import Providers from '../components/Providers';
@@ -12,7 +12,8 @@ const pretendard = localFont({
   src: '../assets/fonts/PretendardVariable.woff2',
   display: 'swap',
   weight: '45 920',
-  preload: true,
+  /** display:swap이므로 preload 명시적 false 설정 */
+  preload: false,
   fallback: [
     '-apple-system',
     'BlinkMacSystemFont',
