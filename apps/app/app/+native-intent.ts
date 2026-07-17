@@ -20,7 +20,7 @@ export function redirectSystemPath({ path }: { path: string; initial: boolean })
   if (webFromUrl) return `/?web=${encodeURIComponent(webFromUrl)}`;
 
   try {
-    /** share extension → openHostApp(`/?web=${encodeURIComponent('/archive?tab=wish')}`) */
+    /** share extension → openHostApp(`/?web=${encodeURIComponent('/archive/wish')}`) */
     const url = new URL(path, 'piki://app');
     const web = url.searchParams.get('web');
 

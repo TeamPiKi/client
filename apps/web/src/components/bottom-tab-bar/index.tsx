@@ -10,8 +10,11 @@ import { ROUTES } from '@/consts/route';
 
 const TABS = [
   { label: '홈', icon: HomeIconFill, href: ROUTES.HOME },
-  { label: '보관', icon: HeartIconFill, href: ROUTES.ARCHIVE() },
+  { label: '보관', icon: HeartIconFill, href: ROUTES.WISHLIST },
 ] as const;
+
+const matchesTabPath = (pathname: string, basePath: string) =>
+  pathname === basePath || pathname.startsWith(`${basePath}/`);
 
 function BottomTabBar() {
   const router = useRouter();
@@ -43,8 +46,9 @@ function BottomTabBar() {
         {TABS.map(({ label, icon: Icon, href }) => {
           const isActive =
             label === '보관'
-              ? pathname.startsWith(ROUTES.ARCHIVE_BASE)
-              : pathname === href || pathname.startsWith(`${href}/`);
+              ? matchesTabPath(pathname, ROUTES.WISHLIST) ||
+                matchesTabPath(pathname, ROUTES.TOURNAMENT_HISTORY)
+              : matchesTabPath(pathname, href);
           return (
             <button
               key={label}

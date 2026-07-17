@@ -1,5 +1,3 @@
-import type { ItemTypeT } from '@/types/item';
-
 /** NOTE: 수정 시 src/utils/getRouteType.ts 도 함께 수정 필요 */
 export const ROUTES = {
   /** 1. Public (Anonymous) */
@@ -21,8 +19,8 @@ export const ROUTES = {
   PLAY_FROM_LINK: (sourceTournamentId: number) => `/play/${sourceTournamentId}`,
 
   /** 3. Member Only */
-  ARCHIVE_BASE: '/archive',
-  ARCHIVE: (tab: ItemTypeT = 'wish') => `/archive?tab=${tab}`,
+  WISHLIST: '/archive/wish',
+  TOURNAMENT_HISTORY: '/archive/tournament',
   WISH_EDIT: (wishId: number) => `/archive/wish/${wishId}`,
   MYPAGE_WITHDRAW: '/mypage/withdraw',
 

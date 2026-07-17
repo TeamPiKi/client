@@ -77,7 +77,10 @@
       [
         "@react-native-kakao/core",
         {
-          "nativeAppKey": "326734abdf8de5c7e090a2fc72e1dce6"
+          "nativeAppKey": "326734abdf8de5c7e090a2fc72e1dce6",
+          "android": {
+            "authCodeHandlerActivity": true
+          }
         }
       ],
       [
@@ -95,6 +98,15 @@
           "backgroundColor": "#A2DEFF",
           "dark": {
             "backgroundColor": "#A2DEFF"
+          },
+          "android": {
+            "image": "./assets/images/splash-android-blank.png",
+            "imageWidth": 200,
+            "resizeMode": "contain",
+            "backgroundColor": "#A2DEFF",
+            "dark": {
+              "backgroundColor": "#A2DEFF"
+            }
           }
         }
       ],

@@ -23,7 +23,7 @@ export const usePostWishLink = () => {
     onSuccess: () => {
       logAnalyticsEvent(ANALYTICS_EVENT.WISH_ADD_COMPLETE, { source: 'link' });
       queryClient.invalidateQueries({ queryKey: ['wishlists'] });
-      if (pathname !== ROUTES.ARCHIVE_BASE) router.push(ROUTES.ARCHIVE('wish'));
+      if (pathname !== ROUTES.WISHLIST) router.push(ROUTES.WISHLIST);
     },
     onError: error => {
       if (!isAxiosError<ApiErrorResponseT>(error) || !error.response) return;

@@ -4,7 +4,7 @@ import type { WishlistPageT } from '@/apis/getWishlist';
 import { getWishlist } from '@/apis/getWishlist';
 import { getQueryClient } from '@/utils/queryClient';
 
-import WishContentClient from './client';
+import WishContentClient from './WishContentClient';
 
 async function WishContent() {
   const queryClient = getQueryClient();

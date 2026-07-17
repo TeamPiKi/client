@@ -2,12 +2,12 @@
 
 import { useState } from 'react';
 
-import { useWishlistDelete } from '../../_hooks/useDeleteWishes';
-import { useShareIntentWish } from '../../_hooks/useShareIntentWish';
-import WishAddDialog from '../WishAddDialog';
-import WishlistBottomBar from '../WishlistBottomBar';
-import WishlistFabArea from '../WishlistFabArea';
-import WishlistList from '../WishlistList';
+import { useDeleteWishes } from '../_hooks/useDeleteWishes';
+import { useShareIntentWish } from '../_hooks/useShareIntentWish';
+import WishAddDialog from './WishAddDialog';
+import WishlistBottomBar from './WishlistBottomBar';
+import WishlistFabArea from './WishlistFabArea';
+import WishlistList from './WishlistList';
 
 function WishContentClient() {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
@@ -20,7 +20,7 @@ function WishContentClient() {
     handleEnterDeleteMode,
     handleToggleSelect,
     handleConfirmDelete,
-  } = useWishlistDelete();
+  } = useDeleteWishes();
 
   return (
     <>
