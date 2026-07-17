@@ -38,7 +38,9 @@ export function SplashScreenControllerProvider({ children }: Props) {
 
   // 첫 렌더가 커밋된 뒤(=RN 오버레이가 이미 그려진 뒤) 시스템 스플래시를 내려 전환 공백을 없앤다.
   useEffect(() => {
-    void SplashScreen.hideAsync();
+    SplashScreen.hideAsync().catch(() => {
+      /* 이미 숨겨졌거나 네이티브 스플래시 뷰가 없는 경우 — 무시해도 안전 */
+    });
   }, []);
 
   const hideSplashOverlay = useCallback(() => {
