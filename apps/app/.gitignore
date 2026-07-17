@@ -44,3 +44,12 @@ app-example
 
 google-services.json
 GoogleService-Info.plist
+
+# EAS 서명 자격증명 (eas credentials 다운로드 산출물 — 키 비밀번호 평문 포함)
+credentials.json
+credentials/
+
+# 로컬 빌드 산출물
+*.apk
+*.aab
+*.apks
