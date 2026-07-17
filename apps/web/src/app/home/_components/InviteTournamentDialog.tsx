@@ -10,21 +10,26 @@ import {
   CODE_LENGTH,
   isValidInviteCodeFormat,
 } from '@/app/tournament/join/_utils/verifyInviteCode';
+import { LoginIconOutline } from '@/assets/icons';
 import Button from '@/components/button';
-import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/dialog';
 import Input from '@/components/input';
 import Spinner from '@/components/spinner';
 import TournamentErrorDialog from '@/components/tournament-error-dialog';
+import { ANALYTICS_EVENT } from '@/consts/analytics';
+import { logAnalyticsEvent } from '@/utils/analytics';
 
-import InvalidCodeDialog from './InvalidCodeDialog';
+import InvalidCodeDialog from './invite-code-dialog/InvalidCodeDialog';
 
-type InviteCodeDialogProps = {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-};
-
-function InviteCodeDialog({ open, onOpenChange }: InviteCodeDialogProps) {
+function InviteTournamentDialog() {
   const router = useRouter();
+  const [open, setOpen] = useState(false);
   const [code, setCode] = useState('');
   const [showFormatError, setShowFormatError] = useState(false);
   const [isInvalidDialogOpen, setIsInvalidDialogOpen] = useState(false);
@@ -32,10 +37,9 @@ function InviteCodeDialog({ open, onOpenChange }: InviteCodeDialogProps) {
 
   const { mutate: previewMutation, isPending: isPreviewPending } = useMutation({
     mutationFn: getInvitePreviewByCode,
-    // mutation 진행 중 사용자가 input 을 바꿀 수 있으므로
-    // 검증에 사용한 변수 (variables) 를 그대로 라우팅에 쓴다 — state 의 code 를 다시 읽지 않는다.
+    /** mutation 진행 중 사용자가 input 을 바꿀 수 있으므로 검증에 사용한 variables 를 그대로 라우팅에 쓴다. */
     onSuccess: (data, enteredCode) => {
-      onOpenChange(false);
+      setOpen(false);
       reset();
       router.push(`/tournament/join/${data.tournamentId}?code=${enteredCode}`);
     },
@@ -44,19 +48,19 @@ function InviteCodeDialog({ open, onOpenChange }: InviteCodeDialogProps) {
         const status = error.response?.status;
         /** 400: 코드 불일치 */
         if (status === 400) {
-          onOpenChange(false);
+          setOpen(false);
           setIsInvalidDialogOpen(true);
           return;
         }
 
         /** 409: 초대 코드 만료 */
         if (status === 409) {
-          onOpenChange(false);
+          setOpen(false);
           setIsTournamentErrorDialogOpen(true);
           return;
         }
       }
-      onOpenChange(false);
+      setOpen(false);
       setIsInvalidDialogOpen(true);
     },
   });
@@ -71,7 +75,11 @@ function InviteCodeDialog({ open, onOpenChange }: InviteCodeDialogProps) {
 
   const handleOpenChange = (next: boolean) => {
     if (!next) reset();
-    onOpenChange(next);
+    setOpen(next);
+  };
+
+  const handleTriggerClick = () => {
+    logAnalyticsEvent(ANALYTICS_EVENT.SOCIAL_INVITE_CLICK);
   };
 
   const handleChange = (next: string) => {
@@ -93,6 +101,16 @@ function InviteCodeDialog({ open, onOpenChange }: InviteCodeDialogProps) {
   return (
     <>
       <Dialog open={open} onOpenChange={handleOpenChange}>
+        <DialogTrigger asChild>
+          <button
+            type="button"
+            onClick={handleTriggerClick}
+            className="flex h-[54px] w-full cursor-pointer items-center justify-center gap-2 rounded-[12px] bg-bg-layer-default px-9"
+          >
+            <LoginIconOutline className="size-6 text-icon-neutral-secondary" />
+            <span className="body-1-semibold text-text-neutral-primary">초대 토너먼트 입장</span>
+          </button>
+        </DialogTrigger>
         <DialogContent showCloseButton={false} className="flex flex-col gap-5 p-6">
           <DialogTitle className="text-center heading-1 text-text-neutral-primary">
             초대받은 토너먼트
@@ -131,4 +149,4 @@ function InviteCodeDialog({ open, onOpenChange }: InviteCodeDialogProps) {
   );
 }
 
-export default InviteCodeDialog;
+export default InviteTournamentDialog;

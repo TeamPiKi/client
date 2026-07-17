@@ -5,7 +5,7 @@ import Spacing from '@/components/spacing';
 
 import AddWishHomeDialog from './_components/AddWishHomeDialog';
 import CreateTournamentDialog from './_components/CreateTournamentDialog';
-import InviteTournamentButton from './_components/InviteTournamentButton';
+import InviteTournamentDialog from './_components/InviteTournamentDialog';
 import MemberOnlyToast from './_components/MemberOnlyToast';
 import TournamentList from './_components/tournament-list';
 
@@ -23,7 +23,7 @@ function HomePage() {
         <section className="grid grid-cols-2 gap-3 py-2.5">
           <AddWishHomeDialog />
           <CreateTournamentDialog />
-          <InviteTournamentButton />
+          <InviteTournamentDialog />
         </section>
 
         {/* 진행 중인 토너먼트 */}
