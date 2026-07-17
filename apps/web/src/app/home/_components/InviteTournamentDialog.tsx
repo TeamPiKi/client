@@ -104,11 +104,11 @@ function InviteTournamentDialog() {
         <DialogTrigger asChild onClick={handleTriggerClick}>
           <button
             type="button"
-            aria-label="새 토너먼트 만들기"
+            aria-label="초대받은 토너먼트 참여하기"
             className="flex h-[104px] cursor-pointer flex-col rounded-2xl bg-gray-50 p-4"
           >
             <span className="text-left body-1-semibold whitespace-pre-line text-text-neutral-primary">
-              {'새 토너먼트\n만들기'}
+              {'초대받은 토너먼트\n참여하기'}
             </span>
             <GroupIconFill className="size-7.5 self-end text-icon-neutral-secondary" />
           </button>

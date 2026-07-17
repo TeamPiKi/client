@@ -28,8 +28,8 @@ function TournamentHistoryList({ statuses }: Props) {
           tournamentId={tournament.tournamentId}
           status={tournament.status}
           name={tournament.name}
-          date={tournament.createdAt.slice(0, 10).replaceAll('-', '/')}
           profileImageUrls={tournament.participantProfileImages}
+          imageUrls={[]} // TODO: 이미지 넣기
           participantCount={tournament.participantProfileImages.length}
         />
       ))}

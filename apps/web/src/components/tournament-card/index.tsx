@@ -6,6 +6,7 @@ import { ROUTES } from '@/consts/route';
 import type { TournamentStatusT } from '@/types/tournament';
 import { cn } from '@/utils/cn';
 
+import ItemImageThumbnails from './ItemImageThumbnails';
 import MorePopover from './MorePopover';
 
 type TournamentCardProps = {
@@ -13,10 +14,13 @@ type TournamentCardProps = {
   status: TournamentStatusT;
   name: string;
   profileImageUrls: string[];
+  /** 토너먼트 아이템 썸네일. 최대 2개. */
+  imageUrls: string[];
   maxProfiles?: number;
   /** 본인 포함 참여자 수. 2명 이상이면 더보기에 '친구 목록 보기' 메뉴 노출. */
   participantCount?: number;
   className?: string;
+  showMorePopover?: boolean;
 };
 
 function TournamentCard({
@@ -24,9 +28,11 @@ function TournamentCard({
   status,
   name,
   profileImageUrls,
+  imageUrls = [],
   maxProfiles = 3,
   participantCount,
   className,
+  showMorePopover = true,
 }: TournamentCardProps) {
   const HREF = {
     PENDING: ROUTES.TOURNAMENT_CREATE(tournamentId),
@@ -38,7 +44,8 @@ function TournamentCard({
     <article
       className={cn('flex w-full items-start gap-2.5 rounded-xl bg-base-50 px-5 py-3', className)}
     >
-      <div className="h-[72px] w-[85px] bg-gray-50"></div> {/** TODO: 이미지 넣기 */}
+      <ItemImageThumbnails imageUrls={imageUrls} />
+
       <div className="flex flex-1 flex-col items-start gap-2 self-center">
         <div className="flex items-center gap-2">
           <StatusChip status={status} />
@@ -51,11 +58,14 @@ function TournamentCard({
         </div>
         <UserProfileGroup profileImageUrls={profileImageUrls} max={maxProfiles} />
       </div>
-      <MorePopover
-        status={status}
-        tournamentId={tournamentId}
-        participantCount={participantCount}
-      />
+
+      {showMorePopover && (
+        <MorePopover
+          status={status}
+          tournamentId={tournamentId}
+          participantCount={participantCount}
+        />
+      )}
     </article>
   );
 }
