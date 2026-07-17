@@ -12,7 +12,7 @@
   font-weight: 700;
 }
 
-@utility heading-2 {
+@utility heading-2-semibold {
   font-size: 18px;
   line-height: 26px;
   letter-spacing: -0.6px;

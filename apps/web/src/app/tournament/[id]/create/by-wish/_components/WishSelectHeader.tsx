@@ -17,14 +17,14 @@ function WishSelectHeader({
     if (isMaxExceeded)
       return (
         <p>
-          <span className="heading-2 text-gray-600">최대 {MAX_SELECT}개</span>
+          <span className="heading-2-semibold text-gray-600">최대 {MAX_SELECT}개</span>
           <span className="heading-2-medium text-gray-300">까지 선택할 수 있어요</span>
         </p>
       );
 
     return (
       <p className="whitespace-pre-line">
-        <span className="heading-2 text-text-neutral-secondary">
+        <span className="heading-2-semibold text-text-neutral-secondary">
           {tournamentCandidateCount}개가
         </span>
         <span className="heading-2-medium text-text-neutral-secondary">

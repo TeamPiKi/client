@@ -15,7 +15,7 @@ function TournamentListClient({ statuses }: Props) {
 
   return (
     <section className="flex flex-col gap-3">
-      <h2 className="heading-2 text-black">진행 중인 토너먼트</h2>
+      <h2 className="heading-2-semibold text-black">참여 중인 토너먼트</h2>
 
       {tournamentListData.map(tournament => (
         <TournamentCard
