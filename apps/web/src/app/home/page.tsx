@@ -20,7 +20,7 @@ function HomePage() {
       {/* 메인 컨텐츠 */}
       <main className="flex w-full flex-col gap-12">
         {/* 로고 + CTA 영역 */}
-        <section className="grid grid-cols-2 gap-3 px-5 py-2.5">
+        <section className="grid grid-cols-2 gap-3 py-2.5">
           <AddWishHomeDialog />
           <CreateTournamentDialog />
           <InviteTournamentButton />

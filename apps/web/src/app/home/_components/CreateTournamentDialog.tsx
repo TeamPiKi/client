@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 
-import { EditIconFill, TrophyIconFill } from '@/assets/icons';
+import { BasketIconFill, EditIconFill } from '@/assets/icons';
 import Button from '@/components/button';
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from '@/components/dialog';
 import Input from '@/components/input';
@@ -38,10 +38,13 @@ function CreateTournamentDialog() {
       <DialogTrigger asChild>
         <button
           type="button"
-          className="flex flex-1 cursor-pointer flex-col items-center gap-2 rounded-[12px] bg-bg-layer-default p-5"
+          aria-label="새 토너먼트 만들기"
+          className="flex h-[104px] cursor-pointer flex-col rounded-2xl bg-gray-900 p-4"
         >
-          <TrophyIconFill className="size-8 text-yellow-400" />
-          <span className="body-1-semibold text-text-neutral-primary">토너먼트 만들기</span>
+          <span className="text-left body-1-semibold whitespace-pre-line text-base-50">
+            {'새 토너먼트\n만들기'}
+          </span>
+          <BasketIconFill className="size-7.5 self-end text-white" />
         </button>
       </DialogTrigger>
       <DialogContent showCloseButton={false} className="flex flex-col gap-5">
