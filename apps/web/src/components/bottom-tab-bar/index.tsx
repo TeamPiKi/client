@@ -15,6 +15,7 @@ import {
   TrophyIconOutline,
 } from '@/assets/icons';
 import { ROUTES } from '@/consts/route';
+import { Z_INDEX } from '@/consts/zIndex';
 import { cn } from '@/utils/cn';
 
 const TABS = [
@@ -210,101 +211,106 @@ function BottomTabBar() {
 
   return (
     <div
-      ref={barRef}
       data-bottom-tab-bar // NOTE: 탭바가 렌더된 페이지에서 토스트가 탭바 위에 뜨도록 하는 마커
-      onPointerDown={handlePointerDown}
-      onPointerUp={() => setIsPressed(false)}
-      onPointerLeave={() => !isGrabbingRef.current && setIsPressed(false)}
-      onPointerCancel={() => !isGrabbingRef.current && setIsPressed(false)}
-      onClickCapture={e => {
-        // 드래그·탭 제스처의 내비게이션은 릴리즈에서 처리하므로 Link 클릭은 차단 (제스처당 1회)
-        if (!isDraggedRef.current) return;
-        isDraggedRef.current = false;
-        e.preventDefault();
-        e.stopPropagation();
-      }}
-      className={cn(
-        'relative isolate inline-flex h-[58px] touch-none items-center gap-2 rounded-full p-1 shadow-[0px_6px_24px_0px_rgba(0,0,0,0.16)] transition-transform duration-200 ease-out select-none',
-        isPressed && 'scale-102'
-      )}
+      className="fixed bottom-8 left-1/2 -translate-x-1/2"
+      style={{ zIndex: Z_INDEX.BOTTOM_TAB_BAR }}
     >
-      {/* 유리 레이어: 블러 + 채도 */}
-      <div className="absolute inset-0 -z-30 rounded-full backdrop-blur-[8px] backdrop-saturate-150" />
-      {/* 틴트 레이어 — 평소엔 white/80, 렌즈 상태(홀드/드래그)에서만 투명해져 유리가 드러남 */}
       <div
+        ref={barRef}
+        onPointerDown={handlePointerDown}
+        onPointerUp={() => setIsPressed(false)}
+        onPointerLeave={() => !isGrabbingRef.current && setIsPressed(false)}
+        onPointerCancel={() => !isGrabbingRef.current && setIsPressed(false)}
+        onClickCapture={e => {
+          // 드래그·탭 제스처의 내비게이션은 릴리즈에서 처리하므로 Link 클릭은 차단 (제스처당 1회)
+          if (!isDraggedRef.current) return;
+          isDraggedRef.current = false;
+          e.preventDefault();
+          e.stopPropagation();
+        }}
         className={cn(
-          'absolute inset-0 -z-20 rounded-full transition-colors duration-200 ease-out',
-          isGrabbing ? 'bg-white/40' : 'bg-white/80'
+          'relative isolate inline-flex h-[58px] touch-none items-center gap-2 rounded-full p-1 shadow-[0px_6px_24px_0px_rgba(0,0,0,0.16)] transition-transform duration-200 ease-out select-none',
+          isPressed && 'scale-102'
         )}
-      />
-      {/* 반사광 레이어 */}
-      <div className="absolute inset-0 -z-10 rounded-full shadow-[inset_2px_2px_1px_0_rgba(255,255,255,0.6),inset_-1px_-1px_1px_1px_rgba(255,255,255,0.4)]" />
-      {/* 활성 탭 인디케이터 — 꾹 잡고 드래그해 다른 탭으로 옮길 수 있는 버블 */}
-      {activeIndex >= 0 && (
+      >
+        {/* 유리 레이어: 블러 + 채도 */}
+        <div className="absolute inset-0 -z-30 rounded-full backdrop-blur-[8px] backdrop-saturate-150" />
+        {/* 틴트 레이어 — 평소엔 white/80, 렌즈 상태(홀드/드래그)에서만 투명해져 유리가 드러남 */}
         <div
-          ref={indicatorRef}
-          aria-hidden
           className={cn(
-            'pointer-events-none absolute top-1 bottom-1',
-            // 잡는 동안엔 아이콘 위로 올라와 렌즈로 동작
-            isGrabbing ? 'z-10' : '-z-10'
+            'absolute inset-0 -z-20 rounded-full transition-colors duration-200 ease-out',
+            isGrabbing ? 'bg-white/40' : 'bg-white/80'
           )}
-          style={{
-            left: indexToLeft(activeIndex),
-            right: BAR_WIDTH - indexToLeft(activeIndex) - TAB_WIDTH,
-          }}
-        >
-          {/* 누르면 부풀고 드래그 속도에 따라 진행 방향으로 늘어나는 스쿼시 */}
+        />
+        {/* 반사광 레이어 */}
+        <div className="absolute inset-0 -z-10 rounded-full shadow-[inset_2px_2px_1px_0_rgba(255,255,255,0.6),inset_-1px_-1px_1px_1px_rgba(255,255,255,0.4)]" />
+        {/* 활성 탭 인디케이터 — 꾹 잡고 드래그해 다른 탭으로 옮길 수 있는 버블 */}
+        {activeIndex >= 0 && (
           <div
-            ref={bubbleRef}
+            ref={indicatorRef}
+            aria-hidden
             className={cn(
-              'relative size-full overflow-hidden rounded-full transition-[scale,transform,background-color,box-shadow,backdrop-filter] duration-300',
-              // 평소엔 무광 알약, 잡는 동안만 유리 렌즈로 전환
-              isGrabbing
-                ? 'scale-125 bg-white/2 shadow-[inset_1.5px_1.5px_1px_0_rgba(255,255,255,0.6),inset_-1px_-1px_1px_0_rgba(255,255,255,0.35),0_4px_12px_0_rgba(0,0,0,0.18)]'
-                : 'bg-black/8'
+              'pointer-events-none absolute top-1 bottom-1',
+              // 잡는 동안엔 아이콘 위로 올라와 렌즈로 동작
+              isGrabbing ? 'z-10' : '-z-10'
             )}
-            style={{ transitionTimingFunction: SPRING_EASE }}
+            style={{
+              left: indexToLeft(activeIndex),
+              right: BAR_WIDTH - indexToLeft(activeIndex) - TAB_WIDTH,
+            }}
           >
-            {/* 이동 시 반대편으로 밀리는 반사광 */}
+            {/* 누르면 부풀고 드래그 속도에 따라 진행 방향으로 늘어나는 스쿼시 */}
             <div
-              ref={glintRef}
+              ref={bubbleRef}
               className={cn(
-                'absolute inset-0 rounded-full transition-[translate,opacity] duration-200 ease-out',
-                isGrabbing ? 'opacity-100' : 'opacity-0'
+                'relative size-full overflow-hidden rounded-full transition-[scale,transform,background-color,box-shadow,backdrop-filter] duration-300',
+                // 평소엔 무광 알약, 잡는 동안만 유리 렌즈로 전환
+                isGrabbing
+                  ? 'scale-125 bg-white/2 shadow-[inset_1.5px_1.5px_1px_0_rgba(255,255,255,0.6),inset_-1px_-1px_1px_0_rgba(255,255,255,0.35),0_4px_12px_0_rgba(0,0,0,0.18)]'
+                  : 'bg-black/8'
               )}
-              style={{
-                // 위쪽 테두리에만 붙는 얇은 반사광 — 중앙은 침범하지 않음
-                background:
-                  'radial-gradient(75% 45% at 40% -12%, rgba(255,255,255,0.55), transparent 55%)',
-              }}
-            />
-          </div>
-        </div>
-      )}
-      {TABS.map(({ label, activeIcon: ActiveIcon, inactiveIcon: InactiveIcon, href }) => {
-        const isActive = matchesTabPath(pathname, href);
-        const Icon = isActive ? ActiveIcon : InactiveIcon;
-        return (
-          <Link
-            key={label}
-            href={href}
-            draggable={false}
-            className={cn(
-              'flex h-full w-[72px] cursor-pointer flex-col items-center justify-center rounded-full p-2 transition-colors',
-              isActive ? 'text-gray-900' : 'text-gray-800'
-            )}
-          >
-            <Icon className="size-5.5 shrink-0" />
-            <span
-              className="text-[10px] leading-[18px] font-medium tracking-[-0.4px]"
-              style={{ fontFeatureSettings: "'ss10' on" }}
+              style={{ transitionTimingFunction: SPRING_EASE }}
             >
-              {label}
-            </span>
-          </Link>
-        );
-      })}
+              {/* 이동 시 반대편으로 밀리는 반사광 */}
+              <div
+                ref={glintRef}
+                className={cn(
+                  'absolute inset-0 rounded-full transition-[translate,opacity] duration-200 ease-out',
+                  isGrabbing ? 'opacity-100' : 'opacity-0'
+                )}
+                style={{
+                  // 위쪽 테두리에만 붙는 얇은 반사광 — 중앙은 침범하지 않음
+                  background:
+                    'radial-gradient(75% 45% at 40% -12%, rgba(255,255,255,0.55), transparent 55%)',
+                }}
+              />
+            </div>
+          </div>
+        )}
+        {TABS.map(({ label, activeIcon: ActiveIcon, inactiveIcon: InactiveIcon, href }) => {
+          const isActive = matchesTabPath(pathname, href);
+          const Icon = isActive ? ActiveIcon : InactiveIcon;
+          return (
+            <Link
+              key={label}
+              href={href}
+              draggable={false}
+              className={cn(
+                'flex h-full w-[72px] cursor-pointer flex-col items-center justify-center rounded-full p-2 transition-colors',
+                isActive ? 'text-gray-900' : 'text-gray-800'
+              )}
+            >
+              <Icon className="size-5.5 shrink-0" />
+              <span
+                className="text-[10px] leading-[18px] font-medium tracking-[-0.4px]"
+                style={{ fontFeatureSettings: "'ss10' on" }}
+              >
+                {label}
+              </span>
+            </Link>
+          );
+        })}
+      </div>
     </div>
   );
 }

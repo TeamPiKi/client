@@ -2,8 +2,6 @@
 
 import { Suspense, useState } from 'react';
 
-import BottomTabBar from '@/components/bottom-tab-bar';
-import { Z_INDEX } from '@/consts/zIndex';
 import type { TournamentStatusT } from '@/types/tournament';
 
 import ArchivePageLayout from '../../_common/_components/ArchivePageLayout';
@@ -32,12 +30,6 @@ function ArchiveTournamentClient() {
       >
         <TournamentHistoryList key={activeTab} statuses={STATUS_BY_TAB[activeTab]} />
       </Suspense>
-      <div
-        className="fixed bottom-10 left-1/2 flex -translate-x-1/2 items-center gap-3"
-        style={{ zIndex: Z_INDEX.BOTTOM_TAB_BAR }}
-      >
-        <BottomTabBar />
-      </div>
     </ArchivePageLayout>
   );
 }

@@ -4,7 +4,6 @@ import { getMe } from '@/apis/getMe';
 import BottomTabBar from '@/components/bottom-tab-bar';
 import { Header, HeaderIcon } from '@/components/header';
 import Spacing from '@/components/spacing';
-import { Z_INDEX } from '@/consts/zIndex';
 import { getQueryClient } from '@/utils/queryClient';
 
 import AccountInfoSection from './_components/AccountInfoSection';
@@ -39,12 +38,7 @@ async function MypagePage() {
       </main>
 
       {/* 하단 네비게이션 */}
-      <div
-        className="fixed bottom-10 left-1/2 -translate-x-1/2"
-        style={{ zIndex: Z_INDEX.BOTTOM_TAB_BAR }}
-      >
-        <BottomTabBar />
-      </div>
+      <BottomTabBar />
     </div>
   );
 }
