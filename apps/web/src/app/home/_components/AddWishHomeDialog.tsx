@@ -1,10 +1,13 @@
 'use client';
 
-import { HeartIconFill } from '@/assets/icons';
+import Image from 'next/image';
+
 import { Dialog, DialogTrigger } from '@/components/dialog';
 import GetItemDialogContent from '@/components/get-item-dialog';
 import { ANALYTICS_EVENT } from '@/consts/analytics';
 import { logAnalyticsEvent } from '@/utils/analytics';
+
+import AddWishBg from '../_assets/add-wish-bg.png';
 
 function AddWishHomeDialog() {
   const handleAddWishClick = () => {
@@ -17,12 +20,13 @@ function AddWishHomeDialog() {
         <button
           type="button"
           onClick={handleAddWishClick}
-          className="flex flex-1 cursor-pointer flex-col items-center gap-2 rounded-[12px] bg-bg-layer-default p-5"
+          className="relative row-span-2 h-[220px] cursor-pointer overflow-hidden rounded-2xl bg-[#62c7ff]"
         >
-          <HeartIconFill className="size-8 text-red-400" />
-          <span className="body-1-semibold text-text-neutral-primary">위시 담기</span>
+          <Image src={AddWishBg} alt="위시 담기" width={197} height={242} />
+          <span className="absolute top-[18px] left-[15px] heading-1 text-base-50">위시 담기</span>
         </button>
       </DialogTrigger>
+
       <GetItemDialogContent type="wish" />
     </Dialog>
   );
