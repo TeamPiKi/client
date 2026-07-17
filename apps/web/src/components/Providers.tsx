@@ -15,8 +15,12 @@ import { getQueryClient } from '@/utils/queryClient';
 /** Production 빌드에서는 React Query Devtools 미포함 */
 const ReactQueryDevtools =
   process.env.NODE_ENV === 'development'
-    ? dynamic(() =>
-        import('@tanstack/react-query-devtools').then(mod => ({ default: mod.ReactQueryDevtools }))
+    ? dynamic(
+        () =>
+          import('@tanstack/react-query-devtools').then(mod => ({
+            default: mod.ReactQueryDevtools,
+          })),
+        { ssr: false }
       )
     : null;
 
