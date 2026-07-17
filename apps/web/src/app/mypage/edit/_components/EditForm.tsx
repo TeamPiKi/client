@@ -74,7 +74,7 @@ function EditForm() {
         />
       </div>
 
-      <BottomCta className="border-t border-gray-50 bg-bg-layer-basement pb-8">
+      <BottomCta>
         <Button
           type="submit"
           variant="primary"
