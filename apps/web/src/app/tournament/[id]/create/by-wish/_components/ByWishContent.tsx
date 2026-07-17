@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import { toast } from 'sonner';
 
+import BottomCta from '@/components/bottom-cta';
 import Button from '@/components/button';
 import { useGetWishlist } from '@/hooks/useGetWishlist';
 
@@ -77,29 +78,20 @@ function ByWishContent({ tournamentId }: ByWishContentProps) {
         </div>
       </main>
 
-      <div className="fixed bottom-0 left-1/2 z-10 w-full max-w-120 -translate-x-1/2">
-        <div
-          className="pointer-events-none w-full"
-          style={{
-            height: '66.878px',
-            background: 'linear-gradient(180deg, rgba(244, 244, 246, 0.00) 0%, #F4F4F6 100%)',
-          }}
-        />
-        <div className="flex gap-[10px] bg-[#F4F4F6] px-5 py-3">
-          <Button variant="secondary" size="lg" onClick={() => history.back()}>
-            뒤로
-          </Button>
-          <Button
-            variant="primary"
-            size="lg"
-            disabled={selectedIds.length === 0}
-            isLoading={isPostTournamentItemsByWishPending}
-            onClick={handleNext}
-          >
-            다음
-          </Button>
-        </div>
-      </div>
+      <BottomCta hasGradient>
+        <Button variant="secondary" size="lg" onClick={() => history.back()}>
+          뒤로
+        </Button>
+        <Button
+          variant="primary"
+          size="lg"
+          disabled={selectedIds.length === 0}
+          isLoading={isPostTournamentItemsByWishPending}
+          onClick={handleNext}
+        >
+          다음
+        </Button>
+      </BottomCta>
     </div>
   );
 }

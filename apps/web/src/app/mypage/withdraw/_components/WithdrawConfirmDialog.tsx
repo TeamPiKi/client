@@ -32,7 +32,7 @@ function WithdrawConfirmDialog() {
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <BottomCta className="bg-bg-layer-basement pb-8">
+      <BottomCta>
         <DialogTrigger asChild>
           <Button variant="secondary" size="lg" className="w-full">
             탈퇴하기
