@@ -5,10 +5,10 @@ import { cn } from '@/utils/cn';
 
 import { type StatusChipStyleProps, statusChipStyles } from './statusChip.style';
 
-const STATUS_CONFIG = {
-  [TOURNAMENT_STATUS.PENDING]: { label: '담는 중' },
-  [TOURNAMENT_STATUS.IN_PROGRESS]: { label: '플레이 중' },
-  [TOURNAMENT_STATUS.COMPLETED]: { label: '완료' },
+const STATUS_LABEL = {
+  [TOURNAMENT_STATUS.PENDING]: '담는 중',
+  [TOURNAMENT_STATUS.IN_PROGRESS]: '플레이 중',
+  [TOURNAMENT_STATUS.COMPLETED]: '완료',
 } as const;
 
 type StatusChipProps = Omit<ComponentProps<'span'>, 'children'> &
@@ -17,11 +17,9 @@ type StatusChipProps = Omit<ComponentProps<'span'>, 'children'> &
   };
 
 function StatusChip({ status, className, ...rest }: StatusChipProps) {
-  const { label } = STATUS_CONFIG[status];
-
   return (
     <span className={cn(statusChipStyles({ status }), className)} {...rest}>
-      {label}
+      {STATUS_LABEL[status]}
     </span>
   );
 }
