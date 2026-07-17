@@ -3,7 +3,7 @@ import { cookies, headers } from 'next/headers';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
-import PikiLogo from '@/assets/images/piki-logo.svg';
+import PikiLogo from '@/assets/images/piki-logo-cart.svg';
 import { QUERY_ACTION } from '@/consts/queryAction';
 import { ROUTES } from '@/consts/route';
 import { getRoleFromToken } from '@/utils/auth';
@@ -33,13 +33,16 @@ async function LoginPage({ searchParams }: LoginPageProps) {
   return (
     <div className="flex min-h-dvh flex-col items-center bg-gray-50 px-4 pt-padding-top pb-10">
       <div className="mt-15 flex flex-col items-center gap-6">
-        <PikiLogo aria-label="PIKI" />
-        <p className="text-center body-1-bold whitespace-pre-line text-text-neutral-secondary animate-in fade-in-0 duration-500">
+        <PikiLogo
+          aria-label="PIKI"
+          className="h-[106px] w-[146px] shrink-0 text-text-neutral-primary"
+        />
+        <p className="animate-in text-center body-1-bold whitespace-pre-line text-text-neutral-secondary duration-500 fade-in-0">
           {'매일 쌓여만 가던\n위시리스트가 오늘의 결정으로'}
         </p>
       </div>
 
-      <div className="mt-[90px] w-full animate-in fade-in-0 duration-500">
+      <div className="mt-[90px] w-full animate-in duration-500 fade-in-0">
         <LoginButtons
           redirect={redirectParam ?? null}
           action={action ?? null}

@@ -1,4 +1,4 @@
-import PikiLogo from '@/assets/images/piki-logo.svg';
+import PikiLogo from '@/assets/images/piki-logo-cart.svg';
 import BottomTabBar from '@/components/bottom-tab-bar';
 import { Header, HeaderIcon } from '@/components/header';
 
@@ -18,8 +18,11 @@ function HomePage() {
         {/* 로고 + CTA 영역 */}
         <section className="flex flex-col items-center gap-12">
           {/* PIKI 로고 */}
-          <PikiLogo aria-label="PIKI" />
-          <h1 className="sr-only">PIKI</h1>
+          <PikiLogo
+            aria-label="PIKI"
+            className="h-[106px] w-[146px] shrink-0 text-text-neutral-primary"
+          />
+          <h1 className="sr-only">PiKi</h1>
 
           {/* CTA 카드 + 초대 입장 */}
           <div className="flex w-full flex-col gap-3">

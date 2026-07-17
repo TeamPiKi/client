@@ -10,7 +10,7 @@ import {
   ChevronDownIconFill,
   ChevronUpIconFill,
 } from '@/assets/icons/fill';
-import PikiReceiptLogo from '@/assets/images/piki-receipt-logo.svg';
+import PikiLogo from '@/assets/images/piki-logo-cart.svg';
 import ReceiptZigzag from '@/assets/images/tournament/result/receipt-zigzag.svg';
 import TrophyBadge from '@/assets/images/tournament/result/trophy-badge.svg';
 import { cn } from '@/utils/cn';
@@ -111,7 +111,7 @@ function GroupResultClient({ tournamentId }: GroupResultClientProps) {
         <div className="relative flex w-full flex-col gap-2 bg-bg-layer-default pt-6 pb-6.25 filter-[drop-shadow(0px_2px_4px_rgba(0,0,0,0.12))]">
           {/* PIKI 로고 + 헤드라인 */}
           <div className="relative flex flex-col items-center gap-2">
-            <PikiReceiptLogo aria-label="PIKI" className="h-14 w-19.25" />
+            <PikiLogo aria-label="PIKI" className="h-14 w-19.25 shrink-0 text-gray-800" />
             <p
               className={cn(
                 kodeMono.className,
