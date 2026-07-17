@@ -11,14 +11,14 @@ import TournamentList from './_components/tournament-list';
 
 function HomePage() {
   return (
-    <div className="relative flex min-h-dvh flex-col bg-linear-to-b from-bg-layer-default to-bg-layer-default px-5 pt-padding-top pb-32">
+    <div className="to-bg-base-50 relative flex min-h-dvh flex-col bg-linear-to-b from-bg-layer-default px-5 pt-padding-top pb-32">
       {/* 상단 헤더 */}
       <Header left={<PiKiLogo />} right={<HeaderIcon name="ALARM" />} />
 
       <Spacing size={24} />
 
       {/* 메인 컨텐츠 */}
-      <main className="flex w-full flex-col gap-12">
+      <main className="flex w-full flex-col gap-8">
         {/* 로고 + CTA 영역 */}
         <section className="grid grid-cols-2 gap-3 py-2.5">
           <AddWishHomeDialog />
