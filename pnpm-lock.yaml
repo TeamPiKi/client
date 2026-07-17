@@ -197,6 +197,9 @@ importers:
       '@expo/plist':
         specifier: ~0.4.8
         version: 0.4.8
+      '@sentry/cli':
+        specifier: 2.55.0
+        version: 2.55.0
       '@types/react':
         specifier: 19.1.17
         version: 19.1.17
