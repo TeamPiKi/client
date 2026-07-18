@@ -1,8 +1,10 @@
+import type { Route } from '@playwright/test';
 import { expect, test as base } from '@playwright/test';
 
 import { ENDPOINTS } from '@/consts/api';
 
 import { createApiError, createApiSuccess } from '../helpers/apiResponse';
+import { DEFAULT_MOCK_IMAGE, MOCK_IMAGE_MAP } from '../mocks/images';
 
 type MockEntryT = {
   method: string;
@@ -87,6 +89,30 @@ export const test = base.extend<{ api: ApiMockT }>({
     /** 알림 SSE(Next Route Handler — /api/v1 아님): 빈 스트림으로 응답해 upstream 접근 차단 */
     await page.route('**/api/notifications/subscribe', route =>
       route.fulfill({ status: 200, headers: { 'content-type': 'text/event-stream' }, body: '' })
+    );
+
+    const fulfillMockImage = (route: Route, originalUrl: string) =>
+      route.fulfill({
+        status: 200,
+        contentType: 'image/svg+xml',
+        body: MOCK_IMAGE_MAP[originalUrl] ?? DEFAULT_MOCK_IMAGE,
+      });
+
+    /**
+     * next/image 최적화 요청(/_next/image?url=...) 인터셉트.
+     * 외부 URL 이미지는 Next 서버가 서버사이드에서 원본을 fetch 하기 때문에 여기서
+     * 서버 도달 전에 가로채 MOCK_IMAGE_MAP 의 로컬 이미지로 응답한다 (외부 접근 0).
+     * 로컬(public/) 이미지는 그대로 통과시켜 dev 서버가 서빙한다.
+     */
+    await page.route('**/_next/image**', route => {
+      const originalUrl = new URL(route.request().url()).searchParams.get('url') ?? '';
+      if (!/^https?:\/\//.test(originalUrl)) return route.continue();
+      return fulfillMockImage(route, originalUrl);
+    });
+
+    /** next/image 를 안 거치는 일반 <img> 가 가짜 CDN 주소를 직접 요청하는 경우 */
+    await page.route('https://cdn.example/**', route =>
+      fulfillMockImage(route, route.request().url())
     );
 
     /**
