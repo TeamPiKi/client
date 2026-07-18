@@ -22,6 +22,8 @@ type ApiErrorOptionsT = {
 export type ApiMockT = {
   get: <T>(path: string, data: T) => void;
   post: <T>(path: string, data: T) => void;
+  patch: <T>(path: string, data: T) => void;
+  delete: <T>(path: string, data: T) => void;
   error: (method: 'GET' | 'POST' | 'PATCH' | 'DELETE', path: string, options?: ApiErrorOptionsT) => void;
 };
 
@@ -127,6 +129,10 @@ export const test = base.extend<{ api: ApiMockT }>({
         entries.push({ method: 'GET', path, status: 200, body: createApiSuccess(data) }),
       post: (path, data) =>
         entries.push({ method: 'POST', path, status: 200, body: createApiSuccess(data) }),
+      patch: (path, data) =>
+        entries.push({ method: 'PATCH', path, status: 200, body: createApiSuccess(data) }),
+      delete: (path, data) =>
+        entries.push({ method: 'DELETE', path, status: 200, body: createApiSuccess(data) }),
       error: (method, path, options) =>
         entries.push({
           method,
