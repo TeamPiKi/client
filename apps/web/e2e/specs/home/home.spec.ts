@@ -1,8 +1,8 @@
 import { ENDPOINTS } from '@/consts/api';
 
-import { expect, test } from './fixtures/mockApiFixture';
-import { MOCK_GUEST_ME } from './mocks/me';
-import { MOCK_TOURNAMENT_LIST } from './mocks/tournament';
+import { expect, test } from '@e2e/fixtures/mockApiFixture';
+import { MOCK_GUEST_ME } from '@e2e/mocks/me';
+import { MOCK_TOURNAMENT_LIST } from '@e2e/mocks/tournament';
 
 test('홈에 진입하면 진행 중인 토너먼트 목록이 렌더링된다', async ({ page, api }) => {
   api.get(ENDPOINTS.TOURNAMENTS, MOCK_TOURNAMENT_LIST);

@@ -1,8 +1,8 @@
 import { ENDPOINTS } from '@/consts/api';
 
-import { expect, test } from './fixtures/mockApiFixture';
-import { MOCK_GUEST_ME } from './mocks/me';
-import { MOCK_TOURNAMENT_LIST, MOCK_TOURNAMENT_PENDING } from './mocks/tournament';
+import { expect, test } from '@e2e/fixtures/mockApiFixture';
+import { MOCK_GUEST_ME } from '@e2e/mocks/me';
+import { MOCK_TOURNAMENT_LIST, MOCK_TOURNAMENT_PENDING } from '@e2e/mocks/tournament';
 
 /**
  * 홈 → 카드 클릭 → 준비 페이지 진입 플로우.
