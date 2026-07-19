@@ -40,10 +40,10 @@
 | `archive/layout.tsx` | `fetchQuery(['me'])` + MEMBER redirect | 유지 필수 |
 | `mypage/withdraw/layout.tsx` | `fetchQuery(['me'])` + MEMBER redirect | 유지 필수 (단 page 의 중복 getMe 는 제거) |
 
-### 설정 현황
+### 설정 현황 (조사 시점 스냅샷 → #359 반영 결과)
 
-- `utils/queryClient.ts`: staleTime 60s / **`dehydrate.shouldDehydrateQuery` 미설정** → pending 스트리밍 불가 상태 (1순위 작업)
-- 개별 staleTime 오버라이드: **0건** (전부 기본 60s 상속 — prefetch/클라 불일치 리스크 없음)
+- `utils/queryClient.ts`: staleTime 기본 60s / ~~`dehydrate.shouldDehydrateQuery` 미설정~~ → **✅ #359 에서 pending 포함 설정 완료**
+- 개별 staleTime 오버라이드: 조사 시점 0건 → **✅ `useGetMe` 만 5분으로 상향** (그 외는 기본 60s 유지)
 - loading.tsx: 전 라우트 통틀어 `tournament/[id]/match` **1개뿐**
 - Suspense 소비 훅 (경계 필요): `useGetMe`, `useGetTournament`, `useGetInvitePreview`, `useGetWish`, `useGetTournamentItem`, `useGetTournamentList`
 
@@ -97,11 +97,12 @@ queryClient.prefetchQuery({ queryKey: ['me'], queryFn: getMe });
 
 | 단계 | 작업 | 리스크 |
 |---|---|---|
-| 1 | queryClient `shouldDehydrateQuery` 설정 | 낮음 — await 페이지엔 무영향 (pending 이 없으므로) |
-| 2 | 파일럿: `result/group` + `notification` await 제거 | 낮음 — 자체 폴백 완비 |
-| 3 | `mypage` · `mypage/edit` · `tournament/join/[id]` await 제거 | 낮음 — 첫 방문 체감은 현행 유지 |
-| 4 | 중복 정리: `create` tournament prefetch 삭제 · `withdraw` page getMe 삭제(+nickname 클라 이동) | 중간 — 동작 동일성 확인 |
-| 5 | dev 배포 → 전환 체감 검증 → staleTime 도메인 튜닝 (me 5분 등) | 낮음 |
+| 1 | ✅ queryClient `shouldDehydrateQuery` 설정 | 완료 (#359) |
+| 2 | ✅ 파일럿: `result/group` + `notification` await 제거 | 완료 (#359) |
+| 3 | ✅ `mypage` · `mypage/edit` · `tournament/join/[id]` await 제거 | 완료 (#359) |
+| 4 | ✅ 중복 정리: `create` tournament prefetch 삭제 · `withdraw` page getMe 삭제(+nickname 클라 이동) | 완료 (#359) |
+| 5 | ✅ 추가 발견 반영: 홈 `tournament-list` 자식 RSC 언블로킹 · 탭바 착지 애니메이션 중 라우트 prefetch · me staleTime 5분 | 완료 (#359) |
+| 6 | dev 배포 → 전환 체감 검증 (홈↔마이 왕복 즉시 렌더 등) | 남음 |
 
 ### 검증
 
