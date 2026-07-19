@@ -49,8 +49,8 @@ const TAB_STEP = TAB_WIDTH + TAB_GAP;
 const BAR_WIDTH = BAR_PADDING * 2 + TABS.length * TAB_WIDTH + (TABS.length - 1) * TAB_GAP;
 /** 이 거리(px) 이상 움직이면 탭이 아니라 드래그로 판정 — 손떨림 탭이 드래그로 빠지지 않을 만큼 */
 const DRAG_THRESHOLD = 12;
-/** 릴리즈 후 버블이 유리인 채 착지를 마치고 무광 전환·라우팅되기까지 지연 (ms) */
-const NAVIGATE_DELAY = 380;
+/** 릴리즈 후 버블이 유리인 채 착지(0.4s + stagger 0.08s)를 마치고 무광 전환·라우팅되기까지 지연 (ms) — 착지 총 시간과 일치 */
+const NAVIGATE_DELAY = 480;
 
 /** 스프링 오버슈트 이징 — 리퀴드 글래스 바운스 (짧은 거리 전용, 오버슈트 36%) */
 const SPRING_EASE =
@@ -119,9 +119,9 @@ function BottomTabBar() {
     // 어느 탭을 누르든 버블이 눌린 탭으로 미끄러져 온 뒤 드래그 대상이 됨
     const isMovingToRight = pressLeft >= indexToLeft(activeIndex);
     indicator.style.transitionProperty = 'left, right';
-    indicator.style.transitionDuration = '0.5s, 0.5s';
+    indicator.style.transitionDuration = '0.4s, 0.4s';
     indicator.style.transitionTimingFunction = `${SLIDE_EASE}, ${SLIDE_EASE}`;
-    indicator.style.transitionDelay = isMovingToRight ? '0.06s, 0s' : '0s, 0.06s';
+    indicator.style.transitionDelay = isMovingToRight ? '0.08s, 0s' : '0s, 0.08s';
     indicator.style.left = `${pressLeft}px`;
     indicator.style.right = `${BAR_WIDTH - pressLeft - TAB_WIDTH}px`;
 
