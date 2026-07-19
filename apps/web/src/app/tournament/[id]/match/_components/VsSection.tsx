@@ -38,7 +38,8 @@ function VsSection({ left, right, isFinal = false, onSelect }: VsSectionProps) {
 
   const CardComponent = isFinal ? FinalProductCard : ProductCard;
 
-  const vsBadgeColor = isFinal ? 'bg-bg-accent' : 'bg-bg-neutral-secondary';
+  // DS VS Divider 는 단일 스타일 (bg/neutral/secondary) — 결승 분기 없음
+  const vsBadgeColor = 'bg-bg-neutral-secondary';
 
   return (
     <div className="w-full">
