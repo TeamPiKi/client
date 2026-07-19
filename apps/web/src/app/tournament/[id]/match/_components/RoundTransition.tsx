@@ -63,7 +63,7 @@ function RoundTransition({
             <span className="heading-2 text-text-neutral-secondary">결승전</span>
           </div>
         ) : (
-          <FireIconFill className="size-11 text-blue-500" aria-hidden />
+          <FireIconFill className="size-11 text-icon-accent" aria-hidden />
         )}
         <h1 className="title-1 text-text-neutral-primary">{title}</h1>
       </div>
@@ -89,7 +89,7 @@ function RoundTransition({
               cx={ARC_SIZE / 2}
               cy={ARC_SIZE / 2}
               r={ARC_RADIUS}
-              stroke="#74ABF9"
+              stroke="var(--color-sky-blue-300)"
               strokeWidth={ARC_STROKE_WIDTH}
               fill="none"
               strokeLinecap="round"
@@ -97,7 +97,7 @@ function RoundTransition({
               style={{ transition: `stroke-dasharray ${arcTransitionDuration}ms linear` }}
             />
           </svg>
-          <span className="text-[48px] leading-8 font-bold tracking-[-0.6px] text-blue-500">
+          <span className="text-[48px] leading-8 font-bold tracking-[-0.6px] text-text-accent">
             {remaining}
           </span>
         </div>
