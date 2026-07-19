@@ -116,7 +116,7 @@ function ResultClient({ tournamentId }: ResultClientProps) {
     <main className="flex min-h-dvh flex-col overflow-x-hidden bg-bg-layer-basement pt-padding-top pb-30">
       <Header center="토너먼트 결과" centerClassName="heading-1" />
 
-      <div className="mx-auto mt-3 flex min-h-0 w-full max-w-120 flex-1 flex-col gap-3">
+      <div className="mx-auto mt-4 flex min-h-0 w-full max-w-120 flex-1 flex-col gap-3">
         <ReceiptDrawMachine
           ref={receiptMachineRef}
           tournamentName={tournamentName}
