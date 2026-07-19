@@ -8,7 +8,7 @@ import ReceiptIcon from '@/assets/images/tournament/result/receipt-icon.svg';
 import SmileIcon from '@/assets/images/tournament/result/smile-icon.svg';
 import BottomCta from '@/components/bottom-cta';
 import Button from '@/components/button';
-import { Header, HeaderIcon } from '@/components/header';
+import { Header } from '@/components/header';
 import { ANALYTICS_EVENT } from '@/consts/analytics';
 import { QUERY_ACTION } from '@/consts/queryAction';
 import { ROUTES } from '@/consts/route';
@@ -114,7 +114,7 @@ function ResultClient({ tournamentId }: ResultClientProps) {
 
   return (
     <main className="flex min-h-dvh flex-col overflow-x-hidden bg-bg-layer-basement pt-padding-top pb-30">
-      <Header center="토너먼트 결과" centerClassName="title-1" left={<HeaderIcon name="BACK" />} />
+      <Header center="토너먼트 결과" centerClassName="title-1" />
 
       <div className="mx-auto mt-3 flex min-h-0 w-full max-w-120 flex-1 flex-col gap-3">
         <ReceiptDrawMachine
