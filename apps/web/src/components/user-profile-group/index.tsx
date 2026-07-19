@@ -6,7 +6,7 @@ import { cn } from '@/utils/cn';
 const SIZE_STYLES = {
   sm: {
     profile: 'size-5 border-[1.2px]',
-    overlap: '-mr-1.5',
+    overlap: '-mr-[3px]',
     badge: 'size-5 border-[1.2px] caption-1-semibold',
     sizes: '20px',
   },

@@ -37,14 +37,14 @@ function TournamentCard({
   return (
     <article
       className={cn(
-        'flex w-full items-center gap-2.5 rounded-4xl bg-bg-layer-default py-3 pr-4 pl-5',
+        'flex w-full items-center gap-2.5 rounded-2xl bg-bg-layer-default px-5 py-3',
         className
       )}
     >
       {/* 아이템 이미지 스택 — 목록 API 에 아이템 이미지가 없어 시안과 동일한 placeholder 로 표시 */}
-      <div aria-hidden className="relative h-16.5 w-17.5 shrink-0">
-        <div className="absolute top-0 left-1.5 size-15.5 rotate-10 rounded-[15px] border-[1.85px] border-white bg-bg-layer-basement opacity-60 shadow-[0px_0px_4px_0px_rgba(0,0,0,0.25)]" />
-        <div className="absolute top-0.5 left-0 size-15.5 rounded-[15px] border-[1.85px] border-white bg-bg-layer-basement shadow-[0px_0px_4px_0px_rgba(0,0,0,0.25)]" />
+      <div aria-hidden className="relative h-16.5 w-18.5 shrink-0">
+        <div className="absolute top-0 left-3 size-15.5 rotate-10 rounded-[15px] border-[1.85px] border-white bg-bg-layer-basement opacity-60 shadow-[0px_0px_4px_0px_rgba(0,0,0,0.25)]" />
+        <div className="absolute top-1 left-0 size-15.5 rounded-[15px] border-[1.85px] border-white bg-bg-layer-basement shadow-[0px_0px_4px_0px_rgba(0,0,0,0.25)]" />
       </div>
 
       <div className="flex min-w-0 flex-1 flex-col justify-center gap-2.5">
