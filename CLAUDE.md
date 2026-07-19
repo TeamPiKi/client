@@ -50,6 +50,7 @@
 - **스키마 검증**: Zod
 - **API 모킹**: MSW (필요 시)
 - **아이콘**: `@/assets/icons` (fill/outline SVG) — Lucide React 사용 안 함
+- **E2E 테스트**: Playwright (`pnpm test:e2e`) — 작성법·목킹 구조는 `apps/web/e2e/README.md` 참고
 
 ### apps/app (React Native)
 
