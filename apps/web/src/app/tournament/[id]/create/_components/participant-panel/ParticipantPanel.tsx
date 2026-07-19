@@ -70,7 +70,7 @@ function ParticipantPanel({
             >
               <div className="flex min-w-0 items-center gap-3">
                 {depositDeadline ? (
-                  <div className="shrink-0 rounded-lg bg-blue-50 px-3 py-1.5">
+                  <div className="shrink-0 rounded-lg bg-sky-blue-50 px-3 py-1.5">
                     <DepositCountdown deadline={depositDeadline} showLabel={false} />
                   </div>
                 ) : (

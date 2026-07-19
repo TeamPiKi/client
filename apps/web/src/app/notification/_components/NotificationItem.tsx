@@ -11,7 +11,7 @@ type NotificationItemProps = {
 function NotificationItem({ profileImage, message, time, isRead, onClick }: NotificationItemProps) {
   const innerContent = (
     <>
-      <div className="size-8 shrink-0 overflow-hidden rounded-full bg-blue-200">
+      <div className="size-8 shrink-0 overflow-hidden rounded-full bg-sky-blue-200">
         {profileImage && <img src={profileImage} alt="" className="size-full object-cover" />}
       </div>
       <div className="flex flex-col gap-1">

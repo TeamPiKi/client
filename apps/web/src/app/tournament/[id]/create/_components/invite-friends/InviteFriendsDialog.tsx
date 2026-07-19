@@ -127,7 +127,7 @@ function InviteFriendsDialog({
           {expiresInfo && (
             <div className="flex w-full items-center justify-between rounded-xl border border-border-neutral-muted bg-bg-layer-default px-4 py-5">
               <div className="flex items-center gap-4">
-                <div className="flex size-11 items-center justify-center rounded-3xl bg-blue-50">
+                <div className="flex size-11 items-center justify-center rounded-3xl bg-sky-blue-50">
                   <StopwatchIconFill className="size-6 text-text-accent" />
                 </div>
                 <div className="flex flex-col gap-0.5">

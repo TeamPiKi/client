@@ -262,7 +262,7 @@ function MiniBracket({ stage }: { stage: TransitionStageT }) {
           <div
             className={[
               'flex size-full items-center justify-center rounded-[12px] border-2 border-white',
-              card.isBlue ? 'bg-[#ECF3FE] text-[#9DC3F9]' : 'bg-[#F4F4F6] text-[#C5C8CE]',
+              card.isBlue ? 'bg-[#ECF8FE] text-[#9EDBFD]' : 'bg-[#F4F4F6] text-[#C5C8CE]',
             ].join(' ')}
             style={{ boxShadow: '0 0 6.662px 0 rgba(0,0,0,0.16)' }}
           >
@@ -330,7 +330,7 @@ function RoundTransitionSheet({ stage, onComplete }: RoundTransitionSheetProps) 
         style={{
           height: 540,
           borderRadius: '24px 24px 0 0',
-          background: 'linear-gradient(180deg, #ECF3FE 0%, #FFF 50%)',
+          background: 'linear-gradient(180deg, #ECF8FE 0%, #FFF 50%)',
         }}
         onClick={handleSkip}
       >

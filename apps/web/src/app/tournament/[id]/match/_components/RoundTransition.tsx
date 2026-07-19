@@ -49,7 +49,7 @@ function RoundTransition({
   const isFinal = stage === 'toFinal';
 
   const containerClassName = isFinal
-    ? 'bg-gradient-to-b from-[#ECF3FE] via-[#F3F7FE] to-white'
+    ? 'bg-gradient-to-b from-[#ECF8FE] via-[#F5FCFF] to-white'
     : 'bg-bg-layer-basement';
 
   return (
