@@ -88,7 +88,7 @@ const ReceiptPaper = forwardRef<HTMLDivElement, ReceiptPaperProps>(function Rece
 
         {/* 1st Place */}
         {first && (
-          <div className="flex flex-col gap-3 py-3">
+          <div className="flex flex-col gap-3 pt-3">
             <PlaceLabel label="1st Place" />
             <ProductCard product={first} highlight />
           </div>
