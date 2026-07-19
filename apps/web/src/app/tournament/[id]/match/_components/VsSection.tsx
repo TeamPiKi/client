@@ -38,7 +38,7 @@ function VsSection({ left, right, isFinal = false, onSelect }: VsSectionProps) {
 
   const CardComponent = isFinal ? FinalProductCard : ProductCard;
 
-  const vsBadgeColor = isFinal ? 'bg-[#1F7AF9]' : 'bg-gray-800';
+  const vsBadgeColor = isFinal ? 'bg-bg-accent' : 'bg-bg-neutral-secondary';
 
   return (
     <div className="w-full">
