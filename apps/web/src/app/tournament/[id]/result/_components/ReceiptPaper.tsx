@@ -20,7 +20,11 @@ type ReceiptPaperProps = {
   date: Date;
 };
 
-const SectionDivider = () => <div className="h-px w-full border-t border-dashed border-gray-100" />;
+const SectionDivider = () => (
+  <div className="px-5">
+    <div className="h-px w-full border-t border-dashed border-gray-100" />
+  </div>
+);
 
 /**
  * 영수증 구분선 라벨. `*****Label*****` 형태로, 라벨 길이에 상관없이 항상
@@ -55,7 +59,7 @@ const ReceiptPaper = forwardRef<HTMLDivElement, ReceiptPaperProps>(function Rece
   return (
     <div
       ref={ref}
-      className="relative flex w-full flex-col gap-2 bg-bg-layer-default pt-6 filter-[drop-shadow(0px_2px_4px_rgba(0,0,0,0.12))]"
+      className="relative flex w-full flex-col gap-3 bg-bg-layer-default pt-6 filter-[drop-shadow(0px_2px_4px_rgba(0,0,0,0.12))]"
     >
       <div
         aria-hidden
@@ -63,12 +67,12 @@ const ReceiptPaper = forwardRef<HTMLDivElement, ReceiptPaperProps>(function Rece
       />
 
       {/* PIKI 로고 + 헤드라인 */}
-      <div className="relative flex flex-col items-center gap-2">
+      <div className="relative flex flex-col items-center gap-3">
         <PikiReceiptLogo aria-label="PIKI" className="h-14 w-19.25" />
         <p
           className={cn(
             kodeMono.className,
-            'text-center text-[12px] leading-4 font-semibold tracking-[-0.4px] text-text-neutral-secondary'
+            'text-center text-[12px] leading-4 font-semibold tracking-[-0.4px] text-text-neutral-tertiary'
           )}
         >
           FROM WISH TO PICK
@@ -78,8 +82,8 @@ const ReceiptPaper = forwardRef<HTMLDivElement, ReceiptPaperProps>(function Rece
       <div className="flex flex-col">
         {/* 날짜 / 시간 */}
         <div className={cn(kodeMono.className, 'flex items-center justify-between px-5')}>
-          <span className="caption-1-semibold text-text-neutral-secondary">{formatDate(date)}</span>
-          <span className="caption-1-semibold text-text-neutral-secondary">{formatTime(date)}</span>
+          <span className="caption-1-semibold text-text-neutral-tertiary">{formatDate(date)}</span>
+          <span className="caption-1-semibold text-text-neutral-tertiary">{formatTime(date)}</span>
         </div>
 
         <SectionDivider />
@@ -91,7 +95,7 @@ const ReceiptPaper = forwardRef<HTMLDivElement, ReceiptPaperProps>(function Rece
 
         {/* 1st Place */}
         {first && (
-          <div className="flex flex-col gap-3 pt-3">
+          <div className="flex flex-col gap-3">
             <PlaceLabel label="1st Place" />
             <ProductCard tournamentId={tournamentId} product={first} highlight />
           </div>
