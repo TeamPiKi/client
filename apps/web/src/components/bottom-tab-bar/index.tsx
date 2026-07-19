@@ -100,6 +100,8 @@ function BottomTabBar() {
     if (event.button !== 0 || isGrabbingRef.current) return;
     isDraggedRef.current = false;
     setIsPressed(true);
+    // 새 제스처 시작 — 이전 제스처가 예약한 라우팅을 취소해 스테일 타이머·연속 라우팅 방지
+    if (navigateTimerRef.current) clearTimeout(navigateTimerRef.current);
 
     const bar = barRef.current;
     const indicator = indicatorRef.current;
