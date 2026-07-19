@@ -2,7 +2,6 @@
 
 import { Suspense, useState } from 'react';
 
-import BottomTabBar from '@/components/bottom-tab-bar';
 import type { TournamentStatusT } from '@/types/tournament';
 
 import ArchivePageLayout from '../../_common/_components/ArchivePageLayout';
@@ -31,9 +30,6 @@ function ArchiveTournamentClient() {
       >
         <TournamentHistoryList key={activeTab} statuses={STATUS_BY_TAB[activeTab]} />
       </Suspense>
-      <div className="fixed bottom-10 left-1/2 z-20 flex -translate-x-1/2 items-center gap-3">
-        <BottomTabBar />
-      </div>
     </ArchivePageLayout>
   );
 }
