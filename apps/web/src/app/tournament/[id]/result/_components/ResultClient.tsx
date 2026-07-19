@@ -108,7 +108,7 @@ function ResultClient({ tournamentId }: ResultClientProps) {
   };
 
   return (
-    <main className="flex min-h-dvh flex-col overflow-x-hidden bg-bg-layer-basement pt-padding-top pb-30">
+    <main className="flex min-h-dvh flex-col overflow-x-hidden bg-bg-layer-basement pt-padding-top pb-40">
       <Header center="토너먼트 결과" centerClassName="heading-1" />
 
       <div className="mx-auto mt-4 flex min-h-0 w-full max-w-120 flex-1 flex-col gap-3">
@@ -118,18 +118,23 @@ function ResultClient({ tournamentId }: ResultClientProps) {
           result={result}
           date={date}
         />
-      </div>
 
-      {/* 하단 CTA — 전체 결과 카드 → 저장/공유 버튼 → 홈으로 가기 순 위계 */}
-      <BottomCta hasGradient className="flex-col items-stretch gap-4 pb-5">
         {/*
           친구 토너먼트 결과보기 카드 노출 + 라우팅.
           - ROOT 사용자(주최자 / 친구 초대 멤버) 에게만 노출. 본인 id 가 그대로 group-result 대상이다.
           - CLONE 사용자(플레이 링크 게스트) 는 ROOT 토너먼트의 친구 일원이 아니라 결과 카드가 의미 없으므로 숨긴다.
           - 친구 유무는 클릭 시 group-result API 응답으로 판단한다 (캐시 의존 X).
+          - 앱 화면이 낮게 크롭될 때도 CTA 는 항상 고정돼야 해서 스크롤 영역에 둔다.
         */}
-        {tournamentData.isRoot && <GroupResultEntryCard tournamentId={tournamentId} />}
+        {tournamentData.isRoot && (
+          <div className="mx-5">
+            <GroupResultEntryCard tournamentId={tournamentId} />
+          </div>
+        )}
+      </div>
 
+      {/* 하단 CTA — 저장/공유 버튼 → 홈으로 가기 순 위계, 항상 화면 하단 고정 */}
+      <BottomCta hasGradient className="flex-col items-stretch gap-6.5 pb-[30px]">
         {/* 영수증 저장 (모든 사용자) + 토너먼트 공유 (ROOT 소유자만, 플레이 링크 공유) */}
         <div className="flex gap-3">
           <Button
@@ -159,7 +164,7 @@ function ResultClient({ tournamentId }: ResultClientProps) {
 
         <Link
           href={ROUTES.HOME}
-          className="mt-2 flex items-center justify-center gap-0.5 body-1-medium text-text-neutral-secondary"
+          className="flex items-center justify-center gap-0.5 body-1-medium text-text-neutral-secondary"
         >
           홈으로 가기
           <ChevronForwardIconFill aria-hidden className="size-4" />
