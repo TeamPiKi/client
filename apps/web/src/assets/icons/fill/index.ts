@@ -51,6 +51,7 @@ export { default as DislikeIconFill } from './dislike.svg';
 export { default as DocumentIconFill } from './document.svg';
 export { default as DollarIconFill } from './dollar.svg';
 export { default as DonutChartIconFill } from './donut-chart.svg';
+export { default as DownloadIconFill } from './download.svg';
 export { default as EditIconFill } from './edit.svg';
 export { default as EventScheduledIconFill } from './event-scheduled.svg';
 export { default as ExpandIconFill } from './expand.svg';

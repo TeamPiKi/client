@@ -25,6 +25,7 @@ const RECEIPT_TOP_PER_PRINTER_HEIGHT =
   RECEIPT_TOP_AT_MAX_PRINTER_WIDTH_PX / REFERENCE_PRINTER_FRAME_HEIGHT_PX;
 
 type ReceiptDrawMachineProps = {
+  tournamentId: number;
   tournamentName: string;
   result: RankedProductT[];
   date: Date;
@@ -36,7 +37,7 @@ export type ReceiptDrawMachineHandleT = {
 };
 
 const ReceiptDrawMachine = forwardRef<ReceiptDrawMachineHandleT, ReceiptDrawMachineProps>(
-  function ReceiptDrawMachine({ tournamentName, result, date }, ref) {
+  function ReceiptDrawMachine({ tournamentId, tournamentName, result, date }, ref) {
     const animationScopeRef = useRef<HTMLDivElement | null>(null);
     const printerFrameRef = useRef<HTMLDivElement | null>(null);
     const receiptPaperRef = useRef<HTMLDivElement | null>(null);
@@ -159,7 +160,12 @@ const ReceiptDrawMachine = forwardRef<ReceiptDrawMachineHandleT, ReceiptDrawMach
 
         {/* 영수증 종이 영역 공간 확보 (layout reserved) */}
         <div className="invisible mx-auto w-[74%]" aria-hidden>
-          <ReceiptPaper tournamentName={tournamentName} result={result} date={date} />
+          <ReceiptPaper
+            tournamentId={tournamentId}
+            tournamentName={tournamentName}
+            result={result}
+            date={date}
+          />
         </div>
 
         {/* 영수증 마스크 — 슬롯 위치(top)부터 컨테이너 끝(bottom-0)까지, 프린터 위로(z-40) 덮음.
@@ -172,7 +178,12 @@ const ReceiptDrawMachine = forwardRef<ReceiptDrawMachineHandleT, ReceiptDrawMach
             ref={receiptPaperRef}
             className="pointer-events-auto mx-auto h-fit w-[74%] will-change-transform"
           >
-            <ReceiptPaper tournamentName={tournamentName} result={result} date={date} />
+            <ReceiptPaper
+              tournamentId={tournamentId}
+              tournamentName={tournamentName}
+              result={result}
+              date={date}
+            />
           </div>
         </div>
       </div>
