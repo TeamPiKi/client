@@ -103,7 +103,7 @@ const ReceiptPaper = forwardRef<HTMLDivElement, ReceiptPaperProps>(function Rece
 
         {/* Others */}
         {rest.length > 0 && (
-          <div className="flex flex-col gap-3 py-3">
+          <div className="flex flex-col gap-3 pt-3 pb-5">
             <PlaceLabel label="Others" />
             <ul className="flex flex-col gap-5">
               {rest.map(product => (
