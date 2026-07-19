@@ -40,7 +40,6 @@ function WishGrid({ items, isDeleteMode = false, selectedIds, onToggleSelect }: 
             >
               <WishCard name={item.name} price={item.price} imageUrl={item.imageUrl} />
               <span className="pointer-events-none absolute top-3 left-3 z-10 size-6">
-                <span className="absolute inset-[3px] rounded-[3px] bg-white" />
                 {isSelected ? (
                   <CheckboxSelectedIconFill className="relative size-6 text-bg-accent" />
                 ) : (

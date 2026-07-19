@@ -20,7 +20,6 @@ function WishSelectCard({ name, price, imageUrl, isSelected, onSelect }: WishSel
     >
       <WishCard name={name} price={price} imageUrl={imageUrl} />
       <span className="pointer-events-none absolute top-3 left-3 z-10 size-6">
-        <span className="absolute inset-[3px] rounded-[3px] bg-white" />
         {isSelected ? (
           <CheckboxSelectedIconFill className="relative size-6 text-bg-accent" />
         ) : (
