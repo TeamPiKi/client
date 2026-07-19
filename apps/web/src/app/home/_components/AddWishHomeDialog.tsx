@@ -22,7 +22,14 @@ function AddWishHomeDialog() {
           onClick={handleAddWishClick}
           className="relative row-span-2 h-[220px] cursor-pointer overflow-hidden rounded-2xl bg-[#62c7ff]"
         >
-          <Image src={AddWishBg} alt="위시 담기" width={197} height={242} className="mx-auto" />
+          <Image
+            src={AddWishBg}
+            alt="위시 담기"
+            width={197}
+            height={242}
+            className="mx-auto h-auto w-auto"
+            priority
+          />
           <span className="absolute top-[18px] left-[15px] heading-1 text-base-50">위시 담기</span>
         </button>
       </DialogTrigger>

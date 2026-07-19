@@ -2,6 +2,7 @@ import type { CSSProperties, ReactNode } from 'react';
 
 import { ImageIconFill, LoaderIconFill } from '@/assets/icons';
 import BaseImage from '@/components/base-image';
+import Skeleton from '@/components/skeleton';
 import { Z_INDEX } from '@/consts/zIndex';
 import { cn } from '@/utils/cn';
 
@@ -54,7 +55,16 @@ function Thumbnail({
       style={style}
     >
       {src ? (
-        <BaseImage src={src} alt="" className="object-cover" />
+        <BaseImage
+          src={src}
+          alt=""
+          sizes="63px"
+          className="object-cover"
+          loadingFallback={<Skeleton className="absolute inset-0" />}
+          errorFallback={
+            <div className="flex size-full items-center justify-center">{fallback}</div>
+          }
+        />
       ) : (
         <div className="flex size-full items-center justify-center">{fallback}</div>
       )}
