@@ -52,7 +52,7 @@ const ReceiptPaper = forwardRef<HTMLDivElement, ReceiptPaperProps>(function Rece
   return (
     <div
       ref={ref}
-      className="relative flex w-full flex-col gap-2 bg-bg-layer-default pt-6 pb-6.25 filter-[drop-shadow(0px_2px_4px_rgba(0,0,0,0.12))]"
+      className="relative flex w-full flex-col gap-2 bg-bg-layer-default pt-6 filter-[drop-shadow(0px_2px_4px_rgba(0,0,0,0.12))]"
     >
       <div
         aria-hidden
@@ -98,7 +98,7 @@ const ReceiptPaper = forwardRef<HTMLDivElement, ReceiptPaperProps>(function Rece
         {rest.length > 0 && (
           <div className="flex flex-col gap-3 py-3">
             <PlaceLabel label="Others" />
-            <ul className="flex flex-col gap-3">
+            <ul className="flex flex-col gap-5">
               {rest.map(product => (
                 <li key={`${product.rank}-${product.itemId ?? product.name}`}>
                   <ProductCard product={product} />
@@ -172,9 +172,7 @@ function ProductCard({ product, highlight = false }: ProductCardProps) {
         )}
       </div>
       <div className="flex min-w-0 flex-1 flex-col">
-        <p className="body-2-regular wrap-break-word break-keep text-text-neutral-primary">
-          {product.name}
-        </p>
+        <p className="truncate body-2-regular text-text-neutral-primary">{product.name}</p>
         <p className="body-2-semibold text-text-neutral-primary">{formatPrice(product.price)}</p>
       </div>
       <span className="sr-only">{product.rank}위</span>
