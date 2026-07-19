@@ -17,7 +17,7 @@ export const useDeleteWish = (wishId: number) => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['wishlists'] });
       toast.success('위시 상품이 삭제되었습니다.');
-      router.replace(ROUTES.ARCHIVE());
+      router.replace(ROUTES.WISHLIST);
     },
     onError: error => {
       if (!isAxiosError<ApiErrorResponseT>(error) || !error.response) return;
@@ -33,11 +33,7 @@ export const useDeleteWish = (wishId: number) => {
        * 403: 위시 삭제 권한 없음
        * 404: 위시 존재하지 않음
        */
-      if (status === 403 || status === 404) {
-        toast.error(clientErrorMessage);
-      } else if (status === 500) {
-        toast.error('서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
-      }
+      if (status === 403 || status === 404) toast.error(clientErrorMessage);
     },
   });
 

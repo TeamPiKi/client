@@ -22,6 +22,7 @@ import type {
   WebReqPushPermissionStatusMessageT,
   WebReqSetBadgeMessageT,
 } from './pushNotification';
+import type { AppReqNavigateMessageT } from './navigation';
 import type { AppResShareIntentMessageT } from './shareIntent';
 
 export type WebBridgeMessageT =
@@ -40,6 +41,7 @@ export type WebBridgeMessageT =
   | AppResPushPermissionStatusMessageT
   | AppResFcmTokenMessageT
   | AppReqDeepLinkMessageT
+  | AppReqNavigateMessageT
   | WebReqLogoutMessageT
   | WebReqLogAnalyticsEventMessageT
   | WebReqTokenRefreshedMessageT

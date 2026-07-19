@@ -31,11 +31,46 @@ const nextConfig = async () => {
       ],
     },
 
+    /**
+     * 구버전 앱 공유 시트·기존 딥링크의 /archive(?tab=) 경로 호환
+     *
+     * NOTE: 구버전 앱 사라지면 이 설정 제거 필요
+     */
+    async redirects() {
+      return [
+        {
+          source: '/archive',
+          has: [{ type: 'query', key: 'tab', value: 'tournament' }],
+          destination: '/archive/tournament',
+          permanent: false,
+        },
+        {
+          source: '/archive',
+          destination: '/archive/wish',
+          permanent: false,
+        },
+      ];
+    },
+
     async rewrites() {
       return [
         {
           source: '/api/v1/:path*',
           destination: `${process.env.NEXT_PUBLIC_API_URL}/api/v1/:path*`,
+        },
+      ];
+    },
+
+    /** iOS Universal Link, Android App Link 검증 파일은 application/json으로 확장자 지정 */
+    async headers() {
+      return [
+        {
+          source: '/.well-known/apple-app-site-association',
+          headers: [{ key: 'Content-Type', value: 'application/json' }],
+        },
+        {
+          source: '/.well-known/assetlinks.json',
+          headers: [{ key: 'Content-Type', value: 'application/json' }],
         },
       ];
     },

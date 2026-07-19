@@ -40,7 +40,8 @@ const isAuthorizedRoute = (pathname: string) =>
 
 const isMemberOnlyRoute = (pathname: string) => {
   if (pathname === ROUTES.MYPAGE_WITHDRAW) return true;
-  if (matchesPath(pathname, ROUTES.ARCHIVE_BASE)) return true;
+  if (matchesPath(pathname, ROUTES.WISHLIST)) return true;
+  if (matchesPath(pathname, ROUTES.TOURNAMENT_HISTORY)) return true;
 
   return false;
 };

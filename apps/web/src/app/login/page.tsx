@@ -1,9 +1,12 @@
+import { WEBVIEW_UA_TOKEN } from '@piki/core';
+import { cookies, headers } from 'next/headers';
 import Link from 'next/link';
+import { redirect } from 'next/navigation';
 
-import { getMe } from '@/apis/getMe';
 import PikiLogo from '@/assets/images/piki-logo.svg';
+import { QUERY_ACTION } from '@/consts/queryAction';
 import { ROUTES } from '@/consts/route';
-import { getQueryClient } from '@/utils/queryClient';
+import { getRoleFromToken } from '@/utils/auth';
 
 import LoginButtons from './_components/LoginButtons';
 
@@ -14,26 +17,33 @@ type LoginPageProps = {
 async function LoginPage({ searchParams }: LoginPageProps) {
   const { redirect: redirectParam, action } = await searchParams;
 
-  /** 게스트 세션 재활용 가능 여부 판단 */
-  const user = await getQueryClient()
-    .fetchQuery({ queryKey: ['me'], queryFn: getMe })
-    .catch(() => null);
-  const canReuseGuestSession = user?.identityType === 'GUEST';
+  /** 멤버가 로그인 페이지 직접 진입 시 홈으로 리다이렉트 */
+  const accessToken = (await cookies()).get('access_token')?.value;
+  const role = getRoleFromToken(accessToken);
+  if (role === 'MEMBER' && action !== QUERY_ACTION.VALUE.SESSION_EXPIRED) redirect(ROUTES.HOME);
+
+  /**
+   * Android 웹뷰에서는 Apple 로그인 미노출.
+   * 앱의 Apple 로그인은 iOS 전용 네이티브 모듈(expo-apple-authentication)로 처리되어
+   * Android 에서 선택 시 항상 실패한다. (일반 Android 브라우저는 웹 OAuth 라 정상 동작)
+   */
+  const userAgent = (await headers()).get('user-agent') ?? '';
+  const isAndroidWebview = userAgent.includes(WEBVIEW_UA_TOKEN) && /android/i.test(userAgent);
 
   return (
     <div className="flex min-h-dvh flex-col items-center bg-gray-50 px-4 pt-padding-top pb-10">
       <div className="mt-15 flex flex-col items-center gap-6">
         <PikiLogo aria-label="PIKI" />
-        <p className="text-center body-1-bold whitespace-pre-line text-text-neutral-secondary">
+        <p className="text-center body-1-bold whitespace-pre-line text-text-neutral-secondary animate-in fade-in-0 duration-500">
           {'매일 쌓여만 가던\n위시리스트가 오늘의 결정으로'}
         </p>
       </div>
 
-      <div className="mt-[90px] w-full">
+      <div className="mt-[90px] w-full animate-in fade-in-0 duration-500">
         <LoginButtons
           redirect={redirectParam ?? null}
           action={action ?? null}
-          canReuseGuestSession={canReuseGuestSession}
+          showAppleLogin={!isAndroidWebview}
         />
 
         <p className="mt-9 text-center font-features-['ss10'_on] text-[11px] leading-[150%] font-medium tracking-[-0.232px] text-text-neutral-tertiary">

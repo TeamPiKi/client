@@ -23,7 +23,7 @@ const CONTENT = {
     title: '가져올 위시가 없어요.',
     description: '위시를 먼저 추가해주세요.',
     buttonText: '위시 추가하기',
-    buttonLink: ROUTES.ARCHIVE('wish'),
+    buttonLink: ROUTES.WISHLIST,
   },
   ALREADY_STARTED: {
     icon: <FireIconFill className="size-10 text-icon-accent" />,
