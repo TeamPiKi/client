@@ -114,7 +114,7 @@ const ReceiptPaper = forwardRef<HTMLDivElement, ReceiptPaperProps>(function Rece
         <p
           className={cn(
             kodeMono.className,
-            'px-5 pt-3 pb-2 text-center caption-1-semibold text-text-neutral-secondary'
+            'px-5 pt-3 pb-2 text-center caption-1-semibold text-text-neutral-tertiary'
           )}
         >
           @piki.day
