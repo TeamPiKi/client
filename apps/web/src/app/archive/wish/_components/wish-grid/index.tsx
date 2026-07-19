@@ -17,7 +17,7 @@ type WishGridProps = {
 
 function WishGrid({ items, isDeleteMode = false, selectedIds, onToggleSelect }: WishGridProps) {
   return (
-    <div className="grid grid-cols-2 gap-x-2 gap-y-3">
+    <div className="grid grid-cols-2">
       {items.map((item, index) => {
         if (item.status === 'FAILED')
           return (

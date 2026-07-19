@@ -11,9 +11,9 @@ type WishCardProps = {
 
 function WishCard({ name, price, imageUrl, preload = false }: WishCardProps) {
   return (
-    <div className="flex aspect-[0.765] flex-col overflow-hidden rounded-2xl bg-white">
+    <div className="flex flex-col overflow-hidden bg-white">
       {/* 이미지 */}
-      <div className="relative flex flex-1 items-center justify-center self-stretch bg-white">
+      <div className="relative h-[166px] self-stretch bg-white">
         {imageUrl ? (
           <BaseImage
             src={imageUrl}
@@ -35,10 +35,13 @@ function WishCard({ name, price, imageUrl, preload = false }: WishCardProps) {
         )}
       </div>
 
-      {/* 상품명 + 가격 */}
-      <div className="flex flex-col items-center justify-center gap-2 self-stretch px-3 py-3">
-        <p className="line-clamp-1 self-stretch text-center body-1-medium text-gray-600">{name}</p>
-        <p className="heading-2 text-gray-950">{price.toLocaleString()}원</p>
+      {/* 상품명 + 가격 + 커머스칩 */}
+      <div className="flex h-[124px] flex-col items-start gap-2.5 self-stretch p-4">
+        <div className="flex flex-col gap-1 self-stretch">
+          <p className="line-clamp-2 self-stretch body-2-medium text-text-neutral-primary">{name}</p>
+          <p className="body-2-semibold text-text-neutral-primary">{price.toLocaleString()}원</p>
+        </div>
+        {/* TODO: 커머스칩 — 백엔드에 sourceName 필드 추가 후 구현 (WishItemT.sourceName) */}
       </div>
     </div>
   );
