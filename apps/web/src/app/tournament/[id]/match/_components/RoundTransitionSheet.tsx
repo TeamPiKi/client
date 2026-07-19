@@ -214,7 +214,7 @@ function MiniBracket({ stage }: { stage: TransitionStageT }) {
               key={i}
               d={path.d}
               fill="none"
-              stroke="#9DC3F9"
+              stroke="var(--color-sky-blue-200)"
               strokeWidth={MLW}
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -383,7 +383,7 @@ function RoundTransitionSheet({ stage, onComplete }: RoundTransitionSheetProps) 
             </svg>
             <span
               className="text-[20px] leading-7 font-bold tracking-[-0.6px]"
-              style={{ color: '#1F7AF9' }}
+              style={{ color: 'var(--color-text-accent)' }}
             >
               {remaining}
             </span>
@@ -397,12 +397,12 @@ function RoundTransitionSheet({ stage, onComplete }: RoundTransitionSheetProps) 
             <p className="text-[16px] leading-[22px] font-semibold tracking-[-0.6px]">
               {isSemi ? (
                 <>
-                  <span style={{ color: '#1F7AF9' }}>3번</span>
+                  <span style={{ color: 'var(--color-text-accent)' }}>3번</span>
                   <span className="text-text-neutral-tertiary">의 선택만 남았어요.</span>
                 </>
               ) : (
                 <>
-                  <span style={{ color: '#1F7AF9' }}>최종</span>
+                  <span style={{ color: 'var(--color-text-accent)' }}>최종</span>
                   <span className="text-text-neutral-tertiary"> 선택만 남았어요.</span>
                 </>
               )}

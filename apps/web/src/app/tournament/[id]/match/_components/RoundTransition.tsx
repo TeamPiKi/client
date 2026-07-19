@@ -74,9 +74,9 @@ function RoundTransition({
 
       <div className="relative mt-24 flex size-66.25 items-center justify-center">
         {/* 가장 바깥 옅은 링 */}
-        <div className="absolute inset-0 rounded-full bg-[#C5DBFB]/10" aria-hidden />
+        <div className="absolute inset-0 rounded-full bg-sky-blue-100/10" aria-hidden />
         {/* 중간 링 */}
-        <div className="absolute inset-6 rounded-full bg-[#C5DBFB]/20" aria-hidden />
+        <div className="absolute inset-6 rounded-full bg-sky-blue-100/20" aria-hidden />
         {/* 흰 원 + 카운트다운 호 */}
         <div className="relative flex size-41 items-center justify-center rounded-full bg-white shadow-[0_2px_10px_0_rgba(197,219,251,0.20)]">
           <svg
