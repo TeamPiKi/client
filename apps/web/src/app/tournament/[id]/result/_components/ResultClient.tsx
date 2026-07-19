@@ -144,7 +144,7 @@ function ResultClient({ tournamentId }: ResultClientProps) {
             leadingIcon={<DownloadIconFill aria-hidden className="size-5" />}
             onClick={handleShareReceiptImage}
             disabled={isCapturing}
-            className="flex-1 border-gray-100 bg-gray-75 text-text-neutral-secondary"
+            className="flex-1 border-gray-75 bg-gray-75 text-text-neutral-secondary"
           >
             {isCapturing ? '이미지 만드는 중...' : '영수증 저장'}
           </Button>
