@@ -7,7 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "check-types": "next typegen && tsc --noEmit"
+    "check-types": "next typegen && tsc --noEmit",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui"
   },
   "dependencies": {
     "@microsoft/fetch-event-source": "^2.0.1",
@@ -37,6 +39,7 @@
   },
   "devDependencies": {
     "@piki/typescript-config": "workspace:*",
+    "@playwright/test": "^1.61.1",
     "@svgr/webpack": "^8.1.0",
     "@tailwindcss/postcss": "^4.2.2",
     "@types/matter-js": "^0.20.2",
