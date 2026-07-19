@@ -116,6 +116,10 @@ function BottomTabBar() {
     if (lensOffTimerRef.current) clearTimeout(lensOffTimerRef.current);
     setIsGrabbing(true);
 
+    // 착지 애니메이션(NAVIGATE_DELAY) 동안 목적지 라우트를 미리 받아 push 시점 대기를 없앤다
+    const pressTabForPrefetch = TABS[pressIndex];
+    if (pressTabForPrefetch && pressIndex !== activeIndex) router.prefetch(pressTabForPrefetch.href);
+
     // 어느 탭을 누르든 버블이 눌린 탭으로 미끄러져 온 뒤 드래그 대상이 됨
     const isMovingToRight = pressLeft >= indexToLeft(activeIndex);
     indicator.style.transitionProperty = 'left, right';
@@ -215,6 +219,8 @@ function BottomTabBar() {
 
       const targetTab = TABS[targetIndex];
       if (targetTab && targetIndex !== activeIndex) {
+        // 스냅 애니메이션 동안 목적지 라우트를 미리 받아 push 시점 대기를 없앤다
+        router.prefetch(targetTab.href);
         navigateTimerRef.current = setTimeout(() => router.push(targetTab.href), NAVIGATE_DELAY);
       }
     };
