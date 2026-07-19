@@ -10,9 +10,10 @@ import AccountInfoSection from './_components/AccountInfoSection';
 import AppVersionFooter from './_components/AppVersionFooter';
 import ProfileSection from './_components/ProfileSection';
 
-async function MypagePage() {
+function MypagePage() {
   const queryClient = getQueryClient();
-  await queryClient.prefetchQuery({
+  // await 하지 않음 — pending dehydrate 스트리밍. 재방문 시 클라 캐시로 즉시 렌더
+  void queryClient.prefetchQuery({
     queryKey: ['me'],
     queryFn: getMe,
   });

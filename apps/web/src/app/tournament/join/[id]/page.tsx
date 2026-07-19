@@ -44,17 +44,16 @@ async function TournamentJoinPage({ params, searchParams }: TournamentJoinPagePr
   if (tournamentId === null) notFound();
 
   const queryClient = getQueryClient();
-  const getInvitePreviewPromise = queryClient.prefetchQuery({
+  // await 하지 않음 — 두 prefetch 모두 pending 상태로 dehydrate 되어 스트리밍 (전환 논블로킹)
+  void queryClient.prefetchQuery({
     queryKey: ['invitePreview', tournamentId],
     queryFn: () => getInvitePreview(tournamentId),
   });
 
-  const getMePromise = queryClient.prefetchQuery({
+  void queryClient.prefetchQuery({
     queryKey: ['me'],
     queryFn: getMe,
   });
-
-  await Promise.all([getInvitePreviewPromise, getMePromise]);
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
