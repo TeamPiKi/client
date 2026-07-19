@@ -114,6 +114,7 @@ function ResultClient({ tournamentId }: ResultClientProps) {
       <div className="mx-auto mt-4 flex min-h-0 w-full max-w-120 flex-1 flex-col gap-3">
         <ReceiptDrawMachine
           ref={receiptMachineRef}
+          tournamentId={tournamentId}
           tournamentName={tournamentName}
           result={result}
           date={date}

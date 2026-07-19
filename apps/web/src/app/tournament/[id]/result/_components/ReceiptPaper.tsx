@@ -1,9 +1,11 @@
 import { Kode_Mono } from 'next/font/google';
+import Link from 'next/link';
 import { forwardRef } from 'react';
 
 import PikiReceiptLogo from '@/assets/images/piki-receipt-logo.svg';
 import ReceiptZigzag from '@/assets/images/tournament/result/receipt-zigzag.svg';
 import TrophyBadge from '@/assets/images/tournament/result/trophy-badge.svg';
+import { ROUTES } from '@/consts/route';
 import { cn } from '@/utils/cn';
 
 import type { RankedProductT } from '../../_common/_types/tournament';
@@ -12,6 +14,7 @@ import { formatDate, formatPrice, formatTime } from '../_utils/formatReceipt';
 const kodeMono = Kode_Mono({ subsets: ['latin'], weight: ['400', '500', '600', '700'] });
 
 type ReceiptPaperProps = {
+  tournamentId: number;
   tournamentName: string;
   result: RankedProductT[];
   date: Date;
@@ -41,7 +44,7 @@ const PlaceLabel = ({ label }: { label: string }) => (
 );
 
 const ReceiptPaper = forwardRef<HTMLDivElement, ReceiptPaperProps>(function ReceiptPaper(
-  { tournamentName, result, date },
+  { tournamentId, tournamentName, result, date },
   ref
 ) {
   // 응답 배열 순서에 의존하지 않고 rank 기준으로 정렬 — 1위는 별도 강조 카드.
@@ -90,7 +93,7 @@ const ReceiptPaper = forwardRef<HTMLDivElement, ReceiptPaperProps>(function Rece
         {first && (
           <div className="flex flex-col gap-3 pt-3">
             <PlaceLabel label="1st Place" />
-            <ProductCard product={first} highlight />
+            <ProductCard tournamentId={tournamentId} product={first} highlight />
           </div>
         )}
 
@@ -100,8 +103,8 @@ const ReceiptPaper = forwardRef<HTMLDivElement, ReceiptPaperProps>(function Rece
             <PlaceLabel label="Others" />
             <ul className="flex flex-col gap-5">
               {rest.map(product => (
-                <li key={`${product.rank}-${product.itemId ?? product.name}`}>
-                  <ProductCard product={product} />
+                <li key={product.tournamentItemId}>
+                  <ProductCard tournamentId={tournamentId} product={product} />
                 </li>
               ))}
             </ul>
@@ -132,6 +135,7 @@ const ReceiptPaper = forwardRef<HTMLDivElement, ReceiptPaperProps>(function Rece
 });
 
 type ProductCardProps = {
+  tournamentId: number;
   product: RankedProductT;
   /** 1위 카드에 트로피 뱃지 표시 */
   highlight?: boolean;
@@ -148,9 +152,12 @@ type ProductCardProps = {
 const toSameOriginImageUrl = (originalUrl: string, width = 128) =>
   `/_next/image?url=${encodeURIComponent(originalUrl)}&w=${width}&q=75`;
 
-function ProductCard({ product, highlight = false }: ProductCardProps) {
+function ProductCard({ tournamentId, product, highlight = false }: ProductCardProps) {
   return (
-    <div className="flex items-center gap-3 px-5">
+    <Link
+      href={ROUTES.TOURNAMENT_ITEM_EDIT(tournamentId, product.tournamentItemId)}
+      className="flex cursor-pointer items-center gap-3 px-5"
+    >
       <div className="relative size-15 shrink-0">
         <div className="size-full overflow-hidden rounded-md bg-gray-50">
           {product.imageUrl && (
@@ -176,7 +183,7 @@ function ProductCard({ product, highlight = false }: ProductCardProps) {
         <p className="body-2-semibold text-text-neutral-primary">{formatPrice(product.price)}</p>
       </div>
       <span className="sr-only">{product.rank}위</span>
-    </div>
+    </Link>
   );
 }
 
