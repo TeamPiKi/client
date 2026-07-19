@@ -27,7 +27,7 @@ function AddWishHomeDialog() {
             alt="위시 담기"
             width={197}
             height={242}
-            className="mx-auto h-auto w-auto"
+            className="pointer-events-none mx-auto h-auto w-auto"
             priority
           />
           <span className="absolute top-[18px] left-[15px] heading-1 text-base-50">위시 담기</span>

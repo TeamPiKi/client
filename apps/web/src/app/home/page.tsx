@@ -19,14 +19,14 @@ function HomePage() {
 
       {/* 메인 컨텐츠 */}
       <main className="flex w-full flex-col gap-8">
-        {/* 로고 + CTA 영역 */}
+        {/** 위시 추가·토너먼트 생성·토너먼트 초대 */}
         <section className="grid grid-cols-2 gap-3 py-2.5">
           <AddWishHomeDialog />
           <CreateTournamentDialog />
           <InviteTournamentDialog />
         </section>
 
-        {/* 진행 중인 토너먼트 */}
+        {/* 참여 중인 토너먼트 */}
         <TournamentList />
       </main>
 
