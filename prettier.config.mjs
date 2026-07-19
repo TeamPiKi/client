@@ -13,7 +13,7 @@ const config = {
 
   tailwindStylesheet: './apps/web/src/styles/globals.css',
 
-  importOrder: ['<THIRD_PARTY_MODULES>', '^@/', '^[./]'],
+  importOrder: ['<THIRD_PARTY_MODULES>', '^@/', '^@e2e/', '^[./]'],
 };
 
 export default config;
