@@ -4,7 +4,13 @@ import { useState } from 'react';
 
 import { BasketIconFill, EditIconFill } from '@/assets/icons';
 import Button from '@/components/button';
-import { Dialog, DialogContent, DialogTitle, DialogTrigger } from '@/components/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/dialog';
 import Input from '@/components/input';
 
 import { usePostCreateTournament } from '../_hooks/usePostCreateTournament';
@@ -48,6 +54,7 @@ function CreateTournamentDialog() {
         </button>
       </DialogTrigger>
       <DialogContent showCloseButton={false} className="flex flex-col gap-5">
+        <DialogDescription className="sr-only">새 토너먼트 생성 다이얼로그</DialogDescription>
         <DialogTitle className="text-center heading-1 text-text-neutral-primary">
           새 토너먼트
         </DialogTitle>
