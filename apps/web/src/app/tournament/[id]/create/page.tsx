@@ -3,7 +3,6 @@ import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
 import { getMe } from '@/apis/getMe';
 import { getQueryClient } from '@/utils/queryClient';
 
-import { getTournament } from '../_common/_apis/getTournament';
 import TournamentCreateClient from './_components/TournamentCreateClient';
 
 type TournamentCreatePageProps = {
@@ -15,16 +14,12 @@ async function TournamentCreatePage({ params }: TournamentCreatePageProps) {
   const tournamentId = Number(id);
   const queryClient = getQueryClient();
 
-  await Promise.all([
-    queryClient.prefetchQuery({
-      queryKey: ['tournament', tournamentId],
-      queryFn: () => getTournament(tournamentId),
-    }),
-    queryClient.prefetchQuery({
-      queryKey: ['me'],
-      queryFn: getMe,
-    }),
-  ]);
+  // ['tournament', id] 는 상위 layout 이 이미 조회·시드하므로 중복 prefetch 하지 않는다.
+  // me 는 await 하지 않음 — pending dehydrate 스트리밍 (전환 논블로킹)
+  void queryClient.prefetchQuery({
+    queryKey: ['me'],
+    queryFn: getMe,
+  });
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
