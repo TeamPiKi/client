@@ -261,7 +261,7 @@ function MiniBracket({ stage }: { stage: TransitionStageT }) {
         >
           <div
             className={[
-              'flex size-full items-center justify-center rounded-[12px] border-2 border-white',
+              'flex size-full items-center justify-center rounded-[12px] border-[1.85px] border-white',
               card.isBlue ? 'bg-[#ECF8FE] text-[#9EDBFD]' : 'bg-[#F4F4F6] text-[#C5C8CE]',
             ].join(' ')}
             style={{ boxShadow: '0 0 6.662px 0 rgba(0,0,0,0.16)' }}
