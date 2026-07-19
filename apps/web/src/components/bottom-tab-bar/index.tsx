@@ -160,7 +160,7 @@ function BottomTabBar() {
       lastX = e.clientX;
     };
 
-    const handleUp = () => {
+    const handleUp = (releaseEvent: PointerEvent) => {
       window.removeEventListener('pointermove', handleMove);
       window.removeEventListener('pointerup', handleUp);
       window.removeEventListener('pointercancel', handleUp);
@@ -178,6 +178,19 @@ function BottomTabBar() {
       }
       const glint = glintRef.current;
       if (glint) glint.style.translate = '';
+
+      // 시스템이 제스처를 중단(pointercancel)하면 스냅·라우팅 없이 인디케이터를 활성 탭으로 복원
+      if (releaseEvent.type === 'pointercancel') {
+        isDraggedRef.current = false;
+        const activeLeft = indexToLeft(activeIndex);
+        indicator.style.transitionProperty = 'left, right';
+        indicator.style.transitionDuration = '0.4s, 0.4s';
+        indicator.style.transitionTimingFunction = `${SPRING_EASE}, ${SPRING_EASE}`;
+        indicator.style.transitionDelay = '0s, 0s';
+        indicator.style.left = `${activeLeft}px`;
+        indicator.style.right = `${BAR_WIDTH - activeLeft - TAB_WIDTH}px`;
+        return;
+      }
 
       if (!isDraggedRef.current) {
         // 탭: 버블은 이미 눌린 탭으로 이동 중 — 내비게이션은 여기서 처리하고 Link 클릭은 차단
