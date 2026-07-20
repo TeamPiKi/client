@@ -2,7 +2,6 @@ import BaseImage from '@/components/base-image';
 import Skeleton from '@/components/skeleton';
 import { cn } from '@/utils/cn';
 
-/** DS 0719 — 토너먼트 카드에서는 20px(sm) 프로필 사용 */
 const SIZE_STYLES = {
   sm: {
     profile: 'size-5 border-[1.2px]',

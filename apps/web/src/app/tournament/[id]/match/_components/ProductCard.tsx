@@ -19,7 +19,6 @@ function ProductCard({ imageUrl, name, price, isPicked, onClick }: ProductCardPr
           <span className="text-[20px] leading-5.5 font-bold tracking-[-0.6px] text-white">
             Pick!
           </span>
-          {/* DS 0719 — 상단 밝은 이너 섀도 (스티커 광택) */}
           <div
             aria-hidden
             className="pointer-events-none absolute inset-0 rounded-full shadow-[inset_0_1px_8.1px_0_#A2DEFF]"

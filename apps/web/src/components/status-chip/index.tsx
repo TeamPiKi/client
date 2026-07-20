@@ -5,7 +5,6 @@ import { cn } from '@/utils/cn';
 
 import { type StatusChipStyleProps, statusChipStyles } from './statusChip.style';
 
-/** DS 0719 — 내부 아이콘 제거, 텍스트만 표시 */
 const STATUS_CONFIG = {
   [TOURNAMENT_STATUS.PENDING]: { label: '담는 중' },
   [TOURNAMENT_STATUS.IN_PROGRESS]: { label: '플레이 중' },
