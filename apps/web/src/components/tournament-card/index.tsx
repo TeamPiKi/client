@@ -67,7 +67,7 @@ function TournamentCard({
             )}
           </div>
 
-          <UserProfileGroup profileImageUrls={profileImageUrls} max={maxProfiles} />
+          <UserProfileGroup profileImageUrls={profileImageUrls} max={maxProfiles} size="sm" />
         </div>
       </article>
     </Link>
