@@ -1,5 +1,6 @@
 import BaseImage from '@/components/base-image';
 import Skeleton from '@/components/skeleton';
+import { Z_INDEX } from '@/consts/zIndex';
 import { cn } from '@/utils/cn';
 
 type UserProfileGroupProps = {
@@ -19,22 +20,30 @@ function UserProfileGroup({ profileImageUrls, max = 3, className }: UserProfileG
         <span
           key={`${url}-${index}`}
           className={cn(
-            'relative block size-7 shrink-0 overflow-hidden rounded-full border-[1.6px] border-white',
-            index === visibleProfileImageUrls.length - 1 && overflowCount <= 0 ? '' : '-mr-2'
+            'relative block size-[22px] shrink-0 rounded-full',
+            index === visibleProfileImageUrls.length - 1 && overflowCount <= 0 ? '' : '-mr-[3.96px]'
           )}
         >
-          <BaseImage
-            src={url}
-            alt="참여자 프로필"
-            sizes="30px"
-            className="object-cover"
-            loadingFallback={<Skeleton shape="circle" className="absolute inset-0" />}
+          <span className="absolute inset-0 overflow-hidden rounded-full">
+            <BaseImage
+              src={url}
+              alt="참여자 프로필"
+              sizes="22px"
+              className="object-cover"
+              loadingFallback={<Skeleton shape="circle" className="absolute inset-0" />}
+            />
+          </span>
+          <span
+            aria-hidden
+            className="pointer-events-none absolute -inset-[0.2px] rounded-full border-[1.6px] border-white"
+            style={{ zIndex: Z_INDEX.BASE_IMAGE }}
           />
         </span>
       ))}
       {overflowCount > 0 && (
         <span
-          className="flex size-8 shrink-0 items-center justify-center rounded-full border-[1.6px] border-white bg-gray-50 body-2-semibold text-text-neutral-tertiary"
+          className="flex size-[24px] shrink-0 items-center justify-center rounded-full bg-gray-50 body-2-semibold text-text-neutral-tertiary"
+          style={{ zIndex: Z_INDEX.BASE_IMAGE + 1 }}
           aria-label={`외 ${overflowCount}명`}
         >
           +{overflowCount}
