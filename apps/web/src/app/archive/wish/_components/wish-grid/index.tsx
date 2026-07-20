@@ -1,6 +1,6 @@
 import Link from 'next/link';
 
-import { CheckboxEmptyIconFill, CheckboxSelectedIconFill } from '@/assets/icons';
+import CheckboxSelectedIconFill from '@/assets/icons/fill/checkbox-selected.svg';
 import WishCard from '@/components/common/wish-card';
 import { ROUTES } from '@/consts/route';
 import type { WishItemT } from '@/types/wish';
@@ -39,12 +39,15 @@ function WishGrid({ items, isDeleteMode = false, selectedIds, onToggleSelect }: 
               className="relative cursor-pointer text-left transition-opacity active:opacity-80"
             >
               <WishCard name={item.name} price={item.price} imageUrl={item.imageUrl} />
-              <span className="pointer-events-none absolute top-3 left-3 z-10 size-6">
-                <span className="absolute inset-[3px] rounded-[3px] bg-white" />
+              <div className={`pointer-events-none absolute top-0 left-0 right-0 z-[11] aspect-[201/166] bg-black/20 transition-opacity duration-200 ${isSelected ? 'opacity-100' : 'opacity-0'}`} />
+              <span className="pointer-events-none absolute top-3 left-3 z-[12] block size-5 overflow-hidden">
                 {isSelected ? (
-                  <CheckboxSelectedIconFill className="relative size-6 text-uac-light" />
+                  <>
+                    <span className="absolute inset-0.5 bg-white" />
+                    <CheckboxSelectedIconFill className="absolute inset-0 size-5 origin-center scale-[1.334] text-uac-light" />
+                  </>
                 ) : (
-                  <CheckboxEmptyIconFill className="relative size-6 text-[#636366]" />
+                  <span className="absolute inset-0 rounded border-[1.4px] border-white bg-black/[0.08]" />
                 )}
               </span>
             </button>
@@ -57,7 +60,7 @@ function WishGrid({ items, isDeleteMode = false, selectedIds, onToggleSelect }: 
               name={item.name}
               price={item.price}
               imageUrl={item.imageUrl}
-              preload={index < 4} // 4개 이미지 로딩 전까지는 preload
+              preload={index < 4}
             />
           </Link>
         );

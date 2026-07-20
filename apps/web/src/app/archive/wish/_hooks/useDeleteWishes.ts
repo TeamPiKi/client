@@ -4,8 +4,7 @@ import { toast } from 'sonner';
 
 import { deleteWishes } from '../_apis/deleteWishes';
 
-export const useDeleteWishes = () => {
-  const [isDeleteMode, setIsDeleteMode] = useState(false);
+export const useDeleteWishes = (options?: { onSuccess?: () => void }) => {
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
 
   const queryClient = useQueryClient();
@@ -17,15 +16,10 @@ export const useDeleteWishes = () => {
         queryClient.invalidateQueries({ queryKey: ['wish', wishId] });
       });
       setSelectedIds(new Set());
-      setIsDeleteMode(false);
+      options?.onSuccess?.();
       toast.success('선택한 위시를 삭제했어요');
     },
   });
-
-  const handleEnterDeleteMode = () => {
-    setIsDeleteMode(true);
-    setSelectedIds(new Set());
-  };
 
   const handleToggleSelect = (id: number) => {
     setSelectedIds(prev => {
@@ -36,17 +30,25 @@ export const useDeleteWishes = () => {
     });
   };
 
-  const handleConfirmDelete = () => {
+  const handleSelectAll = (allIds: number[]) => {
+    setSelectedIds(new Set(allIds));
+  };
+
+  const handleClearSelection = () => {
+    setSelectedIds(new Set());
+  };
+
+  const handleDeleteWishes = () => {
     if (selectedIds.size === 0) return;
     deleteWishesMutation(Array.from(selectedIds));
   };
 
   return {
-    isDeleteMode,
     selectedIds,
     isDeleteWishesPending,
-    handleEnterDeleteMode,
     handleToggleSelect,
-    handleConfirmDelete,
+    handleSelectAll,
+    handleClearSelection,
+    handleDeleteWishes,
   };
 };
