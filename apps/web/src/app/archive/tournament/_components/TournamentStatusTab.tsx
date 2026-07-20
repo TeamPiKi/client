@@ -1,37 +1,43 @@
-'use client';
+import Link from 'next/link';
+import type { ComponentType, SVGProps } from 'react';
 
+import { BasketIconOutline, ReciptIconOutline } from '@/assets/icons';
 import { cn } from '@/utils/cn';
 
-export type TournamentStatusTabT = 'in-progress' | 'completed';
+import type { TournamentStatusTabT } from '../_consts/tournamentTab';
 
 type Props = {
   activeTab: TournamentStatusTabT;
-  onTabChange: (tab: TournamentStatusTabT) => void;
 };
 
-const TABS: { value: TournamentStatusTabT; label: string }[] = [
-  { value: 'in-progress', label: '진행 중' },
-  { value: 'completed', label: '완료' },
+const TABS: {
+  value: TournamentStatusTabT;
+  label: string;
+  Icon: ComponentType<SVGProps<SVGSVGElement>>;
+}[] = [
+  { value: 'ongoing', label: '진행 중', Icon: BasketIconOutline },
+  { value: 'completed', label: '완료', Icon: ReciptIconOutline },
 ];
 
-function TournamentStatusTab({ activeTab, onTabChange }: Props) {
+function TournamentStatusTab({ activeTab }: Props) {
   return (
     <div className="flex w-full border-b border-border-neutral-muted">
-      {TABS.map(tab => (
-        <button
-          key={tab.value}
-          type="button"
-          onClick={() => onTabChange(tab.value)}
+      {TABS.map(({ value, label, Icon }) => (
+        <Link
+          key={value}
+          href={`?tab=${value}`}
+          scroll={false}
           className={cn(
-            'relative flex h-11 flex-1 cursor-pointer items-center justify-center body-1-semibold transition-colors',
-            activeTab === tab.value ? 'text-text-neutral-primary' : 'text-text-neutral-tertiary'
+            'relative flex flex-1 items-center justify-center gap-1 py-3 body-1-semibold transition-colors',
+            activeTab === value ? 'text-text-neutral-primary' : 'text-text-neutral-tertiary'
           )}
         >
-          {tab.label}
-          {activeTab === tab.value && (
+          <Icon className="size-5" />
+          {label}
+          {activeTab === value && (
             <span className="absolute inset-x-0 bottom-0 h-0.5 bg-text-neutral-primary" />
           )}
-        </button>
+        </Link>
       ))}
     </div>
   );
