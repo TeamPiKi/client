@@ -381,10 +381,7 @@ function RoundTransitionSheet({ stage, onComplete }: RoundTransitionSheetProps) 
                 style={{ transition: arcTransition }}
               />
             </svg>
-            <span
-              className="text-[20px] leading-7 font-bold tracking-[-0.6px]"
-              style={{ color: 'var(--color-text-accent)' }}
-            >
+            <span className="text-[20px] leading-7 font-bold tracking-[-0.6px] text-text-accent">
               {remaining}
             </span>
           </div>
@@ -397,12 +394,12 @@ function RoundTransitionSheet({ stage, onComplete }: RoundTransitionSheetProps) 
             <p className="text-[16px] leading-[22px] font-semibold tracking-[-0.6px]">
               {isSemi ? (
                 <>
-                  <span style={{ color: 'var(--color-text-accent)' }}>3번</span>
+                  <span className="text-text-accent">3번</span>
                   <span className="text-text-neutral-tertiary">의 선택만 남았어요.</span>
                 </>
               ) : (
                 <>
-                  <span style={{ color: 'var(--color-text-accent)' }}>최종</span>
+                  <span className="text-text-accent">최종</span>
                   <span className="text-text-neutral-tertiary"> 선택만 남았어요.</span>
                 </>
               )}
