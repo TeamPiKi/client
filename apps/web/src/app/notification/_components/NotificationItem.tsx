@@ -1,3 +1,4 @@
+import BaseImage from '@/components/base-image';
 import { cn } from '@/utils/cn';
 
 type NotificationItemProps = {
@@ -11,8 +12,10 @@ type NotificationItemProps = {
 function NotificationItem({ profileImage, message, time, isRead, onClick }: NotificationItemProps) {
   const innerContent = (
     <>
-      <div className="size-8 shrink-0 overflow-hidden rounded-full bg-blue-200">
-        {profileImage && <img src={profileImage} alt="" className="size-full object-cover" />}
+      <div className="relative size-8 shrink-0 overflow-hidden rounded-full bg-sky-blue-200">
+        {profileImage && (
+          <BaseImage src={profileImage} alt="" sizes="32px" className="object-cover" />
+        )}
       </div>
       <div className="flex flex-col gap-1">
         <p className="body-1-semibold text-text-neutral-secondary">{message}</p>
