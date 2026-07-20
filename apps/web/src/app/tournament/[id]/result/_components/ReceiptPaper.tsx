@@ -1,9 +1,11 @@
 import { Kode_Mono } from 'next/font/google';
+import Link from 'next/link';
 import { forwardRef } from 'react';
 
 import PikiReceiptLogo from '@/assets/images/piki-receipt-logo.svg';
 import ReceiptZigzag from '@/assets/images/tournament/result/receipt-zigzag.svg';
 import TrophyBadge from '@/assets/images/tournament/result/trophy-badge.svg';
+import { ROUTES } from '@/consts/route';
 import { cn } from '@/utils/cn';
 
 import type { RankedProductT } from '../../_common/_types/tournament';
@@ -12,12 +14,17 @@ import { formatDate, formatPrice, formatTime } from '../_utils/formatReceipt';
 const kodeMono = Kode_Mono({ subsets: ['latin'], weight: ['400', '500', '600', '700'] });
 
 type ReceiptPaperProps = {
+  tournamentId: number;
   tournamentName: string;
   result: RankedProductT[];
   date: Date;
 };
 
-const SectionDivider = () => <div className="h-px w-full border-t border-dashed border-gray-100" />;
+const SectionDivider = () => (
+  <div className="px-5">
+    <div className="h-px w-full border-t border-dashed border-gray-100" />
+  </div>
+);
 
 /**
  * 영수증 구분선 라벨. `*****Label*****` 형태로, 라벨 길이에 상관없이 항상
@@ -41,7 +48,7 @@ const PlaceLabel = ({ label }: { label: string }) => (
 );
 
 const ReceiptPaper = forwardRef<HTMLDivElement, ReceiptPaperProps>(function ReceiptPaper(
-  { tournamentName, result, date },
+  { tournamentId, tournamentName, result, date },
   ref
 ) {
   // 응답 배열 순서에 의존하지 않고 rank 기준으로 정렬 — 1위는 별도 강조 카드.
@@ -52,7 +59,7 @@ const ReceiptPaper = forwardRef<HTMLDivElement, ReceiptPaperProps>(function Rece
   return (
     <div
       ref={ref}
-      className="relative flex w-full flex-col gap-2 bg-bg-layer-default pt-6 pb-6.25 filter-[drop-shadow(0px_2px_4px_rgba(0,0,0,0.12))]"
+      className="relative flex w-full flex-col gap-3 bg-bg-layer-default pt-6 filter-[drop-shadow(0px_2px_4px_rgba(0,0,0,0.12))]"
     >
       <div
         aria-hidden
@@ -60,12 +67,12 @@ const ReceiptPaper = forwardRef<HTMLDivElement, ReceiptPaperProps>(function Rece
       />
 
       {/* PIKI 로고 + 헤드라인 */}
-      <div className="relative flex flex-col items-center gap-2">
+      <div className="relative flex flex-col items-center gap-3">
         <PikiReceiptLogo aria-label="PIKI" className="h-14 w-19.25" />
         <p
           className={cn(
             kodeMono.className,
-            'text-center text-[12px] leading-4 font-semibold tracking-[-0.4px] text-text-neutral-secondary'
+            'text-center text-[12px] leading-4 font-semibold tracking-[-0.4px] text-text-neutral-tertiary'
           )}
         >
           FROM WISH TO PICK
@@ -75,8 +82,8 @@ const ReceiptPaper = forwardRef<HTMLDivElement, ReceiptPaperProps>(function Rece
       <div className="flex flex-col">
         {/* 날짜 / 시간 */}
         <div className={cn(kodeMono.className, 'flex items-center justify-between px-5')}>
-          <span className="caption-1-semibold text-text-neutral-secondary">{formatDate(date)}</span>
-          <span className="caption-1-semibold text-text-neutral-secondary">{formatTime(date)}</span>
+          <span className="caption-1-semibold text-text-neutral-tertiary">{formatDate(date)}</span>
+          <span className="caption-1-semibold text-text-neutral-tertiary">{formatTime(date)}</span>
         </div>
 
         <SectionDivider />
@@ -88,20 +95,20 @@ const ReceiptPaper = forwardRef<HTMLDivElement, ReceiptPaperProps>(function Rece
 
         {/* 1st Place */}
         {first && (
-          <div className="flex flex-col gap-3 py-3">
+          <div className="flex flex-col gap-3">
             <PlaceLabel label="1st Place" />
-            <ProductCard product={first} highlight />
+            <ProductCard tournamentId={tournamentId} product={first} highlight />
           </div>
         )}
 
         {/* Others */}
         {rest.length > 0 && (
-          <div className="flex flex-col gap-3 py-3">
+          <div className="flex flex-col gap-3 pt-3 pb-5">
             <PlaceLabel label="Others" />
-            <ul className="flex flex-col gap-3">
+            <ul className="flex flex-col gap-5">
               {rest.map(product => (
-                <li key={`${product.rank}-${product.itemId ?? product.name}`}>
-                  <ProductCard product={product} />
+                <li key={product.tournamentItemId}>
+                  <ProductCard tournamentId={tournamentId} product={product} />
                 </li>
               ))}
             </ul>
@@ -114,7 +121,7 @@ const ReceiptPaper = forwardRef<HTMLDivElement, ReceiptPaperProps>(function Rece
         <p
           className={cn(
             kodeMono.className,
-            'px-5 pt-3 pb-2 text-center caption-1-semibold text-text-neutral-secondary'
+            'px-5 pt-3 pb-2 text-center caption-1-semibold text-text-neutral-tertiary'
           )}
         >
           @piki.day
@@ -132,6 +139,7 @@ const ReceiptPaper = forwardRef<HTMLDivElement, ReceiptPaperProps>(function Rece
 });
 
 type ProductCardProps = {
+  tournamentId: number;
   product: RankedProductT;
   /** 1위 카드에 트로피 뱃지 표시 */
   highlight?: boolean;
@@ -148,9 +156,12 @@ type ProductCardProps = {
 const toSameOriginImageUrl = (originalUrl: string, width = 128) =>
   `/_next/image?url=${encodeURIComponent(originalUrl)}&w=${width}&q=75`;
 
-function ProductCard({ product, highlight = false }: ProductCardProps) {
+function ProductCard({ tournamentId, product, highlight = false }: ProductCardProps) {
   return (
-    <div className="flex items-center gap-3 px-5">
+    <Link
+      href={ROUTES.TOURNAMENT_ITEM_EDIT(tournamentId, product.tournamentItemId)}
+      className="flex cursor-pointer items-center gap-3 px-5"
+    >
       <div className="relative size-15 shrink-0">
         <div className="size-full overflow-hidden rounded-md bg-gray-50">
           {product.imageUrl && (
@@ -167,18 +178,16 @@ function ProductCard({ product, highlight = false }: ProductCardProps) {
         {highlight && (
           <TrophyBadge
             aria-label="1위"
-            className="pointer-events-none absolute -top-2 -left-2 size-8"
+            className="pointer-events-none absolute -top-2 -left-2 size-9"
           />
         )}
       </div>
       <div className="flex min-w-0 flex-1 flex-col">
-        <p className="body-2-regular break-keep wrap-break-word text-text-neutral-primary">
-          {product.name}
-        </p>
+        <p className="truncate body-2-regular text-text-neutral-primary">{product.name}</p>
         <p className="body-2-semibold text-text-neutral-primary">{formatPrice(product.price)}</p>
       </div>
       <span className="sr-only">{product.rank}위</span>
-    </div>
+    </Link>
   );
 }
 
