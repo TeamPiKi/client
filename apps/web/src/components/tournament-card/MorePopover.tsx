@@ -7,7 +7,7 @@ import {
   GroupIconFill,
   HeartIconFill,
   ReciptIconFill,
-  ThreeDotHorizontalIconFill,
+  ThreeDotVerticalIconFill,
   TrashIconFill,
 } from '@/assets/icons';
 import { QUERY_ACTION } from '@/consts/queryAction';
@@ -68,7 +68,7 @@ function MorePopover({ status, tournamentId, participantCount = 0 }: MorePopover
       <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
         <PopoverTrigger asChild>
           <button type="button" aria-label="더보기" className="cursor-pointer">
-            <ThreeDotHorizontalIconFill className="size-6 text-icon-neutral-secondary" />
+            <ThreeDotVerticalIconFill className="size-6 text-icon-neutral-secondary" />
           </button>
         </PopoverTrigger>
         <PopoverContent className="p-2" align="end" alignOffset={-24}>

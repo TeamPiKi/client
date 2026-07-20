@@ -43,25 +43,32 @@ function TournamentCard({
   return (
     <Link href={HREF[status]}>
       <article
-        className={cn('flex w-full items-start gap-2.5 rounded-xl bg-base-50 px-5 py-3', className)}
+        className={cn(
+          'flex w-full items-start gap-2.5 rounded-xl bg-base-50 py-3',
+          showMorePopover ? 'pr-3 pl-5' : 'px-5',
+          className
+        )}
       >
         <ItemImageThumbnails imageUrls={imageUrls} />
 
         <div className="flex flex-1 flex-col items-start gap-2 self-center">
-          <div className="flex items-center gap-2">
-            <StatusChip status={status} />
-            <div className="line-clamp-1 body-1-semibold text-text-neutral-primary">{name}</div>
+          <div className="flex w-full items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <StatusChip status={status} />
+              <div className="line-clamp-1 body-1-semibold text-text-neutral-primary">{name}</div>
+            </div>
+
+            {showMorePopover && (
+              <MorePopover
+                status={status}
+                tournamentId={tournamentId}
+                participantCount={participantCount}
+              />
+            )}
           </div>
+
           <UserProfileGroup profileImageUrls={profileImageUrls} max={maxProfiles} />
         </div>
-
-        {showMorePopover && (
-          <MorePopover
-            status={status}
-            tournamentId={tournamentId}
-            participantCount={participantCount}
-          />
-        )}
       </article>
     </Link>
   );
