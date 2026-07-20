@@ -23,6 +23,7 @@ function TournamentListClient({ statuses }: Props) {
           tournamentId={tournament.tournamentId}
           status={tournament.status}
           name={tournament.name}
+          date={tournament.createdAt.slice(0, 10).replaceAll('-', '/')}
           profileImageUrls={tournament.participantProfileImages}
           participantCount={tournament.participantProfileImages.length}
         />
