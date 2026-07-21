@@ -12,8 +12,8 @@ type TournamentEmptyStateProps = TournamentEmptyStateVariantProps;
 
 function TournamentEmptyState({ variant }: TournamentEmptyStateProps) {
   return (
-    <div className={tournamentEmptyStateStyles({ variant })}>
-      <BasketEmptyIcon className={tournamentEmptyStateIconStyles({ variant })} />
+    <div className={tournamentEmptyStateStyles({ variant })} role="status">
+      <BasketEmptyIcon className={tournamentEmptyStateIconStyles({ variant })} aria-hidden />
       <div className={tournamentEmptyStateTextGroupStyles({ variant })}>
         <p className={tournamentEmptyStateTitleStyles({ variant })}>
           최근 생성한 토너먼트가 없어요
