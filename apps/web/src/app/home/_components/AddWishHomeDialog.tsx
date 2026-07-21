@@ -64,7 +64,8 @@ function WishButtonContent() {
     <>
       <Image
         src={AddWishBg}
-        alt="위시 담기"
+        alt=""
+        aria-hidden
         width={197}
         height={242}
         className="pointer-events-none mx-auto h-auto w-auto"
