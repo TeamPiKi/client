@@ -38,7 +38,7 @@ function WishGrid({ items, isDeleteMode = false, selectedIds, onToggleSelect }: 
               aria-pressed={isSelected}
               className="relative cursor-pointer text-left transition-opacity active:opacity-80"
             >
-              <WishCard name={item.name} price={item.price} imageUrl={item.imageUrl} />
+              <WishCard name={item.name} price={item.price} imageUrl={item.imageUrl} sourcePlatform={item.sourcePlatform} />
               <span className="pointer-events-none absolute top-3 left-3 z-10 size-6">
                 <span className="absolute inset-[3px] rounded-[3px] bg-white" />
                 {isSelected ? (
@@ -57,7 +57,8 @@ function WishGrid({ items, isDeleteMode = false, selectedIds, onToggleSelect }: 
               name={item.name}
               price={item.price}
               imageUrl={item.imageUrl}
-              preload={index < 4} // 4개 이미지 로딩 전까지는 preload
+              sourcePlatform={item.sourcePlatform}
+              preload={index < 4}
             />
           </Link>
         );
