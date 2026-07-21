@@ -1,4 +1,5 @@
-import Link from 'next/link';
+'use client';
+
 import type { ComponentType, SVGProps } from 'react';
 
 import { BasketIconOutline, ReciptIconOutline } from '@/assets/icons';
@@ -8,6 +9,7 @@ import type { TournamentStatusTabT } from '../_consts/tournamentTab';
 
 type Props = {
   activeTab: TournamentStatusTabT;
+  onTabChange: (tab: TournamentStatusTabT) => void;
 };
 
 const TABS: {
@@ -19,16 +21,16 @@ const TABS: {
   { value: 'completed', label: '완료', Icon: ReciptIconOutline },
 ];
 
-function TournamentStatusTab({ activeTab }: Props) {
+function TournamentStatusTab({ activeTab, onTabChange }: Props) {
   return (
     <div className="flex w-full border-b border-border-neutral-muted">
       {TABS.map(({ value, label, Icon }) => (
-        <Link
+        <button
           key={value}
-          href={`?tab=${value}`}
-          scroll={false}
+          type="button"
+          onClick={() => onTabChange(value)}
           className={cn(
-            'relative flex flex-1 items-center justify-center gap-1 py-3 body-1-semibold transition-colors',
+            'relative flex h-11 flex-1 cursor-pointer items-center justify-center gap-1 body-1-semibold transition-colors',
             activeTab === value ? 'text-text-neutral-primary' : 'text-text-neutral-tertiary'
           )}
         >
@@ -37,7 +39,7 @@ function TournamentStatusTab({ activeTab }: Props) {
           {activeTab === value && (
             <span className="absolute inset-x-0 bottom-0 h-0.5 bg-text-neutral-primary" />
           )}
-        </Link>
+        </button>
       ))}
     </div>
   );

@@ -1,12 +1,11 @@
-import { Suspense } from 'react';
+import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
 
+import { getTournamentList } from '@/apis/getTournamentList';
 import BottomTabBar from '@/components/bottom-tab-bar';
-import Spacing from '@/components/spacing';
+import { getQueryClient } from '@/utils/queryClient';
 
 import TournamentFab from './_components/TournamentFab';
-import TournamentHistoryList from './_components/TournamentHistoryList';
-import TournamentHistorySkeleton from './_components/TournamentHistorySkeleton';
-import TournamentStatusTab from './_components/TournamentStatusTab';
+import TournamentHistorySection from './_components/TournamentHistorySection';
 import { STATUS_BY_TAB, type TournamentStatusTabT } from './_consts/tournamentTab';
 
 type Props = {
@@ -15,18 +14,20 @@ type Props = {
 
 async function ArchiveTournamentPage({ searchParams }: Props) {
   const { tab } = await searchParams;
-  const activeTab: TournamentStatusTabT = tab === 'completed' ? 'completed' : 'ongoing';
+  const initialTab: TournamentStatusTabT = tab === 'completed' ? 'completed' : 'ongoing';
+
+  const queryClient = getQueryClient();
+  const statuses = STATUS_BY_TAB[initialTab];
+  await queryClient.prefetchQuery({
+    queryKey: ['tournamentList', statuses],
+    queryFn: () => getTournamentList(statuses),
+  });
 
   return (
     <div className="flex min-h-dvh flex-col bg-bg-layer-basement px-5">
-      <div className="sticky top-0 z-20 flex w-full flex-col bg-bg-layer-basement pt-padding-top">
-        <h1 className="heading-1 text-text-neutral-primary">내 토너먼트</h1>
-        <Spacing size={16} />
-        <TournamentStatusTab activeTab={activeTab} />
-      </div>
-      <Suspense key={activeTab} fallback={<TournamentHistorySkeleton />}>
-        <TournamentHistoryList statuses={STATUS_BY_TAB[activeTab]} />
-      </Suspense>
+      <HydrationBoundary state={dehydrate(queryClient)}>
+        <TournamentHistorySection initialTab={initialTab} />
+      </HydrationBoundary>
       <TournamentFab />
       <BottomTabBar />
     </div>
