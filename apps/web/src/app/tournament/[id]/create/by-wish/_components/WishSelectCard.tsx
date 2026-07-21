@@ -1,5 +1,4 @@
-import CheckboxEmptyIconFill from '@/assets/icons/fill/checkbox-empty.svg';
-import CheckboxSelectedIconFill from '@/assets/icons/fill/checkbox-selected.svg';
+import { CheckboxEmptyIconFill, CheckboxSelectedIconFill } from '@/assets/icons';
 import WishCard from '@/components/common/wish-card';
 
 type WishSelectCardProps = {
@@ -19,11 +18,11 @@ function WishSelectCard({ name, price, imageUrl, isSelected, onSelect }: WishSel
       className="relative h-full w-full cursor-pointer text-left"
     >
       <WishCard name={name} price={price} imageUrl={imageUrl} />
-      <span className="pointer-events-none absolute top-3 left-3 z-10 size-6">
+      <span className="pointer-events-none absolute top-3 left-3 z-10 block size-5">
         {isSelected ? (
-          <CheckboxSelectedIconFill className="relative size-6 text-bg-accent" />
+          <CheckboxSelectedIconFill className="size-5 text-uac-light" />
         ) : (
-          <CheckboxEmptyIconFill className="relative size-6 text-black/8" />
+          <CheckboxEmptyIconFill className="size-5 text-black/8" />
         )}
       </span>
     </button>

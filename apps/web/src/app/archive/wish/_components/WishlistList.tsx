@@ -45,7 +45,7 @@ function WishlistList({ isDeleteMode, selectedIds, onToggleSelect }: WishlistLis
       />
 
       {isFetchingNextPage && (
-        <div className="grid grid-cols-2 gap-x-2 gap-y-3">
+        <div className="grid grid-cols-2">
           {Array.from({ length: 2 }).map((_, index) => (
             <WishCardSkeleton key={index} />
           ))}

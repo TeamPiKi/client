@@ -1,24 +1,31 @@
+import BottomCta from '@/components/bottom-cta';
 import BottomTabBar from '@/components/bottom-tab-bar';
+import Button from '@/components/button';
 import { Z_INDEX } from '@/consts/zIndex';
 
 type WishlistBottomBarProps = {
   isDeleteMode: boolean;
   selectedCount: number;
+  onOpenDeleteDialog: () => void;
 };
 
-function WishlistBottomBar({ isDeleteMode, selectedCount }: WishlistBottomBarProps) {
+function WishlistBottomBar({ isDeleteMode, selectedCount, onOpenDeleteDialog }: WishlistBottomBarProps) {
   if (!isDeleteMode) return <BottomTabBar />;
 
   return (
-    <div
-      // 삭제 모드(BottomTabBar 언마운트)에서도 토스트가 하단 바 위에 뜨도록 마커 유지 (globals.css 참고)
-      data-bottom-tab-bar
-      className="fixed bottom-10 left-1/2 -translate-x-1/2"
-      style={{ zIndex: Z_INDEX.BOTTOM_TAB_BAR }}
-    >
-      <div className="flex h-[68px] w-[168px] items-center justify-center rounded-full bg-bg-layer-default shadow-[0px_0px_8px_0px_rgba(0,0,0,0.04)]">
-        <span className="body-1-bold text-text-neutral-primary">{selectedCount}개 선택됨</span>
-      </div>
+    // 삭제 모드(BottomTabBar 언마운트)에서도 토스트가 하단 바 위에 뜨도록 마커 유지 (globals.css 참고)
+    <div data-bottom-tab-bar style={{ zIndex: Z_INDEX.BOTTOM_CTA }}>
+      <BottomCta hasGradient>
+        <Button
+          variant="primary"
+          size="lg"
+          className="w-full"
+          disabled={selectedCount === 0}
+          onClick={onOpenDeleteDialog}
+        >
+          선택한 {selectedCount}개의 상품 삭제
+        </Button>
+      </BottomCta>
     </div>
   );
 }
