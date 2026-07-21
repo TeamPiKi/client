@@ -1,9 +1,9 @@
 import type { GetTournamentPendingResponseT } from '@/app/tournament/[id]/_common/_types/tournamentResponse';
-import type { TournamentT } from '@/types/tournament';
+import type { GetTournamentListResponseT } from '@/types/tournament';
 
 import { MOCK_IMAGE_URLS } from './images';
 
-export const MOCK_TOURNAMENT_LIST: TournamentT[] = [
+export const MOCK_TOURNAMENT_LIST: GetTournamentListResponseT = [
   {
     tournamentId: 1,
     name: 'E2E 토너먼트',
@@ -11,6 +11,7 @@ export const MOCK_TOURNAMENT_LIST: TournamentT[] = [
     createdAt: '2026-01-01T00:00:00Z',
     /** 가짜 URL — fixture 가 가로채 로컬 이미지로 응답한다 (e2e/mocks/images.ts) */
     participantProfileImages: [MOCK_IMAGE_URLS.avatar],
+    thumbnailUrls: [],
   },
 ];
 

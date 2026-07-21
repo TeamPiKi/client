@@ -2,7 +2,7 @@ import { Kode_Mono } from 'next/font/google';
 import Link from 'next/link';
 import { forwardRef } from 'react';
 
-import PikiReceiptLogo from '@/assets/images/piki-receipt-logo.svg';
+import PikiLogo from '@/assets/images/piki-logo-cart.svg';
 import ReceiptZigzag from '@/assets/images/tournament/result/receipt-zigzag.svg';
 import TrophyBadge from '@/assets/images/tournament/result/trophy-badge.svg';
 import { ROUTES } from '@/consts/route';
@@ -66,9 +66,9 @@ const ReceiptPaper = forwardRef<HTMLDivElement, ReceiptPaperProps>(function Rece
         className="pointer-events-none absolute -top-6 left-0 h-15.25 w-full bg-linear-to-t from-white to-[#f9f9f9]"
       />
 
-      {/* PIKI 로고 + 헤드라인 */}
-      <div className="relative flex flex-col items-center gap-3">
-        <PikiReceiptLogo aria-label="PIKI" className="h-14 w-19.25" />
+      {/* PiKi 로고 + 헤드라인 */}
+      <div className="relative flex flex-col items-center gap-2">
+        <PikiLogo aria-label="PiKi" className="h-14 w-19.25 shrink-0 text-gray-800" />
         <p
           className={cn(
             kodeMono.className,
@@ -183,7 +183,9 @@ function ProductCard({ tournamentId, product, highlight = false }: ProductCardPr
         )}
       </div>
       <div className="flex min-w-0 flex-1 flex-col">
-        <p className="truncate body-2-regular text-text-neutral-primary">{product.name}</p>
+        <p className="body-2-regular wrap-break-word break-keep text-text-neutral-primary">
+          {product.name}
+        </p>
         <p className="body-2-semibold text-text-neutral-primary">{formatPrice(product.price)}</p>
       </div>
       <span className="sr-only">{product.rank}위</span>

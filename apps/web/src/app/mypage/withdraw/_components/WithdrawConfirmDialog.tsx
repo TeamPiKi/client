@@ -42,7 +42,7 @@ function WithdrawConfirmDialog() {
       <DialogContent showCloseButton={false} className="space-y-5">
         <DialogHeader className="flex flex-col items-center gap-2 py-2">
           <WarningIconFill className="size-9 text-icon-neutral-secondary" aria-hidden />
-          <DialogTitle className="heading-1 text-text-neutral-primary">
+          <DialogTitle className="heading-1-bold text-text-neutral-primary">
             정말 탈퇴하시겠어요?
           </DialogTitle>
         </DialogHeader>
