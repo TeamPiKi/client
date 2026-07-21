@@ -71,7 +71,7 @@ function FriendListDialog({ open, onOpenChange, tournamentId }: FriendListDialog
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent showCloseButton={false} className="gap-4 p-5">
-        <DialogTitle className="text-center heading-1 text-text-neutral-primary">
+        <DialogTitle className="text-center heading-1-bold text-text-neutral-primary">
           친구 목록 보기
         </DialogTitle>
         <DialogDescription className="sr-only">

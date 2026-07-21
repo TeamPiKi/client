@@ -53,6 +53,7 @@ export const useNotificationSSE = (enabled: boolean) => {
   const queryClient = useQueryClient();
   const retryDelayRef = useRef(1_000);
   const abortRef = useRef<AbortController | null>(null);
+  const hasConnectedRef = useRef(false);
 
   useEffect(() => {
     if (!enabled) return;
@@ -90,6 +91,11 @@ export const useNotificationSSE = (enabled: boolean) => {
         onopen: async response => {
           if (response.ok) {
             retryDelayRef.current = 1_000;
+            if (hasConnectedRef.current) {
+              // 재연결 성공 — 끊긴 동안 놓쳤을 수 있는 변경사항을 화면 재조회로 복구
+              void queryClient.invalidateQueries();
+            }
+            hasConnectedRef.current = true;
             return;
           }
           if (response.status === 401) {

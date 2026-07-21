@@ -101,7 +101,7 @@ function PlayClient({ sourceTournamentId }: PlayClientProps) {
   return (
     <main className="flex min-h-dvh flex-col items-center justify-center gap-6 bg-bg-layer-basement px-5 pt-padding-top">
       <div className="flex flex-col items-center gap-2">
-        <p className="heading-1 text-text-neutral-primary">플레이 링크가 유효하지 않아요</p>
+        <p className="heading-1-bold text-text-neutral-primary">플레이 링크가 유효하지 않아요</p>
         <p className="text-center body-1-medium text-text-neutral-tertiary">
           만료됐거나 이미 진행한 토너먼트일 수 있어요.
           <br />

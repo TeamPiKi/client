@@ -12,10 +12,10 @@ export const buttonStyles = cva(
           'disabled:bg-gray-200 disabled:border-gray-200',
         ],
         secondary: [
-          'border-[1.2px] text-text-neutral-primary',
-          'bg-bg-layer-default border-gray-200',
-          'active:bg-gray-50 active:border-border-neutral-muted active:text-text-neutral-tertiary',
-          'disabled:bg-bg-layer-default disabled:border-border-neutral-muted disabled:text-text-neutral-tertiary',
+          'text-text-neutral-secondary',
+          'bg-bg-neutral-tertiary',
+          'active:bg-gray-50 active:text-text-neutral-primary',
+          'disabled:bg-gray-50 disabled:text-text-neutral-tertiary',
         ],
       },
       size: {

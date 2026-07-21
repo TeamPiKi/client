@@ -7,7 +7,7 @@ import {
   GroupIconFill,
   HeartIconFill,
   ReciptIconFill,
-  ThreeDotHorizontalIconFill,
+  ThreeDotVerticalIconFill,
   TrashIconFill,
 } from '@/assets/icons';
 import { QUERY_ACTION } from '@/consts/queryAction';
@@ -32,7 +32,7 @@ function MorePopover({ status, tournamentId, participantCount = 0 }: MorePopover
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isFriendListOpen, setIsFriendListOpen] = useState(false);
 
-  // 본인 외 친구가 1명 이상이면 (= participantCount >= 2) 친구 목록 보기 메뉴 노출.
+  /** 본인 외 친구가 1명 이상이면 (= participantCount >= 2) 친구 목록 보기 메뉴 노출. */
   const hasInvitedFriends = participantCount >= 2;
 
   const handleAddTournamentItem = () => {
@@ -58,11 +58,17 @@ function MorePopover({ status, tournamentId, participantCount = 0 }: MorePopover
   };
 
   return (
-    <>
+    <div
+      className="contents"
+      onClick={event => {
+        event.preventDefault();
+        event.stopPropagation();
+      }}
+    >
       <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
         <PopoverTrigger asChild>
           <button type="button" aria-label="더보기" className="cursor-pointer">
-            <ThreeDotHorizontalIconFill className="size-6 text-icon-neutral-secondary" />
+            <ThreeDotVerticalIconFill className="size-6 text-icon-neutral-secondary" />
           </button>
         </PopoverTrigger>
         <PopoverContent className="p-2" align="end" alignOffset={-24}>
@@ -133,7 +139,7 @@ function MorePopover({ status, tournamentId, participantCount = 0 }: MorePopover
         onOpenChange={setIsFriendListOpen}
         tournamentId={tournamentId}
       />
-    </>
+    </div>
   );
 }
 

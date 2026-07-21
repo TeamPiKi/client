@@ -4,7 +4,9 @@ import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 
 import { getMe } from '@/apis/getMe';
+import WishLoginRequired from '@/components/common/wish-login-required';
 import { QUERY_ACTION } from '@/consts/queryAction';
+import { ROUTES } from '@/consts/route';
 import type { ApiErrorResponseT } from '@/types/api';
 import { getLoginPath } from '@/utils/loginRedirect';
 import { getQueryClient } from '@/utils/queryClient';
@@ -24,7 +26,12 @@ async function ArchiveLayout({ children }: ArchiveLayoutProps) {
       queryKey: ['me'],
       queryFn: getMe,
     });
-    if (user.identityType !== 'MEMBER') redirect(getLoginPath(redirectPath));
+    if (user.identityType !== 'MEMBER') {
+      /** 위시 페이지는 로그인 유도 화면을 렌더 */
+      if (redirectPath?.startsWith(ROUTES.WISHLIST)) return <WishLoginRequired />;
+
+      redirect(getLoginPath(redirectPath));
+    }
   } catch (error) {
     if (!isAxiosError<ApiErrorResponseT>(error)) throw error;
 

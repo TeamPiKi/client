@@ -214,7 +214,7 @@ function MiniBracket({ stage }: { stage: TransitionStageT }) {
               key={i}
               d={path.d}
               fill="none"
-              stroke="#9DC3F9"
+              stroke="var(--color-sky-blue-200)"
               strokeWidth={MLW}
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -261,8 +261,8 @@ function MiniBracket({ stage }: { stage: TransitionStageT }) {
         >
           <div
             className={[
-              'flex size-full items-center justify-center rounded-[12px] border-2 border-white',
-              card.isBlue ? 'bg-[#ECF3FE] text-[#9DC3F9]' : 'bg-[#F4F4F6] text-[#C5C8CE]',
+              'flex size-full items-center justify-center rounded-[12px] border-[1.85px] border-white',
+              card.isBlue ? 'bg-sky-blue-50 text-sky-blue-200' : 'bg-[#F4F4F6] text-[#C5C8CE]',
             ].join(' ')}
             style={{ boxShadow: '0 0 6.662px 0 rgba(0,0,0,0.16)' }}
           >
@@ -330,7 +330,7 @@ function RoundTransitionSheet({ stage, onComplete }: RoundTransitionSheetProps) 
         style={{
           height: 540,
           borderRadius: '24px 24px 0 0',
-          background: 'linear-gradient(180deg, #ECF3FE 0%, #FFF 50%)',
+          background: 'linear-gradient(180deg, #ECF8FE 0%, #FFF 50%)',
         }}
         onClick={handleSkip}
       >
@@ -381,10 +381,7 @@ function RoundTransitionSheet({ stage, onComplete }: RoundTransitionSheetProps) 
                 style={{ transition: arcTransition }}
               />
             </svg>
-            <span
-              className="text-[20px] leading-7 font-bold tracking-[-0.6px]"
-              style={{ color: '#1F7AF9' }}
-            >
+            <span className="text-[20px] leading-7 font-bold tracking-[-0.6px] text-text-accent">
               {remaining}
             </span>
           </div>
@@ -397,12 +394,12 @@ function RoundTransitionSheet({ stage, onComplete }: RoundTransitionSheetProps) 
             <p className="text-[16px] leading-[22px] font-semibold tracking-[-0.6px]">
               {isSemi ? (
                 <>
-                  <span style={{ color: '#1F7AF9' }}>3번</span>
+                  <span className="text-text-accent">3번</span>
                   <span className="text-text-neutral-tertiary">의 선택만 남았어요.</span>
                 </>
               ) : (
                 <>
-                  <span style={{ color: '#1F7AF9' }}>최종</span>
+                  <span className="text-text-accent">최종</span>
                   <span className="text-text-neutral-tertiary"> 선택만 남았어요.</span>
                 </>
               )}

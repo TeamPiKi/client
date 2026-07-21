@@ -105,7 +105,7 @@ function InviteExpiresPicker({
       <DrawerContent>
         <div className="flex flex-col items-center gap-6">
           <div className="flex flex-col items-center gap-1">
-            <DrawerTitle className="heading-1 text-text-neutral-primary">
+            <DrawerTitle className="heading-1-bold text-text-neutral-primary">
               초대 마감 시각 변경
             </DrawerTitle>
             <DrawerDescription className="body-1-medium text-text-neutral-tertiary">
