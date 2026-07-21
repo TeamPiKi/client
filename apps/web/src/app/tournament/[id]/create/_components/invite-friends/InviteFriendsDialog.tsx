@@ -118,7 +118,7 @@ function InviteFriendsDialog({
       <DrawerContent>
         <div className="flex flex-col items-center gap-6">
           <div className="flex flex-col items-center gap-1">
-            <DrawerTitle className="heading-1 text-text-neutral-primary">친구 초대하기</DrawerTitle>
+            <DrawerTitle className="heading-1-bold text-text-neutral-primary">친구 초대하기</DrawerTitle>
             <DrawerDescription className="body-1-medium text-text-neutral-tertiary">
               초대 링크를 보내 친구와 함께 담을 수 있어요.
             </DrawerDescription>
@@ -132,7 +132,7 @@ function InviteFriendsDialog({
                 </div>
                 <div className="flex flex-col gap-0.5">
                   <p className="body-2-semibold text-text-accent">{expiresInfo.remainingLabel}</p>
-                  <p className="heading-1 text-text-neutral-primary">{expiresInfo.absoluteLabel}</p>
+                  <p className="heading-1-bold text-text-neutral-primary">{expiresInfo.absoluteLabel}</p>
                 </div>
               </div>
               <button

@@ -5,7 +5,7 @@
   font-weight: 700;
 }
 
-@utility heading-1 {
+@utility heading-1-bold {
   font-size: 20px;
   line-height: 28px;
   letter-spacing: -0.6px;

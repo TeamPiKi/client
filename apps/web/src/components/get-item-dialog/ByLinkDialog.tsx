@@ -86,7 +86,7 @@ function ByLinkDialog({ type, open, onOpenChange }: ByLinkProps) {
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent showCloseButton={false} className="flex flex-col gap-5 rounded-3xl">
-        <DialogTitle className="text-center heading-1 text-text-neutral-primary">
+        <DialogTitle className="text-center heading-1-bold text-text-neutral-primary">
           링크로 담기
         </DialogTitle>
         <DialogDescription className="sr-only">상품 URL을 입력해 담습니다.</DialogDescription>

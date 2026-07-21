@@ -72,7 +72,7 @@ function ByImageDialog({ type, open, onOpenChange }: Props) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent showCloseButton={false} className="flex flex-col gap-4 rounded-3xl">
-        <DialogTitle className="text-center heading-1 text-text-neutral-primary">
+        <DialogTitle className="text-center heading-1-bold text-text-neutral-primary">
           이미지로 담기
         </DialogTitle>
 

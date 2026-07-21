@@ -44,7 +44,7 @@ function TournamentDeleteDialog({ open, onOpenChange, tournamentId }: Tournament
           </div>
         </div>
         <DialogHeader className="mt-4 gap-1">
-          <DialogTitle className="heading-1">토너먼트를 삭제할까요?</DialogTitle>
+          <DialogTitle className="heading-1-bold">토너먼트를 삭제할까요?</DialogTitle>
           <p className="body-1-medium text-text-neutral-tertiary">
             삭제 후에는 다시 복구할 수 없어요.
           </p>

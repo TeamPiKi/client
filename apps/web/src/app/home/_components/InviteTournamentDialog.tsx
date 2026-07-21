@@ -114,7 +114,7 @@ function InviteTournamentDialog() {
           </button>
         </DialogTrigger>
         <DialogContent showCloseButton={false} className="flex flex-col gap-5 p-6">
-          <DialogTitle className="text-center heading-1 text-text-neutral-primary">
+          <DialogTitle className="text-center heading-1-bold text-text-neutral-primary">
             초대받은 토너먼트
           </DialogTitle>
           <DialogDescription className="sr-only">초대 코드를 입력해 입장합니다.</DialogDescription>

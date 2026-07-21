@@ -30,7 +30,7 @@ function AddWishHomeDialog() {
             className="pointer-events-none mx-auto h-auto w-auto"
             priority
           />
-          <span className="absolute top-[18px] left-[15px] heading-1 text-base-50">위시 담기</span>
+          <span className="absolute top-[18px] left-[15px] heading-1-bold text-base-50">위시 담기</span>
         </button>
       </DialogTrigger>
 

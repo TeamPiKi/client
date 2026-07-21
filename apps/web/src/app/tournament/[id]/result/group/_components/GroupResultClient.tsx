@@ -71,12 +71,12 @@ function GroupResultClient({ tournamentId }: GroupResultClientProps) {
           >
             <ChevronBackwardIconFill className="size-6 text-icon-neutral-secondary" />
           </button>
-          <h1 className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 heading-1 text-text-neutral-primary">
+          <h1 className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 heading-1-bold text-text-neutral-primary">
             친구 토너먼트 결과
           </h1>
         </header>
         <div className="flex flex-1 flex-col items-center justify-center gap-2 px-5">
-          <p className="heading-1 text-text-neutral-primary">아직 친구 결과가 없어요</p>
+          <p className="heading-1-bold text-text-neutral-primary">아직 친구 결과가 없어요</p>
           <p className="text-center body-1-medium text-text-neutral-tertiary">
             친구가 토너먼트를 완료하면
             <br />
@@ -102,7 +102,7 @@ function GroupResultClient({ tournamentId }: GroupResultClientProps) {
         >
           <ChevronBackwardIconFill className="size-6 text-icon-neutral-secondary" />
         </button>
-        <h1 className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 heading-1 text-text-neutral-primary">
+        <h1 className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 heading-1-bold text-text-neutral-primary">
           친구 토너먼트 결과
         </h1>
       </header>

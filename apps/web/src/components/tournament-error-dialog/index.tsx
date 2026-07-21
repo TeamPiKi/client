@@ -61,7 +61,7 @@ function TournamentErrorDialog({ type, open, onOpenChange }: Props) {
       <DialogContent showCloseButton={false} className="flex flex-col items-center gap-5">
         {CONTENT[type].icon}
         <div className="space-y-2 text-center">
-          <DialogTitle className="heading-1 break-keep text-text-neutral-primary">
+          <DialogTitle className="heading-1-bold break-keep text-text-neutral-primary">
             {CONTENT[type].title}
           </DialogTitle>
           <DialogDescription className="body-1-medium break-keep text-text-neutral-tertiary">

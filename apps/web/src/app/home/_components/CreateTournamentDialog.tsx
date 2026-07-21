@@ -55,7 +55,7 @@ function CreateTournamentDialog() {
       </DialogTrigger>
       <DialogContent showCloseButton={false} className="flex flex-col gap-5">
         <DialogDescription className="sr-only">새 토너먼트 생성 다이얼로그</DialogDescription>
-        <DialogTitle className="text-center heading-1 text-text-neutral-primary">
+        <DialogTitle className="text-center heading-1-bold text-text-neutral-primary">
           새 토너먼트
         </DialogTitle>
         <div className="flex flex-col gap-[15px]">

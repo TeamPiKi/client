@@ -22,7 +22,7 @@ const TYPOGRAPHY_ROWS: TypographyStyleRowT[] = [
   },
   {
     label: 'Heading 1',
-    utilityClass: 'heading-1',
+    utilityClass: 'heading-1-bold',
     size: '20px',
     lineHeight: '28px',
     letterSpacing: '-0.6px',
