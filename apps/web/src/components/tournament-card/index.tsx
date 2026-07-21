@@ -41,7 +41,7 @@ function TournamentCard({
   } as const;
 
   return (
-    <Link href={HREF[status]}>
+    <Link href={HREF[status]} aria-label={name}>
       <article
         className={cn(
           'flex w-full items-start gap-2.5 rounded-xl bg-base-50 py-3',
