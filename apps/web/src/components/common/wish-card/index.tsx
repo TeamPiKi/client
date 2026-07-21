@@ -12,9 +12,9 @@ type WishCardProps = {
 
 function WishCard({ name, price, imageUrl, sourcePlatform, preload = false }: WishCardProps) {
   return (
-    <div className="flex flex-col overflow-hidden bg-white">
+    <div className="flex flex-col overflow-hidden bg-bg-layer-basement">
       {/* 이미지 */}
-      <div className="relative h-[166px] self-stretch bg-white">
+      <div className="relative aspect-[201/166] w-full bg-bg-layer-basement">
         {imageUrl ? (
           <BaseImage
             src={imageUrl}

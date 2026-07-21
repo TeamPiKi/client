@@ -39,11 +39,12 @@ function WishGrid({ items, isDeleteMode = false, selectedIds, onToggleSelect }: 
               className="relative cursor-pointer text-left transition-opacity active:opacity-80"
             >
               <WishCard name={item.name} price={item.price} imageUrl={item.imageUrl} sourcePlatform={item.sourcePlatform} />
-              <span className="pointer-events-none absolute top-3 left-3 z-10 size-6">
+              <div className={`pointer-events-none absolute top-0 left-0 right-0 z-[11] aspect-[201/166] bg-black/20 transition-opacity duration-200 ${isSelected ? 'opacity-100' : 'opacity-0'}`} />
+              <span className="pointer-events-none absolute top-3 left-3 z-[12] block size-5">
                 {isSelected ? (
-                  <CheckboxSelectedIconFill className="relative size-6 text-bg-accent" />
+                  <CheckboxSelectedIconFill className="size-5 text-uac-light" />
                 ) : (
-                  <CheckboxEmptyIconFill className="relative size-6 text-black/8" />
+                  <CheckboxEmptyIconFill className="size-5 text-black/8" />
                 )}
               </span>
             </button>
