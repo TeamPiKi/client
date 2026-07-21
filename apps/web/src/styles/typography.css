@@ -12,6 +12,13 @@
   font-weight: 700;
 }
 
+@utility heading-1-semibold {
+  font-size: 20px;
+  line-height: 28px;
+  letter-spacing: -0.6px;
+  font-weight: 600;
+}
+
 @utility heading-2-semibold {
   font-size: 18px;
   line-height: 26px;

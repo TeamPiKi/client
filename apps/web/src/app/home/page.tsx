@@ -18,7 +18,7 @@ function HomePage() {
       <Spacing size={24} />
 
       {/* 메인 컨텐츠 */}
-      <main className="flex w-full flex-col gap-8">
+      <main className="flex w-full flex-1 flex-col gap-8">
         {/** 위시 추가·토너먼트 생성·토너먼트 초대 */}
         <section className="grid grid-cols-2 gap-3 py-2.5">
           <AddWishHomeDialog />
