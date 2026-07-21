@@ -38,7 +38,7 @@ function WishGrid({ items, isDeleteMode = false, selectedIds, onToggleSelect }: 
               aria-pressed={isSelected}
               className="relative cursor-pointer text-left transition-opacity active:opacity-80"
             >
-              <WishCard name={item.name} price={item.price} imageUrl={item.imageUrl} />
+              <WishCard name={item.name} price={item.price} imageUrl={item.imageUrl} sourcePlatform={item.sourcePlatform} />
               <div className={`pointer-events-none absolute top-0 left-0 right-0 z-[11] aspect-[201/166] bg-black/20 transition-opacity duration-200 ${isSelected ? 'opacity-100' : 'opacity-0'}`} />
               <span className="pointer-events-none absolute top-3 left-3 z-[12] block size-5">
                 {isSelected ? (
@@ -57,6 +57,7 @@ function WishGrid({ items, isDeleteMode = false, selectedIds, onToggleSelect }: 
               name={item.name}
               price={item.price}
               imageUrl={item.imageUrl}
+              sourcePlatform={item.sourcePlatform}
               preload={index < 4}
             />
           </Link>

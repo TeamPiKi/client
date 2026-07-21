@@ -6,10 +6,11 @@ type WishCardProps = {
   name: string;
   price: number;
   imageUrl: string | null;
+  sourcePlatform?: string | null;
   preload?: boolean;
 };
 
-function WishCard({ name, price, imageUrl, preload = false }: WishCardProps) {
+function WishCard({ name, price, imageUrl, sourcePlatform, preload = false }: WishCardProps) {
   return (
     <div className="flex flex-col overflow-hidden bg-bg-layer-basement">
       {/* 이미지 */}
@@ -41,7 +42,11 @@ function WishCard({ name, price, imageUrl, preload = false }: WishCardProps) {
           <p className="line-clamp-2 self-stretch body-2-medium text-text-neutral-primary">{name}</p>
           <p className="body-2-semibold text-text-neutral-primary">{price.toLocaleString()}원</p>
         </div>
-        {/* TODO: 커머스칩 — 백엔드에 sourceName 필드 추가 후 구현 (WishItemT.sourceName) */}
+        {sourcePlatform && (
+          <span className="flex h-5 items-center rounded-[4px] bg-gray-75 px-1.5 caption-1-regular text-text-neutral-secondary">
+            {sourcePlatform}
+          </span>
+        )}
       </div>
     </div>
   );

@@ -78,6 +78,7 @@ function ByWishContent({ tournamentId }: ByWishContentProps) {
               name={item.name}
               price={item.price}
               imageUrl={item.imageUrl}
+              sourcePlatform={item.sourcePlatform}
               isSelected={selectedIds.includes(item.id)}
               onSelect={() => handleSelect(item.id)}
             />
