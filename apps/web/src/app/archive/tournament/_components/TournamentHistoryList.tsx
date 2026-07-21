@@ -20,7 +20,7 @@ function TournamentHistoryList({ statuses }: Props) {
     );
 
   return (
-    <main className="hide-scrollbar flex flex-1 flex-col gap-3 overflow-y-auto pb-24">
+    <>
       {tournamentListData.map(tournament => (
         <TournamentCard
           key={tournament.tournamentId}
@@ -32,7 +32,7 @@ function TournamentHistoryList({ statuses }: Props) {
           participantCount={tournament.participantProfileImages.length}
         />
       ))}
-    </main>
+    </>
   );
 }
 

@@ -2,10 +2,10 @@ import Link from 'next/link';
 import { Suspense } from 'react';
 
 import { ChevronForwardIconFill } from '@/assets/icons';
+import TournamentCardSkeleton from '@/components/tournament-card/TournamentCardSkeleton';
 import { ROUTES } from '@/consts/route';
 import type { TournamentStatusT } from '@/types/tournament';
 
-import TournamentListSkeleton from './TournamentListSkeleton';
 import TournamentListClient from './client';
 
 const TOURNAMENT_LIST_STATUS: TournamentStatusT[] = ['PENDING', 'IN_PROGRESS'];
@@ -20,7 +20,15 @@ function TournamentList() {
         </Link>
       </div>
 
-      <Suspense fallback={<TournamentListSkeleton />}>
+      <Suspense
+        fallback={
+          <>
+            {Array.from({ length: 3 }).map((_, index) => (
+              <TournamentCardSkeleton key={index} />
+            ))}
+          </>
+        }
+      >
         <TournamentListClient statuses={TOURNAMENT_LIST_STATUS} />
       </Suspense>
     </section>

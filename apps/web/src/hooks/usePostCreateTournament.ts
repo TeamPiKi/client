@@ -1,11 +1,10 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 
+import { postCreateTournament } from '@/apis/postCreateTournament';
 import { ANALYTICS_EVENT } from '@/consts/analytics';
 import { ROUTES } from '@/consts/route';
 import { logAnalyticsEvent } from '@/utils/analytics';
-
-import { postCreateTournament } from '../_apis/postCreateTournament';
 
 export const usePostCreateTournament = () => {
   const router = useRouter();
