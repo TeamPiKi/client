@@ -20,7 +20,7 @@ function ConfirmStartDialog({ open, onOpenChange, onConfirm }: ConfirmStartDialo
         <ConfirmStartFace className="size-7.75" aria-hidden />
 
         <div className="flex flex-col items-center gap-1">
-          <DialogTitle className="text-center heading-1 text-text-neutral-primary">
+          <DialogTitle className="text-center heading-1-bold text-text-neutral-primary">
             토너먼트를 정말 바로 시작할까요?
           </DialogTitle>
           <DialogDescription className="text-center body-2-medium text-text-neutral-tertiary">

@@ -18,7 +18,7 @@ function EditContent({ wishId }: EditContentProps) {
       <Header
         left={<HeaderIcon name="BACK" />}
         center="위시템 정보 확인"
-        centerClassName="heading-1"
+        centerClassName="heading-1-bold"
       />
       <main>
         <ItemEditForm

@@ -33,7 +33,7 @@ function LoadingBar() {
 
       <div className="relative h-2 w-full overflow-hidden rounded bg-gray-100">
         <div
-          className="absolute inset-y-0 left-0 rounded bg-blue-500 transition-[width] duration-100 ease-linear"
+          className="absolute inset-y-0 left-0 rounded bg-bg-accent transition-[width] duration-100 ease-linear"
           style={{ width: `${progress * 100}%` }}
         />
       </div>

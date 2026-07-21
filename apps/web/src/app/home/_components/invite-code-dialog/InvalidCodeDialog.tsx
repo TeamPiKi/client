@@ -18,7 +18,7 @@ function InvalidCodeDialog({ open, onOpenChange }: InvalidCodeDialogProps) {
         <SadFace className="size-7.75" aria-hidden />
 
         <div className="flex flex-col items-center gap-1">
-          <DialogTitle className="text-center heading-1 text-text-neutral-primary">
+          <DialogTitle className="text-center heading-1-bold text-text-neutral-primary">
             코드가 유효하지 않아요
           </DialogTitle>
           <DialogDescription className="text-center body-2-medium text-text-neutral-tertiary">

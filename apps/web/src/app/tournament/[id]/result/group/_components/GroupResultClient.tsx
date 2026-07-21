@@ -10,7 +10,7 @@ import {
   ChevronDownIconFill,
   ChevronUpIconFill,
 } from '@/assets/icons/fill';
-import PikiReceiptLogo from '@/assets/images/piki-receipt-logo.svg';
+import PikiLogo from '@/assets/images/piki-logo-cart.svg';
 import ReceiptZigzag from '@/assets/images/tournament/result/receipt-zigzag.svg';
 import TrophyBadge from '@/assets/images/tournament/result/trophy-badge.svg';
 import { cn } from '@/utils/cn';
@@ -71,12 +71,12 @@ function GroupResultClient({ tournamentId }: GroupResultClientProps) {
           >
             <ChevronBackwardIconFill className="size-6 text-icon-neutral-secondary" />
           </button>
-          <h1 className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 heading-1 text-text-neutral-primary">
+          <h1 className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 heading-1-bold text-text-neutral-primary">
             친구 토너먼트 결과
           </h1>
         </header>
         <div className="flex flex-1 flex-col items-center justify-center gap-2 px-5">
-          <p className="heading-1 text-text-neutral-primary">아직 친구 결과가 없어요</p>
+          <p className="heading-1-bold text-text-neutral-primary">아직 친구 결과가 없어요</p>
           <p className="text-center body-1-medium text-text-neutral-tertiary">
             친구가 토너먼트를 완료하면
             <br />
@@ -102,16 +102,16 @@ function GroupResultClient({ tournamentId }: GroupResultClientProps) {
         >
           <ChevronBackwardIconFill className="size-6 text-icon-neutral-secondary" />
         </button>
-        <h1 className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 heading-1 text-text-neutral-primary">
+        <h1 className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 heading-1-bold text-text-neutral-primary">
           친구 토너먼트 결과
         </h1>
       </header>
 
       <div className="mx-auto mt-5 flex w-full max-w-105 flex-1 flex-col px-5">
         <div className="relative flex w-full flex-col gap-2 bg-bg-layer-default pt-6 pb-6.25 filter-[drop-shadow(0px_2px_4px_rgba(0,0,0,0.12))]">
-          {/* PIKI 로고 + 헤드라인 */}
+          {/* PiKi 로고 + 헤드라인 */}
           <div className="relative flex flex-col items-center gap-2">
-            <PikiReceiptLogo aria-label="PIKI" className="h-14 w-19.25" />
+            <PikiLogo aria-label="PiKi" className="h-14 w-19.25 shrink-0 text-gray-800" />
             <p
               className={cn(
                 kodeMono.className,

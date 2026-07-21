@@ -19,11 +19,11 @@ function TournamentGuidePopover() {
         sideOffset={25}
         className="w-[calc(100vw-2.5rem)] max-w-[440px] gap-4 p-5"
       >
-        <h2 className="heading-1">토너먼트 진행 가이드</h2>
+        <h2 className="heading-1-bold">토너먼트 진행 가이드</h2>
         <ul className="flex flex-col gap-2">
           {GUIDE_ITEMS.map(({ icon: Icon, text }) => (
             <li key={text} className="flex items-center gap-3">
-              <Icon className="size-6 shrink-0 text-blue-500" aria-hidden />
+              <Icon className="size-6 shrink-0 text-icon-accent" aria-hidden />
               <p className="body-1-medium text-text-neutral-secondary">{text}</p>
             </li>
           ))}
