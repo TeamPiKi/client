@@ -32,7 +32,7 @@ function OwnerStartedDialog({
         <FireIconFill className="size-10 text-icon-accent" aria-hidden />
 
         <div className="flex flex-col items-center gap-2">
-          <DialogTitle className="text-center heading-1 text-text-neutral-primary">
+          <DialogTitle className="text-center heading-1-bold text-text-neutral-primary">
             주최자가 토너먼트를 시작했어요!
           </DialogTitle>
           <DialogDescription className="text-center body-1-medium text-text-neutral-tertiary">

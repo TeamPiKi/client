@@ -34,7 +34,7 @@ function LogoutMenuItem() {
       <DialogContent showCloseButton={false} className="space-y-5 text-center">
         <DialogHeader className="flex flex-col items-center gap-2 py-2">
           <SadIconFill className="size-9 text-icon-neutral-secondary" />
-          <DialogTitle className="heading-1 text-text-neutral-primary">
+          <DialogTitle className="heading-1-bold text-text-neutral-primary">
             로그아웃 하시겠어요?
           </DialogTitle>
         </DialogHeader>

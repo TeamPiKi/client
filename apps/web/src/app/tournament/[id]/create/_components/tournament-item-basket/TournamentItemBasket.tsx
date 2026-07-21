@@ -47,7 +47,7 @@ function TournamentItemBasket({
     <Dialog>
       <DialogTrigger asChild>
         <button
-          className="relative flex aspect-square w-full cursor-pointer items-center justify-center overflow-hidden rounded-2xl border-[3px] border-white bg-white/1 shadow-[0_0_8px_rgba(0,0,0,0.16)] backdrop-blur-sm"
+          className="relative flex aspect-square w-full cursor-pointer items-center justify-center overflow-hidden rounded-2xl border-[1.85px] border-white bg-white/1 shadow-[0_0_8px_rgba(0,0,0,0.16)] backdrop-blur-sm"
           aria-label="위시 아이템 추가"
         >
           <AddIcon width={28} height={28} className="text-base-50" aria-hidden />

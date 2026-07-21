@@ -22,7 +22,7 @@ function Error({ error, reset }: Props) {
       <div className="flex flex-col items-center gap-4">
         <WarningIconFill className="size-20 text-icon-error" />
         <div className="flex flex-col items-center gap-2">
-          <h1 className="heading-1 text-text-neutral-secondary">오류가 발생했어요.</h1>
+          <h1 className="heading-1-bold text-text-neutral-secondary">오류가 발생했어요.</h1>
           <p className="body-1-semibold text-text-neutral-tertiary">
             일시적인 오류예요. 잠시 후 다시 시도해 주세요.
           </p>

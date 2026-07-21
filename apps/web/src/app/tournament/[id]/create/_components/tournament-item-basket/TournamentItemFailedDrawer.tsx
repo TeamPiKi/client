@@ -54,7 +54,7 @@ function TournamentItemFailedModal({
           </div>
         </div>
         <DialogHeader className="mt-4 gap-1">
-          <DialogTitle className="heading-1">상품 정보를 가져오지 못했어요</DialogTitle>
+          <DialogTitle className="heading-1-bold">상품 정보를 가져오지 못했어요</DialogTitle>
           <p className="body-1-medium text-text-neutral-tertiary">서버에서 문제가 발생했어요</p>
         </DialogHeader>
         <DialogFooter className="mt-6 flex-row gap-3">

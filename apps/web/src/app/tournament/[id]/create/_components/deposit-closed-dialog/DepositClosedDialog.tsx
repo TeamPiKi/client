@@ -36,7 +36,7 @@ function DepositClosedDialog({
         <SandTimerIconFill className="size-10 text-icon-accent" aria-hidden />
 
         <div className="flex flex-col items-center gap-2">
-          <DialogTitle className="text-center heading-1 text-text-neutral-primary">
+          <DialogTitle className="text-center heading-1-bold text-text-neutral-primary">
             담기 시간이 종료됐어요.
           </DialogTitle>
           <DialogDescription className="text-center body-1-medium text-text-neutral-tertiary">

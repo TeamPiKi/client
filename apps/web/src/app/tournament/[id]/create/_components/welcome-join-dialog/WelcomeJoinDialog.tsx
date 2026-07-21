@@ -45,7 +45,7 @@ function WelcomeJoinDialog({
                 />
               </div>
               <div className="flex flex-col items-center gap-1">
-                <DrawerTitle className="heading-1 text-text-neutral-primary">
+                <DrawerTitle className="heading-1-bold text-text-neutral-primary">
                   {nickname}
                 </DrawerTitle>
                 <DrawerDescription className="text-center body-1-medium text-text-neutral-secondary">
@@ -85,7 +85,7 @@ function WelcomeJoinDialog({
               />
             </div>
             <div className="flex flex-col items-center gap-1">
-              <DrawerTitle className="heading-1 text-text-neutral-primary">
+              <DrawerTitle className="heading-1-bold text-text-neutral-primary">
                 {nickname}님,
               </DrawerTitle>
               <DrawerDescription className="text-center body-1-medium text-text-neutral-tertiary">

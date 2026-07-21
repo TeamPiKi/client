@@ -21,7 +21,7 @@ async function MypageWithdrawPage() {
       <div className="hide-scrollbar flex w-full flex-1 flex-col items-center justify-center gap-12 overflow-y-auto pb-[98px]">
         <div className="flex w-full flex-col items-center gap-[15px]">
           <SadIconFill className="size-[74px] text-gray-100" aria-hidden />
-          <p className="text-center heading-2 text-text-neutral-secondary">
+          <p className="heading-2-semibold text-center text-text-neutral-secondary">
             {userData.nickname}님, PiKi를 떠나시나요?
           </p>
           <p className="text-center body-2-medium break-keep text-text-neutral-tertiary">

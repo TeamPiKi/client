@@ -30,7 +30,7 @@ function GetItemDialogContent({ type }: GetItemDialogContentProps) {
   return (
     <>
       <DialogContent showCloseButton={false} className="flex flex-col gap-[15px]">
-        <DialogTitle className="text-center heading-1 text-text-neutral-primary">
+        <DialogTitle className="text-center heading-1-bold text-text-neutral-primary">
           위시템 담기
         </DialogTitle>
         <DialogDescription className="sr-only">
