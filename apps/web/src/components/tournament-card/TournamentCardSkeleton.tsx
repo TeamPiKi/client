@@ -2,17 +2,26 @@ import Skeleton from '@/components/skeleton';
 
 function TournamentCardSkeleton() {
   return (
-    <article className="flex w-full flex-col gap-2 rounded-xl bg-bg-layer-default px-6 py-5">
-      <div className="flex items-start justify-between">
-        <div className="flex items-center gap-2">
-          <Skeleton className="h-6 w-[67px] rounded-lg" />
-          <Skeleton className="h-5 w-32" />
+    <article className="flex w-full items-start gap-2.5 rounded-xl bg-base-50 py-3 pr-3 pl-5">
+      {/* 이미지 썸네일 */}
+      <div className="relative h-[72px] w-[85px] shrink-0">
+        <div className="absolute top-0 left-[13px] flex size-[72px] items-center justify-center">
+          <Skeleton className="size-[63px] origin-center scale-[0.918] rotate-10 rounded-[16px] border-[3px] border-white opacity-60" />
         </div>
-        <Skeleton className="size-[22px]" />
+        <Skeleton className="absolute top-1 left-0 size-[63px] rounded-[16px] border-[3px] border-white" />
       </div>
-      <div className="flex items-end justify-between">
-        <Skeleton className="h-4 w-16" />
-        <Skeleton shape="circle" className="h-[22px] w-16" />
+
+      {/* 텍스트 영역 */}
+      <div className="flex flex-1 flex-col items-start gap-2 self-center">
+        <div className="flex items-center gap-2">
+          {/* 상태 칩 */}
+          <Skeleton className="h-[26px] w-14 rounded-lg" />
+          {/* 이름 */}
+          <Skeleton className="h-[22px] w-32" />
+        </div>
+
+        {/* 참여자 프로필 */}
+        <Skeleton shape="circle" className="size-5 border-[1.6px] border-white" />
       </div>
     </article>
   );
