@@ -60,7 +60,7 @@ function ByWishContent({ tournamentId }: ByWishContentProps) {
       <div className="px-5">
         <Header
           left={<HeaderIcon name="BACK" />}
-          center={<h1 className="heading-1 text-text-neutral-primary">내 위시에서 가져오기</h1>}
+          center={<h1 className="heading-1-bold text-text-neutral-primary">내 위시에서 가져오기</h1>}
         />
         <WishSelectHeader
           selectedCount={selectedIds.length}

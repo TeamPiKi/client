@@ -1,6 +1,6 @@
 import Link from 'next/link';
 
-import CheckboxSelectedIconFill from '@/assets/icons/fill/checkbox-selected.svg';
+import { CheckboxEmptyIconFill, CheckboxSelectedIconFill } from '@/assets/icons';
 import WishCard from '@/components/common/wish-card';
 import { ROUTES } from '@/consts/route';
 import type { WishItemT } from '@/types/wish';
@@ -40,14 +40,11 @@ function WishGrid({ items, isDeleteMode = false, selectedIds, onToggleSelect }: 
             >
               <WishCard name={item.name} price={item.price} imageUrl={item.imageUrl} />
               <div className={`pointer-events-none absolute top-0 left-0 right-0 z-[11] aspect-[201/166] bg-black/20 transition-opacity duration-200 ${isSelected ? 'opacity-100' : 'opacity-0'}`} />
-              <span className="pointer-events-none absolute top-3 left-3 z-[12] block size-5 overflow-hidden">
+              <span className="pointer-events-none absolute top-3 left-3 z-[12] block size-5">
                 {isSelected ? (
-                  <>
-                    <span className="absolute inset-0.5 bg-white" />
-                    <CheckboxSelectedIconFill className="absolute inset-0 size-5 origin-center scale-[1.334] text-uac-light" />
-                  </>
+                  <CheckboxSelectedIconFill className="size-5 text-uac-light" />
                 ) : (
-                  <span className="absolute inset-0 rounded border-[1.4px] border-white bg-black/[0.08]" />
+                  <CheckboxEmptyIconFill className="size-5 text-black/8" />
                 )}
               </span>
             </button>

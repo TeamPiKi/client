@@ -66,7 +66,7 @@ function WishContentClient() {
   return (
     <div className="flex min-h-dvh flex-col bg-bg-layer-basement">
       <div className="sticky top-0 z-20 flex flex-col gap-7 bg-bg-layer-basement px-5 pt-padding-top pb-6">
-        <h1 className="heading-1 text-text-neutral-primary">내 위시리스트</h1>
+        <h1 className="heading-1-bold text-text-neutral-primary">내 위시리스트</h1>
 
         {isDeleteMode ? (
           <div className="flex items-center justify-between">
@@ -75,12 +75,9 @@ function WishContentClient() {
               onClick={handleToggleSelectAll}
               className="flex w-[110px] cursor-pointer items-center gap-2"
             >
-              <span className="relative block size-3 overflow-hidden">
+              <span className="block size-3">
                 {isAllSelected ? (
-                  <>
-                    <span className="absolute inset-[1px] bg-white" />
-                    <CheckboxSelectedIconFill className="absolute inset-0 size-3 origin-center scale-[1.334] text-uac-light" />
-                  </>
+                  <CheckboxSelectedIconFill className="size-3 text-uac-light" />
                 ) : (
                   <span className="block size-3 rounded-[2.4px] border-[0.84px] border-gray-400" />
                 )}

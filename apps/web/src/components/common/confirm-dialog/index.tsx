@@ -44,7 +44,7 @@ function ConfirmDialog({
           <WarningIconFill width={48} height={48} className="text-red-300" aria-hidden />
         </div>
         <DialogHeader className="mt-4 gap-1">
-          <DialogTitle className="heading-1">{title}</DialogTitle>
+          <DialogTitle className="heading-1-bold">{title}</DialogTitle>
           {description && (
             <p className="body-1-medium text-text-neutral-tertiary">{description}</p>
           )}
