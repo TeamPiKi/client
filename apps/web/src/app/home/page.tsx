@@ -26,7 +26,7 @@ function HomePage() {
           <InviteTournamentDialog />
         </section>
 
-        {/* 참여 중인 토너먼트 */}
+        {/* 최근 생성한 토너먼트 */}
         <TournamentList />
       </main>
 
