@@ -214,6 +214,6 @@ html[data-app] {
  * 사용하므로 두 변수 모두 `!important` 로 덮어야 한다.
  */
 body:has([data-bottom-tab-bar]) [data-sonner-toaster][data-y-position='bottom'] {
-  --offset-bottom: 115px !important;
-  --mobile-offset-bottom: 115px !important;
+  --offset-bottom: 102px !important;
+  --mobile-offset-bottom: 102px !important;
 }
