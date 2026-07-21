@@ -1,14 +1,16 @@
 import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
 
 import { getMe } from '@/apis/getMe';
+import { BasketIconFill } from '@/assets/icons';
 import PiKiLogo from '@/assets/images/piki-logo-text.svg';
 import BottomTabBar from '@/components/bottom-tab-bar';
+import CreateTournamentDialogContent from '@/components/common/create-tournament-dialog';
+import { Dialog, DialogTrigger } from '@/components/dialog';
 import { Header, HeaderIcon } from '@/components/header';
 import Spacing from '@/components/spacing';
 import { getQueryClient } from '@/utils/queryClient';
 
 import AddWishHomeDialog from './_components/AddWishHomeDialog';
-import CreateTournamentDialog from './_components/CreateTournamentDialog';
 import InviteTournamentDialog from './_components/InviteTournamentDialog';
 import MemberOnlyToast from './_components/MemberOnlyToast';
 import TournamentList from './_components/tournament-list';
@@ -35,7 +37,21 @@ async function HomePage() {
           {/** 위시 추가·토너먼트 생성·토너먼트 초대 */}
           <section className="grid grid-cols-2 gap-3 py-2.5">
             <AddWishHomeDialog />
-            <CreateTournamentDialog />
+            <Dialog>
+              <DialogTrigger asChild>
+                <button
+                  type="button"
+                  aria-label="새 토너먼트 만들기"
+                  className="flex h-[104px] cursor-pointer flex-col rounded-2xl bg-gray-900 p-4"
+                >
+                  <span className="text-left body-1-semibold whitespace-pre-line text-base-50">
+                    {'새 토너먼트\n만들기'}
+                  </span>
+                  <BasketIconFill className="size-7.5 self-end text-white" />
+                </button>
+              </DialogTrigger>
+              <CreateTournamentDialogContent />
+            </Dialog>
             <InviteTournamentDialog />
           </section>
 
