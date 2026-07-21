@@ -44,23 +44,16 @@ function InviteTournamentDialog() {
       router.push(`/tournament/join/${data.tournamentId}?code=${enteredCode}`);
     },
     onError: error => {
-      if (isAxiosError(error)) {
-        const status = error.response?.status;
-        /** 400: 코드 불일치 */
-        if (status === 400) {
-          setOpen(false);
-          setIsInvalidDialogOpen(true);
-          return;
-        }
-
-        /** 409: 초대 코드 만료 */
-        if (status === 409) {
-          setOpen(false);
-          setIsTournamentErrorDialogOpen(true);
-          return;
-        }
-      }
       setOpen(false);
+      reset();
+
+      /** 409: 초대 코드 만료 */
+      if (isAxiosError(error) && error.response?.status === 409) {
+        setIsTournamentErrorDialogOpen(true);
+        return;
+      }
+
+      /** 그 외(400 코드 불일치 포함): 유효하지 않은 코드로 안내 */
       setIsInvalidDialogOpen(true);
     },
   });
