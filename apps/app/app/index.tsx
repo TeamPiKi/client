@@ -80,8 +80,13 @@ function Page() {
     void logAppOpenEvent();
   }, []);
 
-  // 포그라운드 복귀 시 WKHTTPCookieStore → SecureStore 동기화
-  // proxy.ts(서버)에서 토큰 갱신 시 WebBridge 호출 불가 → AppState로 커버
+  /**
+   * WKHTTPCookieStore → SecureStore 동기화
+   *
+   * - 포그라운드 복귀, 백그라운드 진입 시
+   * - proxy.ts(서버)에서 토큰 갱신 시 WebBridge 호출 불가 → AppState로 커버
+   * - (mount 시점 동기화는 useWebviewCookieSync가 담당 — 여기서 중복 실행하면 부팅 refresh와 레이스)
+   */
   useEffect(() => {
     const WEB_URL = process.env.EXPO_PUBLIC_WEB_URL ?? 'http://localhost:3000';
 
@@ -94,10 +99,8 @@ function Page() {
       }
     };
 
-    syncCookies();
-
     const subscription = AppState.addEventListener('change', async nextState => {
-      if (nextState !== 'active') return;
+      if (nextState !== 'active' && nextState !== 'background') return;
       syncCookies();
     });
 

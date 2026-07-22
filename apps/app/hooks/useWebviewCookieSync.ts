@@ -1,3 +1,4 @@
+import { getTokenExpiresIso, isFresherToken, isTokenValid } from '@piki/core';
 import CookieManager from '@react-native-cookies/cookies';
 import { useEffect, useState } from 'react';
 import { Platform } from 'react-native';
@@ -15,16 +16,29 @@ export const useWebviewCookieSync = () => {
   const [isSynced, setIsSynced] = useState(false);
 
   useEffect(() => {
+    const useWebKit = Platform.OS === 'ios';
+
     const sync = async () => {
       let accessToken = await TokenStorage.getAccessToken();
       let refreshToken = await TokenStorage.getRefreshToken();
 
-      /**
-       * 부팅 시 한 번 갱신해 SecureStore 를 최신 rotation 토큰으로 맞춘다.
-       * server proxy 의 갱신은 네이티브 SecureStore 를 못 건드려, 저장된 토큰이 죽은 채로 남아
-       * 딥링크 진입 시 갱신 실패 → 로그인 튕김이 나던 문제를 방지.
-       */
-      if (refreshToken) {
+      /** SecureStore vs 웹뷰 쿠키 중 최신 토큰 채택 */
+      const cookies = await CookieManager.get(WEB_URL, useWebKit);
+      const cookieAccessToken = cookies['access_token']?.value ?? null;
+      const cookieRefreshToken = cookies['refresh_token']?.value ?? null;
+
+      if (
+        cookieAccessToken &&
+        cookieRefreshToken &&
+        isFresherToken(cookieRefreshToken, refreshToken)
+      ) {
+        accessToken = cookieAccessToken;
+        refreshToken = cookieRefreshToken;
+        await TokenStorage.setTokens(accessToken, refreshToken);
+      }
+
+      /** access 가 아직 유효하면 refresh 생략 */
+      if (refreshToken && !isTokenValid(accessToken, 60_000)) {
         try {
           const refreshResponse = await postTokenRefresh(refreshToken);
 
@@ -36,9 +50,9 @@ export const useWebviewCookieSync = () => {
             refreshToken = refreshBody.data.refresh_token;
             await TokenStorage.setTokens(accessToken, refreshToken);
           } else if (refreshResponse.status === 401) {
-            /** 죽은 토큰(SecureStore + WebView 쿠키) 정리 —  */
+            /** 토큰 갱신 401 응답 시 만료된 토큰 정리 */
             await TokenStorage.clearTokens();
-            await CookieManager.clearAll(Platform.OS === 'ios');
+            await CookieManager.clearAll(useWebKit);
             accessToken = null;
             refreshToken = null;
           }
@@ -47,21 +61,31 @@ export const useWebviewCookieSync = () => {
         }
       }
 
-      // iOS WKWebView는 WKHTTPCookieStore를 사용하므로 useWebKit: true 필요
-      const useWebKit = Platform.OS === 'ios';
-
+      /** expires 미지정 시 세션 쿠키가 되어 앱 종료 때 증발 — 토큰 exp 를 그대로 부여 */
       if (accessToken) {
+        const expires = getTokenExpiresIso(accessToken);
         await CookieManager.set(
           WEB_URL,
-          { name: 'access_token', value: accessToken, path: '/' },
+          {
+            name: 'access_token',
+            value: accessToken,
+            path: '/',
+            ...(expires ? { expires } : {}),
+          },
           useWebKit
         );
       }
 
       if (refreshToken) {
+        const expires = getTokenExpiresIso(refreshToken);
         await CookieManager.set(
           WEB_URL,
-          { name: 'refresh_token', value: refreshToken, path: '/' },
+          {
+            name: 'refresh_token',
+            value: refreshToken,
+            path: '/',
+            ...(expires ? { expires } : {}),
+          },
           useWebKit
         );
       }
