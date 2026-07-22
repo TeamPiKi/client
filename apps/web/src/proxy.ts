@@ -1,8 +1,8 @@
+import { getTokenMaxAge, isTokenValid } from '@piki/core';
 import { type NextRequest, NextResponse } from 'next/server';
 
 import { postTokenRefreshServer } from './apis/postTokenRefresh';
 import { postGuestLoginServer } from './app/login/_apis/postGuestLogin';
-import { isTokenValid } from './utils/auth';
 import { getRouteType } from './utils/getRouteType';
 import { getLoginPath } from './utils/loginRedirect';
 import { isWebview } from './utils/webBridge';
@@ -46,8 +46,16 @@ const handleGuestLogin = async (request: NextRequest) => {
   if (isApp) {
     if (bodyAccess && bodyRefresh) {
       const cookieOptions = `Path=/; SameSite=Lax${process.env.NODE_ENV === 'production' ? '; Secure' : ''}`;
-      nextResponse.headers.append('set-cookie', `access_token=${bodyAccess}; ${cookieOptions}`);
-      nextResponse.headers.append('set-cookie', `refresh_token=${bodyRefresh}; ${cookieOptions}`);
+      const accessMaxAge = getTokenMaxAge(bodyAccess);
+      const refreshMaxAge = getTokenMaxAge(bodyRefresh);
+      nextResponse.headers.append(
+        'set-cookie',
+        `access_token=${bodyAccess}; ${cookieOptions}${accessMaxAge === null ? '' : `; Max-Age=${accessMaxAge}`}`
+      );
+      nextResponse.headers.append(
+        'set-cookie',
+        `refresh_token=${bodyRefresh}; ${cookieOptions}${refreshMaxAge === null ? '' : `; Max-Age=${refreshMaxAge}`}`
+      );
     }
   } else setCookieHeaders.forEach(cookie => nextResponse.headers.append('set-cookie', cookie));
 
@@ -143,8 +151,16 @@ const handleTokenRefresh = async (request: NextRequest) => {
     if (isApp) {
       if (bodyAccess && bodyRefresh) {
         const cookieOptions = `Path=/; SameSite=Lax${process.env.NODE_ENV === 'production' ? '; Secure' : ''}`;
-        nextResponse.headers.append('set-cookie', `access_token=${bodyAccess}; ${cookieOptions}`);
-        nextResponse.headers.append('set-cookie', `refresh_token=${bodyRefresh}; ${cookieOptions}`);
+        const accessMaxAge = getTokenMaxAge(bodyAccess);
+        const refreshMaxAge = getTokenMaxAge(bodyRefresh);
+        nextResponse.headers.append(
+          'set-cookie',
+          `access_token=${bodyAccess}; ${cookieOptions}${accessMaxAge === null ? '' : `; Max-Age=${accessMaxAge}`}`
+        );
+        nextResponse.headers.append(
+          'set-cookie',
+          `refresh_token=${bodyRefresh}; ${cookieOptions}${refreshMaxAge === null ? '' : `; Max-Age=${refreshMaxAge}`}`
+        );
       }
     } else setCookieHeaders.forEach(cookie => nextResponse.headers.append('set-cookie', cookie));
 
