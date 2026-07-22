@@ -6,16 +6,15 @@ import { redirect } from 'next/navigation';
 import { getMe } from '@/apis/getMe';
 import WishLoginRequired from '@/components/common/wish-login-required';
 import { QUERY_ACTION } from '@/consts/queryAction';
-import { ROUTES } from '@/consts/route';
 import type { ApiErrorResponseT } from '@/types/api';
 import { getLoginPath } from '@/utils/loginRedirect';
 import { getQueryClient } from '@/utils/queryClient';
 
-type ArchiveLayoutProps = {
+type WishArchiveLayoutProps = {
   children: React.ReactNode;
 };
 
-async function ArchiveLayout({ children }: ArchiveLayoutProps) {
+async function WishArchiveLayout({ children }: WishArchiveLayoutProps) {
   const headerStore = await headers();
   const redirectPath = headerStore.get('x-redirect-path');
   const queryClient = getQueryClient();
@@ -26,12 +25,8 @@ async function ArchiveLayout({ children }: ArchiveLayoutProps) {
       queryKey: ['me'],
       queryFn: getMe,
     });
-    if (user.identityType !== 'MEMBER') {
-      /** 위시 페이지는 로그인 유도 화면을 렌더 */
-      if (redirectPath?.startsWith(ROUTES.WISHLIST)) return <WishLoginRequired />;
-
-      redirect(getLoginPath(redirectPath));
-    }
+    /** 위시 페이지는 멤버가 아니면 로그인 유도 화면을 렌더 */
+    if (user.identityType !== 'MEMBER') return <WishLoginRequired />;
   } catch (error) {
     if (!isAxiosError<ApiErrorResponseT>(error)) throw error;
 
@@ -44,4 +39,4 @@ async function ArchiveLayout({ children }: ArchiveLayoutProps) {
   return <HydrationBoundary state={dehydrate(queryClient)}>{children}</HydrationBoundary>;
 }
 
-export default ArchiveLayout;
+export default WishArchiveLayout;
