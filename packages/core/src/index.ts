@@ -56,7 +56,6 @@ export type {
 export type { WebBridgeMessageT, WebReqReadyMessageT } from './types/webBridge';
 
 /** 유틸 */
-export type { JwtPayloadT } from './utils/jwt';
 export {
   decodeJwtPayload,
   getTokenExpiresIso,

@@ -1,4 +1,4 @@
-export type JwtPayloadT = {
+type JwtPayloadT = {
   iat?: number;
   exp?: number;
   role?: string;
@@ -78,7 +78,7 @@ export const getTokenExpiresIso = (token: string): string | null => {
 /**
  * 토큰 만료시간(exp)까지 남은 시간(초) 반환
  *
- * - 만료·손상 토큰은 null 반환
+ * - 손상된 토큰은 null 반환
  */
 export const getTokenMaxAge = (token: string): number | null => {
   const exp = decodeJwtPayload(token)?.exp;
