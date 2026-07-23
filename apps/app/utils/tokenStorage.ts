@@ -1,3 +1,4 @@
+import { isFresherToken } from '@piki/core';
 import * as SecureStore from 'expo-secure-store';
 import { Platform } from 'react-native';
 
@@ -11,7 +12,13 @@ const getSecureStoreOptions = (): SecureStore.SecureStoreOptions =>
   Platform.OS === 'ios' ? { accessGroup: 'group.day.no30s.piki' } : {};
 
 export const TokenStorage = {
+  /** 저장된 refresh 보다 최신일 때만 저장 */
   async setTokens(accessToken: string, refreshToken: string) {
+    const storedRefreshToken = await TokenStorage.getRefreshToken();
+
+    if (storedRefreshToken === refreshToken) return;
+    if (storedRefreshToken && !isFresherToken(refreshToken, storedRefreshToken)) return;
+
     const options = getSecureStoreOptions();
 
     await Promise.all([

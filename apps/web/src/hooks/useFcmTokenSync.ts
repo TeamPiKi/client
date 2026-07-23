@@ -1,11 +1,10 @@
 'use client';
 
-import { WEBBRIDGE_MESSAGE_TYPE } from '@piki/core';
+import { WEBBRIDGE_MESSAGE_TYPE, isTokenValid } from '@piki/core';
 import { useCallback, useEffect } from 'react';
 
 import { postFcmToken } from '@/apis/postFcmToken';
 import { useWebBridgeMessage } from '@/hooks/useWebBridgeMessage';
-import { isTokenValid } from '@/utils/auth';
 import { captureError } from '@/utils/captureError';
 import { getCookie } from '@/utils/cookie';
 import { WebBridge, isWebview as isWebviewFn } from '@/utils/webBridge';
