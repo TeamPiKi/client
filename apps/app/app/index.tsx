@@ -3,14 +3,14 @@ import {
   WEB_REQ_READY_PAYLOAD_TYPE,
   type WebBridgeMessageT,
 } from '@piki/core';
-import CookieManager from '@react-native-cookies/cookies';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { AppState, Linking, Platform, View } from 'react-native';
+import { Linking, View } from 'react-native';
 import type { WebView } from 'react-native-webview';
 import Webview from 'react-native-webview';
 import type {
   WebViewErrorEvent,
   WebViewHttpErrorEvent,
+  WebViewNavigationEvent,
 } from 'react-native-webview/lib/WebViewTypes';
 
 import SplashOverlay from '@/components/SplashOverlay';
@@ -35,11 +35,15 @@ import { WebBridge } from '@/utils/webBridge';
 function Page() {
   const webviewRef = useRef<WebView | null>(null);
   const [webviewUri, setWebviewUri] = useState(process.env.EXPO_PUBLIC_WEB_URL);
+  /** 워밍업 페이지 로드 완료 여부 */
+  const [isWarmupLoaded, setIsWarmupLoaded] = useState(false);
+  /** 실제 페이지 로드 완료 여부 */
   const [isWebViewLoaded, setIsWebViewLoaded] = useState(false);
+  /** 이동 대기 중인 딥링크 경로 */
   const [pendingWarmStartPath, setPendingWarmStartPath] = useState<string | null>(null);
 
   const { handleLogin } = useSocialLogin();
-  const { isSynced } = useWebviewCookieSync();
+  const { isSynced } = useWebviewCookieSync(isWarmupLoaded);
 
   const handleWebviewUriChange = useCallback((uri: string) => setWebviewUri(uri), []);
 
@@ -65,7 +69,7 @@ function Page() {
   }, []);
 
   useEffect(() => {
-    if (!isSynced || !isWebViewLoaded || pendingWarmStartPath === null || !webviewRef.current)
+    if (!isSynced || !isWebViewLoaded || !webviewRef.current || pendingWarmStartPath === null)
       return;
 
     WebBridge.postMessage({
@@ -78,33 +82,6 @@ function Page() {
   // 앱 진입 시 GA4(Firebase Analytics) 세션 시작.
   useEffect(() => {
     void logAppOpenEvent();
-  }, []);
-
-  /**
-   * WKHTTPCookieStore → SecureStore 동기화
-   *
-   * - 포그라운드 복귀, 백그라운드 진입 시
-   * - proxy.ts(서버)에서 토큰 갱신 시 WebBridge 호출 불가 → AppState로 커버
-   * - (mount 시점 동기화는 useWebviewCookieSync가 담당 — 여기서 중복 실행하면 부팅 refresh와 레이스)
-   */
-  useEffect(() => {
-    const WEB_URL = process.env.EXPO_PUBLIC_WEB_URL ?? 'http://localhost:3000';
-
-    const syncCookies = async () => {
-      const cookies = await CookieManager.get(WEB_URL, Platform.OS === 'ios');
-      const accessToken = cookies['access_token']?.value;
-      const refreshToken = cookies['refresh_token']?.value;
-      if (accessToken && refreshToken) {
-        await TokenStorage.setTokens(accessToken, refreshToken);
-      }
-    };
-
-    const subscription = AppState.addEventListener('change', async nextState => {
-      if (nextState !== 'active' && nextState !== 'background') return;
-      syncCookies();
-    });
-
-    return () => subscription.remove();
   }, []);
 
   const { sendShareIntent } = useShareIntent({
@@ -167,10 +144,18 @@ function Page() {
   const { isSplashOverlayVisible, onWebViewLoadEnd, onWebViewLoadError } =
     useSplashScreenController();
 
-  const handleWebViewLoadEnd = useCallback(() => {
-    onWebViewLoadEnd();
-    setIsWebViewLoaded(true);
-  }, [onWebViewLoadEnd]);
+  const handleWebViewLoadEnd = useCallback(
+    (event: WebViewNavigationEvent | WebViewErrorEvent) => {
+      if (event.nativeEvent.url === 'about:blank') {
+        setIsWarmupLoaded(true);
+        return;
+      }
+
+      onWebViewLoadEnd();
+      setIsWebViewLoaded(true);
+    },
+    [onWebViewLoadEnd]
+  );
 
   /** WebView 로드 실패(네이티브 측) 수집 + 기존 스플래시 처리 유지 */
   const handleWebViewError = useCallback(
@@ -198,23 +183,21 @@ function Page() {
 
   return (
     <View style={{ flex: 1 }}>
-      {isSynced && (
-        <Webview
-          ref={webviewRef}
-          style={{ flex: 1 }}
-          applicationNameForUserAgent={USER_AGENT}
-          source={{ uri: webviewUri }}
-          onMessage={onMessage}
-          onLoadEnd={handleWebViewLoadEnd}
-          onError={handleWebViewError}
-          onHttpError={handleWebViewHttpError}
-          allowsBackForwardNavigationGestures
-          cacheEnabled
-          webviewDebuggingEnabled={__DEV__}
-          startInLoadingState
-        />
-      )}
-      {/* 웹뷰 준비 전까지 네이티브 스플래시를 고해상도로 이어받는 오버레이 */}
+      <Webview
+        ref={webviewRef}
+        style={{ flex: 1 }}
+        applicationNameForUserAgent={USER_AGENT}
+        source={isSynced ? { uri: webviewUri } : { html: '' }}
+        onMessage={onMessage}
+        onLoadEnd={handleWebViewLoadEnd}
+        onError={handleWebViewError}
+        onHttpError={handleWebViewHttpError}
+        allowsBackForwardNavigationGestures
+        cacheEnabled
+        sharedCookiesEnabled
+        webviewDebuggingEnabled={__DEV__}
+        startInLoadingState
+      />
       {isSplashOverlayVisible && <SplashOverlay />}
     </View>
   );
