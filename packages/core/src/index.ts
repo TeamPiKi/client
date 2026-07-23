@@ -8,6 +8,7 @@ export {
 } from './consts/webBridge';
 
 /** 타입 */
+export type { AuthTokensT } from './types/auth';
 export type {
   AnalyticsEventParamT,
   AnalyticsEventParamsT,

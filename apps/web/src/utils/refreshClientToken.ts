@@ -1,4 +1,4 @@
-import { WEBBRIDGE_MESSAGE_TYPE } from '@piki/core';
+import { type AuthTokensT, WEBBRIDGE_MESSAGE_TYPE } from '@piki/core';
 import axios from 'axios';
 
 import { ENDPOINTS } from '@/consts/api';
@@ -30,10 +30,7 @@ import { WebBridge, isWebview } from './webBridge';
  */
 
 type RefreshResponseT = {
-  data: {
-    accessToken: string | null;
-    refreshToken: string | null;
-  };
+  data: AuthTokensT;
 };
 
 let inflightRefresh: Promise<void> | null = null;
