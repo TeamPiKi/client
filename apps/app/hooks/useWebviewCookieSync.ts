@@ -44,10 +44,10 @@ export const useWebviewCookieSync = () => {
 
           if (refreshResponse.ok) {
             const refreshBody = (await refreshResponse.json()) as {
-              data: { access_token: string; refresh_token: string };
+              data: { accessToken: string; refreshToken: string };
             };
-            accessToken = refreshBody.data.access_token;
-            refreshToken = refreshBody.data.refresh_token;
+            accessToken = refreshBody.data.accessToken;
+            refreshToken = refreshBody.data.refreshToken;
             await TokenStorage.setTokens(accessToken, refreshToken);
           } else if (refreshResponse.status === 401) {
             /** 토큰 갱신 401 응답 시 만료된 토큰 정리 */

@@ -5,7 +5,7 @@ import { serverApi } from './server';
 
 export const postTokenRefreshServer = async (cookies: string) => {
   const response = await serverApi.post<
-    ApiResponseT<{ access_token: string; refresh_token: string }>
+    ApiResponseT<{ accessToken: string | null; refreshToken: string | null }>
   >(ENDPOINTS.AUTH_TOKEN_REFRESH, void 0, {
     headers: {
       Cookie: cookies,

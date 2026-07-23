@@ -118,8 +118,7 @@ const handleTokenRefresh = async (request: NextRequest) => {
      * 쿠키 옵션 제거 후 key, value만 추출하여 페이지로 전달
      */
     const setCookieHeaders = response.headers['set-cookie'] ?? [];
-    /** app: 토큰이 응답 body(snake_case) 로, web: Set-Cookie 로 온다 */
-    const { access_token: bodyAccess, refresh_token: bodyRefresh } = response.data?.data ?? {};
+    const { accessToken: bodyAccess, refreshToken: bodyRefresh } = response.data?.data ?? {};
 
     if (isApp) {
       if (bodyAccess) cookieMap.set('access_token', bodyAccess);
