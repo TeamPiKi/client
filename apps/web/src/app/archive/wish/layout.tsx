@@ -7,6 +7,7 @@ import { getMe } from '@/apis/getMe';
 import WishLoginRequired from '@/components/common/wish-login-required';
 import { QUERY_ACTION } from '@/consts/queryAction';
 import type { ApiErrorResponseT } from '@/types/api';
+import type { UserT } from '@/types/user';
 import { getLoginPath } from '@/utils/loginRedirect';
 import { getQueryClient } from '@/utils/queryClient';
 
@@ -20,13 +21,12 @@ async function WishArchiveLayout({ children }: WishArchiveLayoutProps) {
   const queryClient = getQueryClient();
 
   /** MEMBER 권한 조회 - 멤버 권한 없으면 로그인 페이지로 리다이렉트 */
+  let user: UserT;
   try {
-    const user = await queryClient.fetchQuery({
+    user = await queryClient.fetchQuery({
       queryKey: ['me'],
       queryFn: getMe,
     });
-    /** 위시 페이지는 멤버가 아니면 로그인 유도 화면을 렌더 */
-    if (user.identityType !== 'MEMBER') return <WishLoginRequired />;
   } catch (error) {
     if (!isAxiosError<ApiErrorResponseT>(error)) throw error;
 
@@ -35,6 +35,9 @@ async function WishArchiveLayout({ children }: WishArchiveLayoutProps) {
 
     throw error;
   }
+
+  /** 위시 페이지는 멤버가 아니면 로그인 유도 화면을 렌더 */
+  if (user.identityType !== 'MEMBER') return <WishLoginRequired />;
 
   return <HydrationBoundary state={dehydrate(queryClient)}>{children}</HydrationBoundary>;
 }
