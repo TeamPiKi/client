@@ -207,7 +207,9 @@ export const useNotificationSSE = (enabled: boolean) => {
 
           // throw하면 fetchEventSource가 재시도 멈춤 → setTimeout으로 수동 재연결
           controller.abort();
-          setTimeout(connect, delay);
+          // 다수 클라이언트가 동시에 끊겼을 때 재연결이 한 시점에 몰리는 것 방지
+          const jitteredDelay = delay * (0.5 + Math.random() * 0.5);
+          setTimeout(connect, jitteredDelay);
           throw err;
         },
       });
