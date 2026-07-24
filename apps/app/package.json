@@ -12,7 +12,6 @@
     "lint": "expo lint"
   },
   "dependencies": {
-    "@expo/vector-icons": "^15.0.3",
     "@piki/core": "workspace:*",
     "@react-native-cookies/cookies": "^6.2.1",
     "@react-native-firebase/analytics": "^24.1.1",
@@ -21,8 +20,6 @@
     "@react-native-google-signin/google-signin": "^15.0.0",
     "@react-native-kakao/core": "^2.4.5",
     "@react-native-kakao/user": "^2.4.5",
-    "@react-navigation/bottom-tabs": "^7.4.0",
-    "@react-navigation/elements": "^2.6.3",
     "@react-navigation/native": "^7.1.8",
     "@sentry/react-native": "~7.2.0",
     "expo": "~54.0.33",
@@ -43,7 +40,6 @@
     "expo-share-intent": "^5.1.1",
     "expo-splash-screen": "~31.0.13",
     "expo-status-bar": "~3.0.9",
-    "expo-symbols": "~1.0.8",
     "expo-system-ui": "~6.0.9",
     "expo-web-browser": "~15.0.10",
     "react": "19.1.0",
