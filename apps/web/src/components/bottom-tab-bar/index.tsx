@@ -219,6 +219,8 @@ function BottomTabBar() {
 
       const targetTab = TABS[targetIndex];
       if (targetTab && targetIndex !== activeIndex) {
+        // 활성 탭에서 시작한 드래그는 프레스 프리패치를 건너뛰므로, 스냅 대상을 push 직전에 프리패치
+        router.prefetch(targetTab.href);
         // 즉시 라우팅 — persistent 탭바라 스냅 연출은 이동 후에도 이어서 재생됨
         router.push(targetTab.href);
       }
