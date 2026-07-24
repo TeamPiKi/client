@@ -7,9 +7,9 @@ import { getQueryClient } from '@/utils/queryClient';
 
 import EditForm from './_components/EditForm';
 
-async function MypageEditPage() {
+function MypageEditPage() {
   const queryClient = getQueryClient();
-  await queryClient.prefetchQuery({
+  queryClient.prefetchQuery({
     queryKey: ['me'],
     queryFn: getMe,
   });
