@@ -1,4 +1,4 @@
-export type GroupResultParticipantT = {
+type GroupResultParticipantT = {
   userId: string;
   nickname: string;
   profileImage: string;
