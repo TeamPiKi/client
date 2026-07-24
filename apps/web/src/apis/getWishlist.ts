@@ -33,6 +33,7 @@ const mapWishlist = (entries: WishlistEntryT[]): WishItemT[] =>
     name: item.name ?? '',
     price: item.currentPrice ?? 0,
     imageUrl: item.imageUrl ?? null,
+    sourcePlatform: item.sourcePlatform ?? null,
   }));
 
 export const getWishlist = async (cursor: string | null = null): Promise<WishlistPageT> => {

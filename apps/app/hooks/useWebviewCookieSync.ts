@@ -1,6 +1,7 @@
+import { getTokenExpiresIso, isFresherToken, isTokenValid } from '@piki/core';
 import CookieManager from '@react-native-cookies/cookies';
 import { useEffect, useState } from 'react';
-import { Platform } from 'react-native';
+import { AppState, Platform } from 'react-native';
 
 import { postTokenRefresh } from '@/apis/postTokenRefresh';
 import { TokenStorage } from '@/utils/tokenStorage';
@@ -8,68 +9,116 @@ import { TokenStorage } from '@/utils/tokenStorage';
 const WEB_URL = process.env.EXPO_PUBLIC_WEB_URL ?? 'http://localhost:3000';
 
 /**
- * expo-secure-store의 토큰을 WebView 쿠키 저장소에 동기화
- * WebView 첫 요청 전에 쿠키가 심어져야 RSC 프리페치가 정상 동작함
+ * SecureStore ↔ WebView 쿠키 저장소 양방향 동기화
+ *
+ * @param isWebviewReady 웹뷰 로드 완료 여부
+ *
+ * - 부팅 시(isWebviewReady): SecureStore → 웹뷰 쿠키 (웹뷰 첫 요청 전에 심어야 RSC 프리페치 정상 동작)
+ * - 포그라운드 복귀, 백그라운드 진입 시: 웹뷰 쿠키 → SecureStore (웹/proxy 가 갱신한 토큰 회수)
  */
-export const useWebviewCookieSync = () => {
+export const useWebviewCookieSync = (isWebviewReady: boolean) => {
   const [isSynced, setIsSynced] = useState(false);
 
+  /** SecureStore → 웹뷰 쿠키 동기화 */
   useEffect(() => {
+    /**
+     * NOTE: iOS 웹뷰 쿠키 저장소(WKHTTPCookieStore)는 WKWebView 인스턴스가 최소 하나 살아있어야 제대로 동작함.
+     * 인스턴스 없이 싱크를 시도하면 토큰 유실되므로, 웹뷰 로드 완료 후(isWebviewReady)에만 동기화 시도
+     */
+    if (!isWebviewReady) return;
+
+    const useWebKit = Platform.OS === 'ios';
+
     const sync = async () => {
       let accessToken = await TokenStorage.getAccessToken();
       let refreshToken = await TokenStorage.getRefreshToken();
 
-      /**
-       * 부팅 시 한 번 갱신해 SecureStore 를 최신 rotation 토큰으로 맞춘다.
-       * server proxy 의 갱신은 네이티브 SecureStore 를 못 건드려, 저장된 토큰이 죽은 채로 남아
-       * 딥링크 진입 시 갱신 실패 → 로그인 튕김이 나던 문제를 방지.
-       */
-      if (refreshToken) {
+      /** SecureStore vs 웹뷰 쿠키 중 최신 토큰 채택 */
+      const cookies = await CookieManager.get(WEB_URL, useWebKit);
+      const cookieAccessToken = cookies['access_token']?.value ?? null;
+      const cookieRefreshToken = cookies['refresh_token']?.value ?? null;
+
+      if (
+        cookieAccessToken &&
+        cookieRefreshToken &&
+        isFresherToken(cookieRefreshToken, refreshToken)
+      ) {
+        accessToken = cookieAccessToken;
+        refreshToken = cookieRefreshToken;
+        await TokenStorage.setTokens(accessToken, refreshToken);
+      }
+
+      /** access 가 아직 유효하면 refresh 생략 */
+      if (refreshToken && !isTokenValid(accessToken, 60_000)) {
         try {
           const refreshResponse = await postTokenRefresh(refreshToken);
 
           if (refreshResponse.ok) {
             const refreshBody = (await refreshResponse.json()) as {
-              data: { access_token: string; refresh_token: string };
+              data: { accessToken: string; refreshToken: string };
             };
-            accessToken = refreshBody.data.access_token;
-            refreshToken = refreshBody.data.refresh_token;
+            accessToken = refreshBody.data.accessToken;
+            refreshToken = refreshBody.data.refreshToken;
             await TokenStorage.setTokens(accessToken, refreshToken);
           } else if (refreshResponse.status === 401) {
-            /** 죽은 토큰(SecureStore + WebView 쿠키) 정리 —  */
+            /** 토큰 갱신 401 응답 시 만료된 토큰 정리 */
             await TokenStorage.clearTokens();
-            await CookieManager.clearAll(Platform.OS === 'ios');
+            await CookieManager.clearAll(useWebKit);
+            if (useWebKit) await CookieManager.clearAll(false);
             accessToken = null;
             refreshToken = null;
           }
         } catch {
-          /** 네트워크 등 일시적 실패 → 기존 토큰 유지 (로그아웃되지 않도록) */
+          /** 네트워크 등 일시적 실패 → 기존 토큰 유지 */
         }
       }
 
-      // iOS WKWebView는 WKHTTPCookieStore를 사용하므로 useWebKit: true 필요
-      const useWebKit = Platform.OS === 'ios';
+      const setAuthCookie = async (name: string, value: string) => {
+        /** expires 미지정 시 세션 쿠키가 되어 앱 종료 때 증발 — 토큰 exp 를 그대로 부여 */
+        const expires = getTokenExpiresIso(value);
+        const cookie = { name, value, path: '/', ...(expires ? { expires } : {}) };
 
-      if (accessToken) {
-        await CookieManager.set(
-          WEB_URL,
-          { name: 'access_token', value: accessToken, path: '/' },
-          useWebKit
-        );
-      }
+        await CookieManager.set(WEB_URL, cookie, useWebKit);
+        if (useWebKit) await CookieManager.set(WEB_URL, cookie, false);
+      };
 
-      if (refreshToken) {
-        await CookieManager.set(
-          WEB_URL,
-          { name: 'refresh_token', value: refreshToken, path: '/' },
-          useWebKit
-        );
-      }
-
-      setIsSynced(true);
+      /** 앱 진입 시 유효한 최신 토큰을 웹뷰 쿠키에 주입 */
+      if (accessToken) await setAuthCookie('access_token', accessToken);
+      if (refreshToken) await setAuthCookie('refresh_token', refreshToken);
     };
 
-    sync();
+    sync()
+      .catch(error => {
+        if (__DEV__) console.warn('[COOKIE_SYNC] 동기화 실패:', String(error));
+      })
+      /** 싱크 실패하더라도 스플래시가 무한으로 뜨는 현상을 방지 */
+      .finally(() => setIsSynced(true));
+  }, [isWebviewReady]);
+
+  /**
+   * 웹뷰 쿠키 → SecureStore 동기화
+   *
+   * - 포그라운드 복귀·백그라운드 진입 시
+   * - 단, proxy에서 토큰 갱신 시 WebBridge 호출 불가 → AppState로 커버
+   */
+  useEffect(() => {
+    const useWebKit = Platform.OS === 'ios';
+
+    const syncCookiesToStore = async () => {
+      const cookies = await CookieManager.get(WEB_URL, useWebKit);
+      const accessToken = cookies['access_token']?.value;
+      const refreshToken = cookies['refresh_token']?.value;
+      if (accessToken && refreshToken) {
+        await TokenStorage.setTokens(accessToken, refreshToken);
+      }
+    };
+
+    const subscription = AppState.addEventListener('change', nextState => {
+      if (nextState !== 'active' && nextState !== 'background') return;
+      syncCookiesToStore();
+    });
+
+    return () => subscription.remove();
   }, []);
 
   return { isSynced };

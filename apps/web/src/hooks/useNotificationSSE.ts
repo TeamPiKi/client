@@ -53,6 +53,7 @@ export const useNotificationSSE = (enabled: boolean) => {
   const queryClient = useQueryClient();
   const retryDelayRef = useRef(1_000);
   const abortRef = useRef<AbortController | null>(null);
+  const hasConnectedRef = useRef(false);
 
   useEffect(() => {
     if (!enabled) return;
@@ -90,6 +91,11 @@ export const useNotificationSSE = (enabled: boolean) => {
         onopen: async response => {
           if (response.ok) {
             retryDelayRef.current = 1_000;
+            if (hasConnectedRef.current) {
+              // 재연결 성공 — 끊긴 동안 놓쳤을 수 있는 변경사항을 화면 재조회로 복구
+              void queryClient.invalidateQueries();
+            }
+            hasConnectedRef.current = true;
             return;
           }
           if (response.status === 401) {
@@ -201,7 +207,9 @@ export const useNotificationSSE = (enabled: boolean) => {
 
           // throw하면 fetchEventSource가 재시도 멈춤 → setTimeout으로 수동 재연결
           controller.abort();
-          setTimeout(connect, delay);
+          // 다수 클라이언트가 동시에 끊겼을 때 재연결이 한 시점에 몰리는 것 방지
+          const jitteredDelay = delay * (0.5 + Math.random() * 0.5);
+          setTimeout(connect, jitteredDelay);
           throw err;
         },
       });

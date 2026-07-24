@@ -25,7 +25,7 @@ function TournamentClient({ tournamentId, tournamentName, inProgress }: Tourname
   } = useTournament({ tournamentId, tournamentName, inProgress });
 
   const backgroundClassName = isFinalRound
-    ? 'bg-gradient-to-b from-[#ECF3FE] via-[#F3F7FE] to-white'
+    ? 'bg-gradient-to-b from-sky-blue-50 via-[#F5FCFF] to-white'
     : 'bg-bg-layer-basement';
 
   return (

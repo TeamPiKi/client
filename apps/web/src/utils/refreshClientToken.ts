@@ -1,4 +1,4 @@
-import { WEBBRIDGE_MESSAGE_TYPE } from '@piki/core';
+import { type AuthTokensT, WEBBRIDGE_MESSAGE_TYPE } from '@piki/core';
 import axios from 'axios';
 
 import { ENDPOINTS } from '@/consts/api';
@@ -30,10 +30,7 @@ import { WebBridge, isWebview } from './webBridge';
  */
 
 type RefreshResponseT = {
-  data: {
-    access_token: string | null;
-    refresh_token: string | null;
-  };
+  data: AuthTokensT;
 };
 
 let inflightRefresh: Promise<void> | null = null;
@@ -47,9 +44,8 @@ const performRefresh = async (): Promise<void> => {
     },
   });
 
-  // 웹뷰는 백엔드 Set-Cookie 가 그대로 안 박히는 케이스가 있어 응답 body 의 토큰을 직접 저장.
   if (isWebview()) {
-    const { access_token: newAccessToken, refresh_token: newRefreshToken } = data.data;
+    const { accessToken: newAccessToken, refreshToken: newRefreshToken } = data.data;
     if (newAccessToken && newRefreshToken) {
       setCookie('access_token', newAccessToken, { hours: 1 });
       setCookie('refresh_token', newRefreshToken, { days: 14 });

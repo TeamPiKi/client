@@ -6,14 +6,15 @@ type WishCardProps = {
   name: string;
   price: number;
   imageUrl: string | null;
+  sourcePlatform?: string | null;
   preload?: boolean;
 };
 
-function WishCard({ name, price, imageUrl, preload = false }: WishCardProps) {
+function WishCard({ name, price, imageUrl, sourcePlatform, preload = false }: WishCardProps) {
   return (
-    <div className="flex aspect-[0.765] flex-col overflow-hidden rounded-2xl bg-white">
+    <div className="flex flex-col overflow-hidden bg-bg-layer-basement">
       {/* 이미지 */}
-      <div className="relative flex flex-1 items-center justify-center self-stretch bg-white">
+      <div className="relative aspect-[201/166] w-full bg-bg-layer-basement">
         {imageUrl ? (
           <BaseImage
             src={imageUrl}
@@ -35,10 +36,17 @@ function WishCard({ name, price, imageUrl, preload = false }: WishCardProps) {
         )}
       </div>
 
-      {/* 상품명 + 가격 */}
-      <div className="flex flex-col items-center justify-center gap-2 self-stretch px-3 py-3">
-        <p className="line-clamp-1 self-stretch text-center body-1-medium text-gray-600">{name}</p>
-        <p className="heading-2 text-gray-950">{price.toLocaleString()}원</p>
+      {/* 상품명 + 가격 + 커머스칩 */}
+      <div className="flex h-[124px] flex-col items-start gap-2.5 self-stretch p-4">
+        <div className="flex flex-col gap-1 self-stretch">
+          <p className="line-clamp-2 self-stretch body-2-medium text-text-neutral-primary">{name}</p>
+          <p className="body-2-semibold text-text-neutral-primary">{price.toLocaleString()}원</p>
+        </div>
+        {sourcePlatform && (
+          <span className="flex h-5 items-center rounded-[4px] bg-gray-75 px-1.5 caption-1-regular text-text-neutral-secondary">
+            {sourcePlatform}
+          </span>
+        )}
       </div>
     </div>
   );

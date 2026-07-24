@@ -116,7 +116,7 @@ function InviteClient({ tournamentId, inviteCode }: InviteClientProps) {
     <>
       <main className="flex min-h-dvh flex-col items-center justify-center gap-6 bg-bg-layer-basement px-5 pt-padding-top">
         <div className="flex flex-col items-center gap-2">
-          <p className="heading-1 text-text-neutral-primary">초대 링크가 유효하지 않아요</p>
+          <p className="heading-1-bold text-text-neutral-primary">초대 링크가 유효하지 않아요</p>
           <p className="text-center body-1-medium text-text-neutral-tertiary">
             만료됐거나 잘못된 링크일 수 있어요.
             <br />

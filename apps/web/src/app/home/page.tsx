@@ -1,48 +1,70 @@
-import PikiLogo from '@/assets/images/piki-logo.svg';
+import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
+
+import { getMe } from '@/apis/getMe';
+import { BasketIconFill } from '@/assets/icons';
+import PiKiLogo from '@/assets/images/piki-logo-text.svg';
 import BottomTabBar from '@/components/bottom-tab-bar';
+import CreateTournamentDialogContent from '@/components/common/create-tournament-dialog';
+import { Dialog, DialogTrigger } from '@/components/dialog';
 import { Header, HeaderIcon } from '@/components/header';
+import Spacing from '@/components/spacing';
+import { getQueryClient } from '@/utils/queryClient';
 
 import AddWishHomeDialog from './_components/AddWishHomeDialog';
-import CreateTournamentDialog from './_components/CreateTournamentDialog';
-import InviteTournamentButton from './_components/InviteTournamentButton';
+import InviteTournamentDialog from './_components/InviteTournamentDialog';
 import MemberOnlyToast from './_components/MemberOnlyToast';
 import TournamentList from './_components/tournament-list';
 
-function HomePage() {
+async function HomePage() {
+  const queryClient = getQueryClient();
+
+  /** 위시 담기 게스트 분기를 위해 유저 정보 프리페치 (AddWishHomeDialog가 useGetMe로 소비) */
+  await queryClient.prefetchQuery({
+    queryKey: ['me'],
+    queryFn: getMe,
+  });
+
   return (
-    <div className="relative flex min-h-dvh flex-col bg-gray-50 px-5 pt-padding-top pb-32">
-      {/* 상단 헤더 */}
-      <Header right={<HeaderIcon name="ALARM" />} />
-      {/* 메인 컨텐츠 */}
-      <main className="mt-[54px] flex w-full flex-col gap-12">
-        {/* 로고 + CTA 영역 */}
-        <section className="flex flex-col items-center gap-12">
-          {/* PIKI 로고 */}
-          <PikiLogo aria-label="PIKI" />
-          <h1 className="sr-only">PIKI</h1>
+    <HydrationBoundary state={dehydrate(queryClient)}>
+      <div className="to-bg-base-50 relative flex min-h-dvh flex-col bg-linear-to-b from-bg-layer-default px-5 pt-padding-top pb-32">
+        {/* 상단 헤더 */}
+        <Header left={<PiKiLogo />} right={<HeaderIcon name="ALARM" />} />
 
-          {/* CTA 카드 + 초대 입장 */}
-          <div className="flex w-full flex-col gap-3">
-            {/* 위시 담기 / 토너먼트 만들기 2분할 */}
-            <div className="flex w-full gap-3">
-              <AddWishHomeDialog />
-              <CreateTournamentDialog />
-            </div>
+        <Spacing size={24} />
 
-            {/* 초대 토너먼트 입장 */}
-            <InviteTournamentButton />
-          </div>
-        </section>
+        {/* 메인 컨텐츠 */}
+        <main className="flex w-full flex-1 flex-col gap-8">
+          {/** 위시 추가·토너먼트 생성·토너먼트 초대 */}
+          <section className="grid grid-cols-2 gap-3 py-2.5">
+            <AddWishHomeDialog />
+            <Dialog>
+              <DialogTrigger asChild>
+                <button
+                  type="button"
+                  aria-label="새 토너먼트 만들기"
+                  className="flex h-[104px] cursor-pointer flex-col rounded-2xl bg-gray-900 p-4"
+                >
+                  <span className="text-left body-1-semibold whitespace-pre-line text-base-50">
+                    {'새 토너먼트\n만들기'}
+                  </span>
+                  <BasketIconFill className="size-7.5 self-end text-white" />
+                </button>
+              </DialogTrigger>
+              <CreateTournamentDialogContent />
+            </Dialog>
+            <InviteTournamentDialog />
+          </section>
 
-        {/* 진행 중인 토너먼트 */}
-        <TournamentList />
-      </main>
+          {/* 최근 생성한 토너먼트 */}
+          <TournamentList />
+        </main>
 
-      {/* 하단 네비게이션 */}
-      <BottomTabBar />
+        {/* 하단 네비게이션 */}
+        <BottomTabBar />
 
-      <MemberOnlyToast />
-    </div>
+        <MemberOnlyToast />
+      </div>
+    </HydrationBoundary>
   );
 }
 

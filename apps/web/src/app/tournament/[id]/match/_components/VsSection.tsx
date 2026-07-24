@@ -38,8 +38,6 @@ function VsSection({ left, right, isFinal = false, onSelect }: VsSectionProps) {
 
   const CardComponent = isFinal ? FinalProductCard : ProductCard;
 
-  const vsBadgeColor = isFinal ? 'bg-[#1F7AF9]' : 'bg-gray-800';
-
   return (
     <div className="w-full">
       {/* 헹거 영역 — 결승에선 제거 */}
@@ -121,7 +119,7 @@ function VsSection({ left, right, isFinal = false, onSelect }: VsSectionProps) {
 
         {/* VS 뱃지 */}
         <div
-          className={`absolute left-1/2 z-10 flex size-8 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full ${vsBadgeColor} text-[12.026px] leading-[17.18px] font-semibold tracking-[-0.515px] text-white ${transition}`}
+          className={`absolute left-1/2 z-10 flex size-8 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-bg-neutral-secondary text-[12.026px] leading-[17.18px] font-semibold tracking-[-0.515px] text-white ${transition}`}
           style={{
             top: isFinal ? IMAGE_HEIGHT / 2 : HOOK_HEIGHT + IMAGE_HEIGHT,
             filter: selectedSide ? 'blur(2px)' : 'none',

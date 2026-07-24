@@ -1,20 +1,19 @@
 'use client';
 
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 
-import ReceiptIcon from '@/assets/images/tournament/result/receipt-icon.svg';
-import SmileIcon from '@/assets/images/tournament/result/smile-icon.svg';
+import { ChevronForwardIconFill, DownloadIconFill, UploadIconFill } from '@/assets/icons';
 import BottomCta from '@/components/bottom-cta';
 import Button from '@/components/button';
-import { Header, HeaderIcon } from '@/components/header';
+import { Header } from '@/components/header';
 import { ANALYTICS_EVENT } from '@/consts/analytics';
 import { QUERY_ACTION } from '@/consts/queryAction';
 import { ROUTES } from '@/consts/route';
 import { useQueryAction } from '@/hooks/useQueryAction';
 import { logAnalyticsEvent } from '@/utils/analytics';
-import { cn } from '@/utils/cn';
 
 import { useGetTournament } from '../../_common/_hooks/useGetTournament';
 import { shareReceiptImage } from '../_utils/shareReceiptImage';
@@ -104,48 +103,29 @@ function ResultClient({ tournamentId }: ResultClientProps) {
   // 플레이 링크 공유는 ROOT 의 소유자만 가능 — CLONE 소유자(친구 초대 → CLONE 생성한 사람) 제외
   const canSharePlayLink = tournamentData.isRoot && tournamentData.isOwner;
 
-  const handleGoHome = () => {
-    router.push(ROUTES.HOME);
-  };
-
   const handleSharePlayLink = () => {
     setIsShareDialogOpen(true);
   };
 
   return (
-    <main className="flex min-h-dvh flex-col overflow-x-hidden bg-bg-layer-basement pt-padding-top pb-30">
-      <Header center="토너먼트 결과" centerClassName="title-1" left={<HeaderIcon name="BACK" />} />
+    <main className="flex min-h-dvh flex-col overflow-x-hidden bg-bg-layer-basement pt-padding-top pb-40">
+      <Header center="토너먼트 결과" centerClassName="heading-1-bold" />
 
-      <div className="mx-auto mt-3 flex min-h-0 w-full max-w-120 flex-1 flex-col gap-3">
+      <div className="mx-auto mt-4 flex min-h-0 w-full max-w-120 flex-1 flex-col gap-3">
         <ReceiptDrawMachine
           ref={receiptMachineRef}
+          tournamentId={tournamentId}
           tournamentName={tournamentName}
           result={result}
           date={date}
         />
-
-        {/* 영수증 밖 공유 버튼 — 이미지 공유 (모든 사용자) + 토너먼트 플레이 체험 (ROOT 소유자만) */}
-        <div className={cn('mx-5 flex gap-3', !canSharePlayLink && 'justify-center')}>
-          <ShareButton
-            icon={<ReceiptIcon aria-hidden className="size-5" />}
-            label={isCapturing ? '이미지 만드는 중...' : '영수증 이미지 공유'}
-            onClick={handleShareReceiptImage}
-            disabled={isCapturing}
-          />
-          {canSharePlayLink && (
-            <ShareButton
-              icon={<SmileIcon aria-hidden className="size-4.25" />}
-              label="토너먼트 플레이 체험"
-              onClick={handleSharePlayLink}
-            />
-          )}
-        </div>
 
         {/*
           친구 토너먼트 결과보기 카드 노출 + 라우팅.
           - ROOT 사용자(주최자 / 친구 초대 멤버) 에게만 노출. 본인 id 가 그대로 group-result 대상이다.
           - CLONE 사용자(플레이 링크 게스트) 는 ROOT 토너먼트의 친구 일원이 아니라 결과 카드가 의미 없으므로 숨긴다.
           - 친구 유무는 클릭 시 group-result API 응답으로 판단한다 (캐시 의존 X).
+          - 앱 화면이 낮게 크롭될 때도 CTA 는 항상 고정돼야 해서 스크롤 영역에 둔다.
         */}
         {tournamentData.isRoot && (
           <div className="mx-5">
@@ -154,11 +134,42 @@ function ResultClient({ tournamentId }: ResultClientProps) {
         )}
       </div>
 
-      {/* 하단 버튼 — 시안상 단일 CTA */}
-      <BottomCta hasGradient>
-        <Button variant="primary" size="lg" onClick={handleGoHome}>
+      {/* 하단 CTA — 저장/공유 버튼 → 홈으로 가기 순 위계, 항상 화면 하단 고정 */}
+      <BottomCta hasGradient className="flex-col items-stretch gap-6.5 pb-[30px]">
+        {/* 영수증 저장 (모든 사용자) + 토너먼트 공유 (ROOT 소유자만, 플레이 링크 공유) */}
+        <div className="flex gap-3">
+          <Button
+            variant="secondary"
+            size="lg"
+            icon="leading"
+            leadingIcon={<DownloadIconFill aria-hidden className="size-5" />}
+            onClick={handleShareReceiptImage}
+            disabled={isCapturing}
+            className="flex-1 border-gray-75 bg-gray-75 text-text-neutral-secondary"
+          >
+            {isCapturing ? '이미지 만드는 중...' : '영수증 저장'}
+          </Button>
+          {canSharePlayLink && (
+            <Button
+              variant="primary"
+              size="lg"
+              icon="leading"
+              leadingIcon={<UploadIconFill aria-hidden className="size-5" />}
+              onClick={handleSharePlayLink}
+              className="flex-1"
+            >
+              토너먼트 공유
+            </Button>
+          )}
+        </div>
+
+        <Link
+          href={ROUTES.HOME}
+          className="flex items-center justify-center gap-0.5 body-1-medium text-text-neutral-secondary"
+        >
           홈으로 가기
-        </Button>
+          <ChevronForwardIconFill aria-hidden className="size-4" />
+        </Link>
       </BottomCta>
 
       <PlateShareDialog
@@ -168,27 +179,6 @@ function ResultClient({ tournamentId }: ResultClientProps) {
         initialPlayLinkExpiresAt={tournamentData.completed.playLinkExpiresAt}
       />
     </main>
-  );
-}
-
-type ShareButtonProps = {
-  icon: React.ReactNode;
-  label: string;
-  onClick: () => void;
-  disabled?: boolean;
-};
-
-function ShareButton({ icon, label, onClick, disabled = false }: ShareButtonProps) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      disabled={disabled}
-      className="flex h-13 flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-xl bg-bg-layer-default body-2-semibold text-text-neutral-primary disabled:cursor-default disabled:opacity-60"
-    >
-      {icon}
-      {label}
-    </button>
   );
 }
 

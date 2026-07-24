@@ -20,7 +20,7 @@ function TournamentItemBasketStatus({ isProcessing, count }: TournamentItemBaske
       <span
         className={cn(
           'inline-flex h-10 items-center rounded-3xl border px-3 body-2-regular',
-          isBlue && 'border-blue-100 bg-blue-50 text-text-accent',
+          isBlue && 'border-sky-blue-100 bg-sky-blue-50 text-text-accent',
           !isBlue && 'border-gray-100 bg-gray-75 text-gray-600'
         )}
       >

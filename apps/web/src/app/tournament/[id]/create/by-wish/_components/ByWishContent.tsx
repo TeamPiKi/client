@@ -5,6 +5,7 @@ import { toast } from 'sonner';
 
 import BottomCta from '@/components/bottom-cta';
 import Button from '@/components/button';
+import { Header, HeaderIcon } from '@/components/header';
 import { useGetWishlist } from '@/hooks/useGetWishlist';
 
 import { useGetTournament } from '../../../_common/_hooks/useGetTournament';
@@ -55,22 +56,29 @@ function ByWishContent({ tournamentId }: ByWishContentProps) {
   };
 
   return (
-    <div className="flex h-full flex-col bg-bg-layer-basement px-5 pt-padding-top">
-      <WishSelectHeader
-        selectedCount={selectedIds.length}
-        totalCount={items.length}
-        tournamentCandidateCount={pending?.items.length ?? 0}
-        isMaxExceeded={isMaxExceeded}
-      />
+    <div className="flex h-full flex-col bg-bg-layer-basement pt-padding-top">
+      <div className="px-5">
+        <Header
+          left={<HeaderIcon name="BACK" />}
+          center={<h1 className="heading-1-bold text-text-neutral-primary">내 위시에서 가져오기</h1>}
+        />
+        <WishSelectHeader
+          selectedCount={selectedIds.length}
+          totalCount={items.length}
+          tournamentCandidateCount={pending?.items.length ?? 0}
+          isMaxExceeded={isMaxExceeded}
+        />
+      </div>
 
-      <main className="mt-4 hide-scrollbar flex flex-1 flex-col overflow-y-auto pb-32">
-        <div className="grid grid-cols-2 gap-x-2 gap-y-3">
+      <main className="mt-6 hide-scrollbar flex flex-1 flex-col overflow-y-auto pb-32">
+        <div className="grid grid-cols-2">
           {items.map(item => (
             <WishSelectCard
               key={item.id}
               name={item.name}
               price={item.price}
               imageUrl={item.imageUrl}
+              sourcePlatform={item.sourcePlatform}
               isSelected={selectedIds.includes(item.id)}
               onSelect={() => handleSelect(item.id)}
             />
@@ -79,9 +87,6 @@ function ByWishContent({ tournamentId }: ByWishContentProps) {
       </main>
 
       <BottomCta hasGradient>
-        <Button variant="secondary" size="lg" onClick={() => history.back()}>
-          뒤로
-        </Button>
         <Button
           variant="primary"
           size="lg"

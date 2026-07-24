@@ -1,8 +1,8 @@
+import { getTokenMaxAge, isTokenValid } from '@piki/core';
 import { type NextRequest, NextResponse } from 'next/server';
 
 import { postTokenRefreshServer } from './apis/postTokenRefresh';
 import { postGuestLoginServer } from './app/login/_apis/postGuestLogin';
-import { isTokenValid } from './utils/auth';
 import { getRouteType } from './utils/getRouteType';
 import { getLoginPath } from './utils/loginRedirect';
 import { isWebview } from './utils/webBridge';
@@ -46,8 +46,16 @@ const handleGuestLogin = async (request: NextRequest) => {
   if (isApp) {
     if (bodyAccess && bodyRefresh) {
       const cookieOptions = `Path=/; SameSite=Lax${process.env.NODE_ENV === 'production' ? '; Secure' : ''}`;
-      nextResponse.headers.append('set-cookie', `access_token=${bodyAccess}; ${cookieOptions}`);
-      nextResponse.headers.append('set-cookie', `refresh_token=${bodyRefresh}; ${cookieOptions}`);
+      const accessMaxAge = getTokenMaxAge(bodyAccess);
+      const refreshMaxAge = getTokenMaxAge(bodyRefresh);
+      nextResponse.headers.append(
+        'set-cookie',
+        `access_token=${bodyAccess}; ${cookieOptions}${accessMaxAge === null ? '' : `; Max-Age=${accessMaxAge}`}`
+      );
+      nextResponse.headers.append(
+        'set-cookie',
+        `refresh_token=${bodyRefresh}; ${cookieOptions}${refreshMaxAge === null ? '' : `; Max-Age=${refreshMaxAge}`}`
+      );
     }
   } else setCookieHeaders.forEach(cookie => nextResponse.headers.append('set-cookie', cookie));
 
@@ -110,8 +118,7 @@ const handleTokenRefresh = async (request: NextRequest) => {
      * 쿠키 옵션 제거 후 key, value만 추출하여 페이지로 전달
      */
     const setCookieHeaders = response.headers['set-cookie'] ?? [];
-    /** app: 토큰이 응답 body(snake_case) 로, web: Set-Cookie 로 온다 */
-    const { access_token: bodyAccess, refresh_token: bodyRefresh } = response.data?.data ?? {};
+    const { accessToken: bodyAccess, refreshToken: bodyRefresh } = response.data?.data ?? {};
 
     if (isApp) {
       if (bodyAccess) cookieMap.set('access_token', bodyAccess);
@@ -143,8 +150,16 @@ const handleTokenRefresh = async (request: NextRequest) => {
     if (isApp) {
       if (bodyAccess && bodyRefresh) {
         const cookieOptions = `Path=/; SameSite=Lax${process.env.NODE_ENV === 'production' ? '; Secure' : ''}`;
-        nextResponse.headers.append('set-cookie', `access_token=${bodyAccess}; ${cookieOptions}`);
-        nextResponse.headers.append('set-cookie', `refresh_token=${bodyRefresh}; ${cookieOptions}`);
+        const accessMaxAge = getTokenMaxAge(bodyAccess);
+        const refreshMaxAge = getTokenMaxAge(bodyRefresh);
+        nextResponse.headers.append(
+          'set-cookie',
+          `access_token=${bodyAccess}; ${cookieOptions}${accessMaxAge === null ? '' : `; Max-Age=${accessMaxAge}`}`
+        );
+        nextResponse.headers.append(
+          'set-cookie',
+          `refresh_token=${bodyRefresh}; ${cookieOptions}${refreshMaxAge === null ? '' : `; Max-Age=${refreshMaxAge}`}`
+        );
       }
     } else setCookieHeaders.forEach(cookie => nextResponse.headers.append('set-cookie', cookie));
 

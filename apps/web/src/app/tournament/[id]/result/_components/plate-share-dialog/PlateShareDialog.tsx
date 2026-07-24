@@ -70,7 +70,7 @@ function PlateShareDialog({
       <DrawerContent>
         <div className="flex flex-col items-center gap-6">
           <div className="flex flex-col items-center gap-1">
-            <DrawerTitle className="heading-1 text-text-neutral-primary">
+            <DrawerTitle className="heading-1-bold text-text-neutral-primary">
               토너먼트 플레이 공유
             </DrawerTitle>
             <DrawerDescription className="body-1-medium text-text-neutral-tertiary">

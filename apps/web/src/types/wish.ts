@@ -22,4 +22,5 @@ export type WishItemT = {
   price: number;
   imageUrl: string | null;
   status: ItemStatusT;
+  sourcePlatform: string | null;
 };

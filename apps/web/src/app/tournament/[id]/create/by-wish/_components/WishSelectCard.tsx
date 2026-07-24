@@ -1,16 +1,16 @@
-import CheckboxEmptyIconFill from '@/assets/icons/fill/checkbox-empty.svg';
-import CheckboxSelectedIconFill from '@/assets/icons/fill/checkbox-selected.svg';
+import { CheckboxEmptyIconFill, CheckboxSelectedIconFill } from '@/assets/icons';
 import WishCard from '@/components/common/wish-card';
 
 type WishSelectCardProps = {
   name: string;
   price: number;
   imageUrl: string | null;
+  sourcePlatform?: string | null;
   isSelected: boolean;
   onSelect: () => void;
 };
 
-function WishSelectCard({ name, price, imageUrl, isSelected, onSelect }: WishSelectCardProps) {
+function WishSelectCard({ name, price, imageUrl, sourcePlatform, isSelected, onSelect }: WishSelectCardProps) {
   return (
     <button
       type="button"
@@ -18,13 +18,12 @@ function WishSelectCard({ name, price, imageUrl, isSelected, onSelect }: WishSel
       aria-pressed={isSelected}
       className="relative h-full w-full cursor-pointer text-left"
     >
-      <WishCard name={name} price={price} imageUrl={imageUrl} />
-      <span className="pointer-events-none absolute top-3 left-3 z-10 size-6">
-        <span className="absolute inset-[3px] rounded-[3px] bg-white" />
+      <WishCard name={name} price={price} imageUrl={imageUrl} sourcePlatform={sourcePlatform} />
+      <span className="pointer-events-none absolute top-3 left-3 z-10 block size-5">
         {isSelected ? (
-          <CheckboxSelectedIconFill className="relative size-6 text-uac-light" />
+          <CheckboxSelectedIconFill className="size-5 text-uac-light" />
         ) : (
-          <CheckboxEmptyIconFill className="relative size-6 text-[#636366]" />
+          <CheckboxEmptyIconFill className="size-5 text-black/8" />
         )}
       </span>
     </button>

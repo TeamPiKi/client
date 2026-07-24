@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-import PikiLogo from '@/assets/images/piki-logo.svg';
+import PikiLogo from '@/assets/images/piki-logo-cart.svg';
 import { ROUTES } from '@/consts/route';
 
 import './splash.css';
@@ -119,7 +119,7 @@ function SplashClient() {
         className="pointer-events-none invisible absolute inset-0 flex flex-col items-center px-4 pt-padding-top"
       >
         <div className="mt-15 flex flex-col items-center">
-          <div ref={targetRef} className="h-[106px] w-[146px]" />
+          <div ref={targetRef} className="h-[106px] w-[146px] shrink-0" />
         </div>
       </div>
 
@@ -131,7 +131,10 @@ function SplashClient() {
           transition: logoTransform.transition,
         }}
       >
-        <PikiLogo aria-label="PIKI" className="block" />
+        <PikiLogo
+          aria-label="PiKi"
+          className="block h-[106px] w-[146px] shrink-0 text-text-neutral-primary"
+        />
       </div>
     </main>
   );
