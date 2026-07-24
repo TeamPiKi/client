@@ -3,7 +3,6 @@ import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
 import { getMe } from '@/apis/getMe';
 import { BasketIconFill } from '@/assets/icons';
 import PiKiLogo from '@/assets/images/piki-logo-text.svg';
-import BottomTabBar from '@/components/bottom-tab-bar';
 import CreateTournamentDialogContent from '@/components/common/create-tournament-dialog';
 import { Dialog, DialogTrigger } from '@/components/dialog';
 import { Header, HeaderIcon } from '@/components/header';
@@ -58,9 +57,6 @@ async function HomePage() {
           {/* 최근 생성한 토너먼트 */}
           <TournamentList />
         </main>
-
-        {/* 하단 네비게이션 */}
-        <BottomTabBar />
 
         <MemberOnlyToast />
       </div>

@@ -1,7 +1,6 @@
 import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
 
 import { getMe } from '@/apis/getMe';
-import BottomTabBar from '@/components/bottom-tab-bar';
 import { Header, HeaderIcon } from '@/components/header';
 import Spacing from '@/components/spacing';
 import { getQueryClient } from '@/utils/queryClient';
@@ -37,8 +36,6 @@ function MypagePage() {
         <AppVersionFooter />
       </main>
 
-      {/* 하단 네비게이션 */}
-      <BottomTabBar />
     </div>
   );
 }
