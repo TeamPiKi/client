@@ -16,8 +16,7 @@ const TOURNAMENT_LIST_STATUS: TournamentStatusT[] = ['PENDING', 'IN_PROGRESS'];
 function TournamentList() {
   const queryClient = getQueryClient();
 
-  // await 하지 않음 — pending dehydrate 스트리밍. 홈 재방문 시 클라 캐시로 즉시 렌더
-  void queryClient.prefetchQuery({
+  queryClient.prefetchQuery({
     queryKey: ['tournamentList', TOURNAMENT_LIST_STATUS],
     queryFn: () => getTournamentList(TOURNAMENT_LIST_STATUS),
   });

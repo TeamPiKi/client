@@ -44,13 +44,12 @@ async function TournamentJoinPage({ params, searchParams }: TournamentJoinPagePr
   if (tournamentId === null) notFound();
 
   const queryClient = getQueryClient();
-  // await 하지 않음 — 두 prefetch 모두 pending 상태로 dehydrate 되어 스트리밍 (전환 논블로킹)
-  void queryClient.prefetchQuery({
+  queryClient.prefetchQuery({
     queryKey: ['invitePreview', tournamentId],
     queryFn: () => getInvitePreview(tournamentId),
   });
 
-  void queryClient.prefetchQuery({
+  queryClient.prefetchQuery({
     queryKey: ['me'],
     queryFn: getMe,
   });

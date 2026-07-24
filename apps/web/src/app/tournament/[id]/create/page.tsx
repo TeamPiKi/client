@@ -14,9 +14,7 @@ async function TournamentCreatePage({ params }: TournamentCreatePageProps) {
   const tournamentId = Number(id);
   const queryClient = getQueryClient();
 
-  // ['tournament', id] 는 상위 layout 이 이미 조회·시드하므로 중복 prefetch 하지 않는다.
-  // me 는 await 하지 않음 — pending dehydrate 스트리밍 (전환 논블로킹)
-  void queryClient.prefetchQuery({
+  queryClient.prefetchQuery({
     queryKey: ['me'],
     queryFn: getMe,
   });
