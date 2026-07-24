@@ -12,13 +12,15 @@ import { getQueryClient } from '@/utils/queryClient';
 import TournamentListClient from './client';
 
 const TOURNAMENT_LIST_STATUS: TournamentStatusT[] = ['PENDING', 'IN_PROGRESS'];
+const TOURNAMENT_LIST_LIMIT = 3;
 
 function TournamentList() {
   const queryClient = getQueryClient();
 
+  // 클라이언트(useGetTournamentList) 와 동일한 키·limit 로 프리패치해야 hydration 캐시가 재사용된다
   queryClient.prefetchQuery({
-    queryKey: ['tournamentList', TOURNAMENT_LIST_STATUS],
-    queryFn: () => getTournamentList(TOURNAMENT_LIST_STATUS),
+    queryKey: ['tournamentList', TOURNAMENT_LIST_STATUS, TOURNAMENT_LIST_LIMIT],
+    queryFn: () => getTournamentList(TOURNAMENT_LIST_STATUS, TOURNAMENT_LIST_LIMIT),
   });
 
   return (
@@ -40,7 +42,7 @@ function TournamentList() {
             </>
           }
         >
-          <TournamentListClient statuses={TOURNAMENT_LIST_STATUS} />
+          <TournamentListClient statuses={TOURNAMENT_LIST_STATUS} limit={TOURNAMENT_LIST_LIMIT} />
         </Suspense>
       </section>
     </HydrationBoundary>
