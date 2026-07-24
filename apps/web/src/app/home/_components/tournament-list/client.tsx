@@ -7,11 +7,10 @@ import type { TournamentStatusT } from '@/types/tournament';
 
 type Props = {
   statuses: TournamentStatusT[];
-  limit: number;
 };
 
-function TournamentListClient({ statuses, limit }: Props) {
-  const { tournamentListData } = useGetTournamentList(statuses, limit);
+function TournamentListClient({ statuses }: Props) {
+  const { tournamentListData } = useGetTournamentList(statuses, 3);
 
   if (tournamentListData.length === 0)
     return (
