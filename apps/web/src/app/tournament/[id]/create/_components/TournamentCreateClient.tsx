@@ -14,7 +14,6 @@ import { type JoinConfirmPayloadT, consumeJoinConfirmFor } from '../../../join/_
 import { useGetTournament } from '../../_common/_hooks/useGetTournament';
 import { useCountdown } from '../_hooks/useCountdown';
 import { usePostTournamentStart } from '../_hooks/usePostTournamentStart';
-import { useScrollToLast } from '../_hooks/useScrollToLast';
 import { hasSentInvite } from '../_utils/inviteSentSession';
 import DepositClosedDialog from './deposit-closed-dialog/DepositClosedDialog';
 import MemberJoinConfirmDialog from './member-join-confirm-dialog/MemberJoinConfirmDialog';
@@ -31,7 +30,9 @@ type TournamentCreateClientProps = {
 };
 
 function TournamentCreateClient({ tournamentId }: TournamentCreateClientProps) {
-  const { scrollToLast, onScrolled } = useScrollToLast();
+  const { isActive: scrollToLast } = useQueryAction({
+    action: QUERY_ACTION.VALUE.SCROLL_TO_LAST,
+  });
   const { tournamentData } = useGetTournament(tournamentId);
   const { userData } = useGetMe();
 
@@ -168,7 +169,6 @@ function TournamentCreateClient({ tournamentId }: TournamentCreateClientProps) {
         <TournamentItemBasketCarousel
           items={pending?.items}
           scrollToLast={scrollToLast}
-          onScrolled={onScrolled}
           isDepositClosed={isDepositClosed}
           participantImageMap={participantImageMap}
         />
