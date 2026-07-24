@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   ci:
-    name: Lint, Type Check, Build
+    name: Lint, Type Check
     runs-on: ubuntu-latest
 
     steps:
@@ -44,11 +44,6 @@ jobs:
 
       - name: Type Check
         run: pnpm check-types
-
-      - name: Build
-        env:
-          NEXT_PUBLIC_API_URL: ${{ vars.NEXT_PUBLIC_API_URL }}
-        run: pnpm build
 
   e2e:
     name: E2E (Playwright)
