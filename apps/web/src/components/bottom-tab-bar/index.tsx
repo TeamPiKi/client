@@ -115,7 +115,7 @@ function BottomTabBar() {
     if (lensOffTimerRef.current) clearTimeout(lensOffTimerRef.current);
     setIsGrabbing(true);
 
-    // 프레스 시점에 목적지 라우트를 미리 받아 릴리즈 후 즉시 push 시 대기를 없앤다
+    // 마운트 프리페치가 만료된(세그먼트 캐시 최소 유효시간 30s) 뒤 눌린 경우를 위한 재예열
     const pressTabForPrefetch = TABS[pressIndex];
     if (pressTabForPrefetch && pressIndex !== activeIndex)
       router.prefetch(pressTabForPrefetch.href);
@@ -316,6 +316,7 @@ function BottomTabBar() {
             <Link
               key={label}
               href={href}
+              prefetch={!isActive} // 현재 페이지 제외 나머지 페이지 전부 prefetch 적용
               draggable={false}
               className={cn(
                 'flex h-full w-[72px] cursor-pointer flex-col items-center justify-center rounded-full p-2 transition-colors',
