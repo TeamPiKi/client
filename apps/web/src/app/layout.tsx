@@ -4,6 +4,8 @@ import type { Metadata, Viewport } from 'next';
 import { headers } from 'next/headers';
 import React from 'react';
 
+import BottomTabBar from '@/components/bottom-tab-bar';
+
 import Providers from '../components/Providers';
 import '../styles/globals.css';
 
@@ -67,6 +69,9 @@ async function RootLayout({
           <div className="mx-auto hide-scrollbar h-full max-w-120 overflow-y-auto [scrollbar-gutter:stable]">
             {children}
           </div>
+
+          {/* NOTE: 전환 애니메이션이 끊기지 않게 하기 위해 탭바를 레이아웃에 렌더 */}
+          <BottomTabBar />
         </Providers>
         {/**
          * GA4 web stream — 일반 브라우저 사용자 추적용.

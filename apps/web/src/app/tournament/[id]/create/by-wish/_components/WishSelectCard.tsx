@@ -21,7 +21,7 @@ function WishSelectCard({ name, price, imageUrl, sourcePlatform, isSelected, onS
       <WishCard name={name} price={price} imageUrl={imageUrl} sourcePlatform={sourcePlatform} />
       <span className="pointer-events-none absolute top-3 left-3 z-10 block size-5">
         {isSelected ? (
-          <CheckboxSelectedIconFill className="size-5 text-uac-light" />
+          <CheckboxSelectedIconFill className="size-5 text-bg-accent" />
         ) : (
           <CheckboxEmptyIconFill className="size-5 text-black/8" />
         )}

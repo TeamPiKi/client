@@ -1,7 +1,6 @@
 import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
 
 import { getMe } from '@/apis/getMe';
-import BottomTabBar from '@/components/bottom-tab-bar';
 import { Header, HeaderIcon } from '@/components/header';
 import Spacing from '@/components/spacing';
 import { getQueryClient } from '@/utils/queryClient';
@@ -10,9 +9,9 @@ import AccountInfoSection from './_components/AccountInfoSection';
 import AppVersionFooter from './_components/AppVersionFooter';
 import ProfileSection from './_components/ProfileSection';
 
-async function MypagePage() {
+function MypagePage() {
   const queryClient = getQueryClient();
-  await queryClient.prefetchQuery({
+  queryClient.prefetchQuery({
     queryKey: ['me'],
     queryFn: getMe,
   });
@@ -37,8 +36,6 @@ async function MypagePage() {
         <AppVersionFooter />
       </main>
 
-      {/* 하단 네비게이션 */}
-      <BottomTabBar />
     </div>
   );
 }
