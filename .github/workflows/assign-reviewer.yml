@@ -88,14 +88,21 @@ jobs:
               const changedOldLines = getChangedOldLines(file.patch);
               if (changedOldLines.size === 0) continue;
 
-              const result = await github.graphql(blameQuery, {
-                owner,
-                repo,
-                sha: baseSha,
-                path,
-              });
+              let ranges;
+              try {
+                const result = await github.graphql(blameQuery, {
+                  owner,
+                  repo,
+                  sha: baseSha,
+                  path,
+                });
+                ranges = result.repository?.object?.blame?.ranges ?? [];
+              } catch (error) {
+                // 파일 하나의 blame 조회 실패로 전체 워크플로가 중단되지 않도록 skip
+                core.warning(`Failed to fetch blame for ${path}: ${error.message}`);
+                continue;
+              }
 
-              const ranges = result.repository?.object?.blame?.ranges ?? [];
               for (const range of ranges) {
                 const login = range.commit?.author?.user?.login;
                 if (!login || login === author) continue;
