@@ -77,7 +77,7 @@ function WishContentClient() {
             >
               <span className="block size-3">
                 {isAllSelected ? (
-                  <CheckboxSelectedIconFill className="size-3 text-uac-light" />
+                  <CheckboxSelectedIconFill className="size-3 text-bg-accent" />
                 ) : (
                   <span className="block size-3 rounded-[2.4px] border-[0.84px] border-gray-400" />
                 )}
