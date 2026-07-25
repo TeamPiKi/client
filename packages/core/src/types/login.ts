@@ -8,7 +8,7 @@ export type WebReqLogoutMessageT = {
 
 /** 웹 → 앱 소셜 로그인 요청 */
 export type RequestSocialLoginMessageT = {
-  type: typeof WEBBRIDGE_MESSAGE_TYPE.REQUEST_SOCIAL_LOGIN;
+  type: typeof WEBBRIDGE_MESSAGE_TYPE.WEB_REQ_SOCIAL_LOGIN;
   payload: RequestSocialLoginPayloadT;
 };
 export type RequestSocialLoginPayloadT = {
@@ -17,7 +17,7 @@ export type RequestSocialLoginPayloadT = {
 
 /** 앱 → 웹 소셜 로그인 성공 */
 export type SocialLoginSuccessMessageT = {
-  type: typeof WEBBRIDGE_MESSAGE_TYPE.SOCIAL_LOGIN_SUCCESS;
+  type: typeof WEBBRIDGE_MESSAGE_TYPE.APP_RES_SOCIAL_LOGIN_SUCCESS;
   payload: SocialLoginSuccessPayloadT;
 };
 export type SocialLoginSuccessPayloadT = {
@@ -27,7 +27,7 @@ export type SocialLoginSuccessPayloadT = {
 
 /** 앱 → 웹 소셜 로그인 실패 */
 export type SocialLoginErrorMessageT = {
-  type: typeof WEBBRIDGE_MESSAGE_TYPE.SOCIAL_LOGIN_ERROR;
+  type: typeof WEBBRIDGE_MESSAGE_TYPE.APP_RES_SOCIAL_LOGIN_ERROR;
   payload: SocialLoginErrorPayloadT;
 };
 export type SocialLoginErrorPayloadT = {

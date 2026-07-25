@@ -22,7 +22,12 @@ type BridgeGateT = {
  * 웹이 아직 보급되지 않은 앱 버전의 네이티브 기능을 호출하지 않도록 막는다.
  */
 export const BRIDGE_GATE: Record<WebBridgeMessageT['type'], BridgeGateT> = {
-  /** 웹 → 앱 */
+  /**
+   * 웹 → 앱
+   *
+   * NOTE: 키는 `WEBBRIDGE_MESSAGE_TYPE`의 키가 아니라 실제 전송되는 값(와이어 포맷)이다.
+   * 소셜 로그인처럼 둘이 다른 경우가 있다 (`WEB_REQ_SOCIAL_LOGIN` → `'REQUEST_SOCIAL_LOGIN'`).
+   */
   REQUEST_SOCIAL_LOGIN: { minAppVersion: null, notifyOnBlock: true },
   WEB_REQ_LOGOUT: { minAppVersion: null, notifyOnBlock: false },
   WEB_REQ_OPEN_IMAGE_PICKER: { minAppVersion: null, notifyOnBlock: true },
