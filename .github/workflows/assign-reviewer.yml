@@ -34,24 +34,40 @@ jobs:
               per_page: 100,
             });
 
-            // patch(unified diff)에서 base 파일 기준으로 삭제/변경된 줄 번호 집합을 구함
+            // patch(unified diff)에서 base 파일 기준으로 삭제/변경된 줄 번호 집합을 구함.
+            // 순수 삽입 hunk(삭제 줄 없이 추가만 있는 경우)는 old 파일에 직접 대응하는 줄이 없으므로,
+            // 삽입 지점 주변 context 줄을 대신 후보로 포함시킨다.
             const getChangedOldLines = patch => {
               const changedLines = new Set();
               let oldLine = 0;
+              let hunkHasDeletion = false;
+              let hunkContextLines = [];
+
+              const flushHunk = () => {
+                if (!hunkHasDeletion) {
+                  for (const l of hunkContextLines) changedLines.add(l);
+                }
+                hunkHasDeletion = false;
+                hunkContextLines = [];
+              };
 
               for (const line of patch.split('\n')) {
                 const hunkHeader = line.match(/^@@ -(\d+)/);
                 if (hunkHeader) {
+                  flushHunk();
                   oldLine = Number(hunkHeader[1]);
                   continue;
                 }
                 if (line.startsWith('-')) {
                   changedLines.add(oldLine);
+                  hunkHasDeletion = true;
                   oldLine += 1;
                 } else if (!line.startsWith('+') && !line.startsWith('\\')) {
+                  hunkContextLines.push(oldLine);
                   oldLine += 1;
                 }
               }
+              flushHunk();
 
               return changedLines;
             };
