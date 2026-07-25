@@ -5,10 +5,10 @@ import { getQueryClient } from '@/utils/queryClient';
 import { getNotifications } from './_apis/getNotifications';
 import NotificationContent from './_components/NotificationContent';
 
-async function Notification() {
+function Notification() {
   const queryClient = getQueryClient();
 
-  await queryClient.prefetchInfiniteQuery({
+  queryClient.prefetchInfiniteQuery({
     queryKey: ['notifications'],
     queryFn: ({ pageParam }) => getNotifications({ cursor: pageParam as string | null }),
     initialPageParam: null,

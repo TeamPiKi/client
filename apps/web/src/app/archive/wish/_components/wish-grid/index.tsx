@@ -42,7 +42,7 @@ function WishGrid({ items, isDeleteMode = false, selectedIds, onToggleSelect }: 
               <div className={`pointer-events-none absolute top-0 left-0 right-0 z-[11] aspect-[201/166] bg-black/20 transition-opacity duration-200 ${isSelected ? 'opacity-100' : 'opacity-0'}`} />
               <span className="pointer-events-none absolute top-3 left-3 z-[12] block size-5">
                 {isSelected ? (
-                  <CheckboxSelectedIconFill className="size-5 text-uac-light" />
+                  <CheckboxSelectedIconFill className="size-5 text-bg-accent" />
                 ) : (
                   <CheckboxEmptyIconFill className="size-5 text-black/8" />
                 )}

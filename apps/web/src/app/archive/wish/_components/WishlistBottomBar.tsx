@@ -1,5 +1,4 @@
 import BottomCta from '@/components/bottom-cta';
-import BottomTabBar from '@/components/bottom-tab-bar';
 import Button from '@/components/button';
 import { Z_INDEX } from '@/consts/zIndex';
 
@@ -9,11 +8,15 @@ type WishlistBottomBarProps = {
   onOpenDeleteDialog: () => void;
 };
 
-function WishlistBottomBar({ isDeleteMode, selectedCount, onOpenDeleteDialog }: WishlistBottomBarProps) {
-  if (!isDeleteMode) return <BottomTabBar />;
+function WishlistBottomBar({
+  isDeleteMode,
+  selectedCount,
+  onOpenDeleteDialog,
+}: WishlistBottomBarProps) {
+  if (!isDeleteMode) return null;
 
   return (
-    // 삭제 모드(BottomTabBar 언마운트)에서도 토스트가 하단 바 위에 뜨도록 마커 유지 (globals.css 참고)
+    /** NOTE: 삭제 모드에서 삭제 CTA 가 탭바를 덮으므로, 토스트가 이 바 위에 뜨도록 마커 유지 (globals.css 참고) */
     <div data-bottom-tab-bar style={{ zIndex: Z_INDEX.BOTTOM_CTA }}>
       <BottomCta hasGradient>
         <Button
