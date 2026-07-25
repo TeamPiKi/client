@@ -49,8 +49,8 @@ const TAB_STEP = TAB_WIDTH + TAB_GAP;
 const BAR_WIDTH = BAR_PADDING * 2 + TABS.length * TAB_WIDTH + (TABS.length - 1) * TAB_GAP;
 /** 이 거리(px) 이상 움직이면 탭이 아니라 드래그로 판정 — 손떨림 탭이 드래그로 빠지지 않을 만큼 */
 const DRAG_THRESHOLD = 12;
-/** 릴리즈 후 버블이 유리인 채 착지(0.4s + stagger 0.08s)를 마치고 무광 전환·라우팅되기까지 지연 (ms) — 착지 총 시간과 일치 */
-const NAVIGATE_DELAY = 480;
+/** 버블이 유리인 채 착지(0.4s + stagger 0.08s)를 마치고 무광으로 돌아오기까지의 시간 (ms). 라우팅은 즉시 하고, persistent 탭바라 이 연출은 이동 후에도 이어서 재생된다. */
+const LANDING_MS = 480;
 
 /** 스프링 오버슈트 이징 — 리퀴드 글래스 바운스 (짧은 거리 전용, 오버슈트 36%) */
 const SPRING_EASE =
@@ -80,7 +80,6 @@ function BottomTabBar() {
   const glintRef = useRef<HTMLDivElement>(null);
   const isDraggedRef = useRef(false);
   const isGrabbingRef = useRef(false);
-  const navigateTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lensOffTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const [isPressed, setIsPressed] = useState(false);
@@ -90,18 +89,18 @@ function BottomTabBar() {
 
   useEffect(
     () => () => {
-      if (navigateTimerRef.current) clearTimeout(navigateTimerRef.current);
       if (lensOffTimerRef.current) clearTimeout(lensOffTimerRef.current);
     },
     []
   );
 
+  // 탭 랜딩 페이지에서만 노출 — 하위 상세/편집 라우트에서는 숨긴다 (기존 동작 유지)
+  if (!TABS.some(({ href }) => href === pathname)) return null;
+
   const handlePointerDown = (event: React.PointerEvent) => {
     if (event.button !== 0 || isGrabbingRef.current) return;
     isDraggedRef.current = false;
     setIsPressed(true);
-    // 새 제스처 시작 — 이전 제스처가 예약한 라우팅을 취소해 스테일 타이머·연속 라우팅 방지
-    if (navigateTimerRef.current) clearTimeout(navigateTimerRef.current);
 
     const bar = barRef.current;
     const indicator = indicatorRef.current;
@@ -115,6 +114,11 @@ function BottomTabBar() {
     // 프레스 즉시 렌즈로 변신 — 유리인 채 이동하고, 착지 후에 무광으로 돌아옴
     if (lensOffTimerRef.current) clearTimeout(lensOffTimerRef.current);
     setIsGrabbing(true);
+
+    // 마운트 프리페치가 만료된(세그먼트 캐시 최소 유효시간 30s) 뒤 눌린 경우를 위한 재예열
+    const pressTabForPrefetch = TABS[pressIndex];
+    if (pressTabForPrefetch && pressIndex !== activeIndex)
+      router.prefetch(pressTabForPrefetch.href);
 
     // 어느 탭을 누르든 버블이 눌린 탭으로 미끄러져 온 뒤 드래그 대상이 됨
     const isMovingToRight = pressLeft >= indexToLeft(activeIndex);
@@ -167,7 +171,7 @@ function BottomTabBar() {
       isGrabbingRef.current = false;
       setIsPressed(false);
       // 렌즈는 유리인 채 착지를 마친 뒤에 무광으로 전환
-      lensOffTimerRef.current = setTimeout(() => setIsGrabbing(false), NAVIGATE_DELAY);
+      lensOffTimerRef.current = setTimeout(() => setIsGrabbing(false), LANDING_MS);
 
       const bubble = bubbleRef.current;
       if (bubble) {
@@ -193,11 +197,11 @@ function BottomTabBar() {
       }
 
       if (!isDraggedRef.current) {
-        // 탭: 버블은 이미 눌린 탭으로 이동 중 — 내비게이션은 여기서 처리하고 Link 클릭은 차단
+        // 탭: 버블은 이미 눌린 탭으로 이동 중 — 즉시 라우팅(persistent 탭바라 착지 연출은 이어서 재생됨), Link 클릭은 차단
         const pressTab = TABS[pressIndex];
         if (pressTab && pressIndex !== activeIndex) {
           isDraggedRef.current = true;
-          navigateTimerRef.current = setTimeout(() => router.push(pressTab.href), NAVIGATE_DELAY);
+          router.push(pressTab.href);
         }
         return;
       }
@@ -215,7 +219,10 @@ function BottomTabBar() {
 
       const targetTab = TABS[targetIndex];
       if (targetTab && targetIndex !== activeIndex) {
-        navigateTimerRef.current = setTimeout(() => router.push(targetTab.href), NAVIGATE_DELAY);
+        // 활성 탭에서 시작한 드래그는 프레스 프리패치를 건너뛰므로, 스냅 대상을 push 직전에 프리패치
+        router.prefetch(targetTab.href);
+        // 즉시 라우팅 — persistent 탭바라 스냅 연출은 이동 후에도 이어서 재생됨
+        router.push(targetTab.href);
       }
     };
 
@@ -309,6 +316,7 @@ function BottomTabBar() {
             <Link
               key={label}
               href={href}
+              prefetch={!isActive} // 현재 페이지 제외 나머지 페이지 전부 prefetch 적용
               draggable={false}
               className={cn(
                 'flex h-full w-[72px] cursor-pointer flex-col items-center justify-center rounded-full p-2 transition-colors',

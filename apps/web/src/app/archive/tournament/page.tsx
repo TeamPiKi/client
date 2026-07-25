@@ -1,7 +1,6 @@
 import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
 
 import { getTournamentList } from '@/apis/getTournamentList';
-import BottomTabBar from '@/components/bottom-tab-bar';
 import { getQueryClient } from '@/utils/queryClient';
 
 import TournamentFab from './_components/TournamentFab';
@@ -29,7 +28,6 @@ async function ArchiveTournamentPage({ searchParams }: Props) {
         <TournamentHistorySection initialTab={initialTab} />
       </HydrationBoundary>
       <TournamentFab />
-      <BottomTabBar />
     </div>
   );
 }
