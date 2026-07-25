@@ -127,12 +127,16 @@ jobs:
               reviewer = FALLBACK_REVIEWER;
             }
 
-            await github.rest.issues.addAssignees({
-              owner,
-              repo,
-              issue_number: pullNumber,
-              assignees: [author],
-            });
+            try {
+              await github.rest.issues.addAssignees({
+                owner,
+                repo,
+                issue_number: pullNumber,
+                assignees: [author],
+              });
+            } catch (error) {
+              core.warning(`Failed to assign author ${author}: ${error.message}`);
+            }
 
             if (reviewer) {
               try {
@@ -146,12 +150,18 @@ jobs:
                 // blame 대상자가 콜라보레이터가 아닌 경우(팀 탈퇴 등) fallback 리뷰어로 재시도
                 core.warning(`Failed to request review from ${reviewer}: ${error.message}`);
                 if (reviewer !== FALLBACK_REVIEWER && author !== FALLBACK_REVIEWER) {
-                  await github.rest.pulls.requestReviewers({
-                    owner,
-                    repo,
-                    pull_number: pullNumber,
-                    reviewers: [FALLBACK_REVIEWER],
-                  });
+                  try {
+                    await github.rest.pulls.requestReviewers({
+                      owner,
+                      repo,
+                      pull_number: pullNumber,
+                      reviewers: [FALLBACK_REVIEWER],
+                    });
+                  } catch (fallbackError) {
+                    core.warning(
+                      `Failed to request review from fallback reviewer ${FALLBACK_REVIEWER}: ${fallbackError.message}`
+                    );
+                  }
                 }
               }
             }
