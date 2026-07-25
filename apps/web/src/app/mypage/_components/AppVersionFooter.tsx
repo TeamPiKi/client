@@ -1,9 +1,8 @@
 import { headers } from 'next/headers';
 
 import { ShoppingBagIconFill } from '@/assets/icons';
+import { getAppVersion } from '@/utils/appVersion';
 import { isWebview } from '@/utils/webBridge';
-
-import { getAppVersion } from '../_utils/appVersion';
 
 async function AppVersionFooter() {
   const webVersion = process.env.NEXT_PUBLIC_WEB_VERSION;
@@ -12,7 +11,7 @@ async function AppVersionFooter() {
   const headerStore = await headers();
   const userAgent = headerStore.get('user-agent');
   const isWebviewEnv = isWebview(userAgent);
-  const appVersion = getAppVersion(userAgent ?? '');
+  const appVersion = getAppVersion(userAgent);
 
   const versionLabel =
     isWebviewEnv && appVersion ? `v${appVersion} (w${webVersion})` : `v${webVersion}`;
