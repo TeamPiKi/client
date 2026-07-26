@@ -46,7 +46,6 @@ export type {
   AppResPushPermissionStatusMessageT,
   DeepLinkPayloadT,
   FcmTokenPayloadT,
-  PushNotificationTypeT,
   PushPermissionStatusPayloadT,
   WebReqOpenNotificationSettingsMessageT,
   WebReqPushPermissionMessageT,

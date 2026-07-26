@@ -1,11 +1,11 @@
 'use client';
 
 import { Header, HeaderIcon } from '@/components/header';
+import ItemLinkBanner from '@/components/common/item-link-banner';
 import { cn } from '@/utils/cn';
 
 import { useGetTournamentItem } from '../_hooks/useGetTournamentItem';
 import ItemEditForm from './ItemEditForm';
-import ItemLinkBanner from './ItemLinkBanner';
 
 type EditContentProps = {
   tournamentId: number;
