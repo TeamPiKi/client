@@ -10,7 +10,7 @@ type GetNotificationsResponseT = ApiResponseT<NotificationListDataT> & {
   };
 };
 
-export type GetNotificationsRequestT = {
+type GetNotificationsRequestT = {
   cursor?: string | null;
   size?: number;
 };

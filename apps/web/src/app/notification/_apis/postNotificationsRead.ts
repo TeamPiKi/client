@@ -9,7 +9,7 @@ type PostNotificationsReadResponseT = ApiResponseT<{
   unreadCountByCategory: Record<NotificationCategoryT, number>;
 }>;
 
-export type PostNotificationsReadRequestT =
+type PostNotificationsReadRequestT =
   | { all: true; ids?: never }
   | { ids: number[]; all?: never };
 

@@ -10,7 +10,7 @@ export type NotificationTypeT =
   | 'ITEM_PARSING_FAILED'
   | 'ANNOUNCEMENT';
 
-export type NotificationKindT = 'WISH' | 'TOURNAMENT';
+type NotificationKindT = 'WISH' | 'TOURNAMENT';
 
 export type NotificationCategoryT = 'ACTIVITY' | 'SYSTEM';
 
