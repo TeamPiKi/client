@@ -32,7 +32,12 @@ test('홈에서 새 토너먼트를 생성하면 담기 화면으로 이동한�
   await expect(createButton).toBeDisabled();
 
   await page.getByLabel('토너먼트 이름').fill('E2E 토너먼트');
+
+  const createRequest = page.waitForRequest(
+    request => request.method() === 'POST' && request.url().includes(ENDPOINTS.TOURNAMENTS)
+  );
   await createButton.click();
+  expect((await createRequest).postDataJSON()).toMatchObject({ name: 'E2E 토너먼트' });
 
   await expect(page).toHaveURL('/tournament/1/create');
   await expect(page.getByText('후보를 장바구니에 담아보세요')).toBeVisible();
@@ -64,7 +69,17 @@ test('위시에서 상품 4개를 가져오면 장바구니에 담긴다', async
 
   /** 담기 성공 후 재조회부터는 4개 담긴 응답 (뒤에 등록한 목이 우선 매칭) */
   api.get(ENDPOINTS.TOURNAMENT(1), MOCK_TOURNAMENT_PENDING_WITH_ITEMS);
+
+  const wishRequest = page.waitForRequest(
+    request =>
+      request.method() === 'POST' &&
+      request.url().includes(ENDPOINTS.TOURNAMENT_ITEMS_FROM_WISH(1))
+  );
   await nextButton.click();
+  const wishBody = (await wishRequest).postDataJSON() as { itemIds: number[] };
+  expect([...wishBody.itemIds].sort()).toEqual(
+    MOCK_WISHLIST_ENTRIES.map(({ item }) => item.id).sort()
+  );
 
   await expect(page).toHaveURL(/\/tournament\/1\/create/);
   await expect(page.getByText('4/32')).toBeVisible();
