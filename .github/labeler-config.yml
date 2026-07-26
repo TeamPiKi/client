@@ -1,78 +1,94 @@
-filters:
-  - label: feature
-    regexs:
-      - /feat/i
-    events: [pull_request]
-    targets: [title, branch]
-  - label: feature
-    regexs:
-      - /feat/i
-    events: [issues]
-    targets: [title]
+settings:
+  onMissingLabel: create
 
-  - label: fix
-    regexs:
-      - /fix/i
-    events: [pull_request]
-    targets: [title, branch]
-  - label: fix
-    regexs:
-      - /fix/i
-    events: [issues]
-    targets: [title]
+rules:
+  issue:
+    - label: feature
+      matches:
+        - operator: any
+          conditions:
+            - title: /feat/i
+    - label: fix
+      matches:
+        - operator: any
+          conditions:
+            - title: /fix/i
+    - label: refactor
+      matches:
+        - operator: any
+          conditions:
+            - title: /refactor/i
+    - label: chore
+      matches:
+        - operator: any
+          conditions:
+            - title: /chore/i
+    - label: docs
+      matches:
+        - operator: any
+          conditions:
+            - title: /docs/i
+    - label: style
+      matches:
+        - operator: any
+          conditions:
+            - title: /style/i
+    - label: test
+      matches:
+        - operator: any
+          conditions:
+            - title: /test/i
 
-  - label: refactor
-    regexs:
-      - /refactor/i
-    events: [pull_request]
-    targets: [title, branch]
-  - label: refactor
-    regexs:
-      - /refactor/i
-    events: [issues]
-    targets: [title]
-
-  - label: chore
-    regexs:
-      - /chore/i
-    events: [pull_request]
-    targets: [title, branch]
-  - label: chore
-    regexs:
-      - /chore/i
-    events: [issues]
-    targets: [title]
-
-  - label: docs
-    regexs:
-      - /docs/i
-    events: [pull_request]
-    targets: [title, branch]
-  - label: docs
-    regexs:
-      - /docs/i
-    events: [issues]
-    targets: [title]
-
-  - label: style
-    regexs:
-      - /style/i
-    events: [pull_request]
-    targets: [title, branch]
-  - label: style
-    regexs:
-      - /style/i
-    events: [issues]
-    targets: [title]
-
-  - label: APP
-    regexs:
-      - /apps\/app/i
-    events: [pull_request]
-    targets: [file]
-
-  - label: WEB
-    regexs:
-      - /apps\/web/i
-    events: [pull_request]
-    targets: [file]
+  pr:
+    - label: feature
+      matches:
+        - operator: any
+          conditions:
+            - title: /feat/i
+            - head-branch: /feat/i
+    - label: fix
+      matches:
+        - operator: any
+          conditions:
+            - title: /fix/i
+            - head-branch: /fix/i
+    - label: refactor
+      matches:
+        - operator: any
+          conditions:
+            - title: /refactor/i
+            - head-branch: /refactor/i
+    - label: chore
+      matches:
+        - operator: any
+          conditions:
+            - title: /chore/i
+            - head-branch: /chore/i
+    - label: docs
+      matches:
+        - operator: any
+          conditions:
+            - title: /docs/i
+            - head-branch: /docs/i
+    - label: style
+      matches:
+        - operator: any
+          conditions:
+            - title: /style/i
+            - head-branch: /style/i
+    - label: test
+      matches:
+        - operator: any
+          conditions:
+            - title: /test/i
+            - head-branch: /test/i
+    - label: APP
+      matches:
+        - operator: any
+          conditions:
+            - changed-files: apps/app/**
+    - label: WEB
+      matches:
+        - operator: any
+          conditions:
+            - changed-files: apps/web/**
