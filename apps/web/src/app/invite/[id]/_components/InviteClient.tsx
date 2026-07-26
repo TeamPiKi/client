@@ -6,7 +6,6 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 
 import { getMe } from '@/apis/getMe';
-import { getTournament } from '@/app/tournament/[id]/_common/_apis/getTournament';
 import { getInvitePreviewByCode } from '@/app/tournament/join/_apis/getInvitePreviewByCode';
 import { postJoin } from '@/app/tournament/join/_apis/postJoin';
 import Button from '@/components/button';
@@ -77,19 +76,10 @@ function InviteClient({ tournamentId, inviteCode }: InviteClientProps) {
         }
 
         /**
-         * 이미 참여한 게스트가 같은 링크로 재진입한 경우 join 플로우를 건너뛰고 토너먼트로 바로 진입.
-         * 참여 여부는 상세 조회(getTournament)의 200/403 으로 판별한다 — 참여자면 200, 미참여면 403.
-         * (409 는 "만료·이미 시작" 등과 뒤섞여 있어 참여 판별에 쓰기 부적절)
+         * 이미 참여한 게스트가 같은 링크로 재진입하면 join 플로우를 건너뛰고 토너먼트로 바로 진입.
+         * preview 응답의 joined 로 판별한다 — 별도 조회 없이 첫 preview 한 번으로 끝난다.
          */
-        const isAlreadyJoined = await getTournament(tournamentId)
-          .then(() => true)
-          .catch(error => {
-            if (isAxiosError<ApiErrorResponseT>(error) && error.response?.status === 403)
-              return false;
-            throw error;
-          });
-
-        if (isAlreadyJoined) {
+        if (preview.joined) {
           router.replace(ROUTES.TOURNAMENT_CREATE(tournamentId));
           return;
         }
