@@ -13,9 +13,8 @@ import useIntersectionObserver from '../_hooks/useIntersectionObserver';
 import { usePostNotificationsRead } from '../_hooks/usePostNotificationsRead';
 import { usePushPermission } from '../_hooks/usePushPermission';
 import { getNotificationRoute } from '../_utils/getNotificationRoute';
-import NotificationEmptyState from './NotificationEmptyState';
-import NotificationErrorState from './NotificationErrorState';
 import NotificationItem from './NotificationItem';
+import NotificationStateCard from './NotificationStateCard';
 import PushDisabledBanner from './PushDisabledBanner';
 
 function NotificationContent() {
@@ -61,9 +60,9 @@ function NotificationContent() {
 
   function renderContent() {
     if (isError && !isFetchNextPageError)
-      return <NotificationErrorState onRetry={() => refetch()} />;
+      return <NotificationStateCard variant="error" onAction={() => refetch()} />;
     if (isEmpty)
-      return <NotificationEmptyState onOpenNotificationSettings={openNotificationSettings} />;
+      return <NotificationStateCard variant="empty" onAction={openNotificationSettings} />;
 
     return (
       <div className="flex flex-col gap-4 pb-9">
