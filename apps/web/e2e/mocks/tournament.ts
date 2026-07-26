@@ -145,13 +145,19 @@ export const MOCK_TOURNAMENT_IN_PROGRESS: GetTournamentInProgressResponseT = {
   },
 };
 
-/** 4강 두 매치 종료 후 서버 재조회 응답 — 결승 라운드 */
+/**
+ * 4강 두 매치 종료 후 서버 재조회 응답 — 결승 라운드.
+ * pairByPriceAsc 는 [11,12], [13,14] 로 페어를 만들고 shufflePairs 는 페어 순서만 섞을 뿐
+ * 페어 내부 좌/우는 유지하며, VsSection 은 왼쪽 카드를 먼저 렌더링한다.
+ * tournamentMatch.spec 이 매 매치 `.first()`(왼쪽=더 저렴한 아이템)를 클릭하므로
+ * 실제 결승 진출자는 항상 11·13 이다 — 같은 매치에서 맞붙은 11·12 가 둘 다 남을 수 없다.
+ */
 export const MOCK_TOURNAMENT_IN_PROGRESS_FINAL: GetTournamentInProgressResponseT = {
   ...MOCK_TOURNAMENT_IN_PROGRESS,
   inProgress: {
     currentRound: 2,
     lastHistory: null,
-    remainingItems: MOCK_TOURNAMENT_ITEMS.slice(0, 2),
+    remainingItems: MOCK_TOURNAMENT_ITEMS.filter(item => [11, 13].includes(item.tournamentItemId)),
   },
 };
 
