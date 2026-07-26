@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
+import { QUERY_ACTION } from '@/consts/queryAction';
 import { ROUTES } from '@/consts/route';
 import { getApiErrorMessage } from '@/utils/getApiErrorMessage';
 
@@ -18,7 +19,9 @@ export const usePostTournamentItemsByWish = (tournamentId: number) => {
     mutationFn: (itemIds: number[]) => postTournamentItemsByWish(tournamentId, { itemIds }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tournament', tournamentId] });
-      router.push(`${ROUTES.TOURNAMENT_CREATE(tournamentId)}?scrollToLast=true`);
+      router.push(
+        `${ROUTES.TOURNAMENT_CREATE(tournamentId)}?${QUERY_ACTION.KEY}=${QUERY_ACTION.VALUE.SCROLL_TO_LAST}`
+      );
     },
     onError: error => {
       toast.error(getApiErrorMessage(error));
