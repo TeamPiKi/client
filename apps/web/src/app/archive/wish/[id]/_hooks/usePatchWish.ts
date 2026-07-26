@@ -5,16 +5,16 @@ import { toast } from 'sonner';
 
 import { ROUTES } from '@/consts/route';
 import type { ApiErrorResponseT } from '@/types/api';
+import type { PatchItemRequestT } from '@/types/item';
 
 import { patchWish } from '../_apis/patchWish';
-import type { PatchWishRequestT } from '../_types/wish';
 
 export const usePatchWish = (wishId: number) => {
   const router = useRouter();
   const queryClient = useQueryClient();
 
   const { mutate: patchWishMutation, isPending: isPatchWishPending } = useMutation({
-    mutationFn: (body: Omit<PatchWishRequestT, 'currency'>) => {
+    mutationFn: (body: Omit<PatchItemRequestT, 'currency'>) => {
       const formData = new FormData();
       formData.append('name', body.name);
       formData.append('currentPrice', String(body.currentPrice));

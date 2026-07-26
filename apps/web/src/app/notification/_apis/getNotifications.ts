@@ -1,5 +1,5 @@
 import { clientApi } from '@/apis/client';
-import type { NotificationListDataT } from '@/app/notification/types/notification';
+import type { NotificationListDataT } from '@/types/notification';
 import { ENDPOINTS } from '@/consts/api';
 import type { ApiResponseT } from '@/types/api';
 
