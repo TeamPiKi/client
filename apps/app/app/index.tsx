@@ -101,7 +101,7 @@ function Page() {
         case WEBBRIDGE_MESSAGE_TYPE.WEB_REQ_OPEN_IMAGE_PICKER:
           await handleOpenImagePicker(message.payload);
           return;
-        case WEBBRIDGE_MESSAGE_TYPE.REQUEST_SOCIAL_LOGIN:
+        case WEBBRIDGE_MESSAGE_TYPE.WEB_REQ_SOCIAL_LOGIN:
           await handleLogin(message.payload.provider);
           return;
 

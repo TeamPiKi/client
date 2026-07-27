@@ -1,4 +1,5 @@
 /** 상수 */
+export { BRIDGE_GATE } from './consts/appVersion';
 export { WEBVIEW_UA_TOKEN } from './consts/client';
 export { SUPPORTED_IMAGE_MIME_TYPES } from './consts/image';
 export {
@@ -46,7 +47,6 @@ export type {
   AppResPushPermissionStatusMessageT,
   DeepLinkPayloadT,
   FcmTokenPayloadT,
-  PushNotificationTypeT,
   PushPermissionStatusPayloadT,
   WebReqOpenNotificationSettingsMessageT,
   WebReqPushPermissionMessageT,
