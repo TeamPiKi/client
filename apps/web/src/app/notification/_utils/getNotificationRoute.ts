@@ -1,6 +1,6 @@
 import { ROUTES } from '@/consts/route';
 
-import type { NotificationItemT, NotificationTypeT } from '../types/notification';
+import type { NotificationItemT, NotificationTypeT } from '@/types/notification';
 
 export const getNotificationRoute = (
   type: NotificationTypeT,
@@ -24,6 +24,7 @@ export const getNotificationRoute = (
       }
       return ROUTES.WISHLIST;
     case 'ANNOUNCEMENT':
+    case 'TOURNAMENT_ITEM_DELETED':
       return null;
   }
 };

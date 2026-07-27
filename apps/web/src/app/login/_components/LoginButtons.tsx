@@ -75,7 +75,7 @@ function LoginButtons({ redirect, action, showAppleLogin }: LoginButtonsProps) {
 
     setNativePendingProvider(provider);
     WebBridge.postMessage({
-      type: WEBBRIDGE_MESSAGE_TYPE.REQUEST_SOCIAL_LOGIN,
+      type: WEBBRIDGE_MESSAGE_TYPE.WEB_REQ_SOCIAL_LOGIN,
       payload: { provider },
     });
     return true;

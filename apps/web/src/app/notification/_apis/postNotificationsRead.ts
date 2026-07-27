@@ -2,14 +2,14 @@ import { clientApi } from '@/apis/client';
 import { ENDPOINTS } from '@/consts/api';
 import type { ApiResponseT } from '@/types/api';
 
-import type { NotificationCategoryT } from '../types/notification';
+import type { NotificationCategoryT } from '@/types/notification';
 
 type PostNotificationsReadResponseT = ApiResponseT<{
   unreadCount: number;
   unreadCountByCategory: Record<NotificationCategoryT, number>;
 }>;
 
-export type PostNotificationsReadRequestT =
+type PostNotificationsReadRequestT =
   | { all: true; ids?: never }
   | { ids: number[]; all?: never };
 

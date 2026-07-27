@@ -1,4 +1,7 @@
-import { WEBVIEW_UA_TOKEN, type WebBridgeMessageT } from '@piki/core';
+import { BRIDGE_GATE, WEBVIEW_UA_TOKEN, type WebBridgeMessageT } from '@piki/core';
+import { toast } from 'sonner';
+
+import { getAppVersion, isAppVersionSupported } from '@/utils/appVersion';
 
 type RNWebViewWindowT = {
   ReactNativeWebView: {
@@ -46,14 +49,27 @@ export const isWebview = (userAgentFromServer: string | null = null) => {
 /**
  * Webview 메시지 송신 핸들러
  *
+ * - 앱 버전이 해당 기능을 지원하지 않으면 메시지를 전송하지 않음
+ *
+ * @returns 메시지를 실제로 전송했으면 true
+ * @note 앱 응답을 기다리는 호출부는 이 값으로 대기 상태를 정리해야 함
+ *
  * @example
  * WebBridge.postMessage({ type: WEBBRIDGE_MESSAGE_TYPE.WEB_REQ_PUSH_PERMISSION, payload: ... })
  */
 export const WebBridge = {
   postMessage(message: WebBridgeMessageT) {
-    if (typeof window === 'undefined') return;
-    if (!isRNWebViewWindow(window)) return;
+    if (typeof window === 'undefined') return false;
+    if (!isRNWebViewWindow(window)) return false;
+
+    const { minAppVersion, notifyOnBlock } = BRIDGE_GATE[message.type];
+    if (minAppVersion && !isAppVersionSupported(getAppVersion(), minAppVersion)) {
+      /** 백그라운드 동작은 사용자가 유발한 게 아니므로 조용히 실패시킨다 */
+      if (notifyOnBlock) toast.info('앱을 업데이트하면 사용할 수 있어요.');
+      return false;
+    }
 
     window.ReactNativeWebView.postMessage(JSON.stringify(message));
+    return true;
   },
 };

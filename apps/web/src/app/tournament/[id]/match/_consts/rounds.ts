@@ -1,22 +1,4 @@
-export type TransitionStageT = 'toNext' | 'toSemi' | 'toFinal';
-
-export const ROUND_TRANSITION_COPY: Record<
-  TransitionStageT,
-  { title: string; description: string }
-> = {
-  toNext: {
-    title: '다음 라운드 진출!',
-    description: '잘하고 있어요!\n이어서 다음 라운드를 시작할게요',
-  },
-  toSemi: {
-    title: '준결승 진출!',
-    description: '얼마 안 남았어요!\n이어서 준결승전을 시작할게요',
-  },
-  toFinal: {
-    title: '마지막 한 판!',
-    description: '최종 선택만 남았어요.',
-  },
-};
+export type TransitionStageT = 'toFinal' | 'toSemi' | 'toNext';
 
 // 다음 라운드에 진출하는 아이템 수에 따라 어떤 전환 화면을 보여줄지 결정
 // 2 → 결승 진입, 4 → 준결승 진입, 그 외 → 일반 다음 라운드

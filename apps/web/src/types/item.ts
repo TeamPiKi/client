@@ -14,3 +14,10 @@ export type ItemT = {
 };
 
 export type ItemStatusT = (typeof ITEM_STATUS)[keyof typeof ITEM_STATUS];
+
+export type PatchItemRequestT = {
+  name: string;
+  currentPrice: number;
+  image: File;
+  currency: string;
+};

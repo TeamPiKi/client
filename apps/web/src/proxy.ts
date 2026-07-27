@@ -1,4 +1,5 @@
 import { getTokenMaxAge, isTokenValid } from '@piki/core';
+import * as Sentry from '@sentry/nextjs';
 import { type NextRequest, NextResponse } from 'next/server';
 
 import { postTokenRefreshServer } from './apis/postTokenRefresh';
@@ -7,7 +8,38 @@ import { getRouteType } from './utils/getRouteType';
 import { getLoginPath } from './utils/loginRedirect';
 import { isWebview } from './utils/webBridge';
 
+/** 봇/크롤러 UA 추정 패턴 — 대시보드 필터용 러프 추정 */
+const BOT_UA_PATTERN =
+  /bot|crawl|spider|slurp|facebookexternalhit|embedly|preview|monitor|uptimerobot|pingdom|headless|lighthouse|curl|wget|python-requests|axios|go-http-client/i;
+
+/** referer 의 민감 값(query/hash)을 버리고 origin+path 만 남긴다. 파싱 실패 시 null */
+const sanitizeReferer = (referer: string | null) => {
+  if (!referer) return null;
+  try {
+    const { origin, pathname } = new URL(referer);
+    return `${origin}${pathname}`;
+  } catch {
+    return null;
+  }
+};
+
 const handleGuestLogin = async (request: NextRequest) => {
+  /** 게스트 유입 분석용 로깅 — 발급 직전 요청 정보를 Sentry 로 수집 (info 라 디코 알림 대상 아님) */
+  const userAgent = request.headers.get('user-agent');
+  Sentry.captureMessage('guest_login', {
+    level: 'info',
+    fingerprint: ['guest-login'],
+    tags: {
+      type: 'guest_login',
+      route: request.nextUrl.pathname,
+      is_bot: BOT_UA_PATTERN.test(userAgent ?? ''),
+    },
+    extra: {
+      userAgent,
+      referer: sanitizeReferer(request.headers.get('referer')),
+    },
+  });
+
   const response = await postGuestLoginServer();
   const isApp = isWebview(request.headers.get('user-agent'));
   const setCookieHeaders = response.headers['set-cookie'] ?? [];

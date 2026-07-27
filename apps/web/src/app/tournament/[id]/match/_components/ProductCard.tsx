@@ -1,14 +1,16 @@
 import BaseImage from '@/components/base-image';
 import { Z_INDEX } from '@/consts/zIndex';
+import formatPrice from '@/utils/formatPrice';
 
 import type { ProductT } from '../../_common/_types/tournament';
 
 type ProductCardProps = ProductT & {
   isPicked?: boolean;
+  isFinal?: boolean;
   onClick?: () => void;
 };
 
-function ProductCard({ imageUrl, name, price, isPicked, onClick }: ProductCardProps) {
+function ProductCard({ imageUrl, name, price, isPicked, isFinal = false, onClick }: ProductCardProps) {
   return (
     <button type="button" onClick={onClick} className="relative w-[148px] cursor-pointer text-left">
       {isPicked && (
@@ -37,9 +39,9 @@ function ProductCard({ imageUrl, name, price, isPicked, onClick }: ProductCardPr
             />
           )}
         </div>
-        <div className="flex flex-1 flex-col items-center justify-center gap-2 p-4 text-center">
+        <div className={`flex gap-2 p-4 text-center ${isFinal ? 'flex-col' : 'flex-1 flex-col items-center justify-center'}`}>
           <p className="body-2-medium text-text-neutral-secondary">{name}</p>
-          <p className="body-1-bold text-text-neutral-primary">{price.toLocaleString()}원</p>
+          <p className="body-1-bold text-text-neutral-primary">{formatPrice(String(price))}</p>
         </div>
       </div>
     </button>
