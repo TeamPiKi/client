@@ -133,10 +133,17 @@ export const useImagePicker = ({
 
     setIsPending(true);
 
-    WebBridge.postMessage({
+    const isSent = WebBridge.postMessage({
       type: WEBBRIDGE_MESSAGE_TYPE.WEB_REQ_OPEN_IMAGE_PICKER,
       payload: { requestId, maxCount },
     });
+
+    /** 앱 버전 게이트로 메시지가 보내지지 않은 경우  */
+    if (!isSent) {
+      pendingRequestsRef.current.delete(requestId);
+      setIsPending(false);
+      return;
+    }
 
     void pendingPromise
       .then(async files => {
