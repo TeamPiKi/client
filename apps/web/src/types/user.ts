@@ -11,7 +11,7 @@ export type GuestUserT = BaseUserT & {
   email: null;
 };
 
-export type MemberUserT = BaseUserT & {
+type MemberUserT = BaseUserT & {
   /** 유저 식별 타입 */
   identityType: 'MEMBER';
   /** 유저 이메일 */

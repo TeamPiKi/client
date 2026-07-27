@@ -1,6 +1,7 @@
 import ImageIconOutline from '@/assets/icons/outline/image.svg';
 import BaseImage from '@/components/base-image';
 import Skeleton from '@/components/skeleton';
+import formatPrice from '@/utils/formatPrice';
 
 type WishCardProps = {
   name: string;
@@ -40,7 +41,7 @@ function WishCard({ name, price, imageUrl, sourcePlatform, preload = false }: Wi
       <div className="flex h-[124px] flex-col items-start gap-2.5 self-stretch p-4">
         <div className="flex flex-col gap-1 self-stretch">
           <p className="line-clamp-2 self-stretch body-2-medium text-text-neutral-primary">{name}</p>
-          <p className="body-2-semibold text-text-neutral-primary">{price.toLocaleString()}원</p>
+          <p className="body-2-semibold text-text-neutral-primary">{formatPrice(String(price))}</p>
         </div>
         {sourcePlatform && (
           <span className="flex h-5 items-center rounded-[4px] bg-gray-75 px-1.5 caption-1-regular text-text-neutral-secondary">

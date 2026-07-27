@@ -27,9 +27,6 @@ const readJson = <T>(key: string): T | null => {
   }
 };
 
-/** 회원이 초대 코드만 입력하고 바로 토너먼트로 진입할 때 확인 다이얼로그 노출용 */
-export const setJoinConfirm = (payload: JoinConfirmPayloadT) => writeJson(CONFIRM_KEY, payload);
-
 export const consumeJoinConfirmFor = (tournamentId: number): JoinConfirmPayloadT | null => {
   const payload = readJson<JoinConfirmPayloadT>(CONFIRM_KEY);
   if (!payload || payload.tournamentId !== tournamentId) return null;
