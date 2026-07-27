@@ -7,6 +7,7 @@ import { toast } from 'sonner';
 
 import { getNotifications } from '@/app/notification/_apis/getNotifications';
 import { ENDPOINTS } from '@/consts/api';
+import { QUERY_ACTION } from '@/consts/queryAction';
 import { ROUTES } from '@/consts/route';
 import { CLIENT_TYPE } from '@/consts/webBridge';
 import type { NotificationSsePayloadT, SilentSyncSsePayloadT } from '@/types/notification';
@@ -28,6 +29,8 @@ const syncBadgeWithServer = () => {
 
 const MAX_RETRY_DELAY_MS = 30_000;
 
+const SCROLL_TO_LAST_QUERY = `${QUERY_ACTION.KEY}=${QUERY_ACTION.VALUE.SCROLL_TO_LAST}`;
+
 const resolveDeepLink = (payload: NotificationSsePayloadT): string | null => {
   const { type, refId, kind, tournamentId } = payload;
 
@@ -36,11 +39,11 @@ const resolveDeepLink = (payload: NotificationSsePayloadT): string | null => {
       return ROUTES.TOURNAMENT_CREATE(refId);
     case 'TOURNAMENT_JOINED':
     case 'TOURNAMENT_ITEM_ADDED':
-      return `${ROUTES.TOURNAMENT_CREATE(refId)}?scrollToLast=true`;
+      return `${ROUTES.TOURNAMENT_CREATE(refId)}?${SCROLL_TO_LAST_QUERY}`;
     case 'ITEM_PARSING_COMPLETED':
     case 'ITEM_PARSING_FAILED':
       if (kind === 'TOURNAMENT' && tournamentId != null) {
-        return `${ROUTES.TOURNAMENT_CREATE(tournamentId)}?scrollToLast=true`;
+        return `${ROUTES.TOURNAMENT_CREATE(tournamentId)}?${SCROLL_TO_LAST_QUERY}`;
       }
       return ROUTES.WISHLIST;
     default:
