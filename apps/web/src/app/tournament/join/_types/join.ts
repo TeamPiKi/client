@@ -4,6 +4,8 @@ export type GetInvitePreviewResponseT = {
   tournamentName: string;
   itemCount: number;
   participantCount: number;
+  /** 요청자(게스트/회원)가 이미 이 토너먼트에 참여 중인지. 미인증·미참여면 false */
+  joined: boolean;
 };
 
 export type PostJoinRequestT = {
