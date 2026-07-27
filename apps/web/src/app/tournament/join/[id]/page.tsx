@@ -44,17 +44,15 @@ async function TournamentJoinPage({ params, searchParams }: TournamentJoinPagePr
   if (tournamentId === null) notFound();
 
   const queryClient = getQueryClient();
-  const getInvitePreviewPromise = queryClient.prefetchQuery({
+  queryClient.prefetchQuery({
     queryKey: ['invitePreview', tournamentId],
     queryFn: () => getInvitePreview(tournamentId),
   });
 
-  const getMePromise = queryClient.prefetchQuery({
+  queryClient.prefetchQuery({
     queryKey: ['me'],
     queryFn: getMe,
   });
-
-  await Promise.all([getInvitePreviewPromise, getMePromise]);
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>

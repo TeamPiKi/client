@@ -19,7 +19,6 @@ import TournamentItemBasket from './TournamentItemBasket';
 type TournamentItemBasketCarouselProps = {
   items?: TournamentPendingItemT[];
   scrollToLast?: boolean;
-  onScrolled?: () => void;
   isDepositClosed?: boolean;
   participantImageMap?: Map<string, string>;
 };
@@ -27,7 +26,6 @@ type TournamentItemBasketCarouselProps = {
 function TournamentItemBasketCarousel({
   items = [],
   scrollToLast = false,
-  onScrolled,
   isDepositClosed = false,
   participantImageMap,
 }: TournamentItemBasketCarouselProps) {
@@ -59,11 +57,10 @@ function TournamentItemBasketCarousel({
 
     if (items.length > prevItemCountRef.current) {
       carouselApi.scrollTo(getBasketIndexForLastItem(items.length));
-      onScrolled?.();
     }
 
     prevItemCountRef.current = items.length;
-  }, [carouselApi, isCarouselEnabled, items.length, onScrolled]);
+  }, [carouselApi, isCarouselEnabled, items.length]);
 
   /** 초기 이미지 위치 틀어짐 방지 */
   useLayoutEffect(() => {

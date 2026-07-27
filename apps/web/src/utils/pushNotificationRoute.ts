@@ -12,6 +12,6 @@ export const getPushNotificationRoute = (payload: DeepLinkPayloadT) => {
       if (payload.kind === 'TOURNAMENT' && payload.tournamentId) {
         return ROUTES.TOURNAMENT_CREATE(payload.tournamentId);
       }
-      return ROUTES.ARCHIVE();
+      return ROUTES.WISHLIST;
   }
 };

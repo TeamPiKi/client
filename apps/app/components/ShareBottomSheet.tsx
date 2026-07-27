@@ -19,7 +19,7 @@ function ShareBottomSheetContent({ url, text }: ShareExtensionProps) {
 
   const handleOpenWishlist = () => {
     /** openHostApp path 규칙: `/{path}?{query}` — `web=...`만 넘기면 `/web=...` 라우트로 해석됨 */
-    openHostApp(`/?web=${encodeURIComponent('/archive?tab=wish')}`);
+    openHostApp(`/?web=${encodeURIComponent('/archive/wish')}`);
   };
 
   useEffect(() => {

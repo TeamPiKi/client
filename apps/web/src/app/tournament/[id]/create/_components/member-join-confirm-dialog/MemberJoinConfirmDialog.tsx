@@ -34,7 +34,7 @@ function MemberJoinConfirmDialog({
           <div className="flex flex-col items-center gap-2">
             <ProfileSvg className="size-12.5" aria-label={nickname} />
             <div className="flex flex-col items-center gap-1">
-              <DrawerTitle className="heading-1 text-text-neutral-primary">{nickname}</DrawerTitle>
+              <DrawerTitle className="heading-1-bold text-text-neutral-primary">{nickname}</DrawerTitle>
               <DrawerDescription className="body-2-medium text-text-neutral-tertiary">
                 이 프로필로 참여할게요.
               </DrawerDescription>

@@ -1,6 +1,6 @@
 'use client';
 
-import { useParams, useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import { useState } from 'react';
 
 import { usePostTournamentItemLink } from '@/app/tournament/[id]/create/_hooks/usePostTournamentItemLink';
@@ -8,7 +8,6 @@ import { LinkIconFill } from '@/assets/icons';
 import Button from '@/components/button';
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/dialog';
 import Input from '@/components/input';
-import { ROUTES } from '@/consts/route';
 import { usePostWishLink } from '@/hooks/usePostWishLink';
 import type { ItemTypeT } from '@/types/item';
 import { URL_PATTERN, extractUrlFromText } from '@/utils/extractUrl';
@@ -20,7 +19,6 @@ type ByLinkProps = {
 };
 
 function ByLinkDialog({ type, open, onOpenChange }: ByLinkProps) {
-  const router = useRouter();
   const { id: tournamentId } = useParams<{ id: string }>();
   const { postWishLinkMutation, isPostWishLinkPending } = usePostWishLink();
   const { postTournamentItemLinkMutation, isPostTournamentItemLinkPending } =
@@ -49,19 +47,17 @@ function ByLinkDialog({ type, open, onOpenChange }: ByLinkProps) {
       return;
     }
 
+    /** 닫기/초기화는 성공 시에만 — 실패 시 URL을 고칠 수 있게 유지. 위시리스트 이동은 usePostWishLink 훅이 조건부로 처리 */
     if (type === 'wish')
       postWishLinkMutation(submitUrl, {
-        onSettled: () => {
+        onSuccess: () => {
           onOpenChange(false);
           resetState();
-        },
-        onSuccess: () => {
-          router.push(ROUTES.ARCHIVE('wish'));
         },
       });
     else
       postTournamentItemLinkMutation(submitUrl, {
-        onSettled: () => {
+        onSuccess: () => {
           onOpenChange(false);
           resetState();
         },
@@ -90,7 +86,7 @@ function ByLinkDialog({ type, open, onOpenChange }: ByLinkProps) {
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent showCloseButton={false} className="flex flex-col gap-5 rounded-3xl">
-        <DialogTitle className="text-center heading-1 text-text-neutral-primary">
+        <DialogTitle className="text-center heading-1-bold text-text-neutral-primary">
           링크로 담기
         </DialogTitle>
         <DialogDescription className="sr-only">상품 URL을 입력해 담습니다.</DialogDescription>

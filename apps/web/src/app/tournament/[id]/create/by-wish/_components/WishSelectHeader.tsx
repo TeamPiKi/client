@@ -16,33 +16,24 @@ function WishSelectHeader({
   const renderSubtitle = () => {
     if (isMaxExceeded)
       return (
-        <p>
-          <span className="heading-2 text-gray-600">최대 {MAX_SELECT}개</span>
-          <span className="heading-2-medium text-gray-300">까지 선택할 수 있어요</span>
+        <p className="body-1-medium text-text-neutral-secondary">
+          최대 {MAX_SELECT}개까지 선택할 수 있어요
         </p>
       );
 
     return (
-      <p className="whitespace-pre-line">
-        <span className="heading-2 text-text-neutral-secondary">
-          {tournamentCandidateCount}개가
-        </span>
-        <span className="heading-2-medium text-text-neutral-secondary">
-          {' 담겨있어요\n더 추가하고 싶은 상품을 골라보세요.'}
-        </span>
+      <p className="whitespace-pre-line body-1-medium text-text-neutral-secondary">
+        {`후보가 ${tournamentCandidateCount}개 담겨있어요.\n후보로 추가할 상품을 선택해주세요.`}
       </p>
     );
   };
 
   return (
-    <div className="flex flex-col gap-[25px]">
-      <div className="flex flex-col gap-2">
-        <h1 className="title-1 text-gray-950">비교할 위시템을 선택해주세요</h1>
-        <div className="min-h-[52px]">{renderSubtitle()}</div>
-      </div>
-      <p className="body-1-medium">
-        <span className="text-gray-950">{selectedCount}</span>
-        <span className="text-gray-600">/{totalCount}개 선택 중</span>
+    <div className="flex flex-col gap-8 pt-6">
+      {renderSubtitle()}
+      <p className="body-2-medium">
+        <span className="text-text-accent">{selectedCount}</span>
+        <span className="text-[#737373]">/{totalCount}개 선택</span>
       </p>
     </div>
   );

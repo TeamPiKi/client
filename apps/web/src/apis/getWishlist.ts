@@ -4,9 +4,13 @@ import { clientApi } from '@/apis/client';
 import { serverApi } from '@/apis/server';
 import { ENDPOINTS } from '@/consts/api';
 import type { ApiResponseT } from '@/types/api';
+import type { ItemT } from '@/types/item';
+import type { WishItemT, WishT } from '@/types/wish';
 
-import type { WishlistEntryT } from '../app/archive/_types/wish';
-import type { WishItemT } from '../app/archive/_types/wish';
+type WishlistEntryT = {
+  wish: WishT;
+  item: ItemT;
+};
 
 type WishlistApiResponseT = ApiResponseT<WishlistEntryT[]> & {
   pageResponse: {
@@ -29,6 +33,7 @@ const mapWishlist = (entries: WishlistEntryT[]): WishItemT[] =>
     name: item.name ?? '',
     price: item.currentPrice ?? 0,
     imageUrl: item.imageUrl ?? null,
+    sourcePlatform: item.sourcePlatform ?? null,
   }));
 
 export const getWishlist = async (cursor: string | null = null): Promise<WishlistPageT> => {

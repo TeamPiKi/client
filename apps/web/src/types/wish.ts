@@ -1,4 +1,4 @@
-import type { ItemT } from './item';
+import type { ItemStatusT, ItemT } from './item';
 
 export type PostWishOCRResponseT = {
   wish: WishT;
@@ -13,4 +13,14 @@ export type PostWishLinkResponseT = {
 export type WishT = {
   id: number;
   createdAt: string;
+};
+
+export type WishItemT = {
+  id: number;
+  itemId: number;
+  name: string;
+  price: number;
+  imageUrl: string | null;
+  status: ItemStatusT;
+  sourcePlatform: string | null;
 };

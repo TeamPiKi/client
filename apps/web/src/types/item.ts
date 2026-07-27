@@ -10,6 +10,7 @@ export type ItemT = {
   currency: string | null;
   imageUrl: string | null;
   sourceUrl: string | null;
+  sourcePlatform: string | null;
 };
 
 export type ItemStatusT = (typeof ITEM_STATUS)[keyof typeof ITEM_STATUS];

@@ -73,6 +73,7 @@ export { default as HashIconOutline } from './hash.svg';
 export { default as HeartIconOutline } from './heart.svg';
 export { default as HelpIconOutline } from './help.svg';
 export { default as HistoryIconOutline } from './history.svg';
+export { default as HomeIconOutline } from './home.svg';
 export { default as ImageIconOutline } from './image.svg';
 export { default as InboxIconOutline } from './inbox.svg';
 export { default as InfoIconOutline } from './info.svg';

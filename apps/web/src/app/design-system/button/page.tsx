@@ -104,7 +104,7 @@ type SectionProps = {
 function ButtonMatrix({ title, icon }: SectionProps) {
   return (
     <section className="flex flex-col gap-6">
-      <h2 className="heading-2 text-text-neutral-primary">{title}</h2>
+      <h2 className="heading-2-semibold text-text-neutral-primary">{title}</h2>
       <div className="flex flex-col gap-8">
         {VARIANTS.map(variant => (
           <div key={variant} className="flex flex-col gap-3">
@@ -140,7 +140,9 @@ function ButtonMatrix({ title, icon }: SectionProps) {
 function ButtonIconOnlyMatrix() {
   return (
     <section className="flex flex-col gap-6">
-      <h2 className="heading-2 text-text-neutral-primary">Icon Only (Primary · Default)</h2>
+      <h2 className="heading-2-semibold text-text-neutral-primary">
+        Icon Only (Primary · Default)
+      </h2>
       <div className="flex items-center gap-6">
         {SIZES.map(size => (
           <div key={size} className="flex flex-col items-center gap-2">

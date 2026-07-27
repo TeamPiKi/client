@@ -9,9 +9,9 @@ import AccountInfoSection from './_components/AccountInfoSection';
 import AppVersionFooter from './_components/AppVersionFooter';
 import ProfileSection from './_components/ProfileSection';
 
-async function MypagePage() {
+function MypagePage() {
   const queryClient = getQueryClient();
-  await queryClient.prefetchQuery({
+  queryClient.prefetchQuery({
     queryKey: ['me'],
     queryFn: getMe,
   });
@@ -21,7 +21,7 @@ async function MypagePage() {
       <Header left={<HeaderIcon name="BACK" />} center="설정" centerClassName="title-1" />
       <Spacing size={48} />
 
-      <main className="hide-scrollbar flex flex-1 flex-col overflow-y-auto pb-9">
+      <main className="hide-scrollbar flex flex-1 flex-col overflow-y-auto pb-32">
         {/** 프로필 */}
         <HydrationBoundary state={dehydrate(queryClient)}>
           <ProfileSection />
@@ -35,6 +35,7 @@ async function MypagePage() {
 
         <AppVersionFooter />
       </main>
+
     </div>
   );
 }

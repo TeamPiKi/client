@@ -1,5 +1,6 @@
 'use client';
 
+import TournamentEmptyState from '@/components/common/tournament-empty-state';
 import TournamentCard from '@/components/tournament-card';
 import { useGetTournamentList } from '@/hooks/useGetTournamentList';
 import type { TournamentStatusT } from '@/types/tournament';
@@ -9,26 +10,30 @@ type Props = {
 };
 
 function TournamentListClient({ statuses }: Props) {
-  const { tournamentListData } = useGetTournamentList(statuses);
+  const { tournamentListData } = useGetTournamentList(statuses, 3);
 
-  if (tournamentListData.length === 0) return null;
+  if (tournamentListData.length === 0)
+    return (
+      <div className="flex flex-1 items-center justify-center">
+        <TournamentEmptyState variant="muted" />
+      </div>
+    );
 
   return (
-    <section className="flex flex-col gap-3">
-      <h2 className="heading-2 text-black">진행 중인 토너먼트</h2>
-
+    <>
       {tournamentListData.map(tournament => (
         <TournamentCard
           key={tournament.tournamentId}
+          imageUrls={tournament.thumbnailUrls}
           tournamentId={tournament.tournamentId}
           status={tournament.status}
           name={tournament.name}
-          date={tournament.createdAt.slice(0, 10).replaceAll('-', '/')}
           profileImageUrls={tournament.participantProfileImages}
           participantCount={tournament.participantProfileImages.length}
+          showMorePopover={false}
         />
       ))}
-    </section>
+    </>
   );
 }
 

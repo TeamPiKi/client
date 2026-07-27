@@ -5,15 +5,9 @@ import { useCallback, useEffect, useRef } from 'react';
 import { toShareIntentPayload } from '@/utils/serializeShareIntent';
 import { WebBridge } from '@/utils/webBridge';
 
-const ARCHIVE_PATH = '/archive';
-const ARCHIVE_WISH_TAB = 'wish';
+const WISHLIST_PATH = '/archive/wish';
 
-const isArchiveWishTab = (uri: URL) => {
-  if (uri.pathname !== ARCHIVE_PATH) return false;
-
-  const tab = uri.searchParams.get('tab');
-  return tab === null || tab === ARCHIVE_WISH_TAB;
-};
+const isWishlistPath = (uri: URL) => uri.pathname === WISHLIST_PATH;
 
 type Props = {
   onChangeWebviewUri: (uri: string) => void;
@@ -47,14 +41,14 @@ export const useShareIntent = ({ onChangeWebviewUri, webviewUri }: Props) => {
       const nextUri = new URL(webviewUri);
 
       /** 이미 아카이브 위시 탭: 즉시 전송 */
-      if (isArchiveWishTab(nextUri)) {
+      if (isWishlistPath(nextUri)) {
         sendShareIntent();
         return;
       }
 
-      /** 다른 페이지: payload 보관 후 아카이브 위시 탭으로 이동 → WEB_REQ_READY 수신 시 전송 */
-      nextUri.pathname = ARCHIVE_PATH;
-      nextUri.search = `?tab=${ARCHIVE_WISH_TAB}`;
+      /** 다른 페이지: payload 보관 후 아카이브 위시로 이동 → WEB_REQ_READY 수신 시 전송 */
+      nextUri.pathname = WISHLIST_PATH;
+      nextUri.search = '';
       nextUri.hash = '';
       onChangeWebviewUri(nextUri.toString());
     } catch {

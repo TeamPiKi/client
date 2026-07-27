@@ -14,7 +14,7 @@ function NicknameField({ value, onChange, isChecking, errorText }: NicknameField
 
   return (
     <div className="flex w-full flex-col">
-      <h2 className="heading-2 text-gray-950">닉네임</h2>
+      <h2 className="heading-2-semibold text-gray-950">닉네임</h2>
       <Input
         name="nickname"
         value={value}

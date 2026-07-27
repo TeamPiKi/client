@@ -7,6 +7,7 @@ import { toast } from 'sonner';
 
 import { getNotifications } from '@/app/notification/_apis/getNotifications';
 import { ENDPOINTS } from '@/consts/api';
+import { QUERY_ACTION } from '@/consts/queryAction';
 import { ROUTES } from '@/consts/route';
 import { CLIENT_TYPE } from '@/consts/webBridge';
 import type { NotificationSsePayloadT, SilentSyncSsePayloadT } from '@/types/notification';
@@ -28,6 +29,8 @@ const syncBadgeWithServer = () => {
 
 const MAX_RETRY_DELAY_MS = 30_000;
 
+const SCROLL_TO_LAST_QUERY = `${QUERY_ACTION.KEY}=${QUERY_ACTION.VALUE.SCROLL_TO_LAST}`;
+
 const resolveDeepLink = (payload: NotificationSsePayloadT): string | null => {
   const { type, refId, kind, tournamentId } = payload;
 
@@ -36,13 +39,13 @@ const resolveDeepLink = (payload: NotificationSsePayloadT): string | null => {
       return ROUTES.TOURNAMENT_CREATE(refId);
     case 'TOURNAMENT_JOINED':
     case 'TOURNAMENT_ITEM_ADDED':
-      return `${ROUTES.TOURNAMENT_CREATE(refId)}?scrollToLast=true`;
+      return `${ROUTES.TOURNAMENT_CREATE(refId)}?${SCROLL_TO_LAST_QUERY}`;
     case 'ITEM_PARSING_COMPLETED':
     case 'ITEM_PARSING_FAILED':
       if (kind === 'TOURNAMENT' && tournamentId != null) {
-        return `${ROUTES.TOURNAMENT_CREATE(tournamentId)}?scrollToLast=true`;
+        return `${ROUTES.TOURNAMENT_CREATE(tournamentId)}?${SCROLL_TO_LAST_QUERY}`;
       }
-      return ROUTES.ARCHIVE_BASE;
+      return ROUTES.WISHLIST;
     default:
       return null;
   }
@@ -53,6 +56,7 @@ export const useNotificationSSE = (enabled: boolean) => {
   const queryClient = useQueryClient();
   const retryDelayRef = useRef(1_000);
   const abortRef = useRef<AbortController | null>(null);
+  const hasConnectedRef = useRef(false);
 
   useEffect(() => {
     if (!enabled) return;
@@ -90,6 +94,11 @@ export const useNotificationSSE = (enabled: boolean) => {
         onopen: async response => {
           if (response.ok) {
             retryDelayRef.current = 1_000;
+            if (hasConnectedRef.current) {
+              // 재연결 성공 — 끊긴 동안 놓쳤을 수 있는 변경사항을 화면 재조회로 복구
+              void queryClient.invalidateQueries();
+            }
+            hasConnectedRef.current = true;
             return;
           }
           if (response.status === 401) {
@@ -201,7 +210,9 @@ export const useNotificationSSE = (enabled: boolean) => {
 
           // throw하면 fetchEventSource가 재시도 멈춤 → setTimeout으로 수동 재연결
           controller.abort();
-          setTimeout(connect, delay);
+          // 다수 클라이언트가 동시에 끊겼을 때 재연결이 한 시점에 몰리는 것 방지
+          const jitteredDelay = delay * (0.5 + Math.random() * 0.5);
+          setTimeout(connect, jitteredDelay);
           throw err;
         },
       });

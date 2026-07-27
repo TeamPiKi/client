@@ -9,7 +9,7 @@ function NotFound() {
       <div className="flex flex-col items-center gap-4">
         <CloseCircularIconFill className="size-20 text-icon-neutral-secondary" />
         <div className="flex flex-col items-center gap-2">
-          <h1 className="heading-1 text-text-neutral-secondary">페이지를 찾을 수 없어요.</h1>
+          <h1 className="heading-1-bold text-text-neutral-secondary">페이지를 찾을 수 없어요.</h1>
           <p className="body-1-semibold text-text-neutral-tertiary">
             링크가 잘못되었거나 삭제된 페이지예요.
           </p>

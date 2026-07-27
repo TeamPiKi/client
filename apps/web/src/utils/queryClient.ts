@@ -1,5 +1,11 @@
 import * as Sentry from '@sentry/nextjs';
-import { MutationCache, QueryCache, QueryClient, environmentManager } from '@tanstack/react-query';
+import {
+  MutationCache,
+  QueryCache,
+  QueryClient,
+  defaultShouldDehydrateQuery,
+  environmentManager,
+} from '@tanstack/react-query';
 import { isAxiosError } from 'axios';
 import { cache } from 'react';
 import { toast } from 'sonner';
@@ -41,6 +47,12 @@ const makeQueryClient = () => {
         retry: 1,
         staleTime: 60 * 1000,
         refetchOnWindowFocus: false,
+      },
+      dehydrate: {
+        // pending 쿼리도 dehydrate — RSC 가 prefetch 완료를 기다리지 않고 응답을 시작하고,
+        // 진행 중인 promise 가 스트리밍으로 클라이언트에 전달된다 (페이지 전환 블로킹 제거의 전제)
+        shouldDehydrateQuery: query =>
+          defaultShouldDehydrateQuery(query) || query.state.status === 'pending',
       },
     },
   });

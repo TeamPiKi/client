@@ -22,7 +22,7 @@ const TYPOGRAPHY_ROWS: TypographyStyleRowT[] = [
   },
   {
     label: 'Heading 1',
-    utilityClass: 'heading-1',
+    utilityClass: 'heading-1-bold',
     size: '20px',
     lineHeight: '28px',
     letterSpacing: '-0.6px',
@@ -30,7 +30,7 @@ const TYPOGRAPHY_ROWS: TypographyStyleRowT[] = [
   },
   {
     label: 'Heading 2',
-    utilityClass: 'heading-2',
+    utilityClass: 'heading-2-semibold',
     size: '18px',
     lineHeight: '26px',
     letterSpacing: '-0.6px',
@@ -151,7 +151,7 @@ function TypographyPage() {
             <h2 className="shrink-0 text-[20px] leading-[1.334] font-bold tracking-[-0.45px] text-black sm:text-[24px] sm:tracking-[-0.552px] lg:max-w-[280px]">
               Style
             </h2>
-            <p className="max-w-[720px] heading-2 text-[#171719]">
+            <p className="max-w-[720px] heading-2-semibold text-[#171719]">
               타이포그래피는 4단계 위계에서 총 12개 하위 위계를 가지고 있습니다.
             </p>
           </div>

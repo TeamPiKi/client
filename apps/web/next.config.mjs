@@ -13,7 +13,21 @@ const nextConfig = async () => {
     turbopack: {
       rules: {
         '*.svg': {
-          loaders: ['@svgr/webpack'],
+          loaders: [
+            {
+              loader: '@svgr/webpack',
+              options: {
+                svgoConfig: {
+                  plugins: [
+                    {
+                      name: 'preset-default',
+                      params: { overrides: { removeViewBox: false } },
+                    },
+                  ],
+                },
+              },
+            },
+          ],
           as: '*.js',
         },
       },
@@ -29,6 +43,27 @@ const nextConfig = async () => {
           hostname: '*.kakaocdn.net',
         },
       ],
+    },
+
+    /**
+     * 구버전 앱 공유 시트·기존 딥링크의 /archive(?tab=) 경로 호환
+     *
+     * NOTE: 구버전 앱 사라지면 이 설정 제거 필요
+     */
+    async redirects() {
+      return [
+        {
+          source: '/archive',
+          has: [{ type: 'query', key: 'tab', value: 'tournament' }],
+          destination: '/archive/tournament',
+          permanent: false,
+        },
+        {
+          source: '/archive',
+          destination: '/archive/wish',
+          permanent: false,
+        },
+      ];
     },
 
     async rewrites() {

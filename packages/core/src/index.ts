@@ -8,6 +8,7 @@ export {
 } from './consts/webBridge';
 
 /** 타입 */
+export type { AuthTokensT } from './types/auth';
 export type {
   AnalyticsEventParamT,
   AnalyticsEventParamsT,
@@ -55,4 +56,11 @@ export type {
 export type { WebBridgeMessageT, WebReqReadyMessageT } from './types/webBridge';
 
 /** 유틸 */
+export {
+  decodeJwtPayload,
+  getTokenExpiresIso,
+  getTokenMaxAge,
+  isFresherToken,
+  isTokenValid,
+} from './utils/jwt';
 export { isWebBridgeMessageT } from './utils/webBridge';
