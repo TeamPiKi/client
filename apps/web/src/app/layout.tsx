@@ -5,6 +5,7 @@ import { headers } from 'next/headers';
 import React from 'react';
 
 import BottomTabBar from '@/components/bottom-tab-bar';
+import { SCROLL_CONTAINER_ID } from '@/consts/layout';
 
 import Providers from '../components/Providers';
 import '../styles/globals.css';
@@ -66,7 +67,10 @@ async function RootLayout({
       <body className="h-full overflow-hidden">
         <Providers>
           {/** TEMP: max width 임시 값 */}
-          <div className="mx-auto hide-scrollbar h-full max-w-120 overflow-y-auto [scrollbar-gutter:stable]">
+          <div
+            id={SCROLL_CONTAINER_ID}
+            className="mx-auto hide-scrollbar h-full max-w-120 overflow-y-auto [scrollbar-gutter:stable]"
+          >
             {children}
           </div>
 
