@@ -19,7 +19,7 @@ const copyToClipboard = async (text: string) => {
   throw new Error('Clipboard API unavailable');
 };
 
-export type ShareResultT = 'shared' | 'copied' | 'cancelled' | 'failed';
+type ShareResultT = 'shared' | 'copied' | 'cancelled' | 'failed';
 
 export const share = async (data: ShareDataT): Promise<ShareResultT> => {
   if (canUseWebShare(data)) {

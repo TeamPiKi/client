@@ -5,9 +5,9 @@ import { toast } from 'sonner';
 
 import { ROUTES } from '@/consts/route';
 import type { ApiErrorResponseT } from '@/types/api';
+import type { PatchItemRequestT } from '@/types/item';
 
 import { patchTournamentItem } from '../_apis/patchTournamentItem';
-import type { PatchTournamentItemRequestT } from '../_types/tournamentItem';
 
 export const usePatchTournamentItem = (tournamentId: number, tournamentItemId: number) => {
   const router = useRouter();
@@ -15,7 +15,7 @@ export const usePatchTournamentItem = (tournamentId: number, tournamentItemId: n
 
   const { mutate: patchTournamentItemMutation, isPending: isPatchTournamentItemPending } =
     useMutation({
-      mutationFn: (body: Omit<PatchTournamentItemRequestT, 'currency'>) => {
+      mutationFn: (body: Omit<PatchItemRequestT, 'currency'>) => {
         const formData = new FormData();
         formData.append('name', body.name);
         formData.append('price', String(body.currentPrice));

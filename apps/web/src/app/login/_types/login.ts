@@ -1,7 +1,5 @@
 import type { UserT } from '@/types/user';
 
-export type { SocialProviderT } from '@piki/core';
-
 export type GetAuthUrlResponseT = {
   url: string;
 };
@@ -14,8 +12,3 @@ export type PostGuestLoginResponseT = {
   user: UserT;
 };
 
-export type PostMemberLoginResponseT = {
-  accessToken: null;
-  refreshToken: null;
-  user: UserT;
-};
