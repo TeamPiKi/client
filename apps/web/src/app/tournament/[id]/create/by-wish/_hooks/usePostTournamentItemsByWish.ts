@@ -19,7 +19,7 @@ export const usePostTournamentItemsByWish = (tournamentId: number) => {
     mutationFn: (itemIds: number[]) => postTournamentItemsByWish(tournamentId, { itemIds }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tournament', tournamentId] });
-      router.push(
+      router.replace(
         `${ROUTES.TOURNAMENT_CREATE(tournamentId)}?${QUERY_ACTION.KEY}=${QUERY_ACTION.VALUE.SCROLL_TO_LAST}`
       );
     },
