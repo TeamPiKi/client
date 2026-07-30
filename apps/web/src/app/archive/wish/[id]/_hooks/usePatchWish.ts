@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
 import { ROUTES } from '@/consts/route';
+import { useBackWithFallback } from '@/hooks/useBackWithFallback';
 import type { ApiErrorResponseT } from '@/types/api';
 import type { PatchItemRequestT } from '@/types/item';
 
@@ -11,6 +12,7 @@ import { patchWish } from '../_apis/patchWish';
 
 export const usePatchWish = (wishId: number) => {
   const router = useRouter();
+  const backWithFallback = useBackWithFallback();
   const queryClient = useQueryClient();
 
   const { mutate: patchWishMutation, isPending: isPatchWishPending } = useMutation({
@@ -25,7 +27,7 @@ export const usePatchWish = (wishId: number) => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['wish', wishId] });
       queryClient.invalidateQueries({ queryKey: ['wishlists'] });
-      router.back();
+      backWithFallback(ROUTES.WISHLIST);
     },
     onError: error => {
       if (!isAxiosError<ApiErrorResponseT>(error) || !error.response) return;

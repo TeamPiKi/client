@@ -1,14 +1,15 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { isAxiosError } from 'axios';
-import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
 import { deleteWish } from '@/apis/deleteWish';
+import { ROUTES } from '@/consts/route';
+import { useBackWithFallback } from '@/hooks/useBackWithFallback';
 import type { ApiErrorResponseT } from '@/types/api';
 
 /** 위시 단건 삭제 */
 export const useDeleteWish = (wishId: number) => {
-  const router = useRouter();
+  const backWithFallback = useBackWithFallback();
   const queryClient = useQueryClient();
 
   const { mutate: deleteWishMutation, isPending: isDeleteWishPending } = useMutation({
@@ -16,7 +17,7 @@ export const useDeleteWish = (wishId: number) => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['wishlists'] });
       toast.success('위시 상품이 삭제되었습니다.');
-      router.back();
+      backWithFallback(ROUTES.WISHLIST);
     },
     onError: error => {
       if (!isAxiosError<ApiErrorResponseT>(error) || !error.response) return;
