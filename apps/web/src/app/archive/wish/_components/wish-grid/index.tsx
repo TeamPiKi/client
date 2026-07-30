@@ -19,6 +19,9 @@ type WishGridProps = {
 
 function WishGrid({ items, isDeleteMode = false, selectedIds, onToggleSelect }: WishGridProps) {
   const handleCardClick = (event: MouseEvent<HTMLAnchorElement>, wishId: number) => {
+    /** 새 탭/새 창 열기는 현재 페이지를 떠나지 않으므로 스크롤 위치를 저장하지 않는다. */
+    if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+
     saveWishScroll(event.currentTarget, wishId);
   };
 
