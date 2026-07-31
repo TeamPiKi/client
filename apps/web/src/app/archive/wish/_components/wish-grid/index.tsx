@@ -4,6 +4,7 @@ import type { MouseEvent } from 'react';
 import { CheckboxEmptyIconFill, CheckboxSelectedIconFill } from '@/assets/icons';
 import WishCard from '@/components/common/wish-card';
 import { ROUTES } from '@/consts/route';
+import { Z_INDEX } from '@/consts/zIndex';
 import type { WishItemT } from '@/types/wish';
 
 import { saveWishScroll } from '../../_utils/wishScroll';
@@ -59,9 +60,13 @@ function WishGrid({ items, isDeleteMode = false, selectedIds, onToggleSelect }: 
                 sourcePlatform={item.sourcePlatform}
               />
               <div
-                className={`pointer-events-none absolute top-0 right-0 left-0 z-[11] aspect-[201/166] bg-black/20 transition-opacity duration-200 ${isSelected ? 'opacity-100' : 'opacity-0'}`}
+                style={{ zIndex: Z_INDEX.BASE_IMAGE + 1 }}
+                className={`pointer-events-none absolute top-0 right-0 left-0 aspect-[201/166] bg-black/20 transition-opacity duration-200 ${isSelected ? 'opacity-100' : 'opacity-0'}`}
               />
-              <span className="pointer-events-none absolute top-3 left-3 z-[12] block size-5">
+              <span
+                style={{ zIndex: Z_INDEX.BASE_IMAGE + 2 }}
+                className="pointer-events-none absolute top-3 left-3 block size-5"
+              >
                 {isSelected ? (
                   <CheckboxSelectedIconFill className="size-5 text-bg-accent" />
                 ) : (
