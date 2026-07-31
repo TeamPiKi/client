@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
+import BottomCta from '@/components/bottom-cta';
 import Button from '@/components/button';
 import { Carousel, type CarouselApi, CarouselContent, CarouselItem } from '@/components/carousel';
 import { ONBOARDING_KEY } from '@/consts/onboarding';
@@ -48,31 +49,33 @@ function OnboardingClient() {
   }, [carouselApi]);
 
   return (
-    <main className="flex min-h-dvh flex-col bg-gray-50 px-5 pt-padding-top pb-9">
-      <Carousel
-        className="grid min-h-0 w-full flex-1"
-        setApi={setCarouselApi}
-        opts={{ loop: false, align: 'start' }}
-      >
-        <CarouselContent className="ml-0 h-full">
-          {ONBOARDING_SLIDES.map(({ subCopy, mainCopy, Illust }) => (
-            <CarouselItem key={subCopy} className="flex h-full flex-col items-center pl-0">
-              <div className="mt-15 flex flex-col items-center gap-[11px]">
-                <p className="text-center body-1-semibold text-sky-blue-400">{subCopy}</p>
-                <h1 className="text-center title-1 whitespace-pre-line text-text-neutral-primary">
-                  {mainCopy}
-                </h1>
-              </div>
+    <>
+      <main className="flex h-dvh flex-col bg-gray-50 px-5 pt-padding-top pb-[130px]">
+        <Carousel
+          className="grid min-h-0 w-full flex-1"
+          setApi={setCarouselApi}
+          opts={{ loop: false, align: 'start' }}
+        >
+          <CarouselContent className="ml-0 h-full">
+            {ONBOARDING_SLIDES.map(({ subCopy, mainCopy, Illust }) => (
+              <CarouselItem key={subCopy} className="flex h-full flex-col items-center pl-0">
+                <div className="mt-[clamp(16px,6vh,60px)] flex flex-col items-center gap-[11px]">
+                  <p className="text-center body-1-semibold text-sky-blue-400">{subCopy}</p>
+                  <h1 className="text-center title-1 whitespace-pre-line text-text-neutral-primary">
+                    {mainCopy}
+                  </h1>
+                </div>
 
-              <div className="mt-10 flex min-h-0 w-full flex-1 items-center justify-center">
-                <Illust aria-hidden className="max-h-full max-w-full" />
-              </div>
-            </CarouselItem>
-          ))}
-        </CarouselContent>
-      </Carousel>
+                <div className="mt-[clamp(12px,4vh,40px)] flex min-h-0 w-full flex-1 items-center justify-center">
+                  <Illust aria-hidden className="h-full max-h-[274px] w-full" />
+                </div>
+              </CarouselItem>
+            ))}
+          </CarouselContent>
+        </Carousel>
+      </main>
 
-      <div className="mt-6 flex flex-col items-center gap-6">
+      <BottomCta hasGradient className="flex-col gap-6">
         <OnboardingIndicator
           totalCount={ONBOARDING_SLIDES.length}
           currentIndex={currentIndex}
@@ -82,8 +85,8 @@ function OnboardingClient() {
         <Button variant="primary" size="lg" onClick={handleNextClick}>
           다음
         </Button>
-      </div>
-    </main>
+      </BottomCta>
+    </>
   );
 }
 
