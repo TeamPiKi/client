@@ -1,9 +1,7 @@
 'use client';
 
-import { isAxiosError } from 'axios';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { toast } from 'sonner';
 
 import { usePatchMe } from '@/app/mypage/edit/_hooks/usePatchMe';
 import { EditIconFill } from '@/assets/icons/fill';
@@ -16,7 +14,6 @@ import { ROUTES } from '@/consts/route';
 import { useGetMe } from '@/hooks/useGetMe';
 import { useNicknameValidation } from '@/hooks/useNicknameValidation';
 import { usePageBackground } from '@/hooks/usePageBackground';
-import type { ApiErrorResponseT } from '@/types/api';
 
 import { useGetInvitePreview } from '../../_hooks/useGetInvitePreview';
 import { usePostJoin } from '../../_hooks/usePostJoin';
@@ -37,10 +34,13 @@ function JoinPreviewClient({ tournamentId, inviteCode }: JoinPreviewClientProps)
   const { userData } = useGetMe();
   const { invitePreviewData } = useGetInvitePreview(tournamentId);
   const { patchMeMutation, isPatchMePending } = usePatchMe();
-  const { postJoinMutation, isPostJoinPending } = usePostJoin();
 
   const [nickname, setNickname] = useState(userData.nickname);
   const [isTournamentErrorDialogOpen, setIsTournamentErrorDialogOpen] = useState(false);
+
+  const { postJoinMutation, isPostJoinPending } = usePostJoin({
+    onConflict: () => setIsTournamentErrorDialogOpen(true),
+  });
 
   const {
     isCheckingNickname,
@@ -64,14 +64,6 @@ function JoinPreviewClient({ tournamentId, inviteCode }: JoinPreviewClientProps)
           router.push(
             `${ROUTES.TOURNAMENT_CREATE(tournamentId)}?${QUERY_ACTION.KEY}=${QUERY_ACTION.VALUE.WELCOME_JOIN}`
           );
-        },
-        onError: error => {
-          if (isAxiosError<ApiErrorResponseT>(error) && error.response?.status === 409) {
-            setIsTournamentErrorDialogOpen(true);
-            return;
-          }
-
-          toast.warning('참여에 실패했어요. 잠시 후 다시 시도해주세요.');
         },
       }
     );
