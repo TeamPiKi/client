@@ -324,6 +324,51 @@ export const usePostGuestLogin = () => {
 
 ---
 
+## 📱 웹뷰 브릿지 (앱 ↔ 웹)
+
+웹은 Vercel로 즉시 배포되지만 앱은 스토어 심사와 유저 업데이트를 거친다. **항상 구버전 앱이 남아 있다고 전제**하고 작성한다.
+
+### 메시지 타입 값은 변경 금지
+
+```ts
+export const WEBBRIDGE_MESSAGE_TYPE = {
+  WEB_REQ_SOCIAL_LOGIN: 'REQUEST_SOCIAL_LOGIN',
+//└─ 키: 코드에서 참조    └─ 값: 실제 전송되는 문자열
+} as const;
+```
+
+- **키** — 자유롭게 변경 가능. 순수 코드 리팩터링이라 앱과 무관
+- **값** — 배포된 앱과의 **공개 API**. 바꾸면 구버전 앱이 메시지를 인식하지 못한다
+- 네이밍 규칙(`WEB_REQ_*` / `APP_RES_*` / `APP_REQ_*` / `WEB_RES_*`)은 **키**에만 적용. 규칙 이전에 만들어진 값은 어긋난 채로 유지한다
+
+값을 꼭 바꿔야 하면 3단계로 나눈다 — ① 앱이 옛 값·새 값 모두 수신 → 릴리즈 ② 웹이 앱 버전 보고 보낼 값 선택 ③ 구버전이 지원 기준선 아래로 내려가면 옛 값 제거.
+
+### 새 브릿지 메시지는 `BRIDGE_GATE`에 등록
+
+`packages/core/src/consts/appVersion.ts`에 최소 앱 버전과 안내 노출 여부를 등록한다. 등록하지 않으면 컴파일 에러가 나지만, **값 판단은 사람이 해야 한다.**
+
+- `minAppVersion` — 앱쪽 핸들러 커밋에 `git tag --contains <sha>`를 돌려 최초로 포함하는 `app-v*` 태그를 쓴다. 날짜로 추정하지 말 것
+- `notifyOnBlock` — 사용자가 직접 유발한 동작(피커 열기, 권한 요청)만 `true`. 애널리틱스·토큰 동기화 같은 백그라운드 동작은 조용히 실패해야 한다
+
+### 앱 응답을 기다리면 `postMessage` 반환값을 확인
+
+`WebBridge.postMessage`는 전송 여부를 `boolean`으로 반환한다. 게이트에 막히면 앱 응답이 영영 오지 않으므로, 대기 상태(pending promise, 로딩 플래그)를 직접 정리해야 한다.
+
+```ts
+const isSent = WebBridge.postMessage({ ... });
+if (!isSent) {
+  pendingRequestsRef.current.delete(requestId);
+  setIsPending(false);
+  return;
+}
+```
+
+### 인바운드 메시지는 payload를 신뢰하지 말 것
+
+`isWebBridgeMessageT`는 `type`이 문자열인지만 확인한다. **payload는 런타임 검증이 없으므로** 구버전 앱이 다른 형태를 보내면 그대로 터진다. 새로 수신 핸들러를 쓸 때는 payload 접근을 방어적으로 한다.
+
+---
+
 ## 📦 Import 규칙
 
 ### 정렬 (자동화됨 — `@trivago/prettier-plugin-sort-imports`)

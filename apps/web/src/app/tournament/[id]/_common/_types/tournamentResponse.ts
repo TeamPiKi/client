@@ -5,7 +5,7 @@ import type {
   TournamentStatusT,
 } from '@/types/tournament';
 
-export type TournamentParticipantT = {
+type TournamentParticipantT = {
   userId: string;
   nickname: string;
   itemCount: number;
@@ -57,7 +57,7 @@ export type GetTournamentPendingResponseT = {
  * 주최자가 ROOT 를 시작했지만 참여자(isOwner=false)는 본인 CLONE 시작 전.
  * 응답은 PENDING 과 동일한 `pending` 페이로드를 받지만 `ownerStarted=true`.
  */
-export type GetTournamentMemberWaitingResponseT = {
+type GetTournamentMemberWaitingResponseT = {
   tournamentId: number;
   name: string;
   isOwner: boolean;

@@ -38,6 +38,9 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
+# pnpm
+.pnpm-store/
+
 # Misc
 .DS_Store
 *.pem

@@ -1,4 +1,4 @@
-import type { PUSH_NOTIFICATION_TYPE, WEBBRIDGE_MESSAGE_TYPE } from '../consts/webBridge';
+import type { WEBBRIDGE_MESSAGE_TYPE } from '../consts/webBridge';
 
 /** 웹 → 앱: 현재 알림 권한 상태 조회 */
 export type WebReqPushPermissionStatusMessageT = {
@@ -47,7 +47,6 @@ export type AppReqDeepLinkMessageT = {
   type: typeof WEBBRIDGE_MESSAGE_TYPE.APP_REQ_DEEP_LINK;
   payload: DeepLinkPayloadT;
 };
-export type PushNotificationTypeT = keyof typeof PUSH_NOTIFICATION_TYPE;
 export type DeepLinkPayloadT =
   | {
       type: 'TOURNAMENT_JOINED' | 'TOURNAMENT_ITEM_ADDED';

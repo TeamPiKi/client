@@ -10,7 +10,7 @@ import UserProfile from '@/components/user-profile-group/UserProfile';
 import type { ProfileTypeT, UserT } from '@/components/user-profile-group/userProfile.const';
 import { useGetMe } from '@/hooks/useGetMe';
 
-export type FriendListItemT = {
+type FriendListItemT = {
   userId: string;
   nickname: string;
   profileImage?: string;

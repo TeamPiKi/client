@@ -1,10 +1,11 @@
 import { GoogleAnalytics } from '@next/third-parties/google';
-import { WEBVIEW_UA_TOKEN } from '@piki/core';
 import type { Metadata, Viewport } from 'next';
 import { headers } from 'next/headers';
 import React from 'react';
 
 import BottomTabBar from '@/components/bottom-tab-bar';
+import { SCROLL_CONTAINER_ID } from '@/consts/layout';
+import { isWebview as _isWebView } from '@/utils/webBridge';
 
 import Providers from '../components/Providers';
 import '../styles/globals.css';
@@ -32,7 +33,7 @@ async function RootLayout({
 }>) {
   const headerStore = await headers();
   const userAgent = headerStore.get('user-agent') ?? '';
-  const isWebview = userAgent.includes(WEBVIEW_UA_TOKEN);
+  const isWebview = _isWebView(userAgent);
 
   return (
     <html
@@ -66,7 +67,10 @@ async function RootLayout({
       <body className="h-full overflow-hidden">
         <Providers>
           {/** TEMP: max width 임시 값 */}
-          <div className="mx-auto hide-scrollbar h-full max-w-120 overflow-y-auto [scrollbar-gutter:stable]">
+          <div
+            id={SCROLL_CONTAINER_ID}
+            className="mx-auto hide-scrollbar h-full max-w-120 overflow-y-auto [scrollbar-gutter:stable]"
+          >
             {children}
           </div>
 
