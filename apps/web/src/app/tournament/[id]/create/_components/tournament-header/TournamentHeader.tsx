@@ -1,6 +1,5 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 import { Header, HeaderIcon } from '@/components/header';
@@ -16,21 +15,20 @@ type TournamentHeaderProps = {
 };
 
 function TournamentHeader({ name, hasFriends }: TournamentHeaderProps) {
-  const router = useRouter();
   const backWithFallback = useBackWithFallback();
   const [isExitConfirmOpen, setIsExitConfirmOpen] = useState(false);
+
+  const handleExit = () => {
+    setIsExitConfirmOpen(false);
+    backWithFallback(ROUTES.HOME);
+  };
 
   const handleBackClick = () => {
     if (hasFriends) {
       setIsExitConfirmOpen(true);
       return;
     }
-    router.push(ROUTES.HOME);
-  };
-
-  const handleConfirmExit = () => {
-    setIsExitConfirmOpen(false);
-    backWithFallback(ROUTES.HOME);
+    handleExit();
   };
 
   return (
@@ -45,7 +43,7 @@ function TournamentHeader({ name, hasFriends }: TournamentHeaderProps) {
       <ConfirmExitDialog
         open={isExitConfirmOpen}
         onOpenChange={setIsExitConfirmOpen}
-        onConfirm={handleConfirmExit}
+        onConfirm={handleExit}
       />
     </>
   );

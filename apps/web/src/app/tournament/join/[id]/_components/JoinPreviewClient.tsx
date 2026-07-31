@@ -61,7 +61,7 @@ function JoinPreviewClient({ tournamentId, inviteCode }: JoinPreviewClientProps)
       },
       {
         onSuccess: () => {
-          router.push(
+          router.replace(
             `${ROUTES.TOURNAMENT_CREATE(tournamentId)}?${QUERY_ACTION.KEY}=${QUERY_ACTION.VALUE.WELCOME_JOIN}`
           );
         },
