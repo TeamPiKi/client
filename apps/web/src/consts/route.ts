@@ -2,6 +2,7 @@
 export const ROUTES = {
   /** 1. Public (Anonymous) */
   ROOT: '/',
+  ONBOARDING: '/onboarding',
   LOGIN: '/login',
   SOCIAL_LOGIN_CALLBACK: (provider: string) => `/auth/callback/${provider}`,
   TERMS: '/terms',
