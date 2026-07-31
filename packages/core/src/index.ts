@@ -1,7 +1,11 @@
 /** 상수 */
 export { BRIDGE_GATE } from './consts/appVersion';
 export { WEBVIEW_UA_TOKEN } from './consts/client';
-export { DEFAULT_ERROR_MESSAGE, ERROR_MESSAGE_MAP } from './consts/errorMessage';
+export {
+  DEFAULT_ERROR_MESSAGE,
+  ERROR_MESSAGE_MAP,
+  SERVER_ERROR_MESSAGE,
+} from './consts/errorCode';
 export { SUPPORTED_IMAGE_MIME_TYPES } from './consts/image';
 export {
   PUSH_NOTIFICATION_TYPE,
@@ -10,8 +14,8 @@ export {
 } from './consts/webBridge';
 
 /** 타입 */
-export type { ErrorCodeT } from './consts/errorMessage';
 export type { AuthTokensT } from './types/auth';
+export type { ApiErrorCodeT, ErrorCodeT } from './types/error';
 export type {
   AnalyticsEventParamT,
   AnalyticsEventParamsT,
@@ -58,6 +62,7 @@ export type {
 export type { WebBridgeMessageT, WebReqReadyMessageT } from './types/webBridge';
 
 /** 유틸 */
+export { getErrorMessageByCode } from './utils/getErrorMessageByCode';
 export {
   decodeJwtPayload,
   getTokenExpiresIso,

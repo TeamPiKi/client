@@ -130,8 +130,8 @@ export const ERROR_MESSAGE_MAP = {
   'NOTIFICATION-001': '알림을 불러오지 못했어요. 새로고침 해주세요.',
 } as const;
 
-/** 정의된 에러 코드 */
-export type ErrorCodeT = keyof typeof ERROR_MESSAGE_MAP;
-
 /** code 매핑 실패 시 공통 fallback 문구 */
 export const DEFAULT_ERROR_MESSAGE = '요청을 처리하지 못했어요.';
+
+/** code 를 알 수 없는 5xx·네트워크 오류 fallback 문구 */
+export const SERVER_ERROR_MESSAGE = ERROR_MESSAGE_MAP['COMMON-SERVER-ERROR'];
