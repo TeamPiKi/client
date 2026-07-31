@@ -5,18 +5,30 @@ import { getQueryClient } from '@/utils/queryClient';
 
 import TournamentFab from './_components/TournamentFab';
 import TournamentHistorySection from './_components/TournamentHistorySection';
+import {
+  PLAY_TYPE_BY_FILTER,
+  PLAY_TYPE_FILTER,
+  type TournamentPlayTypeFilterT,
+} from './_consts/tournamentPlayType';
 import { STATUS_BY_TAB, type TournamentStatusTabT } from './_consts/tournamentTab';
 
 type Props = {
-  searchParams: Promise<{ tab?: string }>;
+  searchParams: Promise<{ tab?: string; play?: string }>;
 };
 
 async function ArchiveTournamentPage({ searchParams }: Props) {
-  const { tab } = await searchParams;
+  const { tab, play } = await searchParams;
   const initialTab: TournamentStatusTabT = tab === 'completed' ? 'completed' : 'ongoing';
+  const initialPlayTypeFilter: TournamentPlayTypeFilterT =
+    play === PLAY_TYPE_FILTER.SOLO || play === PLAY_TYPE_FILTER.SOCIAL
+      ? play
+      : PLAY_TYPE_FILTER.ALL;
 
   const queryClient = getQueryClient();
-  const params = { status: STATUS_BY_TAB[initialTab] };
+  const params = {
+    status: STATUS_BY_TAB[initialTab],
+    playType: PLAY_TYPE_BY_FILTER[initialPlayTypeFilter],
+  };
   await queryClient.prefetchQuery({
     queryKey: ['tournamentList', params],
     queryFn: () => getTournamentList(params),
@@ -25,7 +37,10 @@ async function ArchiveTournamentPage({ searchParams }: Props) {
   return (
     <div className="flex min-h-dvh flex-col bg-bg-layer-basement px-5">
       <HydrationBoundary state={dehydrate(queryClient)}>
-        <TournamentHistorySection initialTab={initialTab} />
+        <TournamentHistorySection
+          initialTab={initialTab}
+          initialPlayTypeFilter={initialPlayTypeFilter}
+        />
       </HydrationBoundary>
       <TournamentFab />
     </div>
