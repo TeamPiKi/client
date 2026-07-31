@@ -6,6 +6,7 @@ import { useGetWishlist } from '@/hooks/useGetWishlist';
 import { useSSEFallback } from '@/hooks/useSSEFallback';
 import { hasParsingItems } from '@/utils/item';
 
+import { useScrollRestoration } from '../_hooks/useScrollRestoration';
 import WishCardSkeleton from './WishCardSkeleton';
 import WishGridContent from './WishGridContent';
 
@@ -22,6 +23,7 @@ function WishlistList({ isDeleteMode, selectedIds, onToggleSelect }: WishlistLis
   const hasPendingItem = hasParsingItems(wishlistData);
 
   useSSEFallback(['wishlists'], hasPendingItem);
+  useScrollRestoration();
 
   useEffect(() => {
     const el = sentinelRef.current;
