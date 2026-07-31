@@ -61,7 +61,6 @@ export const startMockApiServer = (port: number) =>
         res.end(
           JSON.stringify(
             createApiError({
-              status: 404,
               code: 'E2E_SSR_UNMOCKED',
               detail: `SSR 목 스텁에 등록되지 않은 요청: ${req.method} ${pathname}`,
             })

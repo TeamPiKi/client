@@ -84,7 +84,6 @@ export const test = base.extend<{ api: ApiMockT }>({
           contentType: 'application/json',
           body: JSON.stringify(
             createApiError({
-              status: 500,
               code: 'E2E_UNMOCKED',
               detail: `목킹되지 않은 요청: ${method} ${pathname}`,
             })
