@@ -87,7 +87,7 @@ export type GetTournamentInProgressResponseT = {
 };
 
 /** COMPLETED — 결과 */
-type GetTournamentCompletedResponseT = {
+export type GetTournamentCompletedResponseT = {
   tournamentId: number;
   name: string;
   /** 요청자가 토너먼트 소유자(주최자)인지 여부 */

@@ -4,7 +4,9 @@ import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import PikiLogo from '@/assets/images/piki-logo-cart.svg';
+import { ONBOARDING_KEY } from '@/consts/onboarding';
 import { ROUTES } from '@/consts/route';
+import { hasSeenOnboarding } from '@/utils/onboarding';
 
 import './splash.css';
 
@@ -42,26 +44,31 @@ function SplashClient() {
     transition: 'none',
   });
 
-  const navigateToLogin = useCallback(() => {
+  /** 온보딩 미열람이면 온보딩으로, 열람했으면 기존대로 로그인으로 */
+  const getNextRoute = () =>
+    hasSeenOnboarding(ONBOARDING_KEY.INTRO) ? ROUTES.LOGIN : ROUTES.ONBOARDING;
+
+  const navigateToNext = useCallback(() => {
     if (hasNavigatedRef.current) return;
 
     hasNavigatedRef.current = true;
-    router.replace(ROUTES.LOGIN);
+    router.replace(getNextRoute());
   }, [router]);
 
   useEffect(() => {
-    router.prefetch(ROUTES.LOGIN);
+    const nextRoute = getNextRoute();
+    router.prefetch(nextRoute);
 
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (prefersReducedMotion) {
-      navigateToLogin();
+      navigateToNext();
       return;
     }
 
     const startShrink = () => {
       const targetElement = targetRef.current;
       if (!targetElement) {
-        navigateToLogin();
+        navigateToNext();
         return;
       }
 
@@ -82,15 +89,21 @@ function SplashClient() {
             scale: 1,
             transition: SHRINK_TRANSITION,
           });
-          shrinkTimeoutRef.current = window.setTimeout(navigateToLogin, SPLASH_SHRINK_MS);
+          shrinkTimeoutRef.current = window.setTimeout(navigateToNext, SPLASH_SHRINK_MS);
         });
       });
     };
 
     let holdTimeoutId = 0;
 
+    /**
+     * 축소 애니메이션은 로그인 페이지의 로고 자리로 착지시켜 화면을 이어붙이는 연출이다.
+     * 온보딩에는 이어받을 로고가 없어 축소해봤자 로고가 사라지는 것처럼 보이므로 생략한다.
+     */
+    const finishSplash = nextRoute === ROUTES.ONBOARDING ? navigateToNext : startShrink;
+
     const fadeInTimeoutId = window.setTimeout(() => {
-      holdTimeoutId = window.setTimeout(startShrink, SPLASH_HOLD_MS);
+      holdTimeoutId = window.setTimeout(finishSplash, SPLASH_HOLD_MS);
     }, SPLASH_FADE_IN_MS);
 
     return () => {
@@ -98,7 +111,7 @@ function SplashClient() {
       if (holdTimeoutId) window.clearTimeout(holdTimeoutId);
       if (shrinkTimeoutRef.current) window.clearTimeout(shrinkTimeoutRef.current);
     };
-  }, [navigateToLogin, router]);
+  }, [navigateToNext, router]);
 
   return (
     <main
