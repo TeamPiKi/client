@@ -4,13 +4,13 @@ import { clientApi } from '@/apis/client';
 import { serverApi } from '@/apis/server';
 import { ENDPOINTS } from '@/consts/api';
 import type { ApiResponseT } from '@/types/api';
-import type { GetTournamentListResponseT, TournamentStatusT } from '@/types/tournament';
+import type { GetTournamentListRequestT, GetTournamentListResponseT } from '@/types/tournament';
 
-export const getTournamentList = async (status?: TournamentStatusT[], limit?: number) => {
+export const getTournamentList = async (params: GetTournamentListRequestT = {}) => {
   if (environmentManager.isServer()) {
     const { data } = await serverApi.get<ApiResponseT<GetTournamentListResponseT>>(
       ENDPOINTS.TOURNAMENTS,
-      { params: { status, limit } }
+      { params }
     );
 
     return data.data;
@@ -18,7 +18,7 @@ export const getTournamentList = async (status?: TournamentStatusT[], limit?: nu
 
   const { data } = await clientApi.get<ApiResponseT<GetTournamentListResponseT>>(
     ENDPOINTS.TOURNAMENTS,
-    { params: { status, limit } }
+    { params }
   );
   return data.data;
 };

@@ -6,19 +6,22 @@ import { getTournamentList } from '@/apis/getTournamentList';
 import { ChevronForwardIconFill } from '@/assets/icons';
 import TournamentCardSkeleton from '@/components/tournament-card/TournamentCardSkeleton';
 import { ROUTES } from '@/consts/route';
-import type { TournamentStatusT } from '@/types/tournament';
+import type { GetTournamentListRequestT } from '@/types/tournament';
 import { getQueryClient } from '@/utils/queryClient';
 
 import TournamentListClient from './client';
 
-const TOURNAMENT_LIST_STATUS: TournamentStatusT[] = ['PENDING', 'IN_PROGRESS'];
+const TOURNAMENT_LIST_PARAMS: GetTournamentListRequestT = {
+  status: ['PENDING', 'IN_PROGRESS'],
+  limit: 3,
+};
 
 function TournamentList() {
   const queryClient = getQueryClient();
 
   queryClient.prefetchQuery({
-    queryKey: ['tournamentList', TOURNAMENT_LIST_STATUS],
-    queryFn: () => getTournamentList(TOURNAMENT_LIST_STATUS),
+    queryKey: ['tournamentList', TOURNAMENT_LIST_PARAMS],
+    queryFn: () => getTournamentList(TOURNAMENT_LIST_PARAMS),
   });
 
   return (
@@ -40,7 +43,7 @@ function TournamentList() {
             </>
           }
         >
-          <TournamentListClient statuses={TOURNAMENT_LIST_STATUS} />
+          <TournamentListClient params={TOURNAMENT_LIST_PARAMS} />
         </Suspense>
       </section>
     </HydrationBoundary>
