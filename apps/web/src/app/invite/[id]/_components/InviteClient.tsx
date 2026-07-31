@@ -69,6 +69,15 @@ function InviteClient({ tournamentId, inviteCode }: InviteClientProps) {
           return;
         }
 
+        /**
+         * 이미 참여한 유저(멤버·게스트 공통)가 같은 링크로 재진입하면 join 플로우를 건너뛰고
+         * 토너먼트로 바로 진입. preview 응답의 joined 로 판별 — 별도 조회 없이 preview 한 번으로 끝난다.
+         */
+        if (preview.joined) {
+          router.replace(ROUTES.TOURNAMENT_CREATE(tournamentId));
+          return;
+        }
+
         const user = await getMe().catch(() => null);
         if (user?.identityType === 'MEMBER') {
           await joinAsMemberAndGoToCreate();

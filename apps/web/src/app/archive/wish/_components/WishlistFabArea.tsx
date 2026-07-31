@@ -10,7 +10,7 @@ function WishlistFabArea({ isDeleteMode, onAddItem }: WishlistFabAreaProps) {
   if (isDeleteMode) return null;
 
   return (
-    <div className="pointer-events-none fixed right-0 bottom-[103px] left-0 z-30 mx-auto flex w-full max-w-120 justify-end pr-8">
+    <div className="pointer-events-none fixed right-0 bottom-[103px] left-0 z-30 mx-auto flex w-full max-w-120 justify-end pr-5">
       <Button
         variant="primary"
         size="xl"

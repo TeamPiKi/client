@@ -2,7 +2,6 @@
 
 import type { ProductT } from '../../_common/_types/tournament';
 import useCardSelectionAnimation from '../_hooks/useCardSelectionAnimation';
-import FinalProductCard from './FinalProductCard';
 import ProductCard from './ProductCard';
 
 const HANGER_HEIGHT = 54;
@@ -35,8 +34,6 @@ function VsSection({ left, right, isFinal = false, onSelect }: VsSectionProps) {
 
   const transition = 'transition-all ease-in-out';
   const duration = { transitionDuration: `${animationDuration}ms` };
-
-  const CardComponent = isFinal ? FinalProductCard : ProductCard;
 
   return (
     <div className="w-full">
@@ -85,8 +82,9 @@ function VsSection({ left, right, isFinal = false, onSelect }: VsSectionProps) {
               }}
             />
           )}
-          <CardComponent
+          <ProductCard
             {...left}
+            isFinal={isFinal}
             isPicked={selectedSide === 'left'}
             onClick={() => handleClick('left', left)}
           />
@@ -110,8 +108,9 @@ function VsSection({ left, right, isFinal = false, onSelect }: VsSectionProps) {
               }}
             />
           )}
-          <CardComponent
+          <ProductCard
             {...right}
+            isFinal={isFinal}
             isPicked={selectedSide === 'right'}
             onClick={() => handleClick('right', right)}
           />

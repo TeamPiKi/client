@@ -1,10 +1,10 @@
 'use client';
 
 import { Header, HeaderIcon } from '@/components/header';
+import ItemLinkBanner from '@/components/common/item-link-banner';
 
 import { useGetWish } from '../_hooks/useGetWish';
 import ItemEditForm from './ItemEditForm';
-import ItemLinkBanner from './ItemLinkBanner';
 
 type EditContentProps = {
   wishId: number;

@@ -1,10 +1,10 @@
 import { GoogleAnalytics } from '@next/third-parties/google';
-import { WEBVIEW_UA_TOKEN } from '@piki/core';
 import type { Metadata, Viewport } from 'next';
 import { headers } from 'next/headers';
 import React from 'react';
 
 import BottomTabBar from '@/components/bottom-tab-bar';
+import { isWebview as _isWebView } from '@/utils/webBridge';
 
 import Providers from '../components/Providers';
 import '../styles/globals.css';
@@ -32,7 +32,7 @@ async function RootLayout({
 }>) {
   const headerStore = await headers();
   const userAgent = headerStore.get('user-agent') ?? '';
-  const isWebview = userAgent.includes(WEBVIEW_UA_TOKEN);
+  const isWebview = _isWebView(userAgent);
 
   return (
     <html
