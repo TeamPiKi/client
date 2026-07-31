@@ -16,7 +16,7 @@ function OnboardingIndicator({ totalCount, currentIndex, onSelect }: OnboardingI
           aria-label={`${i + 1}번째 슬라이드`}
           onClick={() => onSelect(i)}
           className={cn(
-            'h-2 rounded-full transition-all duration-300',
+            'h-2 cursor-pointer rounded-full transition-all duration-300',
             i === currentIndex ? 'w-5 bg-icon-neutral-primary' : 'w-2 bg-icon-neutral-secondary'
           )}
         />
