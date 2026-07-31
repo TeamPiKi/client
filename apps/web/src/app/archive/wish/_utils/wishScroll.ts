@@ -1,6 +1,6 @@
 import { SCROLL_CONTAINER_ID } from '@/consts/layout';
 
-const STORAGE_KEY_PREFIX = 'piki.wishScroll.';
+const STORAGE_KEY_PREFIX = 'piki:wishScroll:';
 
 const HISTORY_STATE_KEY = '__pikiScrollKey';
 
