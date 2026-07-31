@@ -143,7 +143,7 @@ const useTournament = ({ tournamentId, inProgress }: UseTournamentArgs) => {
     // 결승전 — onSuccess(캐시를 COMPLETED로 시드)까지 기다린 후 결과 페이지로 이동
     if (isFinalRound) {
       postRecordMatchMutation(matchBody, {
-        onSuccess: () => router.push(ROUTES.TOURNAMENT_RESULT(tournamentId)),
+        onSuccess: () => router.replace(ROUTES.TOURNAMENT_RESULT(tournamentId)),
         // 낙관적 상태 변경이 없는 경로 — 매치는 그대로지만 카드 선택 락은 걸려 있어 명시적으로 푼다
         onError: () => {
           toast.error('선택을 저장하지 못했어요. 다시 골라주세요.');

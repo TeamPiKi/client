@@ -25,7 +25,7 @@ export const usePostTournamentStart = (tournamentId: number) => {
           tournament_id: nextTournamentId,
           source_tournament_id: tournamentId,
         });
-        router.push(ROUTES.TOURNAMENT_LOADING(nextTournamentId));
+        router.replace(ROUTES.TOURNAMENT_LOADING(nextTournamentId));
       },
       onError: error => {
         if (!isAxiosError<ApiErrorResponseT>(error) || !error.response) return;
