@@ -21,7 +21,13 @@ const nextConfig = async () => {
                   plugins: [
                     {
                       name: 'preset-default',
-                      params: { overrides: { removeViewBox: false } },
+                      params: {
+                        overrides: {
+                          removeViewBox: false,
+                          /** NOTE: SVG id 축약 방지 */
+                          cleanupIds: { minify: false },
+                        },
+                      },
                     },
                   ],
                 },

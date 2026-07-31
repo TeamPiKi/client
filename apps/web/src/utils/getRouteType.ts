@@ -15,6 +15,7 @@ const matchesPath = (pathname: string, basePath: string) =>
 
 const isPublicRoute = (pathname: string) => {
   if (pathname === ROUTES.ROOT) return true;
+  if (pathname === ROUTES.ONBOARDING) return true;
   if (pathname === ROUTES.TERMS) return true;
   if (pathname === ROUTES.POLICY) return true;
   if (pathname === ROUTES.LOGIN) return true;
