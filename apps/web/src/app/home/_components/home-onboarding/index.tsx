@@ -10,6 +10,7 @@ import { ONBOARDING_KEY } from '@/consts/onboarding';
 import { Z_INDEX } from '@/consts/zIndex';
 import { cn } from '@/utils/cn';
 import { hasSeenOnboarding, markOnboardingSeen } from '@/utils/onboarding';
+import { isWebview } from '@/utils/webBridge';
 
 import { getOnboardingSlides } from '../../_consts/onboarding';
 
@@ -37,11 +38,9 @@ function HomeOnboarding() {
   );
 
   /** 모달 노출 여부 */
-  const isOpen = isMounted && !hasSeen && !isClosed;
-  // const isOpen = isMounted && isWebview() && !hasSeen && !isClosed;
+  const isOpen = isMounted && isWebview() && !hasSeen && !isClosed;
   /** 슬라이드 목록 - iOS/android 분기 */
   const slides = getOnboardingSlides(isAndroid);
-  // const slides = getOnboardingSlides(isInApp && /android/i.test(window.navigator.userAgent));
 
   const handleCloseClick = () => markOnboardingSeen(ONBOARDING_KEY.HOME);
 
