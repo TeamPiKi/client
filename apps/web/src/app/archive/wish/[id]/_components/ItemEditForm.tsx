@@ -10,7 +10,7 @@ import { usePostWishRefresh } from '../_hooks/usePostWishRefresh';
 type ItemEditFormProps = {
   wishId: number;
   itemStatus: ItemStatusT;
-  initialImageUrl: string | null;
+  initialImageUrl: string;
   initialName: string;
   initialPrice: number;
 };

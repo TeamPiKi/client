@@ -70,11 +70,7 @@ function ItemEditForm({
 
   return (
     <>
-      <ItemImageSection
-        imageUrl={initialImageUrl}
-        onImageSelect={setSelectedImage}
-        disabled={itemStatus === 'READY'}
-      />
+      <ItemImageSection imageUrl={initialImageUrl} onImageSelect={setSelectedImage} />
 
       <Spacing size={24} />
 
@@ -86,7 +82,6 @@ function ItemEditForm({
           onChange={event => setName(event.target.value)}
           maxLength={50}
           autoCorrect="off"
-          disabled={itemStatus === 'READY'}
         />
         <Input
           label="가격"
@@ -97,7 +92,6 @@ function ItemEditForm({
           onBlur={() => setPrice(prev => formatPrice(prev))}
           inputMode="numeric"
           autoCorrect="off"
-          disabled={itemStatus === 'READY'}
         />
       </div>
 
@@ -113,6 +107,21 @@ function ItemEditForm({
           >
             삭제하기
           </Button>
+        </BottomCta>
+      )}
+
+      <BottomCta>
+        <Button
+          variant="secondary"
+          size="lg"
+          className="flex-1"
+          isLoading={isDeletePending}
+          disabled={isRefreshPending || isSavePending}
+          onClick={handleDelete}
+        >
+          삭제하기
+        </Button>
+        {itemStatus === 'READY' && onRefresh && (
           <Button
             variant="primary"
             size="lg"
@@ -123,33 +132,18 @@ function ItemEditForm({
           >
             다시 불러오기
           </Button>
-        </BottomCta>
-      )}
-
-      {itemStatus === 'FAILED' && (
-        <BottomCta>
-          <Button
-            variant="secondary"
-            size="lg"
-            className="flex-1"
-            isLoading={isDeletePending}
-            disabled={isRefreshPending || isSavePending}
-            onClick={handleDelete}
-          >
-            삭제하기
-          </Button>
-          <Button
-            variant="primary"
-            size="lg"
-            className="flex-1"
-            isLoading={isSavePending}
-            disabled={isDeletePending || isRefreshPending || !isValid}
-            onClick={handleSave}
-          >
-            저장하기
-          </Button>
-        </BottomCta>
-      )}
+        )}
+        <Button
+          variant="primary"
+          size="lg"
+          className="flex-1"
+          isLoading={isSavePending}
+          disabled={isDeletePending || isRefreshPending || !isValid}
+          onClick={handleSave}
+        >
+          저장하기
+        </Button>
+      </BottomCta>
     </>
   );
 }
