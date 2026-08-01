@@ -43,12 +43,7 @@ function HomeOnboarding() {
   const slides = getOnboardingSlides(isAndroid);
   // const slides = getOnboardingSlides(isInApp && /android/i.test(window.navigator.userAgent));
 
-  /** 중간에 닫아도 다시 뜨지 않도록 노출 시점에 기록 */
-  useEffect(() => {
-    if (!isOpen) return;
-
-    markOnboardingSeen(ONBOARDING_KEY.HOME);
-  }, [isOpen]);
+  const handleCloseClick = () => markOnboardingSeen(ONBOARDING_KEY.HOME);
 
   useEffect(() => {
     if (!carouselApi) return;
@@ -113,6 +108,7 @@ function HomeOnboarding() {
         className="max-w-[334px] gap-0 overflow-hidden rounded-3xl p-0"
         style={{ zIndex: Z_INDEX.HOME_ONBOARDING }}
         onInteractOutside={event => event.preventDefault()}
+        onEscapeKeyDown={event => event.preventDefault()}
       >
         <DialogTitle className="sr-only">링크 공유로 위시 담는 방법</DialogTitle>
 
@@ -154,7 +150,12 @@ function HomeOnboarding() {
         </div>
 
         <DialogClose asChild>
-          <button autoFocus type="button" className="absolute top-2 right-3 cursor-pointer p-2.5">
+          <button
+            autoFocus
+            type="button"
+            className="absolute top-2 right-3 cursor-pointer p-2.5"
+            onClick={handleCloseClick}
+          >
             <CloseIconFill className="size-6 text-white" />
             <span className="sr-only">닫기</span>
           </button>
