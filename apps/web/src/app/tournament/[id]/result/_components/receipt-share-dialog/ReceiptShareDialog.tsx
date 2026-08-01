@@ -167,7 +167,6 @@ function ReceiptShareDialog({
               영수증 이미지를 저장하거나 공유할 수 있어요.
             </DrawerDescription>
 
-            {/* 미리보기 — 공유 이미지는 1080x1920 고정이라 비율도 고정 */}
             <div className="aspect-1080/1920 w-full max-w-52.5">
               {previewUrl ? (
                 // eslint-disable-next-line @next/next/no-img-element
