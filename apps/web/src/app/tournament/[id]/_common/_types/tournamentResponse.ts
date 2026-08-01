@@ -12,6 +12,12 @@ type TournamentParticipantT = {
   profileImage: string;
 };
 
+/** 서버가 브래킷에서 파생해 내려주는 대결 한 판 */
+export type TournamentMatchT = {
+  first: TournamentItemT;
+  second: TournamentItemT;
+};
+
 /**
  * `pending` 필드 페이로드의 item — PENDING 단계라 name/imageUrl/price 등이 아직 없을 수 있다.
  */
@@ -83,6 +89,8 @@ export type GetTournamentInProgressResponseT = {
     currentRound: number;
     lastHistory: TournamentMatchHistoryT | null;
     remainingItems: TournamentItemT[];
+    /** 서버 브래킷이 정한 현재 대결. 라운드가 끝났거나 진행할 매치가 없으면 null */
+    currentMatch: TournamentMatchT | null;
   };
 };
 
@@ -128,7 +136,16 @@ export type PostPlayLinkResponseT = string;
 export type PostRecordMatchRequestT = TournamentMatchHistoryT;
 
 /**
- * 결승(currentRound=2) 기록 시 1~4위 결과가 함께 반환된다.
- * 그 외 라운드는 null.
+ * 매치 기록 응답. 서버가 다음 대결까지 함께 내려준다.
+ * - `nextMatch`: 같은 라운드의 다음 대결. null 이면 라운드 종료 (재조회 필요)
+ * - `completed`: 토너먼트 종료 시에만 채워진다
  */
-export type PostRecordMatchResponseT = { result: TournamentRankingT[] } | null;
+export type PostRecordMatchResponseT = {
+  nextMatch: TournamentMatchT | null;
+  completed: {
+    result: TournamentRankingT[];
+    hasGroupResult: boolean;
+    canAddItem: boolean;
+    playLinkExpiresAt?: string;
+  } | null;
+};
