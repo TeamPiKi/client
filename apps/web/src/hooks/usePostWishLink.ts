@@ -9,7 +9,12 @@ import { ROUTES } from '@/consts/route';
 import type { ApiErrorResponseT } from '@/types/api';
 import { logAnalyticsEvent } from '@/utils/analytics';
 
-export const usePostWishLink = () => {
+type UsePostWishLinkOptionsT = {
+  /** 입력 폼처럼 에러를 화면 안에서 안내하는 경우 false — 4xx 토스트를 끈다 */
+  showErrorToast?: boolean;
+};
+
+export const usePostWishLink = ({ showErrorToast = true }: UsePostWishLinkOptionsT = {}) => {
   const router = useRouter();
   const pathname = usePathname();
   const queryClient = useQueryClient();
@@ -35,7 +40,7 @@ export const usePostWishLink = () => {
 
       if (status < 500) {
         const clientErrorMessage = detail ?? '요청을 처리하지 못했습니다.';
-        toast.error(clientErrorMessage);
+        if (showErrorToast) toast.error(clientErrorMessage);
         return;
       }
 
