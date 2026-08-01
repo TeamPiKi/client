@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 import { CameraIconFill } from '@/assets/icons';
 import BaseImage from '@/components/base-image';
 import Skeleton from '@/components/skeleton';
+import { Z_INDEX } from '@/consts/zIndex';
 import { useImagePicker } from '@/hooks/useImagePicker';
 import type { UserIdentityTypeT } from '@/types/user';
 
@@ -60,6 +61,7 @@ function ProfileImageField({ userIdentityType, profileImage, onImageSelect }: Pr
             disabled={isPending}
             aria-label="프로필 이미지 변경"
             className="absolute top-[54.5px] left-[59px] flex size-10 shrink-0 cursor-pointer items-center justify-center rounded-full bg-bg-layer-default"
+            style={{ zIndex: Z_INDEX.BASE_IMAGE + 1 }}
           >
             <CameraIconFill className="size-6 shrink-0 text-icon-neutral-secondary" />
           </button>
