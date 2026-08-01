@@ -2,7 +2,7 @@
 
 import { isAxiosError } from 'axios';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 
 import { usePatchMe } from '@/app/mypage/edit/_hooks/usePatchMe';
@@ -10,6 +10,7 @@ import { EditIconFill } from '@/assets/icons/fill';
 import Button from '@/components/button';
 import { Header } from '@/components/header';
 import Input from '@/components/input';
+import Spinner from '@/components/spinner';
 import TournamentErrorDialog from '@/components/tournament-error-dialog';
 import { QUERY_ACTION } from '@/consts/queryAction';
 import { ROUTES } from '@/consts/route';
@@ -53,7 +54,7 @@ function JoinPreviewClient({ tournamentId, inviteCode }: JoinPreviewClientProps)
   const isComplete =
     isNicknameValid && !isCheckingNickname && !isPostJoinPending && !isPatchMePending;
 
-  const joinTournament = () => {
+  const joinTournament = useCallback(() => {
     postJoinMutation(
       {
         tournamentId,
@@ -75,7 +76,7 @@ function JoinPreviewClient({ tournamentId, inviteCode }: JoinPreviewClientProps)
         },
       }
     );
-  };
+  }, [inviteCode, postJoinMutation, router, tournamentId]);
 
   const handleConfirm = () => {
     if (!isComplete) return;
@@ -92,6 +93,47 @@ function JoinPreviewClient({ tournamentId, inviteCode }: JoinPreviewClientProps)
 
     joinTournament();
   };
+
+  /**
+   * 회원은 닉네임 입력 없이 자동 참여 — 참여 방식(회원 자동/게스트 닉네임)은 이 페이지가 소유한다.
+   * mutation 을 effect 로 트리거하므로 리마운트·fast refresh 재호출을 ref 로 가드.
+   */
+  const isMember = userData.identityType === 'MEMBER';
+  const hasAutoJoinRunRef = useRef(false);
+
+  useEffect(() => {
+    if (!isMember || hasAutoJoinRunRef.current) return;
+    hasAutoJoinRunRef.current = true;
+
+    /** 이미 참여한 회원이 URL 직접 진입한 경우 — join 없이 바로 이동 */
+    if (invitePreviewData.joined) {
+      router.replace(ROUTES.TOURNAMENT_CREATE(tournamentId));
+      return;
+    }
+
+    joinTournament();
+  }, [isMember, invitePreviewData.joined, router, tournamentId, joinTournament]);
+
+  if (isMember) {
+    return (
+      <>
+        <main className="flex min-h-dvh items-center justify-center bg-bg-layer-default pt-padding-top">
+          <div className="flex flex-col items-center gap-3">
+            <Spinner size={32} />
+            <p className="body-1-medium text-text-neutral-tertiary">
+              토너먼트에 참여하고 있어요...
+            </p>
+          </div>
+        </main>
+
+        <TournamentErrorDialog
+          type="LINK_EXPIRED"
+          open={isTournamentErrorDialogOpen}
+          onOpenChange={setIsTournamentErrorDialogOpen}
+        />
+      </>
+    );
+  }
 
   return (
     <>
