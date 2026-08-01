@@ -8,7 +8,6 @@ import { Drawer, DrawerContent, DrawerDescription, DrawerTitle } from '@/compone
 import Spinner from '@/components/spinner';
 import { ANALYTICS_EVENT } from '@/consts/analytics';
 import { logAnalyticsEvent } from '@/utils/analytics';
-import { getApiErrorMessage } from '@/utils/getApiErrorMessage';
 import { share } from '@/utils/share';
 
 import { usePostPlayLink } from '../../_hooks/usePostPlayLink';
@@ -41,8 +40,8 @@ function PlateShareDialog({
     if (!hasExistingPlayLink) {
       try {
         await postPlayLinkMutation();
-      } catch (error) {
-        toast.warning(getApiErrorMessage(error));
+      } catch {
+        /** 안내는 usePostPlayLink 훅 레벨 onError 가 담당 — 여기선 공유 플로우만 중단 */
         return;
       }
     }

@@ -34,6 +34,8 @@ export const usePostJoin = ({
 
       const { status, data } = error.response;
 
+      if (status === 401 || status >= 500) return;
+
       if (status === 409) {
         if (data.code === ERROR_CODE.TOURNAMENT_ALREADY_PARTICIPANT) {
           onAlreadyJoined?.();
@@ -50,6 +52,10 @@ export const usePostJoin = ({
         return;
       }
 
+      /**
+       * 400: 초대 코드 형식 오류·코드 불일치
+       * 404: 토너먼트 존재하지 않음
+       */
       toast.error(getApiErrorMessage(error));
     },
   });

@@ -1,4 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { isAxiosError } from 'axios';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
@@ -24,6 +25,18 @@ export const usePostTournamentItemsByWish = (tournamentId: number) => {
       );
     },
     onError: error => {
+      if (!isAxiosError(error) || !error.response) return;
+
+      const { status } = error.response;
+
+      if (status === 401 || status >= 500) return;
+
+      /**
+       * 400: 아이템 32개 초과
+       * 403: 토너먼트 참여 권한 없음·위시에 없는 아이템
+       * 404: 토너먼트 or 아이템 존재하지 않음
+       * 409: 이미 담은 아이템·아직 추출 중인 상품
+       */
       toast.error(getApiErrorMessage(error));
     },
   });

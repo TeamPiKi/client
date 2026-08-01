@@ -145,10 +145,7 @@ const useTournament = ({ tournamentId, inProgress }: UseTournamentArgs) => {
       postRecordMatchMutation(matchBody, {
         onSuccess: () => router.push(ROUTES.TOURNAMENT_RESULT(tournamentId)),
         // 낙관적 상태 변경이 없는 경로 — 매치는 그대로지만 카드 선택 락은 걸려 있어 명시적으로 푼다
-        onError: () => {
-          toast.error('선택을 저장하지 못했어요. 다시 골라주세요.');
-          unlockSelection();
-        },
+        onError: unlockSelection,
       });
       return;
     }
@@ -169,10 +166,7 @@ const useTournament = ({ tournamentId, inProgress }: UseTournamentArgs) => {
           }
         },
         // 기록 자체가 실패한 경로 — 매치는 그대로지만 카드 선택 락은 걸려 있어 명시적으로 푼다
-        onError: () => {
-          toast.error('선택을 저장하지 못했어요. 다시 골라주세요.');
-          unlockSelection();
-        },
+        onError: unlockSelection,
       });
       return;
     }
@@ -181,7 +175,6 @@ const useTournament = ({ tournamentId, inProgress }: UseTournamentArgs) => {
     postRecordMatchMutation(matchBody, {
       // 기록 실패 시 낙관적으로 제거한 페어를 복구해 클라/서버 상태 정합을 맞춘다.
       onError: async () => {
-        toast.error('선택을 저장하지 못했어요. 다시 골라주세요.');
         try {
           await syncWithServer();
         } catch {
