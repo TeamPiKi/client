@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 
-import { ChevronForwardIconFill, ReciptIconFill, TrophyIconFill } from '@/assets/icons';
+import { ChevronForwardIconFill, ReciptIconOutline, TrophyIconOutline } from '@/assets/icons';
 import BottomCta from '@/components/bottom-cta';
 import Button from '@/components/button';
 import { Header } from '@/components/header';
@@ -142,7 +142,7 @@ function ResultClient({ tournamentId }: ResultClientProps) {
             variant="secondary"
             size="lg"
             icon="leading"
-            leadingIcon={<ReciptIconFill aria-hidden className="size-5" />}
+            leadingIcon={<ReciptIconOutline aria-hidden className="size-5" />}
             onClick={handleShareReceiptImage}
             disabled={isCapturing}
             className="flex-1 border-gray-75 bg-gray-75 text-text-neutral-secondary"
@@ -154,7 +154,7 @@ function ResultClient({ tournamentId }: ResultClientProps) {
               variant="primary"
               size="lg"
               icon="leading"
-              leadingIcon={<TrophyIconFill aria-hidden className="size-5" />}
+              leadingIcon={<TrophyIconOutline aria-hidden className="size-5" />}
               onClick={handleSharePlayLink}
               className="flex-1"
             >
