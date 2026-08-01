@@ -1,8 +1,12 @@
-import { notFound } from 'next/navigation';
+import { isAxiosError } from 'axios';
+import { notFound, redirect } from 'next/navigation';
 
+import { getInvitePreviewByCode } from '@/app/tournament/join/_apis/getInvitePreviewByCode';
+import { ROUTES } from '@/consts/route';
+import type { ApiErrorResponseT } from '@/types/api';
 import { parseIdParam } from '@/utils/parseIdParam';
 
-import InviteClient from './_components/InviteClient';
+import InviteInvalid from './_components/InviteInvalid';
 
 type InvitePageProps = {
   params: Promise<{ id: string }>;
@@ -16,7 +20,30 @@ async function InvitePage({ params, searchParams }: InvitePageProps) {
 
   if (tournamentId === null) notFound();
 
-  return <InviteClient tournamentId={tournamentId} inviteCode={code ?? ''} />;
+  /** 코드 없이 진입 → 잘못된 링크 */
+  if (!code) return <InviteInvalid />;
+
+  /**
+   * redirect() 는 NEXT_REDIRECT 를 throw 하는 방식이라 try 안에 두면 catch 가 삼킨다.
+   * preview 조회만 감싸고 분기·redirect 는 밖에서 처리한다.
+   */
+  let preview;
+  try {
+    preview = await getInvitePreviewByCode(code);
+  } catch (error) {
+    /** 409(만료·비활성 초대)는 만료 다이얼로그 노출, 그 외(400 코드 불일치 등)는 안내 화면만 */
+    const isExpired = isAxiosError<ApiErrorResponseT>(error) && error.response?.status === 409;
+    return <InviteInvalid showExpiredDialog={isExpired} />;
+  }
+
+  /** 코드의 토너먼트가 URL path 와 다르면 잘못된 링크 */
+  if (preview.tournamentId !== tournamentId) return <InviteInvalid />;
+
+  /** 이미 참여한 유저(회원·게스트 공통) → join 건너뛰고 토너먼트로 바로 진입 */
+  if (preview.joined) redirect(ROUTES.TOURNAMENT_CREATE(tournamentId));
+
+  /** 미참여 → 참여 방식(회원 자동 / 게스트 닉네임 입력)은 join 페이지가 소유 */
+  redirect(`${ROUTES.TOURNAMENT_JOIN_BY_LINK(tournamentId)}?code=${code}`);
 }
 
 export default InvitePage;
