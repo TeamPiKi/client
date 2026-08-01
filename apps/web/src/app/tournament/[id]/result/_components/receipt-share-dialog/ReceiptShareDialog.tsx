@@ -29,6 +29,10 @@ type ReceiptShareDialogProps = {
   date: Date;
 };
 
+/** 스켈레톤 높이 근사 (캡처 레이어 폭 360 기준) — 영수증 고정 영역 + 상품 1개당 높이 */
+const PREVIEW_BASE_HEIGHT = 300;
+const PREVIEW_ITEM_HEIGHT = 76;
+
 type ShareActionProps = {
   icon: React.ReactNode;
   label: string;
@@ -167,17 +171,22 @@ function ReceiptShareDialog({
               영수증 이미지를 저장하거나 공유할 수 있어요.
             </DrawerDescription>
 
-            {/* 미리보기 — 캡처 완료 전에는 스켈레톤 */}
+            {/* 미리보기 — 캡처 완료 전에는 스켈레톤 (상품 수만큼 길어지므로 높이를 근사해 튐을 줄인다) */}
             <div className="w-full max-w-52.5">
               {previewUrl ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={previewUrl} alt="영수증 미리보기" className="w-full rounded-xl" />
               ) : (
-                <Skeleton className="aspect-360/580 w-full rounded-xl" />
+                <Skeleton
+                  className="w-full rounded-xl"
+                  style={{
+                    aspectRatio: `360 / ${PREVIEW_BASE_HEIGHT + result.length * PREVIEW_ITEM_HEIGHT}`,
+                  }}
+                />
               )}
             </div>
 
-            <div className="flex w-full items-start justify-center gap-6 border-t border-gray-75 pt-5">
+            <div className="flex w-full items-start justify-center gap-10 border-t border-gray-75 pt-5">
               <ShareAction
                 icon={<DownloadIconFill className="size-6 text-text-neutral-secondary" />}
                 label="이미지 저장"

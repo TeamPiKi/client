@@ -1,6 +1,6 @@
 import { forwardRef } from 'react';
 
-import BasketIcon from '@/assets/icons/fill/basket.svg';
+import PikiLogoCart from '@/assets/images/piki-logo-cart.svg';
 
 import type { RankedProductT } from '../../../_common/_types/tournament';
 import ReceiptPaper from '../ReceiptPaper';
@@ -22,7 +22,10 @@ const ReceiptShareCaptureLayer = forwardRef<HTMLDivElement, ReceiptShareCaptureL
   function ReceiptShareCaptureLayer({ tournamentId, tournamentName, result, date }, ref) {
     return (
       <div aria-hidden className="pointer-events-none fixed top-0 -left-250">
-        <div ref={ref} className="flex w-90 flex-col items-center gap-6 bg-sky-blue-200 p-6">
+        <div
+          ref={ref}
+          className="flex w-90 flex-col items-center gap-8 bg-sky-blue-200 px-6 pt-6 pb-8"
+        >
           {/* 영수증 하단 톱니가 absolute top-full 로 18px 튀어나와 그만큼 자리를 비워둔다 */}
           <div className="w-full pb-4.5">
             <ReceiptPaper
@@ -32,7 +35,7 @@ const ReceiptShareCaptureLayer = forwardRef<HTMLDivElement, ReceiptShareCaptureL
               date={date}
             />
           </div>
-          <BasketIcon className="size-8 text-white" />
+          <PikiLogoCart aria-hidden className="h-6 w-8.25 shrink-0 text-white" />
         </div>
       </div>
     );

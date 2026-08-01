@@ -71,6 +71,9 @@ export const captureReceiptImage = async (element: HTMLElement): Promise<Blob> =
     // cacheBust:true 는 URL 에 query 를 붙여 새 요청을 만드는데, S3 가 CORS 헤더를 일관되게
     // 안 주면 preflight 가 매번 일어나 차단 위험이 커진다. 브라우저 캐시를 활용해 CORS 검증을 줄인다.
     cacheBust: false,
+    // 상품 이미지는 /_next/image?url=... 로 쿼리에만 차이가 있다. 기본 캐시 키는 쿼리를 잘라내
+    // 모든 상품이 첫 번째 이미지로 그려지므로 쿼리까지 키에 포함시킨다.
+    includeQueryParams: true,
     fetchRequestInit: { cache: 'force-cache', mode: 'cors' },
   });
   if (!blob) throw new Error('영수증 이미지 변환 실패');
