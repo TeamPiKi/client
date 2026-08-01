@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 
-import { ChevronForwardIconFill, DownloadIconFill, UploadIconFill } from '@/assets/icons';
+import { ChevronForwardIconFill, ReciptIconFill, TrophyIconFill } from '@/assets/icons';
 import BottomCta from '@/components/bottom-cta';
 import Button from '@/components/button';
 import { Header } from '@/components/header';
@@ -136,25 +136,25 @@ function ResultClient({ tournamentId }: ResultClientProps) {
 
       {/* 하단 CTA — 저장/공유 버튼 → 홈으로 가기 순 위계, 항상 화면 하단 고정 */}
       <BottomCta hasGradient className="flex-col items-stretch gap-6.5 pb-[30px]">
-        {/* 영수증 저장 (모든 사용자) + 토너먼트 공유 (ROOT 소유자만, 플레이 링크 공유) */}
+        {/* 영수증 공유 (모든 사용자) + 토너먼트 공유 (ROOT 소유자만, 플레이 링크 공유) */}
         <div className="flex gap-3">
           <Button
             variant="secondary"
             size="lg"
             icon="leading"
-            leadingIcon={<DownloadIconFill aria-hidden className="size-5" />}
+            leadingIcon={<ReciptIconFill aria-hidden className="size-5" />}
             onClick={handleShareReceiptImage}
             disabled={isCapturing}
             className="flex-1 border-gray-75 bg-gray-75 text-text-neutral-secondary"
           >
-            {isCapturing ? '이미지 만드는 중...' : '영수증 저장'}
+            {isCapturing ? '이미지 만드는 중...' : '영수증 공유'}
           </Button>
           {canSharePlayLink && (
             <Button
               variant="primary"
               size="lg"
               icon="leading"
-              leadingIcon={<UploadIconFill aria-hidden className="size-5" />}
+              leadingIcon={<TrophyIconFill aria-hidden className="size-5" />}
               onClick={handleSharePlayLink}
               className="flex-1"
             >
