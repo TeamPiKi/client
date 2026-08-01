@@ -89,8 +89,8 @@ export type GetTournamentInProgressResponseT = {
     currentRound: number;
     lastHistory: TournamentMatchHistoryT | null;
     remainingItems: TournamentItemT[];
-    /** 서버 브래킷이 정한 현재 대결. 라운드가 끝났거나 진행할 매치가 없으면 null */
-    currentMatch: TournamentMatchT | null;
+    /** 서버 브래킷이 정한 현재 대결. 값이 없으면 키째 생략된다 (서버 NON_NULL 직렬화) */
+    currentMatch?: TournamentMatchT;
   };
 };
 
@@ -137,15 +137,16 @@ export type PostRecordMatchRequestT = TournamentMatchHistoryT;
 
 /**
  * 매치 기록 응답. 서버가 다음 대결까지 함께 내려준다.
- * - `nextMatch`: 같은 라운드의 다음 대결. null 이면 라운드 종료 (재조회 필요)
+ * 값이 없는 필드는 키째 생략되므로(NON_NULL 직렬화) 둘 다 없으면 응답은 `{}` 다.
+ * - `nextMatch`: 같은 라운드의 다음 대결. 없으면 라운드 종료 → 재조회
  * - `completed`: 토너먼트 종료 시에만 채워진다
  */
 export type PostRecordMatchResponseT = {
-  nextMatch: TournamentMatchT | null;
-  completed: {
+  nextMatch?: TournamentMatchT;
+  completed?: {
     result: TournamentRankingT[];
     hasGroupResult: boolean;
     canAddItem: boolean;
     playLinkExpiresAt?: string;
-  } | null;
+  };
 };

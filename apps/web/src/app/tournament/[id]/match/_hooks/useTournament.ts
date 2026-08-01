@@ -1,12 +1,15 @@
 'use client';
 
 import { useQueryClient } from '@tanstack/react-query';
+import { isAxiosError } from 'axios';
 import { useRouter } from 'next/navigation';
 import { useRef, useState } from 'react';
 import { toast } from 'sonner';
 
 import { ROUTES } from '@/consts/route';
+import type { ApiErrorResponseT } from '@/types/api';
 import type { TournamentItemT } from '@/types/tournament';
+import { getApiErrorMessage } from '@/utils/getApiErrorMessage';
 
 import { getTournament } from '../../_common/_apis/getTournament';
 import type {
@@ -42,7 +45,7 @@ const useTournament = ({ tournamentId, inProgress }: UseTournamentArgs) => {
   // 서버 권위의 현재 라운드 (2, 4, 8, ...) — 라운드 종료 시 재조회로 갱신
   const [currentRound, setCurrentRound] = useState(inProgress.currentRound);
   // 서버 브래킷이 정한 현재 대결 — 기록 응답의 nextMatch 로 갱신된다
-  const [currentMatch, setCurrentMatch] = useState<TournamentMatchT | null>(
+  const [currentMatch, setCurrentMatch] = useState<TournamentMatchT | undefined>(
     inProgress.currentMatch
   );
   // 라운드 내 진행한 매치 수 (라벨 표기용) — 라운드가 바뀌면 0 으로 초기화
@@ -154,8 +157,22 @@ const useTournament = ({ tournamentId, inProgress }: UseTournamentArgs) => {
             }
           }
         },
-        // 기록 실패 — 매치는 그대로지만 카드 선택 락은 걸려 있어 명시적으로 푼다
-        onError: () => {
+        onError: async error => {
+          const status = isAxiosError<ApiErrorResponseT>(error) ? error.response?.status : null;
+
+          // 400 TOURNAMENT-034(브래킷에 없는 조합) · 409 TOURNAMENT-035(이미 기록된 대결)
+          // — 클라 상태가 서버 브래킷과 어긋난 것이라 재선택이 아니라 재동기화가 필요하다.
+          if (status === 400 || status === 409) {
+            toast.error(getApiErrorMessage(error));
+            try {
+              await syncWithServer();
+            } catch {
+              showSyncRetryToast();
+            }
+            return;
+          }
+
+          // 그 외(네트워크·5xx) — 매치는 그대로라 재선택할 수 있게 카드 락만 푼다
           toast.error('선택을 저장하지 못했어요. 다시 골라주세요.');
           unlockSelection();
         },
