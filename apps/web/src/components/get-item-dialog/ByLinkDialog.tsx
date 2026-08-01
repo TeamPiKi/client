@@ -11,6 +11,7 @@ import Input from '@/components/input';
 import { usePostWishLink } from '@/hooks/usePostWishLink';
 import type { ItemTypeT } from '@/types/item';
 import { URL_PATTERN, extractUrlFromText } from '@/utils/extractUrl';
+import { getApiErrorMessage } from '@/utils/getApiErrorMessage';
 
 type ByLinkProps = {
   type: ItemTypeT;
@@ -20,12 +21,15 @@ type ByLinkProps = {
 
 function ByLinkDialog({ type, open, onOpenChange }: ByLinkProps) {
   const { id: tournamentId } = useParams<{ id: string }>();
-  const { postWishLinkMutation, isPostWishLinkPending } = usePostWishLink();
+
+  const { postWishLinkMutation, isPostWishLinkPending } = usePostWishLink({
+    showErrorToast: false,
+  });
   const { postTournamentItemLinkMutation, isPostTournamentItemLinkPending } =
-    usePostTournamentItemLink(Number(tournamentId));
+    usePostTournamentItemLink(Number(tournamentId), { showErrorToast: false });
 
   const [url, setUrl] = useState('');
-  const [hasError, setHasError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const trimmedUrl = url.trim();
   const isEmpty = trimmedUrl.length === 0;
@@ -33,7 +37,7 @@ function ByLinkDialog({ type, open, onOpenChange }: ByLinkProps) {
 
   const resetState = () => {
     setUrl('');
-    setHasError(false);
+    setErrorMessage(null);
   };
 
   const handleSubmit = () => {
@@ -43,30 +47,31 @@ function ByLinkDialog({ type, open, onOpenChange }: ByLinkProps) {
     const submitUrl = URL_PATTERN.test(trimmedUrl) ? trimmedUrl : extractUrlFromText(trimmedUrl);
 
     if (!submitUrl) {
-      setHasError(true);
+      setErrorMessage('올바른 URL 형식으로 입력해주세요.');
+      return;
+    }
+
+    if (!submitUrl.startsWith('https://')) {
+      setErrorMessage('https 링크만 등록할 수 있어요');
       return;
     }
 
     /** 닫기/초기화는 성공 시에만 — 실패 시 URL을 고칠 수 있게 유지. 위시리스트 이동은 usePostWishLink 훅이 조건부로 처리 */
-    if (type === 'wish')
-      postWishLinkMutation(submitUrl, {
-        onSuccess: () => {
-          onOpenChange(false);
-          resetState();
-        },
-      });
-    else
-      postTournamentItemLinkMutation(submitUrl, {
-        onSuccess: () => {
-          onOpenChange(false);
-          resetState();
-        },
-      });
+    const mutationOptions = {
+      onSuccess: () => {
+        onOpenChange(false);
+        resetState();
+      },
+      onError: (error: Error) => setErrorMessage(getApiErrorMessage(error)),
+    };
+
+    if (type === 'wish') postWishLinkMutation(submitUrl, mutationOptions);
+    else postTournamentItemLinkMutation(submitUrl, mutationOptions);
   };
 
   const handleChange = (value: string) => {
     setUrl(value);
-    if (hasError) setHasError(false);
+    if (errorMessage) setErrorMessage(null);
   };
 
   /** 상품 설명 + URL 형태로 붙여넣으면 URL 만 입력창에 반영한다 */
@@ -98,8 +103,8 @@ function ByLinkDialog({ type, open, onOpenChange }: ByLinkProps) {
             onChange={event => handleChange(event.target.value)}
             onPaste={handlePaste}
             left={<LinkIconFill className="size-5" />}
-            aria-invalid={hasError}
-            {...(hasError ? { helperText: '올바른 URL 형식으로 입력해주세요.' } : {})}
+            aria-invalid={Boolean(errorMessage)}
+            {...(errorMessage ? { helperText: errorMessage } : {})}
             autoFocus
           />
           <Button
