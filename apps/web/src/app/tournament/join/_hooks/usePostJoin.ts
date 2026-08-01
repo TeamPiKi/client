@@ -1,3 +1,4 @@
+import { ERROR_CODE } from '@piki/core';
 import { useMutation } from '@tanstack/react-query';
 import { isAxiosError } from 'axios';
 import { toast } from 'sonner';
@@ -10,11 +11,16 @@ import { getApiErrorMessage } from '@/utils/getApiErrorMessage';
 import { postJoin } from '../_apis/postJoin';
 
 type UsePostJoinParams = {
-  /** 409(만료·인원 초과 등 참여 불가 상태) — 토스트 대신 화면에서 다이얼로그로 안내한다. */
-  onConflict?: () => void;
+  onAlreadyJoined?: () => void;
+  onParticipantsFull?: () => void;
+  onUnavailable?: () => void;
 };
 
-export const usePostJoin = ({ onConflict }: UsePostJoinParams = {}) => {
+export const usePostJoin = ({
+  onAlreadyJoined,
+  onParticipantsFull,
+  onUnavailable,
+}: UsePostJoinParams = {}) => {
   const { mutate: postJoinMutation, isPending: isPostJoinPending } = useMutation({
     mutationFn: postJoin,
     onSuccess: (_, variables) => {
@@ -24,8 +30,23 @@ export const usePostJoin = ({ onConflict }: UsePostJoinParams = {}) => {
       });
     },
     onError: error => {
-      if (isAxiosError<ApiErrorResponseT>(error) && error.response?.status === 409) {
-        onConflict?.();
+      if (!isAxiosError<ApiErrorResponseT>(error) || !error.response) return;
+
+      const { status, data } = error.response;
+
+      if (status === 409) {
+        if (data.code === ERROR_CODE.TOURNAMENT_ALREADY_PARTICIPANT) {
+          onAlreadyJoined?.();
+          return;
+        }
+
+        if (data.code === ERROR_CODE.TOURNAMENT_PARTICIPANT_LIMIT_EXCEEDED) {
+          onParticipantsFull?.();
+          return;
+        }
+
+        /** 그 외 참여 불가 — 초대 링크 만료 · PENDING 아닌 토너먼트 */
+        onUnavailable?.();
         return;
       }
 

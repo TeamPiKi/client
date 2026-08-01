@@ -46,3 +46,11 @@ export type PostCreateTournamentRequestT = {
 export type PostCreateTournamentResponseT = {
   tournamentId: number;
 };
+
+export type TournamentErrorTypeT =
+  | 'NO_WISH_EXISTS'
+  | 'ALREADY_STARTED'
+  | 'ALREADY_ENDED'
+  | 'LINK_EXPIRED'
+  | 'PARTICIPANTS_FULL'
+  | 'REQUEST_FAILED';

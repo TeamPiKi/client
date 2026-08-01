@@ -1,5 +1,6 @@
 'use client';
 
+import { ERROR_CODE } from '@piki/core';
 import { isAxiosError } from 'axios';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -14,6 +15,7 @@ import TournamentErrorDialog from '@/components/tournament-error-dialog';
 import { QUERY_ACTION } from '@/consts/queryAction';
 import { ROUTES } from '@/consts/route';
 import type { ApiErrorResponseT } from '@/types/api';
+import type { TournamentErrorTypeT } from '@/types/tournament';
 
 type InviteClientProps = {
   tournamentId: number;
@@ -25,7 +27,7 @@ type InviteStateT = 'loading' | 'invalid';
 function InviteClient({ tournamentId, inviteCode }: InviteClientProps) {
   const router = useRouter();
   const [state, setState] = useState<InviteStateT>('loading');
-  const [isTournamentErrorDialogOpen, setIsTournamentErrorDialogOpen] = useState(false);
+  const [tournamentErrorType, setTournamentErrorType] = useState<TournamentErrorTypeT | null>(null);
 
   const hasRunRef = useRef(false);
 
@@ -44,13 +46,24 @@ function InviteClient({ tournamentId, inviteCode }: InviteClientProps) {
           `${ROUTES.TOURNAMENT_CREATE(tournamentId)}?${QUERY_ACTION.KEY}=${QUERY_ACTION.VALUE.WELCOME_JOIN}`
         );
       } catch (error) {
-        if (isAxiosError<ApiErrorResponseT>(error) && error.response?.status === 409) {
-          setState('invalid');
-          setIsTournamentErrorDialogOpen(true);
+        setState('invalid');
+
+        if (!isAxiosError<ApiErrorResponseT>(error) || error.response?.status !== 409) return;
+
+        const { code } = error.response.data;
+
+        /** preview.joined 로 걸러지지만 그 사이 상태가 바뀐 경우 */
+        if (code === ERROR_CODE.TOURNAMENT_ALREADY_PARTICIPANT) {
+          router.replace(ROUTES.TOURNAMENT_CREATE(tournamentId));
           return;
         }
 
-        setState('invalid');
+        /** 그 외는 초대 링크 만료 · PENDING 아닌 토너먼트 */
+        setTournamentErrorType(
+          code === ERROR_CODE.TOURNAMENT_PARTICIPANT_LIMIT_EXCEEDED
+            ? 'PARTICIPANTS_FULL'
+            : 'LINK_EXPIRED'
+        );
       }
     };
 
@@ -86,14 +99,14 @@ function InviteClient({ tournamentId, inviteCode }: InviteClientProps) {
 
         router.replace(`${ROUTES.TOURNAMENT_JOIN_BY_LINK(tournamentId)}?code=${inviteCode}`);
       } catch (error) {
+        setState('invalid');
+
+        /** invite-preview 의 409 는 "PENDING 아님 · 초대 링크 만료" 뿐이라 code 분기가 필요 없다. */
         if (isAxiosError<ApiErrorResponseT>(error) && error.response?.status === 409) {
-          setState('invalid');
-          setIsTournamentErrorDialogOpen(true);
-          return;
+          setTournamentErrorType('LINK_EXPIRED');
         }
 
-        /** 400 (코드 불일치) / 네트워크 등 */
-        setState('invalid');
+        /** 그 외 400 (코드 불일치) / 네트워크 등은 아래 '유효하지 않은 링크' 화면으로 */
       }
     };
 
@@ -112,11 +125,13 @@ function InviteClient({ tournamentId, inviteCode }: InviteClientProps) {
           </div>
         </main>
 
-        <TournamentErrorDialog
-          type="LINK_EXPIRED"
-          open={isTournamentErrorDialogOpen}
-          onOpenChange={setIsTournamentErrorDialogOpen}
-        />
+        {tournamentErrorType && (
+          <TournamentErrorDialog
+            type={tournamentErrorType}
+            open
+            onOpenChange={() => setTournamentErrorType(null)}
+          />
+        )}
       </>
     );
   }
@@ -140,12 +155,13 @@ function InviteClient({ tournamentId, inviteCode }: InviteClientProps) {
         </Link>
       </main>
 
-      {/** TODO: 409는 초대 코드 만료, 이미 참여 중, 이미 시작된 토너먼트 등 여러 경우가 있음 따라서 타입을 동적으로 설정할 수 있어야 하나, 서버에서 에러코드를 내려주지 않기 때문에 일단 단일 타입으로 처리*/}
-      <TournamentErrorDialog
-        type="LINK_EXPIRED"
-        open={isTournamentErrorDialogOpen}
-        onOpenChange={setIsTournamentErrorDialogOpen}
-      />
+      {tournamentErrorType && (
+        <TournamentErrorDialog
+          type={tournamentErrorType}
+          open
+          onOpenChange={() => setTournamentErrorType(null)}
+        />
+      )}
     </>
   );
 }

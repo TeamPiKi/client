@@ -9,6 +9,7 @@ import Button from '@/components/button';
 import { Header } from '@/components/header';
 import Input from '@/components/input';
 import TournamentErrorDialog from '@/components/tournament-error-dialog';
+import type { TournamentErrorTypeT } from '@/types/tournament';
 import { QUERY_ACTION } from '@/consts/queryAction';
 import { ROUTES } from '@/consts/route';
 import { useGetMe } from '@/hooks/useGetMe';
@@ -36,10 +37,12 @@ function JoinPreviewClient({ tournamentId, inviteCode }: JoinPreviewClientProps)
   const { patchMeMutation, isPatchMePending } = usePatchMe();
 
   const [nickname, setNickname] = useState(userData.nickname);
-  const [isTournamentErrorDialogOpen, setIsTournamentErrorDialogOpen] = useState(false);
+  const [tournamentErrorType, setTournamentErrorType] = useState<TournamentErrorTypeT | null>(null);
 
   const { postJoinMutation, isPostJoinPending } = usePostJoin({
-    onConflict: () => setIsTournamentErrorDialogOpen(true),
+    onAlreadyJoined: () => router.push(ROUTES.TOURNAMENT_CREATE(tournamentId)),
+    onParticipantsFull: () => setTournamentErrorType('PARTICIPANTS_FULL'),
+    onUnavailable: () => setTournamentErrorType('LINK_EXPIRED'),
   });
 
   const {
@@ -131,11 +134,13 @@ function JoinPreviewClient({ tournamentId, inviteCode }: JoinPreviewClientProps)
         </div>
       </main>
 
-      <TournamentErrorDialog
-        type="LINK_EXPIRED"
-        open={isTournamentErrorDialogOpen}
-        onOpenChange={setIsTournamentErrorDialogOpen}
-      />
+      {tournamentErrorType && (
+        <TournamentErrorDialog
+          type={tournamentErrorType}
+          open
+          onOpenChange={() => setTournamentErrorType(null)}
+        />
+      )}
     </>
   );
 }
