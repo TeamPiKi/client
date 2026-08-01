@@ -12,6 +12,7 @@
 - **401 (인증 만료)** → **전역 인터셉터**가 토큰 refresh 후 자동 재시도, 실패 시 로그인 redirect.
 - **인증/권한 게이팅** → **layout 가드(SSR)** 가 진입 시점에 차단.
 - **조용히 실패 금지** → 개별 onError가 없어도 **전역 안전망**이 최소 토스트를 보장.
+- **문구는 `code`, 동작은 `status`** → 사용자 문구는 100% 에러 코드 카탈로그. 분기(이동/다이얼로그)는 status가 1차, code는 같은 status에서 동작이 갈릴 때만.
 
 ---
 
@@ -42,7 +43,7 @@
 | **401** | 인증 만료 | **전역 인터셉터 ①** | refresh → 재시도 → 실패 시 로그인 |
 | **403** | 권한 없음 | **layout ② or 개별 ④** | 게스트/미인증 = layout redirect · 그 외 = 개별 토스트 |
 | **404** | 리소스 없음 | **layout ② or 개별 ④** | 진입 게이팅은 layout · 액션 실패는 개별 |
-| **409** | 충돌(만료/중복/이미 시작) | **개별** | 전용 다이얼로그/안내 (원인별 UX 큼) |
+| **409** | 충돌(만료/중복/이미 시작) | **개별** | 전용 다이얼로그/안내 (원인별 UX가 갈리면 `code` 2차 분기 — 아래 참고) |
 | **413** | 용량 초과 | **개별 (+ 사전검증)** | 업로드 전 클라 용량 체크 우선 |
 | **5xx · 네트워크** | 서버/통신 오류 | **전역 MutationCache ③** | 공통 "일시적 오류" 토스트 + Sentry |
 
@@ -113,6 +114,89 @@
 
 ---
 
+## `status` vs `code` — 무엇으로 분기할까
+
+서버가 모든 실패 응답에 `code`를 실어주면서 "status 대신 code로 다 분기해야 하나?"라는 질문이 생긴다.
+**답은 아니다.** 둘은 답하는 질문이 다르다.
+
+| | 무엇을 답하나 | 어디에 쓰나 |
+| --- | --- | --- |
+| **`code`** | "무슨 일이 일어났나" | **사용자 문구** (100%) |
+| **`status`** | "이제 뭘 해야 하나" — 머무를까 / 이탈할까 / 재시도할까 | **동작 분기 1차** |
+
+### 규칙
+
+1. **문구는 항상 `code`** — `getApiErrorMessage(error)` 하나로 통일. 호출부에서 문구를 직접 쓰지 않는다.
+2. **동작 1차 분기는 `status`** — "머무를까 / 이탈할까 / 재시도할까"는 HTTP 시맨틱으로 충분하다.
+   403/404/409가 전부 "이 화면에 더 못 있음 → 목록으로 replace"로 수렴한다면 code를 나열하지 않는다.
+3. **`code`는 같은 status 안에서 동작이 갈릴 때만 2차 분기** — 아래 판단 기준 참고.
+4. **`code` 분기에는 반드시 `else` fallback을 둔다** — 서버가 code를 추가해도 안전하게 흘러가도록.
+
+> **판단 기준**: "같은 status인데 사용자가 가야 할 곳이 다른가?" → 예면 code 2차 분기, 아니면 status로 충분.
+
+### 왜 전면 전환을 하지 않나
+
+**문구 매핑은 틀려도 degrade되지만, 분기는 틀리면 조용히 깨진다.**
+
+카탈로그에 없는 code가 오면 `detail` → generic으로 흘러서 최악이 "덜 친절한 문구"다.
+반면 동작 분기가 code 기반인데 매칭이 안 되면 **사용자가 엉뚱한 화면으로 간다.** 타입 체크로도 안 잡힌다.
+
+실제로 서버 코드 사전은 자주 움직인다 — `LINK-001~003`이 한 칸씩 당겨지고, 접두사 4개(`IMG_PROXY`→`PROXY` 등)가 통째로 바뀌고, 코드 여러 개가 삭제된 전례가 있다.
+그 변동을 **문구 계층에서만** 흡수해야 라우팅까지 흔들리지 않는다.
+
+### code 2차 분기가 필요한 곳 (현재)
+
+같은 status에 서로 다른 사용자 행동이 묶여 있는 케이스. `api-docs`의 엔드포인트별 응답 설명으로 확인할 수 있다.
+
+| 엔드포인트 | status | code | 동작 |
+| --- | --- | --- | --- |
+| `POST /tournaments/{id}/start` | 409 | `TOURNAMENT-013`·`TOURNAMENT-014` | 토스트 (준비 안 된 상품 안내) |
+| | | 그 외 (이미 시작됨) | 매치 화면으로 이동 |
+| `POST /tournaments/{id}/join` | 409 | `TOURNAMENT-022` (이미 참여 중) | 해당 토너먼트로 진입 |
+| | | `TOURNAMENT-030` (인원 초과) | 인원 마감 다이얼로그 |
+| | | 그 외 (만료·PENDING 아님) | 링크 만료 다이얼로그 |
+
+### status로 충분한 곳 (바꾸지 말 것)
+
+- **401 인터셉터** — code(`AUTH-001`/`COMMON-UNAUTHORIZED`/`OAUTH-*`)로 바꾸면 refresh 로직이 코드 사전에 결합된다. 401은 그냥 401이다.
+- **5xx·네트워크 재시도 판단** — `ERR_NETWORK`는 응답 body 자체가 없어 서버 `code`가 존재하지 않는다.
+- **RSC layout의 `redirect`/`notFound`** — 404 → `notFound()`는 HTTP 시맨틱 그 자체다.
+- **원인이 하나의 동작으로 수렴하는 4xx 묶음** — 아이템 수정·삭제의 403/404/409 등.
+
+---
+
+## 함정: `mutate` 레벨 `onError`는 전역 양보 조건이 아니다
+
+전역 4xx fallback의 양보 조건은 `if (mutation.options.onError) return` 인데,
+여기서 `mutation.options.onError`는 **`useMutation({ onError })`(훅 레벨)만** 가리킨다.
+
+```ts
+// ❌ 전역이 양보하지 않는다 → 토스트 2개
+const { mutate } = useMutation({ mutationFn }); // 훅 레벨 onError 없음
+mutate(vars, {
+  onError: () => toast.error('실패했어요'), // mutate 레벨 — 전역 fallback과 함께 실행됨
+});
+
+// ✅ 훅 레벨에서 4xx를 책임지고, 화면 고유 동작만 콜백으로 위임
+export const usePostJoin = ({ onConflict }: { onConflict?: () => void } = {}) => {
+  return useMutation({
+    mutationFn: postJoin,
+    onError: error => {
+      if (isAxiosError(error) && error.response?.status === 409) {
+        onConflict?.();
+        return;
+      }
+      toast.error(getApiErrorMessage(error));
+    },
+  });
+};
+```
+
+> 에러 처리는 **훅 레벨 `onError`에 둔다.** 화면마다 달라지는 부분(다이얼로그 열기 등)은
+> 훅 파라미터 콜백으로 받아서 위임한다. `mutate` 레벨 `onError`에 에러 처리를 넣으면 전역과 중복된다.
+
+---
+
 ## 개발 규칙 (체크리스트)
 
 - [ ] mutation 훅의 `onError`는 **4xx만** 분기한다. `status === 500` / `else`로 5xx를 토스트하지 않는다 (전역이 담당)
@@ -120,25 +204,45 @@
 - [ ] 화면 진입 조건(로그인/멤버/존재)인 4xx는 layout에서 처리한다
 - [ ] "정상 UI에선 도달 불가"한 status는 개별 분기하지 않는다 (전역 안전망 + Sentry가 덮음)
 - [ ] 일반 query는 `isError`를 분기해 에러 UI를 노출한다
-- [ ] 에러 메시지는 `getApiErrorMessage(error)`로 통일한다
+- [ ] 에러 메시지는 `getApiErrorMessage(error)`로 통일한다 — 호출부에 문구를 직접 쓰지 않는다
+- [ ] 동작 분기는 status가 1차. `code` 분기는 "같은 status인데 갈 곳이 다를 때"만 쓰고, `else` fallback을 둔다
+- [ ] 에러 처리는 **훅 레벨 `onError`**에 둔다 (`mutate` 레벨에 두면 전역 fallback과 토스트가 중복된다)
 
 ---
 
 ## 유틸: `getApiErrorMessage(error)`
 
 에러 → 사용자 문구 변환을 한 곳으로 일원화한다.
+문구 카탈로그는 web·app 공유를 위해 `@piki/core`에 두고, web은 axios 파싱만 담당한다.
+
+```
+packages/core/src/
+├── consts/errorCode.ts            # ERROR_MESSAGE_MAP (code → 문구) + fallback 상수
+├── types/error.ts                 # ErrorCodeT, ApiErrorCodeT
+└── utils/getErrorMessageByCode.ts # 순수 조회 헬퍼 (없으면 undefined)
+```
 
 ```ts
-// utils/getApiErrorMessage.ts
+// apps/web/src/utils/getApiErrorMessage.ts
+// 우선순위: code → detail → generic
 export const getApiErrorMessage = (error: unknown): string => {
-  if (isAxiosError<ApiErrorResponseT>(error)) {
-    const status = error.response?.status;
-    if (!status || status >= 500) return '일시적인 오류예요. 잠시 후 다시 시도해 주세요.';
-    return error.response?.data?.detail ?? '요청을 처리하지 못했어요.';
-  }
-  return '요청을 처리하지 못했어요.';
+  if (!isAxiosError<ApiErrorResponseT>(error)) return DEFAULT_ERROR_MESSAGE;
+
+  const { code, detail } = error.response?.data ?? {};
+
+  const messageByCode = getErrorMessageByCode(code);
+  if (messageByCode) return messageByCode;
+
+  const status = error.response?.status;
+  if (!status || status >= 500) return SERVER_ERROR_MESSAGE;
+
+  return detail ?? DEFAULT_ERROR_MESSAGE;
 };
 ```
+
+> 카탈로그 원본은 [`api-docs`](https://dev.api.piki.day/v3/api-docs)의 `info.description`이다.
+> 서버가 코드를 추가·삭제·개명하므로 **주기적으로 대조**할 것. 클라이언트가 도달할 수 없는
+> 서버 간 통신 코드(`APPLE-*`, `EXTRACTOR-*`, `SNAPSHOT-*`)는 카탈로그에서 제외한다.
 
 ---
 
