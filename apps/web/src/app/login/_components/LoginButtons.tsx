@@ -1,7 +1,7 @@
 'use client';
 
 import type { SocialProviderT } from '@piki/core';
-import { WEBBRIDGE_MESSAGE_TYPE } from '@piki/core';
+import { ERROR_CODE, ERROR_MESSAGE_MAP, WEBBRIDGE_MESSAGE_TYPE } from '@piki/core';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 import { toast } from 'sonner';
@@ -49,6 +49,11 @@ function LoginButtons({ redirect, action, showAppleLogin }: LoginButtonsProps) {
     const handleLoginError = () => {
       if (action === QUERY_ACTION.VALUE.SESSION_EXPIRED) {
         toast.error('로그인 정보가 만료됐어요. 다시 로그인해 주세요.');
+        router.replace(getLoginPath(validRedirect), { scroll: false });
+        return;
+      }
+      if (action === QUERY_ACTION.VALUE.WITHDRAWN_ACCOUNT) {
+        toast.error(ERROR_MESSAGE_MAP[ERROR_CODE.USER_DELETED]);
         router.replace(getLoginPath(validRedirect), { scroll: false });
         return;
       }
