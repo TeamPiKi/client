@@ -123,9 +123,9 @@ function HomeOnboarding() {
         >
           <div
             aria-hidden
-            className="pointer-events-none absolute inset-x-0 top-0 z-0 h-[286px] bg-sky-blue-200"
+            className="pointer-events-none absolute inset-x-0 top-0 h-[286px] bg-sky-blue-200"
           />
-          <CarouselContent className="relative z-10 ml-0">
+          <CarouselContent className="relative ml-0">
             {slides.map(({ title, description, Illust, illustClassName }) => (
               <CarouselItem key={title} className="pl-0">
                 <div className="flex h-[286px] justify-center overflow-hidden">
