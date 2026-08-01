@@ -1,3 +1,6 @@
+/** Playwright webServer·baseURL·storageState origin 공통 주소 */
+export const BASE_URL = 'http://localhost:3000';
+
 /**
  * SSR 목 스텁 서버 포트.
  * playwright.config.ts 가 NEXT_PUBLIC_API_URL 을 이 주소로 강제해
