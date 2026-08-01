@@ -3,6 +3,7 @@ export { BRIDGE_GATE } from './consts/appVersion';
 export { WEBVIEW_UA_TOKEN } from './consts/client';
 export {
   DEFAULT_ERROR_MESSAGE,
+  ERROR_CODE,
   ERROR_MESSAGE_MAP,
   SERVER_ERROR_MESSAGE,
 } from './consts/errorCode';
