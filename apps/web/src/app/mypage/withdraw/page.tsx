@@ -14,7 +14,7 @@ function MypageWithdrawPage() {
       <Header
         left={<HeaderIcon name="BACK" />}
         center="회원탈퇴"
-        centerClassName="title-1 text-text-neutral-primary"
+        centerClassName="heading-1-bold text-text-neutral-primary"
       />
 
       <div className="hide-scrollbar flex w-full flex-1 flex-col items-center justify-center gap-12 overflow-y-auto pb-[98px]">
