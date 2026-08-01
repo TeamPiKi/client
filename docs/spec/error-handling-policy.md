@@ -56,7 +56,8 @@
 - 401 응답 시 자동으로 `refreshClientToken()` → 원 요청 1회 재시도
 - refresh 실패 시 로그인 페이지로 redirect (단 LOGIN/ROOT/auth callback 경로는 제외)
 - **개별 훅에서 401을 따로 처리하지 않는다** (전역이 담당)
-- 주의: `serverApi`(SSR)에는 이 인터셉터가 없다 → SSR 경로의 401은 layout/에러바운더리에서 처리
+- 주의: `serverApi`(SSR)에는 refresh 인터셉터가 없다 → SSR 경로의 401은 layout/에러바운더리에서 처리
+- 탈퇴한 계정(409 `USER-003`)은 401과 같은 계층에서 처리한다 — 양쪽 인터셉터가 세션을 정리하고 로그인으로 보낸다
 
 ### ② 인증·권한 게이팅 — Layout 가드 (SSR)
 

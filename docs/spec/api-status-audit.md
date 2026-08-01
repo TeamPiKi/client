@@ -9,7 +9,7 @@
 ## 전역 동작 (공통 전제)
 
 - **401**: `apis/client.ts` 인터셉터가 토큰 refresh 후 자동 재시도, 실패 시 로그인 리다이렉트 → clientApi 호출은 사실상 401 전역 커버. **단 `serverApi`(SSR)에는 응답 인터셉터가 없어** 서버 렌더 경로의 4xx/5xx는 그대로 throw.
-- **409 `USER-003`(탈퇴한 계정)**: 인터셉터가 토큰 정리 + 로그인 리다이렉트(`?action=withdrawn-account`). SSR 경로는 layout 가드가 동일 처리.
+- **409 `USER-003`(탈퇴한 계정)**: `clientApi` 인터셉터가 토큰 정리 + 로그인 리다이렉트(`?action=withdrawn-account`), `serverApi` 인터셉터가 SSR 경로에서 동일하게 `redirect`.
 - **Mutation 전역 안전망** (`utils/queryClient.ts` `MutationCache.onError`):
   - **5xx·네트워크**: 항상 `getApiErrorMessage` 토스트 + Sentry (개별 `onError` 유무와 무관)
   - **4xx**: 개별 `onError`가 **없으면** generic fallback 토스트 · **있으면** 전역이 양보 → 미처리 status는 토스트 없음
@@ -79,7 +79,7 @@
 | 하드코딩 에러 문구                                                                                     | 전부 `getApiErrorMessage` 로 일원화                             |
 | 5xx 문구 미구분                                                                                        | 500/502/503 코드별 문구 분리 + `app/error.tsx` 도 카탈로그 사용 |
 | `InviteTournamentDialog` 서버 오류 오안내                                                              | 5xx 에 "유효하지 않은 코드" 다이얼로그가 뜨던 문제 수정         |
-| 탈퇴한 계정(`USER-003`) 세션                                                                           | 인터셉터·layout 에서 토큰 정리 후 로그인 유도                   |
+| 탈퇴한 계정(`USER-003`) 세션                                                                           | client/server 인터셉터에서 토큰 정리 후 로그인 유도             |
 
 ---
 
@@ -317,7 +317,7 @@
 - 200: ✅ UserT 반환(`['me']`)
 - 401: ✅ 전역(client) / 서버 경로는 인터셉터 없어 throw → boundary
 - 404: ❌ 전용 처리 없음 — suspense query throw → error boundary
-- 409(`USER-003` 탈퇴한 계정): ✅ 인터셉터 세션 정리 / SSR 경로는 layout 가드가 로그인 유도
+- 409(`USER-003` 탈퇴한 계정): ✅ client/server 양쪽 인터셉터가 세션 정리 후 로그인 유도
 
 ### DELETE /api/v1/users/me (회원 탈퇴) · 200, 401, 403, 404
 
