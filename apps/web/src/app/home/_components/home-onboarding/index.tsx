@@ -30,12 +30,17 @@ function HomeOnboarding() {
     () => true,
     () => false
   );
+  const isAndroid = useSyncExternalStore(
+    () => () => {},
+    () => /android/i.test(window.navigator.userAgent),
+    () => false
+  );
 
   /** 모달 노출 여부 */
   const isOpen = isMounted && !hasSeen && !isClosed;
   // const isOpen = isMounted && isWebview() && !hasSeen && !isClosed;
   /** 슬라이드 목록 - iOS/android 분기 */
-  const slides = getOnboardingSlides(isMounted && /android/i.test(window.navigator.userAgent));
+  const slides = getOnboardingSlides(isAndroid);
   // const slides = getOnboardingSlides(isInApp && /android/i.test(window.navigator.userAgent));
 
   /** 중간에 닫아도 다시 뜨지 않도록 노출 시점에 기록 */
