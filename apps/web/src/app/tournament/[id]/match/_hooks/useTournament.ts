@@ -2,16 +2,18 @@
 
 import { useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
-import { useMemo, useRef, useState, useSyncExternalStore } from 'react';
+import { useRef, useState } from 'react';
 import { toast } from 'sonner';
 
 import { ROUTES } from '@/consts/route';
 import type { TournamentItemT } from '@/types/tournament';
 
 import { getTournament } from '../../_common/_apis/getTournament';
-import type { GetTournamentInProgressResponseT } from '../../_common/_types/tournamentResponse';
+import type {
+  GetTournamentInProgressResponseT,
+  TournamentMatchT,
+} from '../../_common/_types/tournamentResponse';
 import { type TransitionStageT, getRoundLabel, getTransitionStage } from '../_consts/rounds';
-import { pairByPriceAsc, shufflePairs } from '../_utils/pairItems';
 import { usePostRecordMatch } from './usePostRecordMatch';
 
 type UseTournamentArgs = {
@@ -26,10 +28,10 @@ type InProgressT = NonNullable<GetTournamentInProgressResponseT['inProgress']>;
 const useTournament = ({ tournamentId, inProgress }: UseTournamentArgs) => {
   const router = useRouter();
   const queryClient = useQueryClient();
-  const { postRecordMatchMutation } = usePostRecordMatch({
+  const { postRecordMatchMutation, isPostRecordMatchPending } = usePostRecordMatch({
     tournamentId,
     onSuccess: data => {
-      if (!data) return;
+      if (!data.completed) return;
       // 결승 종료 후 result 페이지가 권위 응답(hasGroupResult/playLinkExpiresAt/isRoot 등)
       // 을 받아야 하므로 클라 캐시는 비워 두고 SSR fresh data 로 채우게 한다.
       // (시드해두면 stale 한 hasGroupResult=false 가 클라에 남아 카드 노출이 늦어짐)
@@ -37,44 +39,29 @@ const useTournament = ({ tournamentId, inProgress }: UseTournamentArgs) => {
     },
   });
 
-  // 서버 권위의 현재 라운드 (2, 4, 8, ...) — 라운드 종료 시 refetch로 갱신
+  // 서버 권위의 현재 라운드 (2, 4, 8, ...) — 라운드 종료 시 재조회로 갱신
   const [currentRound, setCurrentRound] = useState(inProgress.currentRound);
-  // 현재 라운드 진행 중 남은 미대결 아이템 (매치 끝날 때마다 두 아이템씩 빠짐)
-  const [remainingItems, setRemainingItems] = useState<TournamentItemT[]>(
-    inProgress.remainingItems
+  // 서버 브래킷이 정한 현재 대결 — 기록 응답의 nextMatch 로 갱신된다
+  const [currentMatch, setCurrentMatch] = useState<TournamentMatchT | null>(
+    inProgress.currentMatch
   );
+  // 라운드 내 진행한 매치 수 (라벨 표기용) — 라운드가 바뀌면 0 으로 초기화
+  const [matchIndex, setMatchIndex] = useState(0);
   const [transitionStage, setTransitionStage] = useState<TransitionStageT | null>(null);
-  // 카드 선택 락 해제용 — 매치가 바뀌지 않는 실패(결승/라운드 마지막 기록 실패)에서
-  // VsSection 을 remount 시켜 재선택을 가능하게 한다 (락은 useCardSelectionAnimation 내부 상태)
+  // 카드 선택 락 해제용 — 매치가 바뀌지 않는 기록 실패에서 VsSection 을 remount 시켜
+  // 재선택을 가능하게 한다 (락은 useCardSelectionAnimation 내부 상태)
   const [selectionEpoch, setSelectionEpoch] = useState(0);
-  // SSR과 클라이언트 첫 렌더에서 동일한 페어 순서를 보장하기 위해, 마운트 후에만 셔플 적용
-  // (Math.random 결과가 SSR/CSR 간 달라 hydration mismatch 발생)
-  const isMounted = useSyncExternalStore(
-    () => () => {},
-    () => true,
-    () => false
-  );
 
   // 준결승/결승 바텀시트 표시 중 재조회 없이 적용할 다음 라운드 데이터
   const pendingNextRoundRef = useRef<InProgressT | null>(null);
 
-  // 페어 생성 — SSR/첫 렌더: 가격 오름차순 그대로, 마운트 후: 셔플 적용
-  const pairs = useMemo(() => {
-    const sorted = pairByPriceAsc(remainingItems);
-    return isMounted ? shufflePairs(sorted) : sorted;
-  }, [remainingItems, isMounted]);
-  const currentMatch = pairs[0];
-  // 현재 라운드 전체 매치 수 = currentRound / 2
-  // 진행한 매치 수 = (currentRound - remainingItems.length) / 2
-  const matchIndex = (currentRound - remainingItems.length) / 2;
   const roundLabel = getRoundLabel(currentRound, matchIndex);
   const isFinalRound = currentRound === 2;
-  const isLastMatchInRound = pairs.length === 1;
 
   /**
    * 서버 권위 상태로 재동기화.
-   * - 낙관적 업데이트가 서버와 어긋났을 때 (매치 기록 실패) 롤백 용도
-   * - 라운드 전환 조회 실패 시 재시도 용도
+   * - 라운드 종료(nextMatch === null) 후 다음 라운드 진입
+   * - 기록 실패로 클라/서버 상태가 어긋났을 때 복구
    * 라운드가 넘어간 상태면 기존 전환 UX(준결승/결승 바텀시트)를 그대로 태운다.
    */
   const syncWithServer = async () => {
@@ -90,12 +77,11 @@ const useTournament = ({ tournamentId, inProgress }: UseTournamentArgs) => {
     const nextInProgress = next.inProgress;
 
     // 라운드 전환 — 서버의 실제 다음 라운드 수 기준으로 바텀시트 판단
-    // (currentRound / 2 계산은 홀수 강에서 틀릴 수 있어 서버 응답만 신뢰)
     if (nextInProgress.currentRound !== currentRound) {
       const stage = getTransitionStage(nextInProgress.currentRound);
 
       if (stage !== 'toNext') {
-        // 준결승/결승 바텀시트 — ref에 저장하고 시트 표시
+        // 준결승/결승 바텀시트 — ref 에 저장하고 시트 표시
         pendingNextRoundRef.current = nextInProgress;
         setTransitionStage(stage);
         return;
@@ -103,7 +89,8 @@ const useTournament = ({ tournamentId, inProgress }: UseTournamentArgs) => {
     }
 
     setCurrentRound(nextInProgress.currentRound);
-    setRemainingItems(nextInProgress.remainingItems);
+    setCurrentMatch(nextInProgress.currentMatch);
+    setMatchIndex(0);
   };
 
   const unlockSelection = () => setSelectionEpoch(prev => prev + 1);
@@ -131,32 +118,31 @@ const useTournament = ({ tournamentId, inProgress }: UseTournamentArgs) => {
   const handleSelect = (winner: TournamentItemT) => {
     if (!currentMatch) return;
 
-    const [first, second] = currentMatch;
+    const { first, second } = currentMatch;
 
-    const matchBody = {
-      currentRound,
-      firstTournamentItemId: first.tournamentItemId,
-      secondTournamentItemId: second.tournamentItemId,
-      selectedTournamentItemId: winner.tournamentItemId,
-    };
+    postRecordMatchMutation(
+      {
+        currentRound,
+        firstTournamentItemId: first.tournamentItemId,
+        secondTournamentItemId: second.tournamentItemId,
+        selectedTournamentItemId: winner.tournamentItemId,
+      },
+      {
+        onSuccess: async data => {
+          // 토너먼트 종료 — 캐시 정리(훅 onSuccess)까지 끝난 뒤 결과 페이지로
+          if (data.completed) {
+            router.push(ROUTES.TOURNAMENT_RESULT(tournamentId));
+            return;
+          }
 
-    // 결승전 — onSuccess(캐시를 COMPLETED로 시드)까지 기다린 후 결과 페이지로 이동
-    if (isFinalRound) {
-      postRecordMatchMutation(matchBody, {
-        onSuccess: () => router.push(ROUTES.TOURNAMENT_RESULT(tournamentId)),
-        // 낙관적 상태 변경이 없는 경로 — 매치는 그대로지만 카드 선택 락은 걸려 있어 명시적으로 푼다
-        onError: () => {
-          toast.error('선택을 저장하지 못했어요. 다시 골라주세요.');
-          unlockSelection();
-        },
-      });
-      return;
-    }
+          // 같은 라운드의 다음 대결 — 서버가 준 매치로 교체
+          if (data.nextMatch) {
+            setCurrentMatch(data.nextMatch);
+            setMatchIndex(prev => prev + 1);
+            return;
+          }
 
-    // 라운드 마지막 매치 — 기록 성공 후 서버 재조회로 다음 라운드 진입
-    if (isLastMatchInRound) {
-      postRecordMatchMutation(matchBody, {
-        onSuccess: async () => {
+          // nextMatch 없음 — 라운드 종료. 재조회로 다음 라운드 진입
           try {
             await syncWithServer();
           } catch {
@@ -168,42 +154,12 @@ const useTournament = ({ tournamentId, inProgress }: UseTournamentArgs) => {
             }
           }
         },
-        // 기록 자체가 실패한 경로 — 매치는 그대로지만 카드 선택 락은 걸려 있어 명시적으로 푼다
+        // 기록 실패 — 매치는 그대로지만 카드 선택 락은 걸려 있어 명시적으로 푼다
         onError: () => {
           toast.error('선택을 저장하지 못했어요. 다시 골라주세요.');
           unlockSelection();
         },
-      });
-      return;
-    }
-
-    // 일반 라운드 — 낙관적 진행 (기록 요청과 동시에 다음 매치로)
-    postRecordMatchMutation(matchBody, {
-      // 기록 실패 시 낙관적으로 제거한 페어를 복구해 클라/서버 상태 정합을 맞춘다.
-      onError: async () => {
-        toast.error('선택을 저장하지 못했어요. 다시 골라주세요.');
-        try {
-          await syncWithServer();
-        } catch {
-          // 재조회마저 실패 — 로컬에서 페어만 복원 (pairByPriceAsc 가 재정렬하므로 순서 무관)
-          setRemainingItems(prev => {
-            const existingIds = new Set(prev.map(item => item.tournamentItemId));
-            const restored = [first, second].filter(
-              item => !existingIds.has(item.tournamentItemId)
-            );
-            return [...prev, ...restored];
-          });
-        }
-      },
-    });
-
-    // 현재 매치 페어를 remainingItems에서 제거 (서버 동작과 동일)
-    setRemainingItems(prev =>
-      prev.filter(
-        item =>
-          item.tournamentItemId !== first.tournamentItemId &&
-          item.tournamentItemId !== second.tournamentItemId
-      )
+      }
     );
   };
 
@@ -212,7 +168,8 @@ const useTournament = ({ tournamentId, inProgress }: UseTournamentArgs) => {
 
     if (pendingNextRound) {
       setCurrentRound(pendingNextRound.currentRound);
-      setRemainingItems(pendingNextRound.remainingItems);
+      setCurrentMatch(pendingNextRound.currentMatch);
+      setMatchIndex(0);
       pendingNextRoundRef.current = null;
     }
 
@@ -225,6 +182,8 @@ const useTournament = ({ tournamentId, inProgress }: UseTournamentArgs) => {
     isFinalRound,
     transitionStage,
     selectionEpoch,
+    /** 기록 요청 대기 중 — 다음 매치를 서버가 주므로 이 동안 스켈레톤을 노출한다 */
+    isRecordingMatch: isPostRecordMatchPending,
     handleSelect,
     handleTransitionComplete,
   };
