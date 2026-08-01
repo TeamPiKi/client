@@ -26,8 +26,8 @@ const ReceiptShareCaptureLayer = forwardRef<HTMLDivElement, ReceiptShareCaptureL
           ref={ref}
           className="flex w-90 flex-col items-center gap-8 bg-sky-blue-200 px-6 pt-6 pb-8"
         >
-          {/* 영수증 하단 톱니가 absolute top-full 로 18px 튀어나와 그만큼 자리를 비워둔다 */}
-          <div className="w-full pb-4.5">
+          {/* 영수증은 상단 그라데이션(-top-6)·하단 톱니(top-full)가 밖으로 튀어나와 그만큼 자리를 비워둔다 */}
+          <div className="w-full pt-6 pb-4.5">
             <ReceiptPaper
               tournamentId={tournamentId}
               tournamentName={tournamentName}
