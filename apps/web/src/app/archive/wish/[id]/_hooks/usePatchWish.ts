@@ -32,14 +32,17 @@ export const usePatchWish = (wishId: number) => {
       if (!isAxiosError<ApiErrorResponseT>(error) || !error.response) return;
 
       const { status } = error.response;
-      const errorMessage = getApiErrorMessage(error);
 
-      if (status === 400) {
-        toast.error(errorMessage);
-      } else if (status === 403 || status === 404 || status === 409) {
-        toast.error(errorMessage);
-        router.replace(ROUTES.WISHLIST);
-      }
+      if (status === 401 || status >= 500) return;
+
+      toast.error(getApiErrorMessage(error));
+
+      /**
+       * 403: 위시 수정 권한 없음
+       * 404: 위시 존재하지 않음
+       * 409: 탈퇴한 계정
+       */
+      if (status === 403 || status === 404 || status === 409) router.replace(ROUTES.WISHLIST);
     },
   });
 

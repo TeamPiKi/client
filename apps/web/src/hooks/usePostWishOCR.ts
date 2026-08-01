@@ -30,15 +30,19 @@ export const usePostWishOCR = () => {
     onError: error => {
       if (!isAxiosError<ApiErrorResponseT>(error) || !error.response) return;
 
+      const { status } = error.response;
+
+      if (status === 401 || status >= 500) return;
+
       /**
        * 400: 이미지 개수/형식/크기 초과
        * 403: 게스트인 경우
+       * 409: 탈퇴한 계정
        */
-      if (error.response.status === 400) toast.error(getApiErrorMessage(error));
-      else if (error.response.status === 403) {
-        toast.error(getApiErrorMessage(error));
+      toast.error(getApiErrorMessage(error));
+
+      if (status === 403)
         router.replace(getLoginPath(`${window.location.pathname}${window.location.search}`));
-      }
     },
   });
 
