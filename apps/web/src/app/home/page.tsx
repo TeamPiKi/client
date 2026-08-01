@@ -12,6 +12,7 @@ import { getQueryClient } from '@/utils/queryClient';
 import AddWishHomeDialog from './_components/AddWishHomeDialog';
 import InviteTournamentDialog from './_components/InviteTournamentDialog';
 import MemberOnlyToast from './_components/MemberOnlyToast';
+import HomeOnboarding from './_components/home-onboarding';
 import TournamentList from './_components/tournament-list';
 
 async function HomePage() {
@@ -59,6 +60,7 @@ async function HomePage() {
         </main>
 
         <MemberOnlyToast />
+        <HomeOnboarding />
       </div>
     </HydrationBoundary>
   );
