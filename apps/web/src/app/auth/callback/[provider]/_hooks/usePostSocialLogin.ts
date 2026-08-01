@@ -1,5 +1,6 @@
 import type { SocialProviderT } from '@piki/core';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { isAxiosError } from 'axios';
 import { useRouter } from 'next/navigation';
 
 import { ANALYTICS_EVENT } from '@/consts/analytics';
@@ -30,8 +31,15 @@ export const usePostSocialLogin = (provider: SocialProviderT) => {
       queryClient.invalidateQueries({ queryKey: ['me'] });
       window.location.replace(getLoginRedirectPath(variables.redirect));
     },
-    onError: (_, variables) => {
-      router.replace(getLoginPath(variables.redirect, QUERY_ACTION.VALUE.SOCIAL_LOGIN_ERROR));
+    onError: (error, variables) => {
+      /** 5xx·네트워크 문구는 전역 안전망이 띄운다 → 액션 쿼리 없이 이동해 토스트 중복을 막는다 */
+      const isServerError = !isAxiosError(error) || !error.response || error.response.status >= 500;
+
+      router.replace(
+        isServerError
+          ? getLoginPath(variables.redirect)
+          : getLoginPath(variables.redirect, QUERY_ACTION.VALUE.SOCIAL_LOGIN_ERROR)
+      );
     },
   });
 

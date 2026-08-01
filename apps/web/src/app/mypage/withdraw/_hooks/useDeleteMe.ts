@@ -1,5 +1,6 @@
 import { WEBBRIDGE_MESSAGE_TYPE } from '@piki/core';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { isAxiosError } from 'axios';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
@@ -28,6 +29,16 @@ export const useDeleteMe = () => {
       router.replace(ROUTES.ROOT);
     },
     onError: error => {
+      if (!isAxiosError(error) || !error.response) return;
+
+      const { status } = error.response;
+
+      if (status === 401 || status >= 500) return;
+
+      /**
+       * 403: 게스트는 탈퇴 불가
+       * 404: 존재하지 않는 계정
+       */
       toast.error(getApiErrorMessage(error));
     },
   });

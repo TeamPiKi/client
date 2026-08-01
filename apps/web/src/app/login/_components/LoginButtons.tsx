@@ -12,6 +12,7 @@ import KakaoIcon from '@/assets/icons/social/kakao.svg';
 import Spinner from '@/components/spinner';
 import { QUERY_ACTION } from '@/consts/queryAction';
 import { useNativeLoginResult } from '@/hooks/useNativeLoginResult';
+import { getApiErrorMessage } from '@/utils/getApiErrorMessage';
 import {
   getLoginPath,
   getPostLoginRedirectPath,
@@ -89,8 +90,9 @@ function LoginButtons({ redirect, action, showAppleLogin }: LoginButtonsProps) {
     try {
       const { url } = await getAuthUrl(provider, validRedirect);
       window.location.href = url;
-    } catch {
-      toast.error('요청을 처리하지 못했어요. 다시 시도해 주세요.');
+    } catch (error) {
+      /** react-query 밖 호출 — 전역 안전망이 잡지 않아 직접 안내 */
+      toast.error(getApiErrorMessage(error));
       setWebPendingProvider(null);
     }
   };
