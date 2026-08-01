@@ -35,17 +35,17 @@
 
 ## Status 등급별 처리 주체
 
-| Status | 의미 | 처리 주체 | 처리 방식 |
-| --- | --- | --- | --- |
-| **200/201** | 성공 | 개별 | onSuccess |
-| **302** | 리다이렉트 | (백엔드/브라우저) | 프론트 직접 처리 X |
-| **400** | 잘못된 요청/검증 | **개별** | 인라인 에러 or `detail` 토스트 |
-| **401** | 인증 만료 | **전역 인터셉터 ①** | refresh → 재시도 → 실패 시 로그인 |
-| **403** | 권한 없음 | **layout ② or 개별 ④** | 게스트/미인증 = layout redirect · 그 외 = 개별 토스트 |
-| **404** | 리소스 없음 | **layout ② or 개별 ④** | 진입 게이팅은 layout · 액션 실패는 개별 |
-| **409** | 충돌(만료/중복/이미 시작) | **개별** | 전용 다이얼로그/안내 (원인별 UX가 갈리면 `code` 2차 분기 — 아래 참고) |
-| **413** | 용량 초과 | **개별 (+ 사전검증)** | 업로드 전 클라 용량 체크 우선 |
-| **5xx · 네트워크** | 서버/통신 오류 | **전역 MutationCache ③** | 공통 "일시적 오류" 토스트 + Sentry |
+| Status             | 의미                      | 처리 주체                | 처리 방식                                                             |
+| ------------------ | ------------------------- | ------------------------ | --------------------------------------------------------------------- |
+| **200/201**        | 성공                      | 개별                     | onSuccess                                                             |
+| **302**            | 리다이렉트                | (백엔드/브라우저)        | 프론트 직접 처리 X                                                    |
+| **400**            | 잘못된 요청/검증          | **개별**                 | 인라인 에러 or `detail` 토스트                                        |
+| **401**            | 인증 만료                 | **전역 인터셉터 ①**      | refresh → 재시도 → 실패 시 로그인                                     |
+| **403**            | 권한 없음                 | **layout ② or 개별 ④**   | 게스트/미인증 = layout redirect · 그 외 = 개별 토스트                 |
+| **404**            | 리소스 없음               | **layout ② or 개별 ④**   | 진입 게이팅은 layout · 액션 실패는 개별                               |
+| **409**            | 충돌(만료/중복/이미 시작) | **개별**                 | 전용 다이얼로그/안내 (원인별 UX가 갈리면 `code` 2차 분기 — 아래 참고) |
+| **413**            | 용량 초과                 | **개별 (+ 사전검증)**    | 업로드 전 클라 용량 체크 우선                                         |
+| **5xx · 네트워크** | 서버/통신 오류            | **전역 MutationCache ③** | 공통 "일시적 오류" 토스트 + Sentry                                    |
 
 ---
 
@@ -75,7 +75,9 @@
 ### ③ 5xx · 네트워크 — 전역 MutationCache onError (`utils/queryClient.ts`)
 
 - **5xx(500/502/503…)와 네트워크 오류(`error.response` 없음)는 전역이 단독으로 처리한다.**
-  - 공통 토스트 ("일시적인 오류예요. 잠시 후 다시 시도해 주세요.") + `Sentry.captureException`
+  - `getApiErrorMessage` 토스트 + `Sentry.captureException`
+  - 5xx도 문구는 code로 갈린다 — `COMMON-RETRYABLE`(502) / `COMMON-SERVER-BUSY`(503) / `COMMON-SERVER-ERROR`(500).
+    에러 바운더리(`app/error.tsx`)도 같은 카탈로그를 쓴다 (code 없으면 `SERVER_ERROR_MESSAGE`)
 - **개별 onError는 5xx를 건드리지 않는다** (아래 개발 규칙 참고) → 토스트 중복 방지
 - 4xx인데 개별 onError가 없으면 전역이 generic 토스트로 fallback (silent failure 방지)
 
@@ -87,10 +89,26 @@
 
 > ⚠️ **전역 4xx fallback은 개별 onError가 "없을 때만" 작동한다** (`if (mutation.options.onError) return`).
 > 그래서 개별 onError는 **"4xx 전부 책임" 또는 "아예 없음(전역 위임)"** 둘 중 하나여야 한다.
+>
 > - **비어있는 onError**(`// TODO`만) → 존재로 취급돼 전역이 양보 → silent. **삭제할 것.**
 > - **부분 onError**(일부 4xx만) → 빠진 4xx는 개별도 전역도 안 잡음 → silent. **도달 가능한 4xx를 전부 채울 것.**
 >
+> **토스트는 status 분기 밖에 둔다.** 분기 안에 넣으면 나열하지 않은 status가 그대로 silent가 된다.
+>
+> ```ts
+> onError: error => {
+>   if (!isAxiosError<ApiErrorResponseT>(error) || !error.response) return;
+>
+>   const { status } = error.response;
+>   if (status >= 500) return; // 전역 안전망에 위임 (중복 토스트 방지)
+>
+>   toast.error(getApiErrorMessage(error)); // 4xx 는 빠짐없이 안내
+>   if (status === 404) router.replace(...); // 이탈이 필요한 status 만 추가 동작
+> }
+> ```
+
 > **전역 net(③)이 커버하지 못하는 것** (= 개별에 반드시 남겨야 하는 것):
+>
 > - **낙관적 업데이트 롤백** — 전역은 토스트만, 상태 되돌림은 개별 `onMutate`/`onError`
 > - **맞춤 4xx UX** — 이동/전용 다이얼로그/인라인 에러
 > - **query(GET) 에러** — `MutationCache`는 mutation만 → `isError`/error boundary로 별도 처리
@@ -101,11 +119,11 @@
 > **query는 mutation과 다르게 다룬다. 전역 "토스트" 금지 — 전역은 "로깅"만.**
 > 배경 refetch/retry가 실패할 때마다 토스트가 스팸되고, query 에러는 보통 그 자리(리스트 영역)에 인라인으로 보여야 하기 때문.
 
-| 종류 | 처리 | 작업 |
-| --- | --- | --- |
-| **suspense query** (`useSuspenseQuery` 등) | throw → `app/error.tsx` 에러바운더리 (이미 있음) | 추가 작업 없음 |
+| 종류                                           | 처리                                                          | 작업            |
+| ---------------------------------------------- | ------------------------------------------------------------- | --------------- |
+| **suspense query** (`useSuspenseQuery` 등)     | throw → `app/error.tsx` 에러바운더리 (이미 있음)              | 추가 작업 없음  |
 | **일반 query** (`useQuery`/`useInfiniteQuery`) | 컴포넌트에서 **`isError` 분기** → "불러오기 실패 + 재시도" UI | 해당 컴포넌트만 |
-| **전역 `QueryCache.onError`** | **Sentry 로깅만** (토스트 X) | 설정 1곳 |
+| **전역 `QueryCache.onError`**                  | **Sentry 로깅만** (토스트 X)                                  | 설정 1곳        |
 
 - 일반 query는 **"빈 상태(데이터 없음)"와 "불러오기 실패"를 반드시 구분**해 표시할 것 (예: 알림 목록)
 - **하지 말 것**:
@@ -119,10 +137,10 @@
 서버가 모든 실패 응답에 `code`를 실어주면서 "status 대신 code로 다 분기해야 하나?"라는 질문이 생긴다.
 **답은 아니다.** 둘은 답하는 질문이 다르다.
 
-| | 무엇을 답하나 | 어디에 쓰나 |
-| --- | --- | --- |
-| **`code`** | "무슨 일이 일어났나" | **사용자 문구** (100%) |
-| **`status`** | "이제 뭘 해야 하나" — 머무를까 / 이탈할까 / 재시도할까 | **동작 분기 1차** |
+|              | 무엇을 답하나                                          | 어디에 쓰나            |
+| ------------ | ------------------------------------------------------ | ---------------------- |
+| **`code`**   | "무슨 일이 일어났나"                                   | **사용자 문구** (100%) |
+| **`status`** | "이제 뭘 해야 하나" — 머무를까 / 이탈할까 / 재시도할까 | **동작 분기 1차**      |
 
 ### 규칙
 
@@ -148,13 +166,13 @@
 
 같은 status에 서로 다른 사용자 행동이 묶여 있는 케이스. `api-docs`의 엔드포인트별 응답 설명으로 확인할 수 있다.
 
-| 엔드포인트 | status | code | 동작 |
-| --- | --- | --- | --- |
-| `POST /tournaments/{id}/start` | 409 | `TOURNAMENT-013`·`TOURNAMENT-014` | 토스트 (준비 안 된 상품 안내) |
-| | | 그 외 (이미 시작됨) | 매치 화면으로 이동 |
-| `POST /tournaments/{id}/join` | 409 | `TOURNAMENT-022` (이미 참여 중) | 해당 토너먼트로 진입 |
-| | | `TOURNAMENT-030` (인원 초과) | 인원 마감 다이얼로그 |
-| | | 그 외 (만료·PENDING 아님) | 링크 만료 다이얼로그 |
+| 엔드포인트                     | status | code                              | 동작                          |
+| ------------------------------ | ------ | --------------------------------- | ----------------------------- |
+| `POST /tournaments/{id}/start` | 409    | `TOURNAMENT-013`·`TOURNAMENT-014` | 토스트 (준비 안 된 상품 안내) |
+|                                |        | 그 외 (이미 시작됨)               | 매치 화면으로 이동            |
+| `POST /tournaments/{id}/join`  | 409    | `TOURNAMENT-022` (이미 참여 중)   | 해당 토너먼트로 진입          |
+|                                |        | `TOURNAMENT-030` (인원 초과)      | 인원 마감 다이얼로그          |
+|                                |        | 그 외 (만료·PENDING 아님)         | 링크 만료 다이얼로그          |
 
 ### status로 충분한 곳 (바꾸지 말 것)
 
@@ -275,7 +293,7 @@ const makeQueryClient = () =>
     }),
     // query — 데이터 fetch 실패: 토스트 X, 로깅만 (표시는 boundary/isError)
     queryCache: new QueryCache({
-      onError: (_error) => {
+      onError: _error => {
         // Sentry.captureException(_error); // 로깅만! 토스트 금지
       },
     }),
