@@ -16,7 +16,7 @@ export const ERROR_MESSAGE_MAP = {
   /** 공통 5xx */
   'COMMON-RETRYABLE': '일시적인 오류가 발생했어요. 잠시 후 다시 시도해 주세요.',
   'COMMON-SERVER-BUSY': '서버가 혼잡해요. 잠시 후 다시 시도해 주세요.',
-  'COMMON-SERVER-ERROR': '일시적인 오류가 발생했어요. 잠시 후 다시 시도해 주세요.',
+  'COMMON-SERVER-ERROR': '서버에 문제가 발생했어요. 불편을 드려 죄송해요.',
 
   /** USER */
   'USER-001': '존재하지 않는 계정이에요.',
@@ -278,4 +278,4 @@ const _assertEveryCodeIsNamed: UnnamedErrorCodeT extends never ? true : UnnamedE
 export const DEFAULT_ERROR_MESSAGE = '요청을 처리하지 못했어요.';
 
 /** code 를 알 수 없는 5xx·네트워크 오류 fallback 문구 */
-export const SERVER_ERROR_MESSAGE = ERROR_MESSAGE_MAP['COMMON-SERVER-ERROR'];
+export const SERVER_ERROR_MESSAGE = '일시적인 오류가 발생했어요. 잠시 후 다시 시도해 주세요.';
