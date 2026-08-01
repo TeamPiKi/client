@@ -13,8 +13,7 @@ type InviteInvalidProps = {
 };
 
 function InviteInvalid({ showExpiredDialog = false }: InviteInvalidProps) {
-  const [isTournamentErrorDialogOpen, setIsTournamentErrorDialogOpen] =
-    useState(showExpiredDialog);
+  const [isTournamentErrorDialogOpen, setIsTournamentErrorDialogOpen] = useState(showExpiredDialog);
 
   return (
     <>
