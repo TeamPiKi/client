@@ -30,13 +30,16 @@ export const useDeleteTournamentItem = (tournamentId: number, tournamentItemId: 
 
         const { status } = error.response;
 
+        if (status === 401 || status >= 500) return;
+
         /**
          * 403: 토너먼트 참여 권한 없음
          * 404: 토너먼트 or 토너먼트 아이템 존재하지 않음
          * 409: PENDING 상태 아닌 토너먼트
          */
+        toast.error(getApiErrorMessage(error));
+
         if (status === 403 || status === 404 || status === 409) {
-          toast.error(getApiErrorMessage(error));
           if (pathname !== ROUTES.TOURNAMENT_CREATE(tournamentId))
             router.replace(ROUTES.TOURNAMENT_CREATE(tournamentId));
         }

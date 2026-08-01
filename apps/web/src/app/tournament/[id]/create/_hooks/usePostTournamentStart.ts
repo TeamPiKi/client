@@ -33,6 +33,8 @@ export const usePostTournamentStart = (tournamentId: number) => {
 
         const { status, data } = error.response;
 
+        if (status === 401 || status >= 500) return;
+
         if (status === 409) {
           /** 아직 시작할 수 없는 상태 — 토너먼트는 그대로 PENDING 이므로 이동시키지 않고 사유만 안내한다. */
           if (
@@ -48,9 +50,12 @@ export const usePostTournamentStart = (tournamentId: number) => {
           return;
         }
 
-        if (status < 500) {
-          toast.error(getApiErrorMessage(error));
-        }
+        /**
+         * 400: 아이템 수 미충족 (2~32개)
+         * 403: 토너먼트 시작 권한 없음
+         * 404: 토너먼트 존재하지 않음
+         */
+        toast.error(getApiErrorMessage(error));
       },
     });
 

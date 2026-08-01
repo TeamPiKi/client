@@ -25,19 +25,18 @@ export const usePostTournamentOCR = (tournamentId: number) => {
       if (!isAxiosError<ApiErrorResponseT>(error) || !error.response) return;
 
       const { status } = error.response;
-      const errorMessage = getApiErrorMessage(error);
+
+      if (status === 401 || status >= 500) return;
 
       /**
-       * 400: 이미지 개수/형식/크기 초과
+       * 400: 이미지 개수/형식/크기 초과·아이템 32개 초과
        * 403: 토너먼트 참여 권한 없음
        * 404: 토너먼트 존재하지 않음
        * 409: PENDING 상태 아닌 토너먼트
        */
-      if (status === 400) toast.error(errorMessage);
-      else if (status === 403 || status === 404 || status === 409) {
-        toast.error(errorMessage);
-        router.replace(ROUTES.HOME);
-      }
+      toast.error(getApiErrorMessage(error));
+
+      if (status === 403 || status === 404 || status === 409) router.replace(ROUTES.HOME);
     },
   });
 
