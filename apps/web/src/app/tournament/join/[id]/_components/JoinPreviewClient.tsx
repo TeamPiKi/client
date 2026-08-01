@@ -42,6 +42,7 @@ function JoinPreviewClient({ tournamentId, inviteCode }: JoinPreviewClientProps)
 
   const [nickname, setNickname] = useState(userData.nickname);
   const [isTournamentErrorDialogOpen, setIsTournamentErrorDialogOpen] = useState(false);
+  const [isAutoJoinFailed, setIsAutoJoinFailed] = useState(false);
 
   const {
     isCheckingNickname,
@@ -72,6 +73,7 @@ function JoinPreviewClient({ tournamentId, inviteCode }: JoinPreviewClientProps)
             return;
           }
 
+          setIsAutoJoinFailed(true);
           toast.warning('참여에 실패했어요. 잠시 후 다시 시도해주세요.');
         },
       }
@@ -94,10 +96,7 @@ function JoinPreviewClient({ tournamentId, inviteCode }: JoinPreviewClientProps)
     joinTournament();
   };
 
-  /**
-   * 회원은 닉네임 입력 없이 자동 참여 — 참여 방식(회원 자동/게스트 닉네임)은 이 페이지가 소유한다.
-   * mutation 을 effect 로 트리거하므로 리마운트·fast refresh 재호출을 ref 로 가드.
-   */
+  /** 회원은 닉네임 입력 없이 자동 참여 — 재호출은 ref 로 가드 */
   const isMember = userData.identityType === 'MEMBER';
   const hasAutoJoinRunRef = useRef(false);
 
@@ -105,7 +104,7 @@ function JoinPreviewClient({ tournamentId, inviteCode }: JoinPreviewClientProps)
     if (!isMember || hasAutoJoinRunRef.current) return;
     hasAutoJoinRunRef.current = true;
 
-    /** 이미 참여한 회원이 URL 직접 진입한 경우 — join 없이 바로 이동 */
+    /** 이미 참여한 회원 — join 없이 바로 이동 */
     if (invitePreviewData.joined) {
       router.replace(ROUTES.TOURNAMENT_CREATE(tournamentId));
       return;
@@ -114,16 +113,30 @@ function JoinPreviewClient({ tournamentId, inviteCode }: JoinPreviewClientProps)
     joinTournament();
   }, [isMember, invitePreviewData.joined, router, tournamentId, joinTournament]);
 
+  const handleRetryAutoJoin = () => {
+    setIsAutoJoinFailed(false);
+    joinTournament();
+  };
+
   if (isMember) {
     return (
       <>
         <main className="flex min-h-dvh items-center justify-center bg-bg-layer-default pt-padding-top">
-          <div className="flex flex-col items-center gap-3">
-            <Spinner size={32} />
-            <p className="body-1-medium text-text-neutral-tertiary">
-              토너먼트에 참여하고 있어요...
-            </p>
-          </div>
+          {isAutoJoinFailed ? (
+            <div className="flex flex-col items-center gap-4">
+              <p className="body-1-medium text-text-neutral-tertiary">참여에 실패했어요.</p>
+              <Button size="md" variant="primary" onClick={handleRetryAutoJoin}>
+                다시 시도
+              </Button>
+            </div>
+          ) : (
+            <div className="flex flex-col items-center gap-3">
+              <Spinner size={32} />
+              <p className="body-1-medium text-text-neutral-tertiary">
+                토너먼트에 참여하고 있어요...
+              </p>
+            </div>
+          )}
         </main>
 
         <TournamentErrorDialog

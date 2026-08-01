@@ -23,10 +23,7 @@ async function InvitePage({ params, searchParams }: InvitePageProps) {
   /** 코드 없이 진입 → 잘못된 링크 */
   if (!code) return <InviteInvalid />;
 
-  /**
-   * redirect() 는 NEXT_REDIRECT 를 throw 하는 방식이라 try 안에 두면 catch 가 삼킨다.
-   * preview 조회만 감싸고 분기·redirect 는 밖에서 처리한다.
-   */
+  /** redirect() 는 throw 방식이라 try 밖에서 호출 — preview 조회만 감싼다 */
   let preview;
   try {
     preview = await getInvitePreviewByCode(code);
@@ -43,7 +40,7 @@ async function InvitePage({ params, searchParams }: InvitePageProps) {
   if (preview.joined) redirect(ROUTES.TOURNAMENT_CREATE(tournamentId));
 
   /** 미참여 → 참여 방식(회원 자동 / 게스트 닉네임 입력)은 join 페이지가 소유 */
-  redirect(`${ROUTES.TOURNAMENT_JOIN_BY_LINK(tournamentId)}?code=${code}`);
+  redirect(`${ROUTES.TOURNAMENT_JOIN_BY_LINK(tournamentId)}?code=${encodeURIComponent(code)}`);
 }
 
 export default InvitePage;
