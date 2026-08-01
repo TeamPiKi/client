@@ -80,7 +80,8 @@ function InviteTournamentDialog() {
     if (showFormatError) setShowFormatError(false);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
     if (!canSubmit) return;
 
     if (!isValidInviteCodeFormat(code)) {
@@ -112,25 +113,27 @@ function InviteTournamentDialog() {
           </DialogTitle>
           <DialogDescription className="sr-only">초대 코드를 입력해 입장합니다.</DialogDescription>
 
-          <Input
-            label="초대 코드"
-            placeholder="ex. ABC123"
-            value={code}
-            onChange={event => handleChange(event.target.value)}
-            aria-invalid={showFormatError}
-            {...(showFormatError
-              ? { helperText: '영문 대문자 3자 + 숫자 3자로 입력해주세요.' }
-              : {})}
-            maxLength={CODE_LENGTH}
-            autoCapitalize="characters"
-            autoCorrect="off"
-            spellCheck={false}
-            autoFocus
-          />
+          <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+            <Input
+              label="초대 코드"
+              placeholder="ex. ABC123"
+              value={code}
+              onChange={event => handleChange(event.target.value)}
+              aria-invalid={showFormatError}
+              {...(showFormatError
+                ? { helperText: '영문 대문자 3자 + 숫자 3자로 입력해주세요.' }
+                : {})}
+              maxLength={CODE_LENGTH}
+              autoCapitalize="characters"
+              autoCorrect="off"
+              spellCheck={false}
+              autoFocus
+            />
 
-          <Button size="lg" variant="primary" disabled={!canSubmit} onClick={handleSubmit}>
-            {isPreviewPending ? <Spinner size={20} /> : '입장하기'}
-          </Button>
+            <Button type="submit" size="lg" variant="primary" disabled={!canSubmit}>
+              {isPreviewPending ? <Spinner size={20} /> : '입장하기'}
+            </Button>
+          </form>
         </DialogContent>
       </Dialog>
 

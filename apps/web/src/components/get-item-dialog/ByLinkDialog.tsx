@@ -36,7 +36,8 @@ function ByLinkDialog({ type, open, onOpenChange }: ByLinkProps) {
     setHasError(false);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
     if (isEmpty) return;
 
     // 상품 설명과 URL 이 함께 붙여넣어진 경우 URL 만 추출해 제출한다 (onPaste 를 타지 않은 경로 안전망).
@@ -90,7 +91,7 @@ function ByLinkDialog({ type, open, onOpenChange }: ByLinkProps) {
           링크로 담기
         </DialogTitle>
         <DialogDescription className="sr-only">상품 URL을 입력해 담습니다.</DialogDescription>
-        <div className="flex flex-col gap-4">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <Input
             label="링크 URL"
             placeholder="복사한 링크를 입력해주세요."
@@ -103,16 +104,16 @@ function ByLinkDialog({ type, open, onOpenChange }: ByLinkProps) {
             autoFocus
           />
           <Button
+            type="submit"
             size="lg"
             variant="primary"
             disabled={isEmpty}
             isLoading={isPending}
-            onClick={handleSubmit}
           >
             {type === 'wish' && '위시리스트에 담기'}
             {type === 'tournament' && '후보 바구니에 담기'}
           </Button>
-        </div>
+        </form>
       </DialogContent>
     </Dialog>
   );
