@@ -4,7 +4,7 @@ import { useInfiniteQuery } from '@tanstack/react-query';
 import { useParams, useRouter } from 'next/navigation';
 import { useState } from 'react';
 
-import { getWishlist } from '@/apis/getWishlist';
+import { wishlistInfiniteQueryOptions } from '@/apis/getWishlist';
 import { HeartIconFill, ImageIconFill, LinkIconFill } from '@/assets/icons';
 import { DialogContent, DialogDescription, DialogTitle } from '@/components/dialog';
 import TournamentErrorDialog from '@/components/tournament-error-dialog';
@@ -32,17 +32,14 @@ function GetItemDialogContent({ type }: GetItemDialogContentProps) {
 
   /** 클릭 시점에 위시 유무를 즉시 판단할 수 있도록 미리 받아둔다 */
   const { data: wishlistData } = useInfiniteQuery({
-    queryKey: ['wishlists'],
-    queryFn: ({ pageParam }) => getWishlist(pageParam),
-    initialPageParam: null as string | null,
-    getNextPageParam: page => (page.hasNext ? page.nextCursor : null),
+    ...wishlistInfiniteQueryOptions,
     enabled: isWishOptionVisible,
   });
 
   if (type === 'tournament' && !tournamentId) return null;
 
   const handleWishClick = () => {
-    const hasNoWish = wishlistData?.pages.every(page => page.items.length === 0) ?? false;
+    const hasNoWish = wishlistData?.pages.every(page => page.data.length === 0) ?? false;
 
     if (hasNoWish) {
       setIsSubDialogOpen('no-wish');

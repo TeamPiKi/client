@@ -1,14 +1,11 @@
 import { useSuspenseInfiniteQuery } from '@tanstack/react-query';
 
-import { getWishlist } from '@/apis/getWishlist';
+import { wishlistInfiniteQueryOptions } from '@/apis/getWishlist';
 
 export const useGetWishlist = () => {
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } = useSuspenseInfiniteQuery({
-    queryKey: ['wishlists'],
-    queryFn: ({ pageParam }) => getWishlist(pageParam),
-    initialPageParam: null as string | null,
-    getNextPageParam: page => (page.pageResponse.hasNext ? page.pageResponse.nextCursor : null),
-  });
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } = useSuspenseInfiniteQuery(
+    wishlistInfiniteQueryOptions
+  );
 
   const wishlistData = data.pages.flatMap(page => page.data);
 
