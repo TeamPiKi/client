@@ -19,6 +19,8 @@ import TournamentItemBasket from './TournamentItemBasket';
 type TournamentItemBasketCarouselProps = {
   items?: TournamentPendingItemT[];
   scrollToLast?: boolean;
+  /** 위시 담기 등 재진입 시점의 기존 바구니 개수 */
+  previousItemCount?: number;
   isDepositClosed?: boolean;
   participantImageMap?: Map<string, string>;
 };
@@ -26,6 +28,7 @@ type TournamentItemBasketCarouselProps = {
 function TournamentItemBasketCarousel({
   items = [],
   scrollToLast = false,
+  previousItemCount,
   isDepositClosed = false,
   participantImageMap,
 }: TournamentItemBasketCarouselProps) {
@@ -34,7 +37,10 @@ function TournamentItemBasketCarousel({
 
   const activeBasketCount = useMemo(() => getActiveBasketCount(items.length), [items.length]);
 
-  const prevBasketCountRef = useRef(activeBasketCount);
+  /** 재진입 시 이미 생성된 바구니는 제외하고 증가 여부를 판단하기 위해 이전 개수를 기준으로 비교 */
+  const prevBasketCountRef = useRef(
+    previousItemCount === undefined ? activeBasketCount : getActiveBasketCount(previousItemCount)
+  );
   useEffect(() => {
     if (activeBasketCount > prevBasketCountRef.current) {
       toast.info('카트가 꽉 찼어요! 새 카트를 만들었어요.');
