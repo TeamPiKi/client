@@ -59,12 +59,10 @@ export const startMockApiServer = (port: number) =>
       if (!body) {
         res.writeHead(404, { 'content-type': 'application/json' });
         res.end(
-          JSON.stringify(
-            createApiError({
-              code: 'E2E_SSR_UNMOCKED',
-              detail: `SSR 목 스텁에 등록되지 않은 요청: ${req.method} ${pathname}`,
-            })
-          )
+          JSON.stringify({
+            ...createApiError({ code: 'E2E_SSR_UNMOCKED' }),
+            debug: `SSR 목 스텁에 등록되지 않은 요청: ${req.method} ${pathname}`,
+          })
         );
         return;
       }

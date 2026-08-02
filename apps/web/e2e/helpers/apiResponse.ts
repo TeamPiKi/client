@@ -7,16 +7,16 @@ export const createApiSuccess = <T>(data: T): ApiResponseT<T> => ({
 });
 
 type CreateApiErrorOptionsT = {
-  detail?: string;
   code?: string;
 };
 
-/** 팀 응답 규약 에러 래핑 — HTTP status 는 응답 본문이 아니라 실제 status code 로 내려간다 */
+/**
+ * 팀 응답 규약 에러 래핑 — HTTP status 는 응답 본문이 아니라 실제 status code 로 내려간다.
+ * 사용자 문구는 `code` 로만 결정되므로 목도 `code` 만 지정한다.
+ */
 export const createApiError = ({
-  detail = 'E2E 목 에러 응답입니다.',
   code = 'COMMON-INVALID-INPUT',
 }: CreateApiErrorOptionsT = {}): ApiErrorResponseT => ({
   data: null,
-  detail,
   code,
 });

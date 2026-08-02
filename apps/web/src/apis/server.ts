@@ -60,7 +60,7 @@ serverApi.interceptors.response.use(
           method: error.config?.method,
           status,
           code: error.code,
-          detail: error.response?.data?.detail,
+          apiCode: error.response?.data?.code,
         },
       });
     }
