@@ -1,10 +1,9 @@
 'use client';
 
-import { type InfiniteData, useQueryClient } from '@tanstack/react-query';
+import { useInfiniteQuery } from '@tanstack/react-query';
 import { useParams, useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
-import type { WishlistPageT } from '@/apis/getWishlist';
 import { getWishlist } from '@/apis/getWishlist';
 import { HeartIconFill, ImageIconFill, LinkIconFill } from '@/assets/icons';
 import { DialogContent, DialogDescription, DialogTitle } from '@/components/dialog';
@@ -24,7 +23,6 @@ type GetItemDialogContentProps = {
 
 function GetItemDialogContent({ type }: GetItemDialogContentProps) {
   const router = useRouter();
-  const queryClient = useQueryClient();
   const { userData } = useGetMe();
   const [isSubDialogOpen, setIsSubDialogOpen] = useState<'link' | 'image' | 'no-wish' | null>(null);
 
@@ -33,23 +31,20 @@ function GetItemDialogContent({ type }: GetItemDialogContentProps) {
   const isWishOptionVisible = type === 'tournament' && userData.identityType === 'MEMBER';
 
   /** 클릭 시점에 위시 유무를 즉시 판단할 수 있도록 미리 받아둔다 */
-  useEffect(() => {
-    if (!isWishOptionVisible) return;
-
-    queryClient.prefetchInfiniteQuery({
-      queryKey: ['wishlists'],
-      queryFn: ({ pageParam }) => getWishlist(pageParam as string | null),
-      initialPageParam: null as string | null,
-      getNextPageParam: (page: WishlistPageT) => (page.hasNext ? page.nextCursor : null),
-    });
-  }, [isWishOptionVisible, queryClient]);
+  const { data: wishlistData } = useInfiniteQuery({
+    queryKey: ['wishlists'],
+    queryFn: ({ pageParam }) => getWishlist(pageParam),
+    initialPageParam: null as string | null,
+    getNextPageParam: page => (page.hasNext ? page.nextCursor : null),
+    enabled: isWishOptionVisible,
+  });
 
   if (type === 'tournament' && !tournamentId) return null;
 
   const handleWishClick = () => {
-    const cached = queryClient.getQueryData<InfiniteData<WishlistPageT>>(['wishlists']);
+    const hasNoWish = wishlistData?.pages.every(page => page.items.length === 0) ?? false;
 
-    if (cached && cached.pages.every(page => page.items.length === 0)) {
+    if (hasNoWish) {
       setIsSubDialogOpen('no-wish');
       return;
     }
