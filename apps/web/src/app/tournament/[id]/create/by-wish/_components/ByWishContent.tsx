@@ -37,10 +37,6 @@ function ByWishContent({ tournamentId }: ByWishContentProps) {
       item.status !== 'FAILED' && item.status !== 'PROCESSING' && !existingItemIds.has(item.id)
   );
 
-  /**
-   * 가져올 위시가 하나도 없는 경우 — 위시가 아예 없거나, 남은 게 전부 이미 담겼거나 추출 실패/진행 중이다.
-   * 전체 페이지를 다 받은 뒤에 판단해야 로딩 중 잘못 뜨지 않는다.
-   */
   const hasNoSelectableWish = !hasNextPage && !isFetchingNextPage && items.length === 0;
 
   useEffect(() => {
@@ -80,19 +76,32 @@ function ByWishContent({ tournamentId }: ByWishContentProps) {
       </div>
 
       <main className="mt-6 hide-scrollbar flex flex-1 flex-col overflow-y-auto pb-32">
-        <div className="grid grid-cols-2">
-          {items.map(({ wish, item }) => (
-            <WishSelectCard
-              key={wish.id}
-              name={item.name}
-              price={item.price}
-              imageUrl={item.imageUrl}
-              sourcePlatform={item.sourcePlatform}
-              isSelected={selectedIds.includes(wish.id)}
-              onSelect={() => handleSelect(wish.id)}
-            />
-          ))}
-        </div>
+        {hasNoSelectableWish ? (
+          <div className="flex flex-1 flex-col items-center justify-center gap-4" role="status">
+            <div className="flex flex-col items-center gap-2">
+              <p className="heading-2-semibold text-text-neutral-primary">
+                담을 수 있는 위시가 없어요
+              </p>
+              <p className="text-center body-1-medium text-text-neutral-tertiary">
+                위시가 모두 후보에 담겨 있어요.
+              </p>
+            </div>
+          </div>
+        ) : (
+          <div className="grid grid-cols-2">
+            {items.map(item => (
+              <WishSelectCard
+                key={item.id}
+                name={item.name}
+                price={item.price}
+                imageUrl={item.imageUrl}
+                sourcePlatform={item.sourcePlatform}
+                isSelected={selectedIds.includes(item.id)}
+                onSelect={() => handleSelect(item.id)}
+              />
+            ))}
+          </div>
+        )}
       </main>
 
       <BottomCta hasGradient>
