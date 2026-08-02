@@ -23,12 +23,12 @@ async function ArchiveTournamentPage({ searchParams }: Props) {
   });
 
   return (
-    <div className="flex min-h-dvh flex-col bg-bg-layer-basement px-5">
+    <main className="flex min-h-dvh flex-col bg-bg-layer-basement px-5">
       <HydrationBoundary state={dehydrate(queryClient)}>
         <TournamentHistorySection initialTab={initialTab} />
       </HydrationBoundary>
       <TournamentFab />
-    </div>
+    </main>
   );
 }
 
