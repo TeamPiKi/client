@@ -12,6 +12,7 @@ import { hasParsingItems } from '@/utils/item';
 
 import { type JoinConfirmPayloadT, consumeJoinConfirmFor } from '../../../join/_utils/joinSession';
 import { useGetTournament } from '../../_common/_hooks/useGetTournament';
+import { PREV_ITEM_COUNT_KEY } from '../_consts/tournamentItemBasket';
 import { useCountdown } from '../_hooks/useCountdown';
 import { usePostTournamentStart } from '../_hooks/usePostTournamentStart';
 import { hasSentInvite } from '../_utils/inviteSentSession';
@@ -32,6 +33,7 @@ type TournamentCreateClientProps = {
 function TournamentCreateClient({ tournamentId }: TournamentCreateClientProps) {
   // back() 복귀는 URL에 쿼리를 추가할 수 없어 sessionStorage로 전달한다.
   const scrollToLastKey = `piki:scrollToLast:${tournamentId}`;
+  const prevItemCountKey = `piki:${PREV_ITEM_COUNT_KEY}:${tournamentId}`;
 
   const { isActive: isScrollToLastQuery } = useQueryAction({
     action: QUERY_ACTION.VALUE.SCROLL_TO_LAST,
@@ -39,12 +41,25 @@ function TournamentCreateClient({ tournamentId }: TournamentCreateClientProps) {
   const [isScrollToLastSession] = useState(
     () => typeof window !== 'undefined' && sessionStorage.getItem(scrollToLastKey) === '1'
   );
+  /** 재진입 시점의 값만 필요하므로 useState 초기화 함수에서 한 번만 읽는다 */
+  const [previousItemCount] = useState(() => {
+    if (typeof window === 'undefined') return;
+
+    const raw = sessionStorage.getItem(prevItemCountKey);
+    if (raw === null) return;
+
+    const parsed = Number(raw);
+    if (!Number.isInteger(parsed) || parsed < 0) return;
+
+    return parsed;
+  });
 
   const scrollToLast = isScrollToLastQuery || isScrollToLastSession;
 
   useEffect(() => {
     sessionStorage.removeItem(scrollToLastKey);
-  }, [scrollToLastKey]);
+    sessionStorage.removeItem(prevItemCountKey);
+  }, [scrollToLastKey, prevItemCountKey]);
 
   const { tournamentData } = useGetTournament(tournamentId);
   const { userData } = useGetMe();
@@ -181,6 +196,7 @@ function TournamentCreateClient({ tournamentId }: TournamentCreateClientProps) {
         <TournamentItemBasketCarousel
           items={pending?.items}
           scrollToLast={scrollToLast}
+          previousItemCount={previousItemCount}
           isDepositClosed={isDepositClosed}
           participantImageMap={participantImageMap}
         />

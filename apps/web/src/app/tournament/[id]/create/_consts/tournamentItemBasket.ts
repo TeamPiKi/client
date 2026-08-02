@@ -2,7 +2,7 @@ export const ITEMS_PER_BASKET = 8;
 export const BASKET_COUNT = 4;
 
 /**
- * 담기 전 바구니 개수를 전달하기 위한 쿼리 키
+ * 담기 전 바구니 개수를 전달하기 위한 sessionStorage 키
  * 재진입 후 생성된 바구니와 기존 바구니를 구분하기 위해 사용
  */
 export const PREV_ITEM_COUNT_KEY = 'prevItemCount';
