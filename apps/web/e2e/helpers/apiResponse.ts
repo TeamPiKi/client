@@ -1,9 +1,8 @@
 import type { ApiErrorResponseT, ApiResponseT } from '@/types/api';
 
-/** 팀 응답 규약 `{ data, detail, code }` 성공 래핑 — 성공 응답의 code 는 항상 null */
+/** 팀 응답 규약 `{ data, code }` 성공 래핑 — 성공 응답의 code 는 항상 null */
 export const createApiSuccess = <T>(data: T): ApiResponseT<T> => ({
   data,
-  detail: '요청이 정상적으로 처리되었습니다.',
   code: null,
 });
 

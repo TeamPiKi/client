@@ -39,7 +39,7 @@
 | ------------------ | ------------------------- | ------------------------ | --------------------------------------------------------------------- |
 | **200/201**        | 성공                      | 개별                     | onSuccess                                                             |
 | **302**            | 리다이렉트                | (백엔드/브라우저)        | 프론트 직접 처리 X                                                    |
-| **400**            | 잘못된 요청/검증          | **개별**                 | 인라인 에러 or `detail` 토스트                                        |
+| **400**            | 잘못된 요청/검증          | **개별**                 | 인라인 에러 or `code` 문구 토스트                                     |
 | **401**            | 인증 만료                 | **전역 인터셉터 ①**      | refresh → 재시도 → 실패 시 로그인                                     |
 | **403**            | 권한 없음                 | **layout ② or 개별 ④**   | 게스트/미인증 = layout redirect · 그 외 = 개별 토스트                 |
 | **404**            | 리소스 없음               | **layout ② or 개별 ④**   | 진입 게이팅은 layout · 액션 실패는 개별                               |
@@ -85,7 +85,7 @@
 ### ④ 4xx — 개별 onError (각 mutation 훅)
 
 - 400/403(비게이팅)/404(액션)/409/413은 **원인별로 사용자 행동이 다르므로 호출부에서 맞춤 처리**
-- 처리 예: 검증 에러 인라인 표시, 만료 다이얼로그, 낙관적 업데이트 롤백, `detail` 토스트
+- 처리 예: 검증 에러 인라인 표시, 만료 다이얼로그, 낙관적 업데이트 롤백, `getApiErrorMessage` 토스트
 - **4xx만 분기한다. 5xx 브랜치를 두지 않는다.**
 
 > ⚠️ **전역 4xx fallback은 개별 onError가 "없을 때만" 작동한다** (`if (mutation.options.onError) return`).
@@ -157,7 +157,7 @@
 
 **문구 매핑은 틀려도 degrade되지만, 분기는 틀리면 조용히 깨진다.**
 
-카탈로그에 없는 code가 오면 `detail` → generic으로 흘러서 최악이 "덜 친절한 문구"다.
+카탈로그에 없는 code가 오면 generic 문구로 흘러서 최악이 "덜 친절한 문구"다.
 반면 동작 분기가 code 기반인데 매칭이 안 되면 **사용자가 엉뚱한 화면으로 간다.** 타입 체크로도 안 잡힌다.
 
 실제로 서버 코드 사전은 자주 움직인다 — `LINK-001~003`이 한 칸씩 당겨지고, 접두사 4개(`IMG_PROXY`→`PROXY` 등)가 통째로 바뀌고, 코드 여러 개가 삭제된 전례가 있다.
@@ -243,19 +243,17 @@ packages/core/src/
 
 ```ts
 // apps/web/src/utils/getApiErrorMessage.ts
-// 우선순위: code → detail → generic
+// 우선순위: code → generic (서버 detail 은 사용자에게 노출하지 않는다)
 export const getApiErrorMessage = (error: unknown): string => {
   if (!isAxiosError<ApiErrorResponseT>(error)) return DEFAULT_ERROR_MESSAGE;
 
-  const { code, detail } = error.response?.data ?? {};
-
-  const messageByCode = getErrorMessageByCode(code);
+  const messageByCode = getErrorMessageByCode(error.response?.data?.code);
   if (messageByCode) return messageByCode;
 
   const status = error.response?.status;
   if (!status || status >= 500) return SERVER_ERROR_MESSAGE;
 
-  return detail ?? DEFAULT_ERROR_MESSAGE;
+  return DEFAULT_ERROR_MESSAGE;
 };
 ```
 

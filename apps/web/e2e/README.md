@@ -71,7 +71,7 @@ api.post(ENDPOINTS.AUTH_GUEST, mockData); // POST 성공 응답
 api.error('GET', ENDPOINTS.TOURNAMENT(1), { status: 500 }); // 에러 응답 (에러 화면 테스트용)
 ```
 
-경로는 항상 `@/consts/api` 의 `ENDPOINTS` 상수를 쓰세요. 응답은 팀 규약 `{ status, data, detail, code }` 로 자동 래핑되므로 **data 안에 들어갈 내용만** 넘기면 됩니다.
+경로는 항상 `@/consts/api` 의 `ENDPOINTS` 상수를 쓰세요. 응답은 팀 규약 `{ status, data, code }` 로 자동 래핑되므로 **data 안에 들어갈 내용만** 넘기면 됩니다.
 
 ## 2. 목 데이터 작성하기
 

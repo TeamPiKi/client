@@ -17,7 +17,7 @@
 - **잡히지 않은 throw / 5xx (query·비-mutation)**: Next.js error boundary(`app/error.tsx`, `app/global-error.tsx`)의 "오류가 발생했어요" 페이지로 fallback.
 - **`useSuspenseQuery` 기반 GET**: per-status 처리 없이 에러 시 error boundary로 fallback.
 - **일반 `useQuery`/`useInfiniteQuery`**: QueryClient에 `throwOnError` 미설정(`utils/queryClient.ts`) → 에러가 boundary로도 안 가고, 컴포넌트가 `isError`를 안 보면 빈 상태로 표시될 수 있음. **QueryCache.onError는 Sentry 로깅만** (토스트 없음).
-- **에러 토스트**: sonner(`@/components/toast`). 문구는 `getApiErrorMessage(error)` 한 곳으로 통일 — `code` → `detail` → generic 순서로 `@piki/core` 카탈로그에서 가져온다.
+- **에러 토스트**: sonner(`@/components/toast`). 문구는 `getApiErrorMessage(error)` 한 곳으로 통일 — `code` → generic 순서로 `@piki/core` 카탈로그에서 가져온다. 서버 `detail` 은 사용자에게 노출하지 않는다.
 - **개별 `onError` 규약**: 4xx 전부 책임(토스트를 status 분기 밖에 둔다) · 401·5xx 는 `return` 으로 전역에 위임.
 
 ---
@@ -153,7 +153,7 @@
 ### POST /api/v1/wishlists/images (이미지 등록/OCR) · 201, 400, 401, 403, 502
 
 - 201: ✅ analytics + invalidate + archive 이동
-- 400: ✅ `detail` 토스트(개수/형식/크기 초과)
+- 400: ✅ 카탈로그 문구 토스트(개수/형식/크기 초과)
 - 401: ✅ 전역 인터셉터
 - 403: ✅ 토스트 + (게스트) 로그인 페이지 replace
 - 409: ✅ 토스트 / `USER-003` 은 인터셉터가 세션 정리
@@ -243,7 +243,7 @@
 ### POST /api/v1/tournaments/{id}/items/images (이미지 OCR) · 200, 400, 401, 403, 404, 409, 502
 
 - 200: ✅ invalidate
-- 400: ✅ detail 토스트
+- 400: ✅ 카탈로그 문구 토스트
 - 401: ✅ 전역
 - 403 / 404 / 409: ✅ 토스트 + `router.replace(HOME)`
 - 502: ✅ 전역 `MutationCache.onError`가 `status>=500` 토스트 처리
@@ -262,7 +262,7 @@
 
 - 200: ✅ invalidate + create 페이지 replace
 - 401: ✅ 전역
-- 403 / 404 / 409: ✅ detail 토스트 + create replace / 5xx: ✅ 서버오류 토스트
+- 403 / 404 / 409: ✅ 카탈로그 문구 토스트 + create replace / 5xx: ✅ 서버오류 토스트
 
 ### PATCH /api/v1/tournaments/{id}/items/{itemId} · 200, 400, 401, 403, 404, 409, 502
 
@@ -337,7 +337,7 @@
 ### GET /api/v1/users/nickname/check · 200, 400, 401
 
 - 200: ✅ `available` 판정, false면 인라인 에러 "이미 사용 중인 닉네임이에요."
-- 400: ✅ 서버 detail을 인라인 필드 에러로 표시
+- 400: ✅ `getApiErrorMessage` 문구를 인라인 필드 에러로 표시
 - 401: ✅ 전역
 
 ---
