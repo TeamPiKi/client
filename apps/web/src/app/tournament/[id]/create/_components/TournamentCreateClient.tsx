@@ -42,16 +42,14 @@ function TournamentCreateClient({ tournamentId }: TournamentCreateClientProps) {
     () => typeof window !== 'undefined' && sessionStorage.getItem(scrollToLastKey) === '1'
   );
   /** 재진입 시점의 값만 필요하므로 useState 초기화 함수에서 한 번만 읽는다 */
-  const [previousItemCount] = useState(() => {
-    if (typeof window === 'undefined') return;
+  const [previousItemCount] = useState<number | null>(() => {
+    if (typeof window === 'undefined') return null;
 
     const raw = sessionStorage.getItem(prevItemCountKey);
-    if (raw === null) return;
+    if (raw === null) return null;
 
     const parsed = Number(raw);
-    if (!Number.isInteger(parsed) || parsed < 0) return;
-
-    return parsed;
+    return Number.isInteger(parsed) && parsed >= 0 ? parsed : null;
   });
 
   const scrollToLast = isScrollToLastQuery || isScrollToLastSession;
