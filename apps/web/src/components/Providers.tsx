@@ -8,6 +8,7 @@ import NavigationOverlay from '@/components/navigation-overlay';
 import NotificationSSEProvider from '@/components/notification-sse-provider';
 import { Toaster } from '@/components/toast';
 import { useAppNavigate } from '@/hooks/useAppNavigate';
+import { useTrackAppEntry } from '@/hooks/useBackWithFallback';
 import { useDeepLink } from '@/hooks/useDeepLink';
 import { useFcmTokenSync } from '@/hooks/useFcmTokenSync';
 import { getQueryClient } from '@/utils/queryClient';
@@ -41,6 +42,9 @@ function AppNavigateHandler() {
 
 function Providers({ children }: Readonly<{ children: ReactNode }>) {
   const queryClient = getQueryClient();
+
+  /** 앱 밖으로 나가는 뒤로가기를 판단하기 위해 진입 시점 history 길이 기록 */
+  useTrackAppEntry();
 
   return (
     <QueryClientProvider client={queryClient}>

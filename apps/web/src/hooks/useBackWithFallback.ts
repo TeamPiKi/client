@@ -1,15 +1,32 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
 
-/** NOTE: history.length 는 앱 진입 이전 방문 기록도 포함해 그 경우 back 이 앱 밖으로 나간다 */
+const ENTRY_HISTORY_LENGTH_KEY = 'piki:entryHistoryLength';
+
+/** 앱 진입 시점의 history 길이를 기준으로 앱 내부에서 생성된 history만 판단 */
+const getEntryHistoryLength = () => {
+  const stored = Number(sessionStorage.getItem(ENTRY_HISTORY_LENGTH_KEY));
+
+  return Number.isInteger(stored) && stored > 0 ? stored : 1;
+};
+
+/** 앱 진입 시점의 history 길이를 탭 세션에 기록 */
+export const useTrackAppEntry = () => {
+  useEffect(() => {
+    if (sessionStorage.getItem(ENTRY_HISTORY_LENGTH_KEY) !== null) return;
+
+    sessionStorage.setItem(ENTRY_HISTORY_LENGTH_KEY, String(window.history.length));
+  }, []);
+};
+
 export const useBackWithFallback = () => {
   const router = useRouter();
 
   return useCallback(
     (fallback: string) => {
-      if (window.history.length > 1) {
+      if (window.history.length > getEntryHistoryLength()) {
         router.back();
         return;
       }
