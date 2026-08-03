@@ -14,7 +14,7 @@ import {
  * 영수증 이미지 실제 저장(html-to-image + Web Share)과 공유 동작은 headless 환경이
  * 실제 유저 환경(모바일 공유 시트)을 대변하지 못해 버튼 노출까지만 검증한다.
  */
-test('결과 페이지에 영수증과 순위, 저장·공유 버튼이 렌더링된다', async ({ page, api }) => {
+test('결과 페이지에 영수증과 순위, 공유 버튼이 렌더링된다', async ({ page, api }) => {
   api.get(ENDPOINTS.USER, MOCK_MEMBER_ME);
   api.get(ENDPOINTS.TOURNAMENT(3), MOCK_TOURNAMENT_COMPLETED);
 
@@ -30,7 +30,7 @@ test('결과 페이지에 영수증과 순위, 저장·공유 버튼이 렌더�
     await expect(page.getByText(rankedItem.name).last()).toBeVisible();
   }
 
-  await expect(page.getByRole('button', { name: '영수증 저장' })).toBeVisible();
+  await expect(page.getByRole('button', { name: '영수증 공유' })).toBeVisible();
   /** isRoot && isOwner — 플레이 링크 공유 버튼 노출 */
   await expect(page.getByRole('button', { name: '토너먼트 공유' })).toBeVisible();
 });

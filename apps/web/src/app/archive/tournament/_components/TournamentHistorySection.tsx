@@ -29,11 +29,11 @@ function TournamentHistorySection({ initialTab }: Props) {
         <Spacing size={16} />
         <TournamentStatusTab activeTab={activeTab} onTabChange={handleTabChange} />
       </div>
-      <main className="hide-scrollbar flex flex-1 flex-col gap-4 overflow-y-auto pt-6 pb-24">
+      <div className="hide-scrollbar flex flex-1 flex-col gap-4 overflow-y-auto pt-6 pb-24">
         <Suspense key={activeTab} fallback={<TournamentHistorySkeleton />}>
           <TournamentHistoryList statuses={STATUS_BY_TAB[activeTab]} />
         </Suspense>
-      </main>
+      </div>
     </>
   );
 }

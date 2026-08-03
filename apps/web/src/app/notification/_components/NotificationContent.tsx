@@ -51,7 +51,11 @@ function NotificationContent() {
 
   return (
     <div className="flex h-dvh flex-col bg-gray-50 px-5 pt-padding-top">
-      <Header left={<HeaderIcon name="BACK" />} center="알림 히스토리" centerClassName="title-1" />
+      <Header
+        left={<HeaderIcon name="BACK" />}
+        center="알림 히스토리"
+        centerClassName="heading-1-bold"
+      />
       <Spacing size={16} />
 
       <div className="hide-scrollbar flex-1 overflow-y-auto pt-5">{renderContent()}</div>
