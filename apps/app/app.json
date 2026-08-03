@@ -180,6 +180,7 @@
         }
       ],
       "./plugins/withShareExtensionKeychain.js",
+      "./plugins/withAndroidShareActivity.js",
       [
         "./plugins/withKakaoLoginConfig.js",
         {
