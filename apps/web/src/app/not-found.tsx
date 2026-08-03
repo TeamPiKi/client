@@ -7,7 +7,7 @@ import { ROUTES } from '@/consts/route';
 function NotFound() {
   return (
     <div className="h-full bg-bg-layer-basement pt-padding-top">
-      <div className="flex flex-col items-center gap-[30px] pt-[calc(253px-env(safe-area-inset-top))]">
+      <div className="flex flex-col items-center gap-[30px] pt-[calc(253px_-_env(safe-area-inset-top))]">
         <div className="flex flex-col items-center gap-[25px]">
           <BasketNotFoundIcon className="size-15" aria-hidden />
           <div className="flex flex-col items-center gap-2">

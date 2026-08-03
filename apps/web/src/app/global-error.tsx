@@ -23,7 +23,7 @@ export default function GlobalError({ error, reset }: Props) {
     <html lang="ko" className="h-full">
       <body className="mx-auto my-0 h-full max-w-120 antialiased">
         <div className="h-full bg-bg-layer-basement pt-padding-top">
-          <div className="flex flex-col items-center gap-[30px] pt-[calc(253px-env(safe-area-inset-top))]">
+          <div className="flex flex-col items-center gap-[30px] pt-[calc(253px_-_env(safe-area-inset-top))]">
             <div className="flex flex-col items-center gap-[25px]">
               <WarningIconFill className="size-15 text-icon-warning" />
               <div className="flex flex-col items-center gap-2">
