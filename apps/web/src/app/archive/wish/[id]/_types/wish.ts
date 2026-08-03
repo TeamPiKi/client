@@ -21,6 +21,18 @@ export type GetWishResponseT = {
         sourceUrl: string | null;
       }
   );
+  /**
+   * 갱신 필요 여부
+   * - 이미지로 등록한 경우: null
+   * - 링크로 등록한 경우: boolean
+   */
+  refreshNeeded: boolean | null;
+  /**
+   * 재사용 여부
+   * - 이미지로 등록한 경우: null
+   * - 링크로 등록한 경우: boolean
+   */
+  reused: boolean | null;
 };
 
 export type PatchWishResponseT = GetWishResponseT;
