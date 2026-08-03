@@ -1,11 +1,10 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { isAxiosError } from 'axios';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
 import { ROUTES } from '@/consts/route';
-import type { ApiErrorResponseT } from '@/types/api';
 import type { PatchItemRequestT } from '@/types/item';
+import { getApiErrorStatus, isGlobalNetError } from '@/utils/apiError';
 import { getApiErrorMessage } from '@/utils/getApiErrorMessage';
 
 import { patchTournamentItem } from '../_apis/patchTournamentItem';
@@ -32,11 +31,7 @@ export const usePatchTournamentItem = (tournamentId: number, tournamentItemId: n
         router.back();
       },
       onError: error => {
-        if (!isAxiosError<ApiErrorResponseT>(error) || !error.response) return;
-
-        const { status } = error.response;
-
-        if (status === 401 || status >= 500) return;
+        if (isGlobalNetError(error)) return;
 
         /**
          * 400: 상품 이름·가격 미입력
@@ -46,6 +41,7 @@ export const usePatchTournamentItem = (tournamentId: number, tournamentItemId: n
          */
         toast.error(getApiErrorMessage(error));
 
+        const status = getApiErrorStatus(error);
         if (status === 403 || status === 404 || status === 409)
           router.replace(ROUTES.TOURNAMENT_CREATE(tournamentId));
       },

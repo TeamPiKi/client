@@ -1,10 +1,10 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { isAxiosError } from 'axios';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
 import { QUERY_ACTION } from '@/consts/queryAction';
 import { ROUTES } from '@/consts/route';
+import { isGlobalNetError } from '@/utils/apiError';
 import { getApiErrorMessage } from '@/utils/getApiErrorMessage';
 
 import { postTournamentItemsByWish } from '../_apis/postTournamentItemsByWish';
@@ -25,11 +25,7 @@ export const usePostTournamentItemsByWish = (tournamentId: number) => {
       );
     },
     onError: error => {
-      if (!isAxiosError(error) || !error.response) return;
-
-      const { status } = error.response;
-
-      if (status === 401 || status >= 500) return;
+      if (isGlobalNetError(error)) return;
 
       /**
        * 400: 아이템 32개 초과

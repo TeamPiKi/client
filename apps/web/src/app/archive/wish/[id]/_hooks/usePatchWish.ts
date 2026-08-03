@@ -1,11 +1,10 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { isAxiosError } from 'axios';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
 import { ROUTES } from '@/consts/route';
-import type { ApiErrorResponseT } from '@/types/api';
 import type { PatchItemRequestT } from '@/types/item';
+import { getApiErrorStatus, isGlobalNetError } from '@/utils/apiError';
 import { getApiErrorMessage } from '@/utils/getApiErrorMessage';
 
 import { patchWish } from '../_apis/patchWish';
@@ -29,20 +28,16 @@ export const usePatchWish = (wishId: number) => {
       router.back();
     },
     onError: error => {
-      if (!isAxiosError<ApiErrorResponseT>(error) || !error.response) return;
-
-      const { status } = error.response;
-
-      if (status === 401 || status >= 500) return;
+      if (isGlobalNetError(error)) return;
 
       toast.error(getApiErrorMessage(error));
 
       /**
        * 403: 위시 수정 권한 없음
        * 404: 위시 존재하지 않음
-       * 409: 탈퇴한 계정
        */
-      if (status === 403 || status === 404 || status === 409) router.replace(ROUTES.WISHLIST);
+      const status = getApiErrorStatus(error);
+      if (status === 403 || status === 404) router.replace(ROUTES.WISHLIST);
     },
   });
 

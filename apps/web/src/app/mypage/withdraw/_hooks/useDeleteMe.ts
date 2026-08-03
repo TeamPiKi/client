@@ -1,10 +1,10 @@
 import { WEBBRIDGE_MESSAGE_TYPE } from '@piki/core';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { isAxiosError } from 'axios';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
 import { ROUTES } from '@/consts/route';
+import { isGlobalNetError } from '@/utils/apiError';
 import { deleteCookie } from '@/utils/cookie';
 import { getApiErrorMessage } from '@/utils/getApiErrorMessage';
 import { WebBridge, isWebview } from '@/utils/webBridge';
@@ -29,11 +29,7 @@ export const useDeleteMe = () => {
       router.replace(ROUTES.ROOT);
     },
     onError: error => {
-      if (!isAxiosError(error) || !error.response) return;
-
-      const { status } = error.response;
-
-      if (status === 401 || status >= 500) return;
+      if (isGlobalNetError(error)) return;
 
       /**
        * 403: 게스트는 탈퇴 불가

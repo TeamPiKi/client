@@ -1,7 +1,7 @@
 import { useMutation } from '@tanstack/react-query';
-import { isAxiosError } from 'axios';
 import { toast } from 'sonner';
 
+import { isGlobalNetError } from '@/utils/apiError';
 import { getApiErrorMessage } from '@/utils/getApiErrorMessage';
 
 import { postPlayLink } from '../_apis/postPlayLink';
@@ -11,11 +11,7 @@ export const usePostPlayLink = (tournamentId: number) => {
     mutationFn: () => postPlayLink(tournamentId),
     /** 문구는 훅 레벨에서만 — 호출부(mutateAsync catch)에서 토스트하면 전역 fallback 과 겹친다 */
     onError: error => {
-      if (!isAxiosError(error) || !error.response) return;
-
-      const { status } = error.response;
-      /** 401(인터셉터)·5xx(전역 안전망)는 전역이 처리한다 */
-      if (status === 401 || status >= 500) return;
+      if (isGlobalNetError(error)) return;
 
       /**
        * 403: 플레이 링크로 참여한 토너먼트는 공유 링크 생성 불가

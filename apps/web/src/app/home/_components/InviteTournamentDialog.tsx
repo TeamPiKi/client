@@ -1,7 +1,6 @@
 'use client';
 
 import { useMutation } from '@tanstack/react-query';
-import { isAxiosError } from 'axios';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
@@ -24,6 +23,7 @@ import Spinner from '@/components/spinner';
 import TournamentErrorDialog from '@/components/tournament-error-dialog';
 import { ANALYTICS_EVENT } from '@/consts/analytics';
 import { logAnalyticsEvent } from '@/utils/analytics';
+import { getApiErrorStatus, isGlobalNetError } from '@/utils/apiError';
 
 import InvalidCodeDialog from './invite-code-dialog/InvalidCodeDialog';
 
@@ -47,14 +47,10 @@ function InviteTournamentDialog() {
       setOpen(false);
       reset();
 
-      if (!isAxiosError(error) || !error.response) return;
-
-      const { status } = error.response;
-      /** 401(인터셉터)·5xx(전역 안전망)는 전역이 처리한다 */
-      if (status === 401 || status >= 500) return;
+      if (isGlobalNetError(error)) return;
 
       /** 409: 초대 코드 만료 */
-      if (status === 409) {
+      if (getApiErrorStatus(error) === 409) {
         setIsTournamentErrorDialogOpen(true);
         return;
       }

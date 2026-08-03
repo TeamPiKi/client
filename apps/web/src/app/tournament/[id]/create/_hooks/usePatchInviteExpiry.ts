@@ -1,9 +1,9 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { isAxiosError } from 'axios';
 import { toast } from 'sonner';
 
 import { ANALYTICS_EVENT } from '@/consts/analytics';
 import { logAnalyticsEvent } from '@/utils/analytics';
+import { isGlobalNetError } from '@/utils/apiError';
 import { getApiErrorMessage } from '@/utils/getApiErrorMessage';
 
 import { type PatchInviteExpiryRequestT, patchInviteExpiry } from '../_apis/patchInviteExpiry';
@@ -20,11 +20,7 @@ export const usePatchInviteExpiry = (tournamentId: number) => {
     },
     /** 문구는 훅 레벨에서만 — mutate 레벨 onError 는 전역 fallback 을 양보시키지 못해 토스트가 두 번 뜬다 */
     onError: error => {
-      if (!isAxiosError(error) || !error.response) return;
-
-      const { status } = error.response;
-      /** 401(인터셉터)·5xx(전역 안전망)는 전역이 처리한다 */
-      if (status === 401 || status >= 500) return;
+      if (isGlobalNetError(error)) return;
 
       /**
        * 400: 마감 시각 형식 오류

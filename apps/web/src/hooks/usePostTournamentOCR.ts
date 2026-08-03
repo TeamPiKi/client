@@ -1,11 +1,10 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { isAxiosError } from 'axios';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
 import { postTournamentOCR } from '@/apis/postTournamentOCR';
 import { ROUTES } from '@/consts/route';
-import type { ApiErrorResponseT } from '@/types/api';
+import { getApiErrorStatus, isGlobalNetError } from '@/utils/apiError';
 import { getApiErrorMessage } from '@/utils/getApiErrorMessage';
 
 export const usePostTournamentOCR = (tournamentId: number) => {
@@ -22,11 +21,7 @@ export const usePostTournamentOCR = (tournamentId: number) => {
       queryClient.invalidateQueries({ queryKey: ['tournament', tournamentId] });
     },
     onError: error => {
-      if (!isAxiosError<ApiErrorResponseT>(error) || !error.response) return;
-
-      const { status } = error.response;
-
-      if (status === 401 || status >= 500) return;
+      if (isGlobalNetError(error)) return;
 
       /**
        * 400: 이미지 개수/형식/크기 초과·아이템 32개 초과
@@ -36,6 +31,7 @@ export const usePostTournamentOCR = (tournamentId: number) => {
        */
       toast.error(getApiErrorMessage(error));
 
+      const status = getApiErrorStatus(error);
       if (status === 403 || status === 404 || status === 409) router.replace(ROUTES.HOME);
     },
   });

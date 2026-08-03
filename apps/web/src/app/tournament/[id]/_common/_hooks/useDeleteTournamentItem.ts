@@ -1,10 +1,9 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { isAxiosError } from 'axios';
 import { usePathname, useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
 import { ROUTES } from '@/consts/route';
-import type { ApiErrorResponseT } from '@/types/api';
+import { getApiErrorStatus, isGlobalNetError } from '@/utils/apiError';
 import { getApiErrorMessage } from '@/utils/getApiErrorMessage';
 
 import { deleteTournamentItem } from '../_apis/deleteTournamentItem';
@@ -26,11 +25,7 @@ export const useDeleteTournamentItem = (tournamentId: number, tournamentItemId: 
           router.replace(ROUTES.TOURNAMENT_CREATE(tournamentId));
       },
       onError: error => {
-        if (!isAxiosError<ApiErrorResponseT>(error) || !error.response) return;
-
-        const { status } = error.response;
-
-        if (status === 401 || status >= 500) return;
+        if (isGlobalNetError(error)) return;
 
         /**
          * 403: 토너먼트 참여 권한 없음
@@ -39,6 +34,7 @@ export const useDeleteTournamentItem = (tournamentId: number, tournamentItemId: 
          */
         toast.error(getApiErrorMessage(error));
 
+        const status = getApiErrorStatus(error);
         if (status === 403 || status === 404 || status === 409) {
           if (pathname !== ROUTES.TOURNAMENT_CREATE(tournamentId))
             router.replace(ROUTES.TOURNAMENT_CREATE(tournamentId));

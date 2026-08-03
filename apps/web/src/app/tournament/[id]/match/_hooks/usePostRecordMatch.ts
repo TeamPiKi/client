@@ -1,7 +1,7 @@
 import { useMutation } from '@tanstack/react-query';
-import { isAxiosError } from 'axios';
 import { toast } from 'sonner';
 
+import { isGlobalNetError } from '@/utils/apiError';
 import { getApiErrorMessage } from '@/utils/getApiErrorMessage';
 
 import type {
@@ -20,11 +20,7 @@ export const usePostRecordMatch = ({ tournamentId, onSuccess }: UsePostRecordMat
     mutationFn: (body: PostRecordMatchRequestT) => postRecordMatch(tournamentId, body),
     onSuccess,
     onError: error => {
-      if (!isAxiosError(error) || !error.response) return;
-
-      const { status } = error.response;
-
-      if (status === 401 || status >= 500) return;
+      if (isGlobalNetError(error)) return;
 
       /**
        * 400: 잘못된 선택·라운드 불일치

@@ -1,11 +1,10 @@
 import { ERROR_CODE } from '@piki/core';
 import { useMutation } from '@tanstack/react-query';
-import { isAxiosError } from 'axios';
 import { toast } from 'sonner';
 
 import { ANALYTICS_EVENT } from '@/consts/analytics';
-import type { ApiErrorResponseT } from '@/types/api';
 import { logAnalyticsEvent } from '@/utils/analytics';
+import { getApiErrorCode, getApiErrorStatus, isGlobalNetError } from '@/utils/apiError';
 import { getApiErrorMessage } from '@/utils/getApiErrorMessage';
 
 import { postJoin } from '../_apis/postJoin';
@@ -30,26 +29,22 @@ export const usePostJoin = ({
       });
     },
     onError: error => {
-      if (!isAxiosError<ApiErrorResponseT>(error) || !error.response) return;
+      if (isGlobalNetError(error)) return;
 
-      const { status, data } = error.response;
+      if (getApiErrorStatus(error) === 409) {
+        const code = getApiErrorCode(error);
 
-      if (status === 401 || status >= 500) return;
+        /** 그 외 참여 불가(만료 · PENDING 아님)는 onUnavailable 담당 */
+        let handleConflict = onUnavailable;
+        if (code === ERROR_CODE.TOURNAMENT_ALREADY_PARTICIPANT) handleConflict = onAlreadyJoined;
+        else if (code === ERROR_CODE.TOURNAMENT_PARTICIPANT_LIMIT_EXCEEDED)
+          handleConflict = onParticipantsFull;
 
-      if (status === 409) {
-        if (data.code === ERROR_CODE.TOURNAMENT_ALREADY_PARTICIPANT) {
-          onAlreadyJoined?.();
+        /** 콜백 미전달 시 아래 generic 토스트로 fallback — 409 무피드백 방지 */
+        if (handleConflict) {
+          handleConflict();
           return;
         }
-
-        if (data.code === ERROR_CODE.TOURNAMENT_PARTICIPANT_LIMIT_EXCEEDED) {
-          onParticipantsFull?.();
-          return;
-        }
-
-        /** 그 외 참여 불가 — 초대 링크 만료 · PENDING 아닌 토너먼트 */
-        onUnavailable?.();
-        return;
       }
 
       /**
