@@ -109,7 +109,7 @@ export { default as PinIconOutline } from './pin.svg';
 export { default as ProfileCircledIconOutline } from './profile-circled.svg';
 export { default as ProfileCircledFilledIconOutline } from './profile-circled-filled.svg';
 export { default as PromoIconOutline } from './promo.svg';
-export { default as ReciptIconOutline } from './recipt.svg';
+export { default as ReceiptIconOutline } from './receipt.svg';
 export { default as RedoIconOutline } from './redo.svg';
 export { default as ReloaderIconOutline } from './reloader.svg';
 export { default as RemoveIconOutline } from './remove.svg';

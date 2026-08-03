@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 
-import { ChevronForwardIconFill, ReciptIconOutline, TrophyIconOutline } from '@/assets/icons';
+import { ChevronForwardIconFill, ReceiptIconOutline, TrophyIconOutline } from '@/assets/icons';
 import BottomCta from '@/components/bottom-cta';
 import Button from '@/components/button';
 import { Header } from '@/components/header';
@@ -104,7 +104,7 @@ function ResultClient({ tournamentId }: ResultClientProps) {
             variant="secondary"
             size="lg"
             icon="leading"
-            leadingIcon={<ReciptIconOutline aria-hidden className="size-5" />}
+            leadingIcon={<ReceiptIconOutline aria-hidden className="size-5" />}
             onClick={() => setIsReceiptShareDialogOpen(true)}
             className="flex-1 border-gray-75 bg-gray-75 text-text-neutral-secondary"
           >

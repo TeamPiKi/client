@@ -6,7 +6,7 @@ import { type ComponentType, type SVGProps, useState } from 'react';
 import {
   GroupIconFill,
   HeartIconFill,
-  ReciptIconFill,
+  ReceiptIconFill,
   ThreeDotVerticalIconFill,
   TrashIconFill,
 } from '@/assets/icons';
@@ -114,7 +114,7 @@ function MorePopover({ status, tournamentId, participantCount = 0 }: MorePopover
                 />
               )}
               <OptionButton
-                Icon={ReciptIconFill}
+                Icon={ReceiptIconFill}
                 label="결과 확인하기"
                 onClick={handleViewTournamentResult}
               />
