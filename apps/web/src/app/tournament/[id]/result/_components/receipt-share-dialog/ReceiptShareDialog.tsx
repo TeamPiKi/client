@@ -251,8 +251,8 @@ function ReceiptShareDialog({
               />
               {isAppEnvironment && (
                 <ShareAction
-                  icon={<InstagramIcon className="size-7 text-white" />}
-                  iconBackgroundClassName="bg-[linear-gradient(45deg,#FEDA75,#FA7E1E,#D62976,#962FBF,#4F5BD5)]"
+                  icon={<InstagramIcon className="size-7" />}
+                  iconBackgroundClassName="border border-gray-75 bg-white"
                   label="스토리 공유"
                   disabled={!imageBlob || isSharing}
                   onClick={handleShareToStory}
