@@ -5,7 +5,9 @@ import { useRouter } from 'next/navigation';
 
 import { ANALYTICS_EVENT } from '@/consts/analytics';
 import { QUERY_ACTION } from '@/consts/queryAction';
+import type { ApiErrorResponseT } from '@/types/api';
 import { logAnalyticsEvent } from '@/utils/analytics';
+import { isServerOrNetworkError } from '@/utils/apiError';
 import { getLoginPath, getLoginRedirectPath } from '@/utils/loginRedirect';
 
 import { postSocialLogin } from '../_apis/postSocialLogin';
@@ -33,13 +35,14 @@ export const usePostSocialLogin = (provider: SocialProviderT) => {
     },
     onError: (error, variables) => {
       /** 5xx·네트워크 문구는 전역 안전망이 띄운다 → 액션 쿼리 없이 이동해 토스트 중복을 막는다 */
-      const isServerError = !isAxiosError(error) || !error.response || error.response.status >= 500;
+      if (isServerOrNetworkError(error)) {
+        router.replace(getLoginPath(variables.redirect));
+        return;
+      }
 
-      router.replace(
-        isServerError
-          ? getLoginPath(variables.redirect)
-          : getLoginPath(variables.redirect, QUERY_ACTION.VALUE.SOCIAL_LOGIN_ERROR)
-      );
+      /** 4xx 는 code 를 함께 넘겨 로그인 페이지가 카탈로그 문구를 띄우게 한다 (OAUTH-* 구분 유지) */
+      const code = isAxiosError<ApiErrorResponseT>(error) ? error.response?.data?.code : null;
+      router.replace(getLoginPath(variables.redirect, QUERY_ACTION.VALUE.SOCIAL_LOGIN_ERROR, code));
     },
   });
 

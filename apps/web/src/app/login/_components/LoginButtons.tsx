@@ -1,7 +1,13 @@
 'use client';
 
 import type { SocialProviderT } from '@piki/core';
-import { ERROR_CODE, ERROR_MESSAGE_MAP, WEBBRIDGE_MESSAGE_TYPE } from '@piki/core';
+import {
+  DEFAULT_ERROR_MESSAGE,
+  ERROR_CODE,
+  ERROR_MESSAGE_MAP,
+  WEBBRIDGE_MESSAGE_TYPE,
+  getErrorMessageByCode,
+} from '@piki/core';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 import { toast } from 'sonner';
@@ -29,11 +35,13 @@ import SocialLoginButton from './SocialLoginButton';
 type LoginButtonsProps = {
   redirect: string | null;
   action: string | null;
+  /** 리다이렉트로 전달받은 서버 에러 코드 — 카탈로그 문구 노출용 */
+  errorCode: string | null;
   /** Android 웹뷰에서는 false — 네이티브 Apple 로그인이 iOS 전용이라 미노출 */
   showAppleLogin: boolean;
 };
 
-function LoginButtons({ redirect, action, showAppleLogin }: LoginButtonsProps) {
+function LoginButtons({ redirect, action, errorCode, showAppleLogin }: LoginButtonsProps) {
   const router = useRouter();
   const validRedirect = isValidLoginRedirectPath(redirect) ? redirect : null;
 
@@ -48,7 +56,7 @@ function LoginButtons({ redirect, action, showAppleLogin }: LoginButtonsProps) {
   useEffect(() => {
     const handleLoginError = () => {
       if (action === QUERY_ACTION.VALUE.SESSION_EXPIRED) {
-        toast.error('로그인 정보가 만료됐어요. 다시 로그인해 주세요.');
+        toast.error(ERROR_MESSAGE_MAP[ERROR_CODE.AUTH_INVALID_TOKEN]);
         router.replace(getLoginPath(validRedirect), { scroll: false });
         return;
       }
@@ -58,7 +66,7 @@ function LoginButtons({ redirect, action, showAppleLogin }: LoginButtonsProps) {
         return;
       }
       if (action === QUERY_ACTION.VALUE.SOCIAL_LOGIN_ERROR) {
-        toast.error('요청을 처리하지 못했어요. 다시 시도해 주세요.');
+        toast.error(getErrorMessageByCode(errorCode) ?? DEFAULT_ERROR_MESSAGE);
         router.replace(getLoginPath(validRedirect), { scroll: false });
       }
     };
@@ -70,7 +78,7 @@ function LoginButtons({ redirect, action, showAppleLogin }: LoginButtonsProps) {
     }
 
     handleLoginError();
-  }, [action, validRedirect, router]);
+  }, [action, errorCode, validRedirect, router]);
 
   const isGuestPending = isPostGuestLoginPending || isGuestRefreshing;
   const activePendingProvider = nativePendingProvider ?? webPendingProvider;

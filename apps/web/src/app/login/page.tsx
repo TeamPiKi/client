@@ -11,11 +11,11 @@ import { getRoleFromToken } from '@/utils/auth';
 import LoginButtons from './_components/LoginButtons';
 
 type LoginPageProps = {
-  searchParams: Promise<{ redirect?: string; action?: string }>;
+  searchParams: Promise<{ redirect?: string; action?: string; code?: string }>;
 };
 
 async function LoginPage({ searchParams }: LoginPageProps) {
-  const { redirect: redirectParam, action } = await searchParams;
+  const { redirect: redirectParam, action, code } = await searchParams;
 
   /** 멤버가 로그인 페이지 직접 진입 시 홈으로 리다이렉트 */
   const accessToken = (await cookies()).get('access_token')?.value;
@@ -46,6 +46,7 @@ async function LoginPage({ searchParams }: LoginPageProps) {
         <LoginButtons
           redirect={redirectParam ?? null}
           action={action ?? null}
+          errorCode={code ?? null}
           showAppleLogin={!isAndroidWebview}
         />
 
