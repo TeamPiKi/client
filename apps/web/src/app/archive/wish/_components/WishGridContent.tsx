@@ -1,10 +1,10 @@
 import { HeartIconFill } from '@/assets/icons';
-import type { WishItemT } from '@/types/wish';
+import type { GetWishlistResponseT } from '@/types/wish';
 
 import WishGrid from './wish-grid';
 
 type WishGridContentProps = {
-  items: WishItemT[];
+  items: GetWishlistResponseT[];
   isDeleteMode?: boolean;
   selectedIds?: Set<number>;
   onToggleSelect?: (id: number) => void;

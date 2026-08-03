@@ -7,10 +7,10 @@ export const useGetWishlist = () => {
     queryKey: ['wishlists'],
     queryFn: ({ pageParam }) => getWishlist(pageParam),
     initialPageParam: null as string | null,
-    getNextPageParam: page => (page.hasNext ? page.nextCursor : null),
+    getNextPageParam: page => (page.pageResponse.hasNext ? page.pageResponse.nextCursor : null),
   });
 
-  const wishlistData = data.pages.flatMap(page => page.items);
+  const wishlistData = data.pages.flatMap(page => page.data);
 
   return { wishlistData, fetchNextPage, hasNextPage, isFetchingNextPage };
 };

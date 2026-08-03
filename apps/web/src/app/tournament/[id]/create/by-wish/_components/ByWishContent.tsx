@@ -29,11 +29,8 @@ function ByWishContent({ tournamentId }: ByWishContentProps) {
   const pending = 'pending' in tournamentData ? tournamentData.pending : null;
   const existingItemIds = new Set(pending?.items.map(i => i.itemId) ?? []);
   const items = wishlistData.filter(
-    item =>
-      item.status !== 'FAILED' &&
-      item.status !== 'PROCESSING' &&
-      item.itemId != null &&
-      !existingItemIds.has(item.itemId)
+    ({ item }) =>
+      item.status !== 'FAILED' && item.status !== 'PROCESSING' && !existingItemIds.has(item.id)
   );
 
   useEffect(() => {
@@ -50,8 +47,8 @@ function ByWishContent({ tournamentId }: ByWishContentProps) {
 
   const handleNext = () => {
     const itemIds = items
-      .filter(item => selectedIds.includes(item.id))
-      .map(item => item.itemId as number);
+      .filter(({ wish }) => selectedIds.includes(wish.id))
+      .map(({ item }) => item.id);
     postTournamentItemsByWishMutation(itemIds);
   };
 
@@ -72,15 +69,15 @@ function ByWishContent({ tournamentId }: ByWishContentProps) {
 
       <main className="mt-6 hide-scrollbar flex flex-1 flex-col overflow-y-auto pb-32">
         <div className="grid grid-cols-2">
-          {items.map(item => (
+          {items.map(({ wish, item }) => (
             <WishSelectCard
-              key={item.id}
+              key={wish.id}
               name={item.name}
-              price={item.price}
+              price={item.currentPrice}
               imageUrl={item.imageUrl}
               sourcePlatform={item.sourcePlatform}
-              isSelected={selectedIds.includes(item.id)}
-              onSelect={() => handleSelect(item.id)}
+              isSelected={selectedIds.includes(wish.id)}
+              onSelect={() => handleSelect(wish.id)}
             />
           ))}
         </div>
