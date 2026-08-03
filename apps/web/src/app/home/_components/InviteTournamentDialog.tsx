@@ -5,7 +5,7 @@ import { isAxiosError } from 'axios';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
-import { getInvitePreviewByCode } from '@/app/tournament/join/_apis/getInvitePreviewByCode';
+import { getInvitePreviewByCode } from '@/apis/getInvitePreviewByCode';
 import {
   CODE_LENGTH,
   isValidInviteCodeFormat,

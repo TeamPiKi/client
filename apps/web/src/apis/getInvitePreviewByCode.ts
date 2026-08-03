@@ -4,8 +4,7 @@ import { clientApi } from '@/apis/client';
 import { serverApi } from '@/apis/server';
 import { ENDPOINTS } from '@/consts/api';
 import type { ApiResponseT } from '@/types/api';
-
-import type { GetInvitePreviewResponseT } from '../_types/join';
+import type { GetInvitePreviewResponseT } from '@/types/tournament';
 
 /**
  * 초대 코드로 토너먼트 미리보기.

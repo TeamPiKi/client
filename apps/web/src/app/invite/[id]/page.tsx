@@ -1,7 +1,7 @@
 import { isAxiosError } from 'axios';
 import { notFound, redirect } from 'next/navigation';
 
-import { getInvitePreviewByCode } from '@/app/tournament/join/_apis/getInvitePreviewByCode';
+import { getInvitePreviewByCode } from '@/apis/getInvitePreviewByCode';
 import { ROUTES } from '@/consts/route';
 import type { ApiErrorResponseT } from '@/types/api';
 import { parseIdParam } from '@/utils/parseIdParam';
