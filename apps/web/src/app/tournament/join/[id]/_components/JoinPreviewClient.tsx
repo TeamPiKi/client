@@ -181,7 +181,7 @@ function JoinPreviewClient({ tournamentId, inviteCode }: JoinPreviewClientProps)
         />
 
         <section className="mt-8.75 flex flex-col gap-2 px-5">
-          <p className="body-2-semibold text-text-neutral-primary">초대받은 토너먼트</p>
+          <p className="body-2-semibold text-text-neutral-primary">공유받은 토너먼트</p>
           <div className="flex flex-col gap-1 rounded-xl bg-gray-50 p-4">
             <p className="body-1-semibold text-text-neutral-primary">
               {invitePreviewData.tournamentName}

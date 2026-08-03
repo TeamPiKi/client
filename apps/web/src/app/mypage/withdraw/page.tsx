@@ -22,7 +22,7 @@ function MypageWithdrawPage() {
           <SadIconFill className="size-[74px] text-gray-100" aria-hidden />
           <WithdrawGreeting />
           <p className="text-center body-2-medium break-keep text-text-neutral-tertiary">
-            지금까지의 토너먼트 기록, 위시템 기록이 전부 사라져요.
+            지금까지의 토너먼트 기록, 위시 기록이 전부 사라져요.
           </p>
         </div>
 
