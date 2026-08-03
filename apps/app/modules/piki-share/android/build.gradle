@@ -1,0 +1,24 @@
+apply plugin: 'com.android.library'
+
+def expoModulesCorePlugin = new File(project(":expo-modules-core").projectDir.absolutePath, "ExpoModulesCorePlugin.gradle")
+
+apply from: expoModulesCorePlugin
+applyKotlinExpoModulesCorePlugin()
+useCoreDependencies()
+useDefaultAndroidSdkVersions()
+
+android {
+  namespace "expo.modules.pikishare"
+  defaultConfig {
+    versionCode 1
+    versionName "1.0.0"
+  }
+  lintOptions {
+    abortOnError false
+  }
+}
+
+dependencies {
+  // ShareActivity(ReactActivity) 컴파일용 — 버전은 루트 react rootproject 플러그인이 결정
+  implementation 'com.facebook.react:react-android'
+}
