@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useEffect } from 'react';
 
 import { WarningIconFill } from '@/assets/icons';
+import { buttonStyles } from '@/components/button/button.style';
 import { ROUTES } from '@/consts/route';
 
 type Props = {
@@ -18,30 +19,27 @@ function Error({ error, reset }: Props) {
   }, [error]);
 
   return (
-    <div className="flex h-full flex-col items-center gap-6 bg-bg-layer-basement pt-40">
-      <div className="flex flex-col items-center gap-4">
-        <WarningIconFill className="size-20 text-icon-error" />
-        <div className="flex flex-col items-center gap-2">
-          <h1 className="heading-1-bold text-text-neutral-secondary">오류가 발생했어요.</h1>
-          <p className="body-1-semibold text-text-neutral-tertiary">
-            일시적인 오류예요. 잠시 후 다시 시도해 주세요.
-          </p>
+    <div className="h-full bg-bg-layer-basement pt-padding-top">
+      <div className="flex flex-col items-center gap-[30px] pt-[calc(253px-env(safe-area-inset-top))]">
+        <div className="flex flex-col items-center gap-[25px]">
+          <WarningIconFill className="size-15 text-icon-warning" />
+          <div className="flex flex-col items-center gap-2">
+            <h1 className="heading-1-semibold text-text-neutral-primary">오류가 발생했어요</h1>
+            <p className="body-1-medium text-text-neutral-tertiary">잠시 후 다시 시도해 주세요</p>
+          </div>
         </div>
-      </div>
-      <div className="flex gap-3">
-        <button
-          type="button"
-          onClick={reset}
-          className="inline-flex cursor-pointer items-center justify-center rounded-[12px] border-[1.2px] border-gray-200 bg-bg-layer-floating px-[18px] py-[10px] body-1-semibold text-text-neutral-primary"
-        >
-          다시 시도
-        </button>
-        <Link
-          href={ROUTES.HOME}
-          className="inline-flex cursor-pointer items-center justify-center rounded-[12px] border border-bg-neutral-primary bg-bg-neutral-primary px-[18px] py-[10px] body-1-semibold text-text-neutral-inverse"
-        >
-          홈으로 가기
-        </Link>
+        <div className="flex gap-3">
+          <button
+            type="button"
+            onClick={reset}
+            className={buttonStyles({ variant: 'secondary', size: 'md' })}
+          >
+            다시 시도
+          </button>
+          <Link href={ROUTES.HOME} className={buttonStyles({ variant: 'primary', size: 'md' })}>
+            홈으로 가기
+          </Link>
+        </div>
       </div>
     </div>
   );
