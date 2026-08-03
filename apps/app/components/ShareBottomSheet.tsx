@@ -1,10 +1,13 @@
-import type { InitialProps as ShareExtensionProps } from 'expo-share-extension';
-import { close, openHostApp } from 'expo-share-extension';
+import type { InitialProps } from 'expo-share-extension';
 import { type ReactNode, useEffect, useState } from 'react';
 import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { postWishLinkFromShare } from '@/utils/postWishLinkFromShare';
+import { close, openHostApp } from '@/utils/shareExtension';
+
+/** iOS 는 expo-share-extension InitialProps, Android 는 ShareActivity 가 동일 shape 으로 text 전달 */
+type ShareExtensionProps = Partial<Pick<InitialProps, 'url' | 'text'>>;
 
 export default function ShareBottomSheet(props: ShareExtensionProps) {
   return (
