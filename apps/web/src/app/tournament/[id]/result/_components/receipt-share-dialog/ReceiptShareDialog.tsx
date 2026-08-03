@@ -1,14 +1,17 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { toast } from 'sonner';
 
 import { CopyIconFill, DownloadIconFill, LinkIconOutline } from '@/assets/icons';
+import InstagramIcon from '@/assets/icons/social/instagram.svg';
 import { Drawer, DrawerContent, DrawerDescription, DrawerTitle } from '@/components/drawer';
 import Skeleton from '@/components/skeleton';
 import { ANALYTICS_EVENT } from '@/consts/analytics';
+import { useInstagramStoryShare } from '@/hooks/useInstagramStoryShare';
 import { logAnalyticsEvent } from '@/utils/analytics';
 import { cn } from '@/utils/cn';
+import { isWebview } from '@/utils/webBridge';
 
 import type { RankedProductT } from '../../../_common/_types/tournament';
 import {
@@ -75,6 +78,14 @@ function ReceiptShareDialog({
   const captureLayerRef = useRef<HTMLDivElement | null>(null);
   const [imageBlob, setImageBlob] = useState<Blob | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const { shareToStory, isSharing } = useInstagramStoryShare();
+
+  /** 스토리 공유는 네이티브 전용 — SSR 은 false 로 두어 hydration mismatch 를 피한다 */
+  const isAppEnvironment = useSyncExternalStore(
+    () => () => {},
+    () => isWebview(),
+    () => false
+  );
 
   /** 시트가 열릴 때 한 번만 캡처하고, 그 blob 을 모든 액션이 재사용한다 */
   useEffect(() => {
@@ -140,6 +151,31 @@ function ReceiptShareDialog({
     toast.success('이미지를 복사했어요.');
   };
 
+  const handleShareToStory = async () => {
+    if (!imageBlob) return;
+
+    const status = await shareToStory(imageBlob);
+
+    /** WebBridge 가 이미 업데이트 안내를 띄웠다 */
+    if (status === 'blocked') return;
+
+    if (status === 'notInstalled') {
+      toast.warning('인스타그램 앱을 설치하면 스토리에 공유할 수 있어요.');
+      return;
+    }
+
+    if (status === 'error') {
+      toast.error('스토리 공유에 실패했어요. 잠시 후 다시 시도해주세요.');
+      return;
+    }
+
+    logAnalyticsEvent(ANALYTICS_EVENT.RECEIPT_SHARE, {
+      tournament_id: tournamentId,
+      method: 'story',
+    });
+    onOpenChange(false);
+  };
+
   const handleShareLink = async () => {
     if (!imageBlob) return;
 
@@ -193,7 +229,8 @@ function ReceiptShareDialog({
               )}
             </div>
 
-            <div className="flex w-full items-start justify-center gap-10 border-t border-gray-75 pt-5">
+            {/* 앱에서는 스토리 공유가 더해져 4개 — 좁은 화면에서 넘치지 않게 간격 상한을 둔다 */}
+            <div className="flex w-full items-start justify-center gap-[clamp(1rem,7vw,2.5rem)] border-t border-gray-75 pt-5">
               <ShareAction
                 icon={<DownloadIconFill className="size-6 text-text-neutral-secondary" />}
                 label="이미지 저장"
@@ -212,6 +249,15 @@ function ReceiptShareDialog({
                 disabled={!imageBlob}
                 onClick={handleShareLink}
               />
+              {isAppEnvironment && (
+                <ShareAction
+                  icon={<InstagramIcon className="size-7 text-white" />}
+                  iconBackgroundClassName="bg-[linear-gradient(45deg,#FEDA75,#FA7E1E,#D62976,#962FBF,#4F5BD5)]"
+                  label="스토리 공유"
+                  disabled={!imageBlob || isSharing}
+                  onClick={handleShareToStory}
+                />
+              )}
             </div>
           </div>
         </DrawerContent>
