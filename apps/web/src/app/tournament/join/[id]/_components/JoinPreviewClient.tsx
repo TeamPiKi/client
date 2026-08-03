@@ -30,6 +30,14 @@ type JoinPreviewClientProps = {
 
 const MAX_NICKNAME_LENGTH = 10;
 
+/**
+ * 회원 자동 참여 화면 상태.
+ * - joining: 참여 요청 진행 중 (스피너)
+ * - retryable: 일시적 실패 — 재시도 가능
+ * - blocked: 409(이미 참여 / 만료) — 재시도가 무의미하므로 종료 화면
+ */
+type AutoJoinStatusT = 'joining' | 'retryable' | 'blocked';
+
 function JoinPreviewClient({ tournamentId, inviteCode }: JoinPreviewClientProps) {
   /** 이 페이지는 흰색 배경(bg-layer-default) — iOS 노치 영역까지 흰색으로 칠해야 자연스럽다. */
   usePageBackground('var(--color-bg-layer-default)');
@@ -42,7 +50,7 @@ function JoinPreviewClient({ tournamentId, inviteCode }: JoinPreviewClientProps)
 
   const [nickname, setNickname] = useState(userData.nickname);
   const [isTournamentErrorDialogOpen, setIsTournamentErrorDialogOpen] = useState(false);
-  const [isAutoJoinFailed, setIsAutoJoinFailed] = useState(false);
+  const [autoJoinStatus, setAutoJoinStatus] = useState<AutoJoinStatusT>('joining');
 
   const {
     isCheckingNickname,
@@ -62,18 +70,20 @@ function JoinPreviewClient({ tournamentId, inviteCode }: JoinPreviewClientProps)
         body: { ...(inviteCode ? { inviteCode } : {}) },
       },
       {
+        /** 참여 완료 후 뒤로가기로 join 화면에 돌아오면 재참여(409)가 되므로 히스토리에서 제거 */
         onSuccess: () => {
-          router.push(
+          router.replace(
             `${ROUTES.TOURNAMENT_CREATE(tournamentId)}?${QUERY_ACTION.KEY}=${QUERY_ACTION.VALUE.WELCOME_JOIN}`
           );
         },
         onError: error => {
           if (isAxiosError<ApiErrorResponseT>(error) && error.response?.status === 409) {
+            setAutoJoinStatus('blocked');
             setIsTournamentErrorDialogOpen(true);
             return;
           }
 
-          setIsAutoJoinFailed(true);
+          setAutoJoinStatus('retryable');
           toast.warning('참여에 실패했어요. 잠시 후 다시 시도해주세요.');
         },
       }
@@ -114,7 +124,7 @@ function JoinPreviewClient({ tournamentId, inviteCode }: JoinPreviewClientProps)
   }, [isMember, invitePreviewData.joined, router, tournamentId, joinTournament]);
 
   const handleRetryAutoJoin = () => {
-    setIsAutoJoinFailed(false);
+    setAutoJoinStatus('joining');
     joinTournament();
   };
 
@@ -122,14 +132,27 @@ function JoinPreviewClient({ tournamentId, inviteCode }: JoinPreviewClientProps)
     return (
       <>
         <main className="flex min-h-dvh items-center justify-center bg-bg-layer-default pt-padding-top">
-          {isAutoJoinFailed ? (
+          {autoJoinStatus === 'blocked' && (
+            <div className="flex flex-col items-center gap-4">
+              <p className="body-1-medium text-text-neutral-tertiary">
+                참여할 수 없는 토너먼트예요.
+              </p>
+              <Button size="md" variant="primary" onClick={() => router.replace(ROUTES.HOME)}>
+                홈으로 가기
+              </Button>
+            </div>
+          )}
+
+          {autoJoinStatus === 'retryable' && (
             <div className="flex flex-col items-center gap-4">
               <p className="body-1-medium text-text-neutral-tertiary">참여에 실패했어요.</p>
               <Button size="md" variant="primary" onClick={handleRetryAutoJoin}>
                 다시 시도
               </Button>
             </div>
-          ) : (
+          )}
+
+          {autoJoinStatus === 'joining' && (
             <div className="flex flex-col items-center gap-3">
               <Spinner size={32} />
               <p className="body-1-medium text-text-neutral-tertiary">
