@@ -1,8 +1,4 @@
-import {
-  WEBBRIDGE_MESSAGE_TYPE,
-  WEB_REQ_READY_PAYLOAD_TYPE,
-  type WebBridgeMessageT,
-} from '@piki/core';
+import { WEBBRIDGE_MESSAGE_TYPE, type WebBridgeMessageT } from '@piki/core';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Linking, View } from 'react-native';
 import type { WebView } from 'react-native-webview';
@@ -15,7 +11,6 @@ import type {
 
 import SplashOverlay from '@/components/SplashOverlay';
 import { USER_AGENT } from '@/constants/userAgent';
-import { useShareIntent } from '@/hooks/useShareIntent';
 import { useSocialLogin } from '@/hooks/useSocialLogin';
 import { useSplashScreenController } from '@/hooks/useSplashScreenController';
 import { useWebBridgeMessage } from '@/hooks/useWebBridgeMessage';
@@ -84,20 +79,9 @@ function Page() {
     void logAppOpenEvent();
   }, []);
 
-  const { sendShareIntent } = useShareIntent({
-    onChangeWebviewUri: handleWebviewUriChange,
-    webviewUri,
-  });
-
   const handleWebMessage = useCallback(
     async (message: WebBridgeMessageT) => {
       switch (message.type) {
-        case WEBBRIDGE_MESSAGE_TYPE.WEB_REQ_READY: {
-          const { type } = message.payload;
-          if (type === WEB_REQ_READY_PAYLOAD_TYPE.SHARE_INTENT) sendShareIntent();
-          return;
-        }
-
         case WEBBRIDGE_MESSAGE_TYPE.WEB_REQ_OPEN_IMAGE_PICKER:
           await handleOpenImagePicker(message.payload);
           return;
@@ -137,7 +121,7 @@ function Page() {
           return;
       }
     },
-    [sendShareIntent, handleLogin]
+    [handleLogin]
   );
 
   const { onMessage } = useWebBridgeMessage(handleWebMessage);

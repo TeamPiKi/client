@@ -124,14 +124,6 @@
         }
       ],
       [
-        "expo-share-intent",
-        {
-          "disableIOS": true,
-          "androidIntentFilters": ["text/*", "image/*"],
-          "androidMultiIntentFilters": ["image/*"]
-        }
-      ],
-      [
         "expo-share-extension",
         {
           "backgroundColor": {
@@ -153,12 +145,7 @@
               "max": 1
             }
           ],
-          "excludedPackages": [
-            "expo-dev-client",
-            "expo-splash-screen",
-            "expo-updates",
-            "expo-share-intent"
-          ]
+          "excludedPackages": ["expo-dev-client", "expo-splash-screen", "expo-updates"]
         }
       ],
       "expo-notifications",

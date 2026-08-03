@@ -2,7 +2,6 @@ import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { initializeKakaoSDK } from '@react-native-kakao/core';
 import * as Sentry from '@sentry/react-native';
 import { Stack } from 'expo-router';
-import { ShareIntentProvider } from 'expo-share-intent';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import 'react-native-reanimated';
@@ -24,15 +23,9 @@ void SplashScreen.preventAutoHideAsync();
 function RootLayout() {
   return (
     <SplashScreenControllerProvider>
-      <ShareIntentProvider
-        options={{
-          scheme: 'piki',
-        }}
-      >
-        <PushNotificationProvider />
-        <StatusBar style="auto" />
-        <Stack screenOptions={{ headerShown: false }} />
-      </ShareIntentProvider>
+      <PushNotificationProvider />
+      <StatusBar style="auto" />
+      <Stack screenOptions={{ headerShown: false }} />
     </SplashScreenControllerProvider>
   );
 }
