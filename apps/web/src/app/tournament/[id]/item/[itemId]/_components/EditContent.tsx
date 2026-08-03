@@ -23,7 +23,7 @@ function EditContent({ tournamentId, tournamentItemId }: EditContentProps) {
     >
       <Header
         left={<HeaderIcon name="BACK" />}
-        center="위시템 정보 확인"
+        center="위시 정보 확인"
         centerClassName="heading-1-bold"
       />
       <main>

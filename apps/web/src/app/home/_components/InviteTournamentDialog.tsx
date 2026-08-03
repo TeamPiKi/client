@@ -98,25 +98,25 @@ function InviteTournamentDialog() {
         <DialogTrigger asChild onClick={handleTriggerClick}>
           <button
             type="button"
-            aria-label="초대받은 토너먼트 참여하기"
+            aria-label="공유받은 토너먼트 참여하기"
             className="flex h-[104px] cursor-pointer flex-col rounded-2xl bg-gray-50 p-4"
           >
             <span className="text-left body-1-semibold whitespace-pre-line text-text-neutral-primary">
-              {'초대받은 토너먼트\n참여하기'}
+              {'공유받은 토너먼트\n참여하기'}
             </span>
             <GroupIconFill className="size-7.5 self-end text-icon-neutral-secondary" />
           </button>
         </DialogTrigger>
         <DialogContent showCloseButton={false} className="flex flex-col gap-5 p-6">
           <DialogTitle className="text-center heading-1-bold text-text-neutral-primary">
-            초대받은 토너먼트
+            공유받은 토너먼트
           </DialogTitle>
           <DialogDescription className="sr-only">초대 코드를 입력해 입장합니다.</DialogDescription>
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-5">
             <Input
               label="초대 코드"
-              placeholder="ex. ABC123"
+              placeholder="pik123"
               value={code}
               onChange={event => handleChange(event.target.value)}
               aria-invalid={showFormatError}

@@ -25,7 +25,7 @@ function TournamentList() {
     <HydrationBoundary state={dehydrate(queryClient)}>
       <section className="flex flex-1 flex-col gap-3">
         <div className="flex items-center justify-between">
-          <h2 className="heading-2-semibold text-black">최근 생성한 토너먼트</h2>
+          <h2 className="heading-2-semibold text-black">최근 토너먼트</h2>
           <Link href={ROUTES.TOURNAMENT_HISTORY} aria-label="토너먼트 히스토리 보기">
             <ChevronForwardIconFill className="size-6 text-icon-neutral-secondary" aria-hidden />
           </Link>
