@@ -4,6 +4,10 @@ export type ApiResponseT<T> = {
   data: T;
   detail: string;
   code: string;
+  pageResponse: {
+    nextCursor: string | null;
+    hasNext: boolean;
+  };
 };
 
 // 공통 에러 응답 타입
