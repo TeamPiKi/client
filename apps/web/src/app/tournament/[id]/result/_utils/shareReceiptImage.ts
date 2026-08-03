@@ -17,6 +17,9 @@ const downloadBlob = (blob: Blob, fileName: string) => {
   URL.revokeObjectURL(url);
 };
 
+/** `download` 속성 미지원(iOS 웹뷰 등) 이면 클릭해도 저장되지 않는다 */
+const isDownloadSupported = () => 'download' in document.createElement('a');
+
 const withTimeout = <T>(promise: Promise<T>, ms: number): Promise<T> =>
   new Promise<T>((resolve, reject) => {
     const timeoutId = window.setTimeout(() => reject(new Error('TIMEOUT')), ms);
@@ -81,9 +84,16 @@ export const captureReceiptImage = async (element: HTMLElement): Promise<Blob> =
   return blob;
 };
 
-/** 캡처된 blob 을 파일로 저장 */
-export const saveReceiptImage = (blob: Blob) => {
-  downloadBlob(blob, FILE_NAME);
+/** 캡처된 blob 을 파일로 저장 — 다운로드 시작에 실패하면 false */
+export const saveReceiptImage = (blob: Blob): boolean => {
+  if (!isDownloadSupported()) return false;
+
+  try {
+    downloadBlob(blob, FILE_NAME);
+    return true;
+  } catch {
+    return false;
+  }
 };
 
 /**

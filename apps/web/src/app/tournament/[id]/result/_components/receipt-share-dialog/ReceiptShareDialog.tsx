@@ -112,7 +112,12 @@ function ReceiptShareDialog({
 
   const handleSave = () => {
     if (!imageBlob) return;
-    saveReceiptImage(imageBlob);
+    const isSaved = saveReceiptImage(imageBlob);
+    if (!isSaved) {
+      toast.error('저장에 실패했습니다.');
+      return;
+    }
+
     logAnalyticsEvent(ANALYTICS_EVENT.RECEIPT_SHARE, {
       tournament_id: tournamentId,
       method: 'save',
