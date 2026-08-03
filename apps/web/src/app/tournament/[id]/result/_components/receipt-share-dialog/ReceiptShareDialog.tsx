@@ -113,7 +113,10 @@ function ReceiptShareDialog({
   const handleSave = () => {
     if (!imageBlob) return;
     saveReceiptImage(imageBlob);
-    logAnalyticsEvent(ANALYTICS_EVENT.RECEIPT_SHARE, { tournament_id: tournamentId });
+    logAnalyticsEvent(ANALYTICS_EVENT.RECEIPT_SHARE, {
+      tournament_id: tournamentId,
+      method: 'save',
+    });
     toast.success('이미지를 저장했어요.');
   };
 
@@ -126,7 +129,10 @@ function ReceiptShareDialog({
       return;
     }
 
-    logAnalyticsEvent(ANALYTICS_EVENT.RECEIPT_SHARE, { tournament_id: tournamentId });
+    logAnalyticsEvent(ANALYTICS_EVENT.RECEIPT_SHARE, {
+      tournament_id: tournamentId,
+      method: 'copy',
+    });
     toast.success('이미지를 복사했어요.');
   };
 
@@ -140,7 +146,10 @@ function ReceiptShareDialog({
     }
     if (shareResult === 'cancelled') return;
 
-    logAnalyticsEvent(ANALYTICS_EVENT.RECEIPT_SHARE, { tournament_id: tournamentId });
+    logAnalyticsEvent(ANALYTICS_EVENT.RECEIPT_SHARE, {
+      tournament_id: tournamentId,
+      method: 'share',
+    });
     onOpenChange(false);
   };
 
