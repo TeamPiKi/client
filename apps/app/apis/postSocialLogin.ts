@@ -1,4 +1,5 @@
-import type { SocialLoginSuccessPayloadT, SocialProviderT } from '@piki/core';
+import type { ApiErrorCodeT, SocialLoginSuccessPayloadT, SocialProviderT } from '@piki/core';
+import { DEFAULT_ERROR_MESSAGE, SERVER_ERROR_MESSAGE, getErrorMessageByCode } from '@piki/core';
 
 import { captureError } from '@/utils/captureError';
 
@@ -26,7 +27,7 @@ export const postSocialLogin = async (
     throw error;
   }
 
-  let data: { data: SocialLoginSuccessPayloadT; detail?: string } | null = null;
+  let data: { data: SocialLoginSuccessPayloadT; code: ApiErrorCodeT | null } | null = null;
   try {
     data = await response.json();
   } catch {
@@ -36,12 +37,13 @@ export const postSocialLogin = async (
   if (!response.ok) {
     /** 5xx 서버 오류만 수집 (4xx는 예상된 흐름이라 제외) */
     if (response.status >= 500) {
-      captureError(new Error(`postSocialLogin ${response.status}: ${data?.detail ?? 'unknown'}`), {
+      captureError(new Error(`postSocialLogin ${response.status}: ${data?.code ?? 'unknown'}`), {
         tags: { source: 'api', api: 'postSocialLogin', provider },
         extra: { status: response.status },
       });
     }
-    throw new Error(data?.detail ?? '로그인에 실패했습니다.');
+    const fallback = response.status >= 500 ? SERVER_ERROR_MESSAGE : DEFAULT_ERROR_MESSAGE;
+    throw new Error(getErrorMessageByCode(data?.code) ?? fallback);
   }
 
   if (!data) {

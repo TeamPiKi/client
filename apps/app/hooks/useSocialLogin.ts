@@ -1,4 +1,4 @@
-import { type SocialProviderT, WEBBRIDGE_MESSAGE_TYPE } from '@piki/core';
+import { DEFAULT_ERROR_MESSAGE, type SocialProviderT, WEBBRIDGE_MESSAGE_TYPE } from '@piki/core';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { login as kakaoLogin } from '@react-native-kakao/user';
 import * as AppleAuthentication from 'expo-apple-authentication';
@@ -58,7 +58,7 @@ export const useSocialLogin = () => {
     } catch (error) {
       WebBridge.postMessage({
         type: WEBBRIDGE_MESSAGE_TYPE.APP_RES_SOCIAL_LOGIN_ERROR,
-        payload: { detail: error instanceof Error ? error.message : '로그인에 실패했습니다.' },
+        payload: { detail: error instanceof Error ? error.message : DEFAULT_ERROR_MESSAGE },
       });
     }
   }, []);
