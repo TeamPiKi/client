@@ -98,13 +98,10 @@
 >
 > ```ts
 > onError: error => {
->   if (!isAxiosError<ApiErrorResponseT>(error) || !error.response) return;
->
->   const { status } = error.response;
->   if (status >= 500) return; // 전역 안전망에 위임 (중복 토스트 방지)
+>   if (isGlobalNetError(error)) return; // 401·5xx·네트워크·탈퇴 계정은 전역이 처리
 >
 >   toast.error(getApiErrorMessage(error)); // 4xx 는 빠짐없이 안내
->   if (status === 404) router.replace(...); // 이탈이 필요한 status 만 추가 동작
+>   if (getApiErrorStatus(error) === 404) router.replace(...); // 이탈이 필요한 status 만 추가 동작
 > }
 > ```
 
@@ -218,14 +215,28 @@ export const usePostJoin = ({ onConflict }: { onConflict?: () => void } = {}) =>
 
 ## 개발 규칙 (체크리스트)
 
+- [ ] mutation 훅의 `onError`는 **`if (isGlobalNetError(error)) return;` 으로 시작**한다 — 전역이 가져간 것(401·5xx·네트워크·탈퇴 계정)을 개별에서 다시 다루지 않는다
+- [ ] 전역이 새로 가져가는 케이스가 생기면 **`utils/apiError.ts` 만 고친다** — 개별 훅에 조건을 흩뿌리면 누락 시 조용히 중복 처리된다
 - [ ] mutation 훅의 `onError`는 **4xx만** 분기한다. `status === 500` / `else`로 5xx를 토스트하지 않는다 (전역이 담당)
-- [ ] 401은 개별에서 처리하지 않는다 (전역 인터셉터)
 - [ ] 화면 진입 조건(로그인/멤버/존재)인 4xx는 layout에서 처리한다
 - [ ] "정상 UI에선 도달 불가"한 status는 개별 분기하지 않는다 (전역 안전망 + Sentry가 덮음)
 - [ ] 일반 query는 `isError`를 분기해 에러 UI를 노출한다
 - [ ] 에러 메시지는 `getApiErrorMessage(error)`로 통일한다 — 호출부에 문구를 직접 쓰지 않는다
 - [ ] 동작 분기는 status가 1차. `code` 분기는 "같은 status인데 갈 곳이 다를 때"만 쓰고, `else` fallback을 둔다
 - [ ] 에러 처리는 **훅 레벨 `onError`**에 둔다 (`mutate` 레벨에 두면 전역 fallback과 토스트가 중복된다)
+
+---
+
+## 유틸: 에러 분류 (`utils/apiError.ts`)
+
+"이 에러를 누가 처리하는가"를 한 곳에 모은다. 개별 훅이 각자 status를 나열하면 전역이 가져간 케이스가 늘 때마다 누락이 생긴다.
+
+| 함수                                    | 용도                                                                     |
+| --------------------------------------- | ------------------------------------------------------------------------ |
+| `isGlobalNetError`                      | **개별 `onError` 의 첫 줄** — 전역이 처리하는 에러면 `return`            |
+| `isServerOrNetworkError`                | 5xx·네트워크만 (react-query 밖 호출에서 "링크 오류 vs 서버 오류" 구분용) |
+| `isWithdrawnAccountError`               | 탈퇴 계정(409 `USER-003`) — 전역 안전망이 스킵 조건으로 사용             |
+| `getApiErrorStatus` / `getApiErrorCode` | axios 파싱 없이 status·code 접근 (없으면 `null`)                         |
 
 ---
 
@@ -238,7 +249,7 @@ export const usePostJoin = ({ onConflict }: { onConflict?: () => void } = {}) =>
 packages/core/src/
 ├── consts/errorCode.ts            # ERROR_MESSAGE_MAP (code → 문구) + fallback 상수
 ├── types/error.ts                 # ErrorCodeT, ApiErrorCodeT
-└── utils/getErrorMessageByCode.ts # 순수 조회 헬퍼 (없으면 undefined)
+└── utils/getErrorMessageByCode.ts # 순수 조회 헬퍼 (없으면 null)
 ```
 
 ```ts
@@ -267,9 +278,13 @@ export const getApiErrorMessage = (error: unknown): string => {
 
 ```ts
 import { MutationCache, QueryCache, QueryClient } from '@tanstack/react-query';
-import { isAxiosError } from 'axios';
 import { toast } from 'sonner';
 
+import {
+  getApiErrorStatus,
+  isServerOrNetworkError,
+  isWithdrawnAccountError,
+} from '@/utils/apiError';
 import { getApiErrorMessage } from '@/utils/getApiErrorMessage';
 
 const makeQueryClient = () =>
@@ -277,10 +292,10 @@ const makeQueryClient = () =>
     // mutation — 사용자 액션 실패: 토스트 + 로깅
     mutationCache: new MutationCache({
       onError: (error, _vars, _ctx, mutation) => {
-        const status = isAxiosError(error) ? error.response?.status : undefined;
-        const isServerError = !status || status >= 500; // 5xx + 네트워크
+        // 401·탈퇴 계정은 인터셉터가 refresh·redirect 로 처리 → 이중 토스트 방지
+        if (getApiErrorStatus(error) === 401 || isWithdrawnAccountError(error)) return;
 
-        if (isServerError) {
+        if (isServerOrNetworkError(error)) {
           toast.error(getApiErrorMessage(error));
           // Sentry.captureException(error);
           return; // 5xx는 전역 독점 → 개별은 5xx 토스트 금지

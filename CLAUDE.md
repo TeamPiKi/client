@@ -333,7 +333,7 @@ export const usePostGuestLogin = () => {
 ```ts
 export const WEBBRIDGE_MESSAGE_TYPE = {
   WEB_REQ_SOCIAL_LOGIN: 'REQUEST_SOCIAL_LOGIN',
-//└─ 키: 코드에서 참조    └─ 값: 실제 전송되는 문자열
+  //└─ 키: 코드에서 참조    └─ 값: 실제 전송되는 문자열
 } as const;
 ```
 
@@ -471,103 +471,71 @@ closes #이슈번호
 
 ## 🌐 API 통신 — Response Schema 규약
 
+> 에러를 **어느 계층에서 어떻게 처리할지**는 [`docs/spec/error-handling-policy.md`](docs/spec/error-handling-policy.md)가 단일 기준이다.
+> 엔드포인트별 status 대응 현황은 [`docs/spec/api-status-audit.md`](docs/spec/api-status-audit.md) 참고.
+
 ### 기본 원칙
 
-1. **HTTP Status Code는 REST 의미대로 사용** (200, 201, 400, 401, 403, 404, 500)
-2. **성공/실패 Body 구조 통일**
-3. **`fetch`는 4xx/5xx에서 자동 throw 안 함** → 반드시 `response.ok` 확인
-4. **`success` 필드 사용 안 함** (`response.ok`와 중복)
+1. **HTTP Status Code는 REST 의미대로 사용** (200, 201, 400, 401, 403, 404, 409, 500)
+2. **성공/실패 Body 구조 통일** — `{ data, code }` (`status`·`detail`·`success` 필드 없음)
+3. **사용자 노출 에러 문구는 100% 프론트가 관리** — 서버는 `code`만 내려주고, 문구는 `@piki/core`의 에러 코드 카탈로그(`ERROR_MESSAGE_MAP`)에서 결정한다
+4. **API 호출은 axios 인스턴스 사용** — 클라이언트는 `apis/client.ts`(`clientApi`), RSC/SSR은 `apis/server.ts`(`serverApi`). 4xx/5xx에서 자동 throw + 인터셉터(401 refresh, 탈퇴 계정 처리, Sentry 수집)가 걸려 있으므로 생 `fetch`를 쓰지 않는다
 
 ### 응답 구조
 
 ```json
-{
-  "status": 200,
-  "data": {},
-  "detail": "요청이 정상적으로 처리되었습니다.",
-  "code": "COMMON_SUCCESS"
-}
+// 성공 — code 는 항상 null
+{ "data": { "wishId": 1 }, "code": null }
+
+// 실패 — data 는 null, code 는 서버 에러 코드 (예: "WISH-004")
+{ "data": null, "code": "WISH-004" }
 ```
 
-| 필드     | 설명                                       |
-| -------- | ------------------------------------------ |
-| `status` | HTTP Status Code와 동일                    |
-| `data`   | 실제 비즈니스 응답 데이터 (실패 시 `null`) |
-| `detail` | 응답 메시지 (사용자 표시용)                |
-| `code`   | 서버 정의 Enum 코드 (세부 분기용)          |
+| 필드   | 설명                                                         |
+| ------ | ------------------------------------------------------------ |
+| `data` | 실제 비즈니스 응답 데이터 (실패 시 `null`)                   |
+| `code` | 서버 정의 에러 코드 (성공 시 `null`) — 문구·세부 분기의 원천 |
 
-### 검증 오류 응답 (400)
+- 공통 타입: `src/types/api.ts`의 `ApiResponseT<T>`(성공) / `ApiErrorResponseT`(실패)
+- 페이지네이션은 응답에 `pageResponse: { nextCursor, hasNext }`가 추가되는 형태 (예: `apis/getWishlist.ts`)
 
-```json
-{
-  "status": 400,
-  "data": null,
-  "detail": "입력값이 올바르지 않습니다.",
-  "code": "INVALID_INPUT",
-  "errors": [{ "field": "url", "reason": "URL 형식이 올바르지 않습니다." }]
-}
-```
+### 에러 코드 카탈로그 (`@piki/core`)
 
-### 페이지 응답 구조
+- `ERROR_MESSAGE_MAP` — code → 사용자 문구 (싱글 소스, web·app 공유)
+- `ERROR_CODE` — 의미 기반 상수. **code 분기 시 문자열 리터럴 대신 반드시 이걸 사용** (`ERROR_CODE.WISH_NOT_FOUND`, `'WISH-004'` ❌)
+- `getErrorMessageByCode(code)` — 순수 조회 헬퍼 (없으면 `null`)
+- 원본은 api-docs(`info.description`) — 서버가 코드를 추가/삭제하면 카탈로그를 대조·갱신한다
 
-```json
-{
-  "status": 200,
-  "data": [{ "wishId": 1, "title": "셔츠" }],
-  "detail": "요청이 정상적으로 처리되었습니다.",
-  "code": "COMMON_SUCCESS",
-  "pageInfo": { "nextCursor": "abc123", "hasNext": true }
-}
-```
-
-### 프론트엔드 fetch 처리 표준
+### 에러 처리 표준
 
 ```ts
-export async function request(url: string, options?: RequestInit) {
-  const response = await fetch(url, options);
+import { getApiErrorStatus, isGlobalNetError } from '@/utils/apiError';
+import { getApiErrorMessage } from '@/utils/getApiErrorMessage';
 
-  let body;
-  try {
-    body = await response.json();
-  } catch {
-    throw new Error('서버 응답을 해석할 수 없습니다.');
-  }
+onError: error => {
+  if (isGlobalNetError(error)) return; // 401·5xx·네트워크·탈퇴 계정은 전역이 처리
 
-  if (response.ok) {
-    return body.data;
-  }
-
-  throw new Error(body.detail || '요청 처리 중 오류가 발생했습니다.');
-}
+  toast.error(getApiErrorMessage(error)); // 4xx 는 빠짐없이 안내 (분기 밖!)
+  if (getApiErrorStatus(error) === 404) router.replace(...); // 추가 동작이 필요한 status 만 분기
+};
 ```
 
-### 검증 오류 세부 처리
-
-```ts
-if (response.status === 400 && body.errors) {
-  return body.errors;
-}
-```
-
-### 분기 처리 (세부 에러)
-
-```ts
-if (body.code === 'WISH_NOT_FOUND') {
-  // 특정 에러 처리
-}
-```
+- **문구는 `code`, 동작은 `status`** — code 분기는 같은 status에서 동작이 갈릴 때만 2차로 쓰고, 반드시 else fallback을 둔다
+- **전역이 가져간 에러는 개별에서 다시 다루지 않는다** — 목록은 `utils/apiError.ts` 의 `isGlobalNetError` 한 곳에만 둔다
+- **개별 onError는 "4xx 전부 책임" 또는 "아예 없음(전역 위임)"** — 빈 onError/일부 code만 처리하는 부분 onError 금지
 
 ### HTTP Status 사용 기준
 
-| 상황        | HTTP Status               |
-| ----------- | ------------------------- |
-| 조회 성공   | 200 OK                    |
-| 생성 성공   | 201 Created               |
-| 잘못된 요청 | 400 Bad Request           |
-| 인증 실패   | 401 Unauthorized          |
-| 권한 없음   | 403 Forbidden             |
-| 리소스 없음 | 404 Not Found             |
-| 서버 오류   | 500 Internal Server Error |
+| 상황                      | HTTP Status               |
+| ------------------------- | ------------------------- |
+| 조회 성공                 | 200 OK                    |
+| 생성 성공                 | 201 Created               |
+| 잘못된 요청               | 400 Bad Request           |
+| 인증 실패                 | 401 Unauthorized          |
+| 권한 없음                 | 403 Forbidden             |
+| 리소스 없음               | 404 Not Found             |
+| 충돌 (만료·중복·상태전이) | 409 Conflict              |
+| 서버 오류                 | 500 Internal Server Error |
 
 ---
 
@@ -600,9 +568,9 @@ if (body.code === 'WISH_NOT_FOUND') {
 
 ### API 관련 코드 생성 시
 
-- HTTP status 기반 분기 (`response.ok`)
-- body 구조: `{ status, data, detail, code }` 가정
-- fetch 래퍼 함수 활용 패턴
+- body 구조: `{ data, code }` 가정 (`ApiResponseT<T>` / `ApiErrorResponseT`)
+- 호출은 `clientApi`/`serverApi` 인스턴스, 에러 문구는 `getApiErrorMessage(error)`
+- 에러 처리 계층은 `docs/spec/error-handling-policy.md` 를 따른다 (4xx 개별 / 5xx·401 전역)
 
 ### 의심스러울 때
 

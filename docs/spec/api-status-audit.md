@@ -18,7 +18,7 @@
 - **`useSuspenseQuery` 기반 GET**: per-status 처리 없이 에러 시 error boundary로 fallback.
 - **일반 `useQuery`/`useInfiniteQuery`**: QueryClient에 `throwOnError` 미설정(`utils/queryClient.ts`) → 에러가 boundary로도 안 가고, 컴포넌트가 `isError`를 안 보면 빈 상태로 표시될 수 있음. **QueryCache.onError는 Sentry 로깅만** (토스트 없음).
 - **에러 토스트**: sonner(`@/components/toast`). 문구는 `getApiErrorMessage(error)` 한 곳으로 통일 — `code` → generic 순서로 `@piki/core` 카탈로그에서 가져온다. 서버 `detail` 은 사용자에게 노출하지 않는다.
-- **개별 `onError` 규약**: 4xx 전부 책임(토스트를 status 분기 밖에 둔다) · 401·5xx 는 `return` 으로 전역에 위임.
+- **개별 `onError` 규약**: 4xx 전부 책임(토스트를 status 분기 밖에 둔다) · 전역이 가져간 것(401·5xx·네트워크·탈퇴 계정)은 `if (isGlobalNetError(error)) return;` 한 줄로 위임 (`utils/apiError.ts`).
 
 ---
 
@@ -41,10 +41,11 @@
 
 ### B. 사용자 피드백 완전 부재 (mutation 전역 안전망 밖)
 
-| 위치                  | 문제                                                                      |
-| --------------------- | ------------------------------------------------------------------------- |
-| `useGetNotifications` | query — `throwOnError`·`isError` 미사용 → 400 시 빈 목록으로 보일 수 있음 |
-| `useFcmTokenSync`     | mutation 아님 — `.catch(console.error)`만 (백그라운드 동작이라 의도적)    |
+| 위치              | 문제                                                                   |
+| ----------------- | ---------------------------------------------------------------------- |
+| `useFcmTokenSync` | mutation 아님 — `.catch(console.error)`만 (백그라운드 동작이라 의도적) |
+
+> `useGetNotifications` 는 대응 완료 — `NotificationContent` 가 `isError` 분기로 에러 상태 카드(재시도 버튼)를 노출한다.
 
 ### C. 클라 사전검증 부재
 
@@ -176,7 +177,8 @@
 - 200: ✅ invalidate + `router.back()`
 - 400: ✅ 토스트 (`ITEM-003` 이름 미입력 등)
 - 401: ✅ 전역 인터셉터
-- 403 / 404 / 409: ✅ 토스트 + 위시리스트 replace
+- 403 / 404: ✅ 토스트 + 위시리스트 replace
+- 409: ✅ `USER-003` 뿐이라 인터셉터가 세션 정리 (개별 분기 없음)
 - 502: ✅ 전역 `MutationCache.onError` 단독 처리
 
 ### GET /api/v1/wishlists/{wishId}/history (가격 히스토리) · 200, 401, 403, 404
