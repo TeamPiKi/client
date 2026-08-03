@@ -54,7 +54,7 @@ test('위시에서 상품 4개를 가져오면 장바구니에 담긴다', async
 
   await page.goto('/tournament/1/create');
   await page.getByRole('button', { name: '위시 아이템 추가' }).click();
-  await page.getByRole('link', { name: /위시에서 가져오기/ }).click();
+  await page.getByRole('button', { name: /위시에서 가져오기/ }).click();
 
   /** 로컬 dev 서버의 by-wish 라우트 첫 컴파일이 기본 5초를 넘길 수 있어 여유를 둔다 */
   await expect(page).toHaveURL('/tournament/1/create/by-wish', { timeout: 15_000 });
@@ -72,8 +72,7 @@ test('위시에서 상품 4개를 가져오면 장바구니에 담긴다', async
 
   const wishRequest = page.waitForRequest(
     request =>
-      request.method() === 'POST' &&
-      request.url().includes(ENDPOINTS.TOURNAMENT_ITEMS_FROM_WISH(1))
+      request.method() === 'POST' && request.url().includes(ENDPOINTS.TOURNAMENT_ITEMS_FROM_WISH(1))
   );
   await nextButton.click();
   const wishBody = (await wishRequest).postDataJSON() as { itemIds: number[] };

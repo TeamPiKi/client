@@ -71,6 +71,16 @@ export const test = base.extend<{ api: ApiMockT }>({
       },
     });
 
+    entries.push({
+      method: 'GET',
+      path: ENDPOINTS.WISHLISTS,
+      status: 200,
+      body: {
+        ...createApiSuccess([]),
+        pageResponse: { nextCursor: null, hasNext: false },
+      },
+    });
+
     await page.route('**/api/v1/**', route => {
       const { pathname } = new URL(route.request().url());
       const method = route.request().method();
