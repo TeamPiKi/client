@@ -1,24 +1,45 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useCallback, useEffect } from 'react';
 
-const ENTRY_HISTORY_LENGTH_KEY = 'piki:entryHistoryLength';
+/** 앱 내부에서 쌓인 히스토리 깊이. 진입 화면이 0 이고, push 될 때마다 1씩 늘어난다. */
+type PikiHistoryStateT = { pikiDepth?: number };
 
-/** 앱 진입 시점의 history 길이를 기준으로 앱 내부에서 생성된 history만 판단 */
-const getEntryHistoryLength = () => {
-  const stored = Number(sessionStorage.getItem(ENTRY_HISTORY_LENGTH_KEY));
+let currentDepth = 0;
+let lastHistoryLength: number | null = null;
 
-  return Number.isInteger(stored) && stored > 0 ? stored : 1;
+const readStampedDepth = () => {
+  const state = window.history.state as PikiHistoryStateT | null;
+
+  return typeof state?.pikiDepth === 'number' ? state.pikiDepth : null;
 };
 
-/** 앱 진입 시점의 history 길이를 탭 세션에 기록 */
-export const useTrackAppEntry = () => {
-  useEffect(() => {
-    if (sessionStorage.getItem(ENTRY_HISTORY_LENGTH_KEY) !== null) return;
+const stampDepth = (depth: number) => {
+  window.history.replaceState({ ...window.history.state, pikiDepth: depth }, '');
+};
 
-    sessionStorage.setItem(ENTRY_HISTORY_LENGTH_KEY, String(window.history.length));
-  }, []);
+export const useTrackAppHistoryDepth = () => {
+  const pathname = usePathname();
+
+  useEffect(() => {
+    const stampedDepth = readStampedDepth();
+
+    if (stampedDepth !== null) {
+      currentDepth = stampedDepth;
+    } else {
+      /**
+       * push만 history.length가 증가하므로 길이 변화로 push/replace를 구분한다.
+       * replace만 이어진 진입은 깊이 0을 유지한다.
+       */
+      const isPushed = lastHistoryLength !== null && window.history.length > lastHistoryLength;
+
+      if (isPushed) currentDepth += 1;
+      stampDepth(currentDepth);
+    }
+
+    lastHistoryLength = window.history.length;
+  }, [pathname]);
 };
 
 export const useBackWithFallback = () => {
@@ -26,7 +47,8 @@ export const useBackWithFallback = () => {
 
   return useCallback(
     (fallback: string) => {
-      if (window.history.length > getEntryHistoryLength()) {
+      /** 깊이가 0 이면 앱 진입 화면이라 back 이 앱 밖으로 나간다 */
+      if (currentDepth > 0) {
         router.back();
         return;
       }
