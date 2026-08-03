@@ -1,5 +1,6 @@
 'use client';
 
+import { SERVER_ERROR_MESSAGE } from '@piki/core';
 import { isAxiosError } from 'axios';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -12,6 +13,7 @@ import Spinner from '@/components/spinner';
 import { ANALYTICS_EVENT } from '@/consts/analytics';
 import { ROUTES } from '@/consts/route';
 import { logAnalyticsEvent } from '@/utils/analytics';
+import { isServerOrNetworkError } from '@/utils/apiError';
 
 import { postFromPlayLink } from '../_apis/postFromPlayLink';
 
@@ -19,7 +21,7 @@ type PlayClientProps = {
   sourceTournamentId: number;
 };
 
-type PlayStateT = 'loading' | 'expired';
+type PlayStateT = 'loading' | 'expired' | 'error';
 
 function PlayClient({ sourceTournamentId }: PlayClientProps) {
   const router = useRouter();
@@ -73,10 +75,15 @@ function PlayClient({ sourceTournamentId }: PlayClientProps) {
             const newTournamentId = await postFromPlayLink(sourceTournamentId);
             await goToTournament(newTournamentId);
             return;
-          } catch {
-            setState('expired');
+          } catch (retryError) {
+            // 5xx·네트워크는 링크 문제가 아니므로 만료 안내와 구분한다
+            setState(isServerOrNetworkError(retryError) ? 'error' : 'expired');
             return;
           }
+        }
+        if (isServerOrNetworkError(error)) {
+          setState('error');
+          return;
         }
         // 404 (없음) / 409 (만료) — 만료 안내로 통합.
         // 같은 사용자의 재진입은 백엔드가 idempotent 로 처리해 200 + 기존 CLONE id 반환한다.
@@ -93,6 +100,35 @@ function PlayClient({ sourceTournamentId }: PlayClientProps) {
         <div className="flex flex-col items-center gap-3">
           <Spinner size={32} />
           <p className="body-1-medium text-text-neutral-tertiary">토너먼트를 준비하고 있어요...</p>
+        </div>
+      </main>
+    );
+  }
+
+  if (state === 'error') {
+    return (
+      <main className="flex min-h-dvh flex-col items-center justify-center gap-6 bg-bg-layer-basement px-5 pt-padding-top">
+        <div className="flex flex-col items-center gap-2">
+          <p className="heading-1-bold text-text-neutral-primary">오류가 발생했어요</p>
+          <p className="text-center body-1-medium text-text-neutral-tertiary">
+            {SERVER_ERROR_MESSAGE}
+          </p>
+        </div>
+
+        <div className="flex w-full max-w-80 flex-col gap-3">
+          <Button
+            size="lg"
+            variant="primary"
+            className="w-full"
+            onClick={() => window.location.reload()}
+          >
+            다시 시도
+          </Button>
+          <Link href={ROUTES.HOME} className="w-full">
+            <Button size="lg" variant="secondary" className="w-full">
+              홈으로 가기
+            </Button>
+          </Link>
         </div>
       </main>
     );

@@ -1,6 +1,6 @@
 'use client';
 
-import { ERROR_CODE } from '@piki/core';
+import { ERROR_CODE, SERVER_ERROR_MESSAGE } from '@piki/core';
 import { isAxiosError } from 'axios';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -16,13 +16,14 @@ import { QUERY_ACTION } from '@/consts/queryAction';
 import { ROUTES } from '@/consts/route';
 import type { ApiErrorResponseT } from '@/types/api';
 import type { TournamentErrorTypeT } from '@/types/tournament';
+import { isServerOrNetworkError } from '@/utils/apiError';
 
 type InviteClientProps = {
   tournamentId: number;
   inviteCode: string;
 };
 
-type InviteStateT = 'loading' | 'invalid';
+type InviteStateT = 'loading' | 'invalid' | 'error';
 
 function InviteClient({ tournamentId, inviteCode }: InviteClientProps) {
   const router = useRouter();
@@ -46,6 +47,12 @@ function InviteClient({ tournamentId, inviteCode }: InviteClientProps) {
           `${ROUTES.TOURNAMENT_CREATE(tournamentId)}?${QUERY_ACTION.KEY}=${QUERY_ACTION.VALUE.WELCOME_JOIN}`
         );
       } catch (error) {
+        /** 5xx·네트워크는 링크 문제가 아니므로 만료 안내와 구분한다 */
+        if (isServerOrNetworkError(error)) {
+          setState('error');
+          return;
+        }
+
         setState('invalid');
 
         if (!isAxiosError<ApiErrorResponseT>(error) || error.response?.status !== 409) return;
@@ -99,6 +106,12 @@ function InviteClient({ tournamentId, inviteCode }: InviteClientProps) {
 
         router.replace(`${ROUTES.TOURNAMENT_JOIN_BY_LINK(tournamentId)}?code=${inviteCode}`);
       } catch (error) {
+        /** 5xx·네트워크는 링크 문제가 아니므로 만료 안내와 구분한다 */
+        if (isServerOrNetworkError(error)) {
+          setState('error');
+          return;
+        }
+
         setState('invalid');
 
         /** invite-preview 의 409 는 "PENDING 아님 · 초대 링크 만료" 뿐이라 code 분기가 필요 없다. */
@@ -106,7 +119,7 @@ function InviteClient({ tournamentId, inviteCode }: InviteClientProps) {
           setTournamentErrorType('LINK_EXPIRED');
         }
 
-        /** 그 외 400 (코드 불일치) / 네트워크 등은 아래 '유효하지 않은 링크' 화면으로 */
+        /** 그 외 400 (코드 불일치) 은 아래 '유효하지 않은 링크' 화면으로 */
       }
     };
 
@@ -133,6 +146,35 @@ function InviteClient({ tournamentId, inviteCode }: InviteClientProps) {
           />
         )}
       </>
+    );
+  }
+
+  if (state === 'error') {
+    return (
+      <main className="flex min-h-dvh flex-col items-center justify-center gap-6 bg-bg-layer-basement px-5 pt-padding-top">
+        <div className="flex flex-col items-center gap-2">
+          <p className="heading-1-bold text-text-neutral-primary">오류가 발생했어요</p>
+          <p className="text-center body-1-medium text-text-neutral-tertiary">
+            {SERVER_ERROR_MESSAGE}
+          </p>
+        </div>
+
+        <div className="flex w-full max-w-80 flex-col gap-3">
+          <Button
+            size="lg"
+            variant="primary"
+            className="w-full"
+            onClick={() => window.location.reload()}
+          >
+            다시 시도
+          </Button>
+          <Link href={ROUTES.HOME} className="w-full">
+            <Button size="lg" variant="secondary" className="w-full">
+              홈으로 가기
+            </Button>
+          </Link>
+        </div>
+      </main>
     );
   }
 
