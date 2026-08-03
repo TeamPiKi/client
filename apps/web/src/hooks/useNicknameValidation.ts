@@ -1,9 +1,11 @@
+import { ERROR_CODE, ERROR_MESSAGE_MAP } from '@piki/core';
+
 import { useGetNicknameCheck } from '@/hooks/useGetNicknameCheck';
 import { getApiErrorMessage } from '@/utils/getApiErrorMessage';
 
 const WITHDRAW_PREFIX = '탈퇴';
 const WITHDRAW_PREFIX_ERROR_TEXT = `'탈퇴'로 시작하는 닉네임은 사용할 수 없습니다.`;
-const DUPLICATE_NICKNAME_ERROR_TEXT = '이미 사용 중인 닉네임이에요.';
+const DUPLICATE_NICKNAME_ERROR_TEXT = ERROR_MESSAGE_MAP[ERROR_CODE.USER_DUPLICATE_NICKNAME];
 
 export const useNicknameValidation = (nickname: string, originalNickname: string) => {
   const trimmedNickname = nickname.trim();
