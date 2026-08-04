@@ -10,7 +10,7 @@ test('홈에 진입하면 최근 생성한 토너먼트 목록이 렌더링된�
 
   await page.goto('/home');
 
-  await expect(page.getByRole('heading', { name: '최근 생성한 토너먼트' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: '최근 토너먼트' })).toBeVisible();
   await expect(page.getByText('E2E 토너먼트')).toBeVisible();
 });
 

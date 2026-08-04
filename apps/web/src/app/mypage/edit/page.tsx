@@ -19,7 +19,7 @@ function MypageEditPage() {
       <Header
         left={<HeaderIcon name="BACK" className="size-7.5" />}
         center="내 프로필 수정"
-        centerClassName="title-1 text-text-neutral-primary"
+        centerClassName="heading-1-bold text-text-neutral-primary"
       />
 
       <Spacing size={60} />

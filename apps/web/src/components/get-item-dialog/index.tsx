@@ -31,7 +31,7 @@ function GetItemDialogContent({ type }: GetItemDialogContentProps) {
     <>
       <DialogContent showCloseButton={false} className="flex flex-col gap-[15px]">
         <DialogTitle className="text-center heading-1-bold text-text-neutral-primary">
-          위시템 담기
+          위시 담기
         </DialogTitle>
         <DialogDescription className="sr-only">
           위시, 링크, 이미지 중 하나를 선택해 상품을 담습니다.

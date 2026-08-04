@@ -9,7 +9,7 @@ function TermsPage() {
       <Header
         left={<HeaderIcon name="BACK" />}
         center="서비스 이용약관"
-        centerClassName="title-1"
+        centerClassName="heading-1-bold"
       />
       <Spacing size={48} />
 

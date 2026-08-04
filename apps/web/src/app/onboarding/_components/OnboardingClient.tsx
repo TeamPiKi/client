@@ -6,12 +6,12 @@ import { useEffect, useState } from 'react';
 import BottomCta from '@/components/bottom-cta';
 import Button from '@/components/button';
 import { Carousel, type CarouselApi, CarouselContent, CarouselItem } from '@/components/carousel';
+import OnboardingIndicator from '@/components/common/onboarding-indicator';
 import { ONBOARDING_KEY } from '@/consts/onboarding';
 import { ROUTES } from '@/consts/route';
 import { markOnboardingSeen } from '@/utils/onboarding';
 
 import { ONBOARDING_SLIDES } from '../_consts/onboardingSlide';
-import OnboardingIndicator from './OnboardingIndicator';
 
 function OnboardingClient() {
   const router = useRouter();

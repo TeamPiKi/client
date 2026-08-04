@@ -8,7 +8,15 @@ import { getApiErrorMessage } from '@/utils/getApiErrorMessage';
 
 import { postTournamentItemLink } from '../_apis/postTournamentItemLink';
 
-export const usePostTournamentItemLink = (tournamentId: number) => {
+type UsePostTournamentItemLinkOptionsT = {
+  /** 입력 폼처럼 에러를 화면 안에서 안내하는 경우 false — 4xx 토스트를 끈다 */
+  showErrorToast?: boolean;
+};
+
+export const usePostTournamentItemLink = (
+  tournamentId: number,
+  { showErrorToast = true }: UsePostTournamentItemLinkOptionsT = {}
+) => {
   const router = useRouter();
   const queryClient = useQueryClient();
 
@@ -27,7 +35,7 @@ export const usePostTournamentItemLink = (tournamentId: number) => {
          * 404: 토너먼트 존재하지 않음
          * 409: PENDING 상태 아닌 토너먼트
          */
-        toast.error(getApiErrorMessage(error));
+        if (showErrorToast) toast.error(getApiErrorMessage(error));
 
         const status = getApiErrorStatus(error);
         if (status === 403 || status === 404 || status === 409) router.replace(ROUTES.HOME);

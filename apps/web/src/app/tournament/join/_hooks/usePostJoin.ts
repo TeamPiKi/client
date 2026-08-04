@@ -20,7 +20,11 @@ export const usePostJoin = ({
   onParticipantsFull,
   onUnavailable,
 }: UsePostJoinParams = {}) => {
-  const { mutate: postJoinMutation, isPending: isPostJoinPending } = useMutation({
+  const {
+    mutate: postJoinMutation,
+    isPending: isPostJoinPending,
+    isError: isPostJoinError,
+  } = useMutation({
     mutationFn: postJoin,
     onSuccess: (_, variables) => {
       logAnalyticsEvent(ANALYTICS_EVENT.FRIEND_JOIN, {
@@ -55,5 +59,5 @@ export const usePostJoin = ({
     },
   });
 
-  return { postJoinMutation, isPostJoinPending };
+  return { postJoinMutation, isPostJoinPending, isPostJoinError };
 };

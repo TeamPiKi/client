@@ -22,7 +22,7 @@ function WishCard({ name, price, imageUrl, sourcePlatform, preload = false }: Wi
             alt={name}
             sizes="(max-width: 480px) calc(100vw - 40px - 8px), 216px"
             preload={preload}
-            loadingFallback={<Skeleton className="absolute inset-0 rounded-t-2xl rounded-b-none" />}
+            loadingFallback={<Skeleton className="absolute inset-0 rounded-none" />}
             errorFallback={
               <div className="absolute inset-0 flex items-center justify-center text-gray-200">
                 <ImageIconOutline width={40} height={40} />

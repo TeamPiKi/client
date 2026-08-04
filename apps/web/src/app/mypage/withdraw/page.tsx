@@ -14,7 +14,7 @@ function MypageWithdrawPage() {
       <Header
         left={<HeaderIcon name="BACK" />}
         center="회원탈퇴"
-        centerClassName="title-1 text-text-neutral-primary"
+        centerClassName="heading-1-bold text-text-neutral-primary"
       />
 
       <div className="hide-scrollbar flex w-full flex-1 flex-col items-center justify-center gap-12 overflow-y-auto pb-[98px]">
@@ -22,7 +22,7 @@ function MypageWithdrawPage() {
           <SadIconFill className="size-[74px] text-gray-100" aria-hidden />
           <WithdrawGreeting />
           <p className="text-center body-2-medium break-keep text-text-neutral-tertiary">
-            지금까지의 토너먼트 기록, 위시템 기록이 전부 사라져요.
+            지금까지의 토너먼트 기록, 위시 기록이 전부 사라져요.
           </p>
         </div>
 
