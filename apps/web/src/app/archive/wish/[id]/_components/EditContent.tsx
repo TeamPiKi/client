@@ -1,7 +1,7 @@
 'use client';
 
-import { Header, HeaderIcon } from '@/components/header';
 import ItemLinkBanner from '@/components/common/item-link-banner';
+import { Header, HeaderIcon } from '@/components/header';
 
 import { useGetWish } from '../_hooks/useGetWish';
 import ItemEditForm from './ItemEditForm';
@@ -24,9 +24,9 @@ function EditContent({ wishId }: EditContentProps) {
         <ItemEditForm
           wishId={wishId}
           itemStatus={wishData.item.status}
-          initialImageUrl={wishData.item.status === 'READY' ? wishData.item.imageUrl : null}
-          initialName={wishData.item.status === 'READY' ? wishData.item.name : ''}
-          initialPrice={wishData.item.status === 'READY' ? wishData.item.currentPrice : 0}
+          initialImageUrl={wishData.item.imageUrl}
+          initialName={wishData.item.name ?? ''}
+          initialPrice={wishData.item.price ?? 0}
         />
 
         {wishData.item.sourceUrl && <ItemLinkBanner href={wishData.item.sourceUrl} />}

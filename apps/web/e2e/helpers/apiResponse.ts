@@ -6,6 +6,10 @@ export const createApiSuccess = <T>(data: T, status = 200): ApiResponseT<T> => (
   data,
   detail: '요청이 정상적으로 처리되었습니다.',
   code: 'COMMON_SUCCESS',
+  pageResponse: {
+    nextCursor: null,
+    hasNext: false,
+  },
 });
 
 type CreateApiErrorOptionsT = {
