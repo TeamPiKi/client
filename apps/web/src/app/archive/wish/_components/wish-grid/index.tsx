@@ -5,14 +5,14 @@ import { CheckboxEmptyIconFill, CheckboxSelectedIconFill } from '@/assets/icons'
 import WishCard from '@/components/common/wish-card';
 import { ROUTES } from '@/consts/route';
 import { Z_INDEX } from '@/consts/zIndex';
-import type { WishItemT } from '@/types/wish';
+import type { GetWishlistResponseT } from '@/types/wish';
 
 import { saveWishScroll } from '../../_utils/wishScroll';
 import WishFailedCard from './WishFailedCard';
 import WishProcessingCard from './WishProcessingCard';
 
 type WishGridProps = {
-  items: WishItemT[];
+  items: GetWishlistResponseT[];
   isDeleteMode?: boolean;
   selectedIds?: Set<number>;
   onToggleSelect?: (id: number) => void;
@@ -28,28 +28,28 @@ function WishGrid({ items, isDeleteMode = false, selectedIds, onToggleSelect }: 
 
   return (
     <div className="grid grid-cols-2">
-      {items.map((item, index) => {
+      {items.map(({ wish, item }, index) => {
         if (item.status === 'FAILED')
           return (
             <Link
-              href={ROUTES.WISH_EDIT(item.id)}
-              key={item.id}
-              data-wish-id={item.id}
-              onClick={event => handleCardClick(event, item.id)}
+              href={ROUTES.WISH_EDIT(wish.id)}
+              key={wish.id}
+              data-wish-id={wish.id}
+              onClick={event => handleCardClick(event, wish.id)}
             >
-              <WishFailedCard key={item.id} />
+              <WishFailedCard />
             </Link>
           );
         else if (item.status === 'PENDING' || item.status === 'PROCESSING')
-          return <WishProcessingCard key={item.id} />;
+          return <WishProcessingCard key={wish.id} />;
 
         if (isDeleteMode) {
-          const isSelected = selectedIds?.has(item.id) ?? false;
+          const isSelected = selectedIds?.has(wish.id) ?? false;
           return (
             <button
-              key={item.id}
+              key={wish.id}
               type="button"
-              onClick={() => onToggleSelect?.(item.id)}
+              onClick={() => onToggleSelect?.(wish.id)}
               aria-pressed={isSelected}
               className="relative cursor-pointer text-left transition-opacity active:opacity-80"
             >
@@ -79,10 +79,10 @@ function WishGrid({ items, isDeleteMode = false, selectedIds, onToggleSelect }: 
 
         return (
           <Link
-            href={ROUTES.WISH_EDIT(item.id)}
-            key={item.id}
-            data-wish-id={item.id}
-            onClick={event => handleCardClick(event, item.id)}
+            href={ROUTES.WISH_EDIT(wish.id)}
+            key={wish.id}
+            data-wish-id={wish.id}
+            onClick={event => handleCardClick(event, wish.id)}
           >
             <WishCard
               name={item.name}

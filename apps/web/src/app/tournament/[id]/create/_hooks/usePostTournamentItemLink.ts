@@ -6,7 +6,15 @@ import type { ApiErrorResponseT } from '@/types/api';
 
 import { postTournamentItemLink } from '../_apis/postTournamentItemLink';
 
-export const usePostTournamentItemLink = (tournamentId: number) => {
+type UsePostTournamentItemLinkOptionsT = {
+  /** 입력 폼처럼 에러를 화면 안에서 안내하는 경우 false — 4xx 토스트를 끈다 */
+  showErrorToast?: boolean;
+};
+
+export const usePostTournamentItemLink = (
+  tournamentId: number,
+  { showErrorToast = true }: UsePostTournamentItemLinkOptionsT = {}
+) => {
   const queryClient = useQueryClient();
 
   const { mutate: postTournamentItemLinkMutation, isPending: isPostTournamentItemLinkPending } =
@@ -25,7 +33,7 @@ export const usePostTournamentItemLink = (tournamentId: number) => {
 
         if (status < 500) {
           const clientErrorMessage = detail ?? '요청을 처리하지 못했습니다.';
-          toast.error(clientErrorMessage);
+          if (showErrorToast) toast.error(clientErrorMessage);
           return;
         }
 

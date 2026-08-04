@@ -1,7 +1,6 @@
 import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
 
 import { getMe } from '@/apis/getMe';
-import { Header, HeaderIcon } from '@/components/header';
 import Spacing from '@/components/spacing';
 import { getQueryClient } from '@/utils/queryClient';
 
@@ -17,12 +16,11 @@ function MypagePage() {
   });
 
   return (
-    <div className="flex h-dvh flex-col bg-bg-layer-basement px-5 pt-padding-top">
-      <Header left={<HeaderIcon name="BACK" />} center="설정" centerClassName="title-1" />
-      <Spacing size={48} />
+    <main className="flex h-dvh flex-col bg-bg-layer-basement px-5 pt-padding-top">
+      <h1 className="heading-1-bold text-text-neutral-primary">내 정보</h1>
+      <Spacing size={24} />
 
-      <main className="hide-scrollbar flex flex-1 flex-col overflow-y-auto pb-32">
-        {/** 프로필 */}
+      <div className="hide-scrollbar flex flex-1 flex-col overflow-y-auto pb-32">
         <HydrationBoundary state={dehydrate(queryClient)}>
           <ProfileSection />
         </HydrationBoundary>
@@ -34,9 +32,8 @@ function MypagePage() {
         <Spacing size={24} />
 
         <AppVersionFooter />
-      </main>
-
-    </div>
+      </div>
+    </main>
   );
 }
 

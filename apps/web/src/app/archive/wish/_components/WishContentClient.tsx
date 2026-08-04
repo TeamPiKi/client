@@ -38,10 +38,10 @@ function WishContentClient() {
   const { wishlistData } = useGetWishlist();
   const selectableIds = wishlistData
     .filter(
-      item =>
+      ({ item }) =>
         item.status !== 'FAILED' && item.status !== 'PENDING' && item.status !== 'PROCESSING'
     )
-    .map(item => item.id);
+    .map(({ wish }) => wish.id);
   const isAllSelected =
     selectableIds.length > 0 && selectableIds.every(id => selectedIds.has(id));
 
@@ -64,7 +64,7 @@ function WishContentClient() {
   };
 
   return (
-    <div className="flex min-h-dvh flex-col bg-bg-layer-basement">
+    <main className="flex min-h-dvh flex-col bg-bg-layer-basement">
       <div className="sticky top-0 z-20 flex flex-col gap-7 bg-bg-layer-basement px-5 pt-padding-top pb-6">
         <h1 className="heading-1-bold text-text-neutral-primary">내 위시리스트</h1>
 
@@ -135,7 +135,7 @@ function WishContentClient() {
         isPending={isDeleteWishesPending}
         onConfirm={handleDeleteWishes}
       />
-    </div>
+    </main>
   );
 }
 
