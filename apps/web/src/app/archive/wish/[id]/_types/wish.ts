@@ -1,4 +1,5 @@
 import type { ITEM_STATUS } from '@/consts/item';
+import type { PriceHistoryT } from '@/types/item';
 import type { WishT } from '@/types/wish';
 
 export type GetWishResponseT = {
@@ -33,6 +34,7 @@ export type GetWishResponseT = {
    * - 링크로 등록한 경우: boolean
    */
   reused: boolean | null;
+  priceHistory: PriceHistoryT[];
 };
 
 export type PatchWishResponseT = GetWishResponseT;
