@@ -296,7 +296,7 @@
 
 ### GET /api/v1/tournaments/{id}/invite-preview · 200, 404, 409
 
-- 200: ✅ / 404 · 409: ⚠️ suspense query 경로 개별 미처리 → error boundary (InviteClient는 by-code로 프리체크)
+- ❌ **프론트 미사용** — 참여 진입은 by-invite-code 단독으로 검증·미리보기를 처리한다
 
 ### GET /api/v1/tournaments/{id}/group-result · 200, 401, 403, 404, 409
 
@@ -305,9 +305,11 @@
 
 ### GET /api/v1/tournaments/by-invite-code · 200, 400, 409
 
-- 200: ✅ join 페이지 라우팅
-- 400: ✅ `InvalidCodeDialog`(코드 불일치) / `state='invalid'`
-- 409: ✅ `TournamentErrorDialog LINK_EXPIRED`
+- 200: ✅ join RSC 가 미리보기까지 그대로 사용 (별도 조회 없음)
+- 400: ✅ 링크 진입·코드 입력 모두 `INVALID_CODE`(코드 불일치) — 링크 진입 문구·CTA 는 디자인 확인 대기
+- 409: ✅ code 2차 분기 — 링크 진입(join RSC)·코드 입력(홈 다이얼로그) 각자 인라인 처리, `TOURNAMENT-005` → `ALREADY_STARTED` · `TOURNAMENT-021`(만료) 및 그 외 → `LINK_EXPIRED`
+  - 서버가 이 경로에서 던지는 409 는 위 두 코드뿐이다 (`checkJoinable(null)` — 인원 초과 `TOURNAMENT-030` 은 `POST /join` 단계에서만 발생)
+  - ⚠️ `TOURNAMENT-005` 가 진행 중/완료를 한 코드로 덮어, 완료된 토너먼트에도 "이미 시작된" 안내가 나간다 (위 §E 참고)
 - 401·5xx: ✅ 다이얼로그 없이 전역 위임 — 서버 오류를 "유효하지 않은 코드"로 오안내하던 문제 수정
 
 ---
