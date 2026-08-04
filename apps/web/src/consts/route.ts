@@ -10,8 +10,6 @@ export const ROUTES = {
 
   /** 2. Member & Guest */
   HOME: '/home',
-  INVITE_BASE: '/invite',
-  INVITE_BY_LINK: (tournamentId: number) => `/invite/${tournamentId}`,
   TOURNAMENT_JOIN_BY_CODE: '/tournament/join',
   TOURNAMENT_JOIN_BY_LINK: (id: number) => `/tournament/join/${id}`,
   NOTIFICATION: '/notification',

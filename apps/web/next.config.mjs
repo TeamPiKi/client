@@ -51,13 +51,16 @@ const nextConfig = async () => {
       ],
     },
 
-    /**
-     * 구버전 앱 공유 시트·기존 딥링크의 /archive(?tab=) 경로 호환
-     *
-     * NOTE: 구버전 앱 사라지면 이 설정 제거 필요
-     */
+    /** NOTE: 구버전 앱·기존 링크 사라지면 이 설정 제거 필요 */
     async redirects() {
       return [
+        /** 구버전 초대 링크 에러 핸들링 경로 호환*/
+        {
+          source: '/invite/:id',
+          destination: '/tournament/join/:id',
+          permanent: false,
+        },
+        /** 구버전 앱 공유 시트·기존 딥링크의 /archive(?tab=) 경로 호환 */
         {
           source: '/archive',
           has: [{ type: 'query', key: 'tab', value: 'tournament' }],

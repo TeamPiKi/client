@@ -15,15 +15,16 @@ import { ROUTES } from '@/consts/route';
 import { useGetMe } from '@/hooks/useGetMe';
 import { useNicknameValidation } from '@/hooks/useNicknameValidation';
 import { usePageBackground } from '@/hooks/usePageBackground';
-import type { TournamentErrorTypeT } from '@/types/tournament';
+import type { GetInvitePreviewResponseT, TournamentErrorTypeT } from '@/types/tournament';
 
-import { useGetInvitePreview } from '../../_hooks/useGetInvitePreview';
 import { usePostJoin } from '../../_hooks/usePostJoin';
 
 type JoinPreviewClientProps = {
   tournamentId: number;
-  /** 친구 초대 코드 — invite 진입 시 query 로 전달됨. join 호출 시 필수 */
+  /** 친구 초대 코드 — 링크 query 로 전달됨. join 호출 시 필수 */
   inviteCode: string;
+  /** 링크 유효성과 함께 RSC 가 이미 조회한 미리보기 */
+  preview: GetInvitePreviewResponseT;
 };
 
 const MAX_NICKNAME_LENGTH = 10;
@@ -36,13 +37,12 @@ const MAX_NICKNAME_LENGTH = 10;
  */
 type AutoJoinStatusT = 'joining' | 'retryable' | 'blocked';
 
-function JoinPreviewClient({ tournamentId, inviteCode }: JoinPreviewClientProps) {
+function JoinPreviewClient({ tournamentId, inviteCode, preview }: JoinPreviewClientProps) {
   /** 이 페이지는 흰색 배경(bg-layer-default) — iOS 노치 영역까지 흰색으로 칠해야 자연스럽다. */
   usePageBackground('var(--color-bg-layer-default)');
 
   const router = useRouter();
   const { userData } = useGetMe();
-  const { invitePreviewData } = useGetInvitePreview(tournamentId);
   const { patchMeMutation, isPatchMePending } = usePatchMe();
 
   const [nickname, setNickname] = useState(userData.nickname);
@@ -105,16 +105,10 @@ function JoinPreviewClient({ tournamentId, inviteCode }: JoinPreviewClientProps)
 
   useEffect(() => {
     if (!isMember || hasAutoJoinRunRef.current) return;
+
     hasAutoJoinRunRef.current = true;
-
-    /** 이미 참여한 회원 — join 없이 바로 이동 */
-    if (invitePreviewData.joined) {
-      router.replace(ROUTES.TOURNAMENT_CREATE(tournamentId));
-      return;
-    }
-
     joinTournament();
-  }, [isMember, invitePreviewData.joined, router, tournamentId, joinTournament]);
+  }, [isMember, joinTournament]);
 
   /** 실패 문구는 usePostJoin 훅이 토스트로 안내 — 화면은 상태만 고른다 */
   const getAutoJoinStatus = (): AutoJoinStatusT => {
@@ -183,11 +177,9 @@ function JoinPreviewClient({ tournamentId, inviteCode }: JoinPreviewClientProps)
         <section className="mt-8.75 flex flex-col gap-2 px-5">
           <p className="body-2-semibold text-text-neutral-primary">공유받은 토너먼트</p>
           <div className="flex flex-col gap-1 rounded-xl bg-gray-50 p-4">
-            <p className="body-1-semibold text-text-neutral-primary">
-              {invitePreviewData.tournamentName}
-            </p>
+            <p className="body-1-semibold text-text-neutral-primary">{preview.tournamentName}</p>
             <p className="body-2-medium text-text-neutral-secondary">
-              후보 {invitePreviewData.itemCount}개 · 참여 {invitePreviewData.participantCount}명
+              후보 {preview.itemCount}개 · 참여 {preview.participantCount}명
             </p>
           </div>
         </section>
