@@ -64,8 +64,8 @@ async function TournamentJoinPage({ params, searchParams }: TournamentJoinPagePr
       if (apiErrorCode === ERROR_CODE.TOURNAMENT_NOT_PENDING)
         return <JoinErrorScreen type="ALREADY_STARTED" />;
 
-      /** 플레이 링크 만료된 경우 */
-      if (apiErrorCode === ERROR_CODE.TOURNAMENT_PLAY_LINK_EXPIRED)
+      /** 초대 링크 만료된 경우 */
+      if (apiErrorCode === ERROR_CODE.TOURNAMENT_INVITE_EXPIRED)
         return <JoinErrorScreen type="LINK_EXPIRED" />;
     }
 
