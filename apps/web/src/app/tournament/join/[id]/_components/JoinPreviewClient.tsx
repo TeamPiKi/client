@@ -6,16 +6,17 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { usePatchMe } from '@/app/mypage/edit/_hooks/usePatchMe';
 import { EditIconFill } from '@/assets/icons/fill';
 import Button from '@/components/button';
+import JoinErrorDialog from '@/components/common/join-error-dialog';
+import type { JoinErrorTypeT } from '@/components/common/join-error-dialog';
 import { Header } from '@/components/header';
 import Input from '@/components/input';
 import Spinner from '@/components/spinner';
-import TournamentErrorDialog from '@/components/tournament-error-dialog';
 import { QUERY_ACTION } from '@/consts/queryAction';
 import { ROUTES } from '@/consts/route';
 import { useGetMe } from '@/hooks/useGetMe';
 import { useNicknameValidation } from '@/hooks/useNicknameValidation';
 import { usePageBackground } from '@/hooks/usePageBackground';
-import type { GetInvitePreviewResponseT, TournamentErrorTypeT } from '@/types/tournament';
+import type { GetInvitePreviewResponseT } from '@/types/tournament';
 
 import { usePostJoin } from '../../_hooks/usePostJoin';
 
@@ -46,13 +47,13 @@ function JoinPreviewClient({ tournamentId, inviteCode, preview }: JoinPreviewCli
   const { patchMeMutation, isPatchMePending } = usePatchMe();
 
   const [nickname, setNickname] = useState(userData.nickname);
-  const [tournamentErrorType, setTournamentErrorType] = useState<TournamentErrorTypeT | null>(null);
+  const [joinErrorType, setJoinErrorType] = useState<JoinErrorTypeT | null>(null);
 
   const { postJoinMutation, isPostJoinPending, isPostJoinError } = usePostJoin({
     /** 참여 완료 후 뒤로가기로 join 화면에 돌아오면 재참여(409)가 되므로 히스토리에서 제거 */
     onAlreadyJoined: () => router.replace(ROUTES.TOURNAMENT_CREATE(tournamentId)),
-    onParticipantsFull: () => setTournamentErrorType('PARTICIPANTS_FULL'),
-    onUnavailable: () => setTournamentErrorType('LINK_EXPIRED'),
+    onParticipantsFull: () => setJoinErrorType('PARTICIPANTS_FULL'),
+    onUnavailable: () => setJoinErrorType('LINK_EXPIRED'),
   });
 
   const {
@@ -112,7 +113,7 @@ function JoinPreviewClient({ tournamentId, inviteCode, preview }: JoinPreviewCli
 
   /** 실패 문구는 usePostJoin 훅이 토스트로 안내 — 화면은 상태만 고른다 */
   const getAutoJoinStatus = (): AutoJoinStatusT => {
-    if (tournamentErrorType) return 'blocked';
+    if (joinErrorType) return 'blocked';
     if (isPostJoinError) return 'retryable';
 
     return 'joining';
@@ -154,12 +155,8 @@ function JoinPreviewClient({ tournamentId, inviteCode, preview }: JoinPreviewCli
           )}
         </main>
 
-        {tournamentErrorType && (
-          <TournamentErrorDialog
-            type={tournamentErrorType}
-            open
-            onOpenChange={() => setTournamentErrorType(null)}
-          />
+        {joinErrorType && (
+          <JoinErrorDialog type={joinErrorType} open onOpenChange={() => setJoinErrorType(null)} />
         )}
       </>
     );
@@ -209,12 +206,8 @@ function JoinPreviewClient({ tournamentId, inviteCode, preview }: JoinPreviewCli
         </div>
       </main>
 
-      {tournamentErrorType && (
-        <TournamentErrorDialog
-          type={tournamentErrorType}
-          open
-          onOpenChange={() => setTournamentErrorType(null)}
-        />
+      {joinErrorType && (
+        <JoinErrorDialog type={joinErrorType} open onOpenChange={() => setJoinErrorType(null)} />
       )}
     </>
   );

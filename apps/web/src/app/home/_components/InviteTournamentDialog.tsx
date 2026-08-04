@@ -12,6 +12,8 @@ import {
 } from '@/app/tournament/join/_utils/verifyInviteCode';
 import { GroupIconFill } from '@/assets/icons';
 import Button from '@/components/button';
+import JoinErrorDialog from '@/components/common/join-error-dialog';
+import type { JoinErrorTypeT } from '@/components/common/join-error-dialog';
 import {
   Dialog,
   DialogContent,
@@ -21,10 +23,8 @@ import {
 } from '@/components/dialog';
 import Input from '@/components/input';
 import Spinner from '@/components/spinner';
-import TournamentErrorDialog from '@/components/tournament-error-dialog';
 import { ANALYTICS_EVENT } from '@/consts/analytics';
 import { ROUTES } from '@/consts/route';
-import type { TournamentErrorTypeT } from '@/types/tournament';
 import { logAnalyticsEvent } from '@/utils/analytics';
 import { getApiErrorCode, getApiErrorStatus, isGlobalNetError } from '@/utils/apiError';
 
@@ -33,7 +33,7 @@ function InviteTournamentDialog() {
   const [open, setOpen] = useState(false);
   const [code, setCode] = useState('');
   const [showFormatError, setShowFormatError] = useState(false);
-  const [tournamentErrorType, setTournamentErrorType] = useState<TournamentErrorTypeT | null>(null);
+  const [joinErrorType, setJoinErrorType] = useState<JoinErrorTypeT | null>(null);
 
   const { mutate: previewMutation, isPending: isPreviewPending } = useMutation({
     mutationFn: getInvitePreviewByCode,
@@ -52,7 +52,7 @@ function InviteTournamentDialog() {
       /** 409(참여 불가): `TOURNAMENT-005`(이미 시작), `TOURNAMENT-021`(만료) 및 매핑되지 않은 409 는 만료 안내 */
       if (getApiErrorStatus(error) === 409) {
         /** TODO: `TOURNAMENT-005` 가 진행 중·완료를 한 코드로 덮어 완료된 토너먼트에도 "이미 시작된" 안내가 나간다 (docs/spec/api-status-audit.md §E) */
-        setTournamentErrorType(
+        setJoinErrorType(
           getApiErrorCode(error) === ERROR_CODE.TOURNAMENT_NOT_PENDING
             ? 'ALREADY_STARTED'
             : 'LINK_EXPIRED'
@@ -61,7 +61,7 @@ function InviteTournamentDialog() {
       }
 
       /** 그 외(400 코드 불일치 포함): 유효하지 않은 코드로 안내 */
-      setTournamentErrorType('INVALID_CODE');
+      setJoinErrorType('INVALID_CODE');
     },
   });
 
@@ -144,12 +144,8 @@ function InviteTournamentDialog() {
         </DialogContent>
       </Dialog>
 
-      {tournamentErrorType && (
-        <TournamentErrorDialog
-          type={tournamentErrorType}
-          open
-          onOpenChange={() => setTournamentErrorType(null)}
-        />
+      {joinErrorType && (
+        <JoinErrorDialog type={joinErrorType} open onOpenChange={() => setJoinErrorType(null)} />
       )}
     </>
   );

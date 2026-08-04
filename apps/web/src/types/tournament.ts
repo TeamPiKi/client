@@ -54,15 +54,6 @@ export type PostCreateTournamentResponseT = {
   tournamentId: number;
 };
 
-export type TournamentErrorTypeT =
-  | 'NO_WISH_EXISTS'
-  | 'ALREADY_STARTED'
-  | 'ALREADY_ENDED'
-  | 'LINK_EXPIRED'
-  | 'INVALID_CODE'
-  | 'PARTICIPANTS_FULL'
-  | 'REQUEST_FAILED';
-
 /** 초대 코드 / 토너먼트 미리보기 응답 */
 export type GetInvitePreviewResponseT = {
   tournamentId: number;
