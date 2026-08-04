@@ -7,13 +7,13 @@ import { toast } from 'sonner';
 import BottomCta from '@/components/bottom-cta';
 import Button from '@/components/button';
 import { Header, HeaderIcon } from '@/components/header';
-import TournamentErrorDialog from '@/components/tournament-error-dialog';
 import { useGetWishlist } from '@/hooks/useGetWishlist';
 
 import { useGetTournament } from '../../../_common/_hooks/useGetTournament';
 import { MAX_SELECT } from '../_consts/selectLimits';
 import { usePostTournamentItemsByWish } from '../_hooks/usePostTournamentItemsByWish';
 import useWishSelection from '../_hooks/useWishSelection';
+import NoWishDialog from './NoWishDialog';
 import WishSelectCard from './WishSelectCard';
 import WishSelectHeader from './WishSelectHeader';
 
@@ -106,11 +106,7 @@ function ByWishContent({ tournamentId }: ByWishContentProps) {
         </Button>
       </BottomCta>
 
-      <TournamentErrorDialog
-        type="NO_WISH_EXISTS"
-        open={hasNoSelectableWish}
-        onOpenChange={() => router.back()}
-      />
+      <NoWishDialog open={hasNoSelectableWish} onOpenChange={() => router.back()} />
     </div>
   );
 }
