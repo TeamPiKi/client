@@ -54,7 +54,7 @@ export const JOIN_ERROR_CONTENT: Record<JoinErrorTypeT, JoinErrorContentT> = {
   },
   INVALID_CODE: {
     Icon: SadFaceImage,
-    iconClassName: 'size-7.75',
+    iconClassName: 'size-7.75 text-icon-accent',
     title: '코드가 유효하지 않아요',
     description: '입력한 코드와 일치하는 토너먼트가 없어요.\n코드를 다시 확인해주세요.',
     buttonText: '닫기',
