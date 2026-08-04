@@ -59,6 +59,7 @@ export type TournamentErrorTypeT =
   | 'ALREADY_STARTED'
   | 'ALREADY_ENDED'
   | 'LINK_EXPIRED'
+  | 'INVALID_CODE'
   | 'PARTICIPANTS_FULL'
   | 'REQUEST_FAILED';
 
