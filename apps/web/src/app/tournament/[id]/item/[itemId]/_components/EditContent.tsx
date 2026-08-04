@@ -1,7 +1,7 @@
 'use client';
 
-import { Header, HeaderIcon } from '@/components/header';
 import ItemLinkBanner from '@/components/common/item-link-banner';
+import { Header, HeaderIcon } from '@/components/header';
 import { cn } from '@/utils/cn';
 
 import { useGetTournamentItem } from '../_hooks/useGetTournamentItem';
@@ -31,11 +31,9 @@ function EditContent({ tournamentId, tournamentItemId }: EditContentProps) {
           tournamentId={tournamentId}
           tournamentItemId={tournamentItemId}
           itemStatus={tournamentItemData.status}
-          initialImageUrl={
-            tournamentItemData.status === 'READY' ? tournamentItemData.imageUrl : null
-          }
-          initialName={tournamentItemData.status === 'READY' ? tournamentItemData.name : ''}
-          initialPrice={tournamentItemData.status === 'READY' ? tournamentItemData.price : 0}
+          initialImageUrl={tournamentItemData.imageUrl ?? null}
+          initialName={tournamentItemData.name ?? ''}
+          initialPrice={tournamentItemData.price ?? 0}
         />
 
         {tournamentItemData.status === 'READY' && tournamentItemData.sourceUrl && (
