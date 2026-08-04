@@ -1,6 +1,5 @@
 'use client';
 
-import Button from '@/components/button';
 import ButtonLink from '@/components/button/ButtonLink';
 import {
   Dialog,
@@ -51,13 +50,9 @@ function JoinErrorDialog({ type, open = true, onOpenChange }: JoinErrorDialogPro
         </div>
         <DialogFooter className="w-full">
           <DialogClose asChild>
-            {buttonLink ? (
-              <ButtonLink size="lg" href={buttonLink}>
-                {buttonText}
-              </ButtonLink>
-            ) : (
-              <Button size="lg">{buttonText}</Button>
-            )}
+            <ButtonLink size="lg" href={buttonLink}>
+              {buttonText}
+            </ButtonLink>
           </DialogClose>
         </DialogFooter>
       </DialogContent>

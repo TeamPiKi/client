@@ -23,7 +23,7 @@ type JoinErrorContentT = {
   title: string;
   description: string;
   buttonText: string;
-  buttonLink: string | null;
+  buttonLink: string;
 };
 
 export const JOIN_ERROR_CONTENT: Record<JoinErrorTypeT, JoinErrorContentT> = {
@@ -57,8 +57,8 @@ export const JOIN_ERROR_CONTENT: Record<JoinErrorTypeT, JoinErrorContentT> = {
     iconClassName: 'size-7.75 text-icon-accent',
     title: '코드가 유효하지 않아요',
     description: '입력한 코드와 일치하는 토너먼트가 없어요.\n코드를 다시 확인해주세요.',
-    buttonText: '닫기',
-    buttonLink: null,
+    buttonText: '홈으로 가기',
+    buttonLink: ROUTES.HOME,
   },
   /** 참여 요청(`POST /join`) 단계에서만 발생 — 미리보기는 인원을 검사하지 않는다 */
   PARTICIPANTS_FULL: {
