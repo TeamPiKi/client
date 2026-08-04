@@ -10,6 +10,7 @@ import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/compone
 import Input from '@/components/input';
 import { usePostWishLink } from '@/hooks/usePostWishLink';
 import type { ItemTypeT } from '@/types/item';
+import { isGlobalNetError } from '@/utils/apiError';
 import { URL_PATTERN, extractUrlFromText } from '@/utils/extractUrl';
 import { getApiErrorMessage } from '@/utils/getApiErrorMessage';
 
@@ -63,7 +64,11 @@ function ByLinkDialog({ type, open, onOpenChange }: ByLinkProps) {
         onOpenChange(false);
         resetState();
       },
-      onError: (error: Error) => setErrorMessage(getApiErrorMessage(error)),
+      /** 5xx·네트워크는 전역 토스트가 안내 — 인라인까지 겹치지 않게 4xx만 표시 */
+      onError: (error: Error) => {
+        if (isGlobalNetError(error)) return;
+        setErrorMessage(getApiErrorMessage(error));
+      },
     };
 
     if (type === 'wish') postWishLinkMutation(submitUrl, mutationOptions);
