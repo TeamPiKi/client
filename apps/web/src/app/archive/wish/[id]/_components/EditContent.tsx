@@ -24,7 +24,7 @@ function EditContent({ wishId }: EditContentProps) {
         <ItemEditForm
           wishId={wishId}
           itemStatus={wishData.item.status}
-          initialImageUrl={wishData.item.imageUrl ?? ''}
+          initialImageUrl={wishData.item.imageUrl}
           initialName={wishData.item.name ?? ''}
           initialPrice={wishData.item.price ?? 0}
         />

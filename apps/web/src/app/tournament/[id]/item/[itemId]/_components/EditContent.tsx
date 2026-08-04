@@ -31,7 +31,7 @@ function EditContent({ tournamentId, tournamentItemId }: EditContentProps) {
           tournamentId={tournamentId}
           tournamentItemId={tournamentItemId}
           itemStatus={tournamentItemData.status}
-          initialImageUrl={tournamentItemData.imageUrl ?? ''}
+          initialImageUrl={tournamentItemData.imageUrl ?? null}
           initialName={tournamentItemData.name ?? ''}
           initialPrice={tournamentItemData.price ?? 0}
         />

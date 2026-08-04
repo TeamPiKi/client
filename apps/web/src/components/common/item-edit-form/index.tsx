@@ -17,7 +17,7 @@ type ItemEditFormProps = {
   initialImageUrl: string | null;
   initialName: string;
   initialPrice: number;
-  onSave?: (data: { name: string; currentPrice: number; image: File }) => void;
+  onSave?: (data: { name: string; price: number; image?: File }) => void;
   isSavePending?: boolean;
   onDelete: () => void;
   isDeletePending?: boolean;
@@ -46,16 +46,23 @@ function ItemEditForm({
   const isActionPending = isDeletePending || isRefreshPending || isSavePending;
   const trimmedName = name.trim();
   const parsedPrice = parsePriceToNumber(price);
-  const isValid = trimmedName.length > 0 && parsedPrice > 0 && selectedImage !== null;
+  /** 기존 이미지가 없으면 이미지 선택이 필수 */
+  const isImageRequired = !initialImageUrl;
+  const isValid =
+    trimmedName.length > 0 && parsedPrice > 0 && (!isImageRequired || selectedImage !== null);
+  const isChanged =
+    trimmedName !== initialName.trim() ||
+    formatPrice(price) !== initialPriceFormatted ||
+    selectedImage !== null;
 
   const handleSave = () => {
-    const isChanged =
-      trimmedName !== initialName.trim() ||
-      formatPrice(price) !== initialPriceFormatted ||
-      selectedImage !== null;
-    if (!isChanged || isActionPending || !selectedImage) return;
+    if (!isChanged || isActionPending || !isValid) return;
 
-    onSave?.({ name: trimmedName, currentPrice: parsedPrice, image: selectedImage });
+    onSave?.({
+      name: trimmedName,
+      price: parsedPrice,
+      ...(selectedImage && { image: selectedImage }),
+    });
   };
 
   const handleDelete = () => {
@@ -95,21 +102,6 @@ function ItemEditForm({
         />
       </div>
 
-      {itemStatus === 'READY' && onRefresh && (
-        <BottomCta>
-          <Button
-            variant="secondary"
-            size="lg"
-            className="flex-1"
-            isLoading={isDeletePending}
-            disabled={isRefreshPending || isSavePending}
-            onClick={handleDelete}
-          >
-            삭제하기
-          </Button>
-        </BottomCta>
-      )}
-
       <BottomCta>
         <Button
           variant="secondary"
@@ -138,7 +130,7 @@ function ItemEditForm({
           size="lg"
           className="flex-1"
           isLoading={isSavePending}
-          disabled={isDeletePending || isRefreshPending || !isValid}
+          disabled={isDeletePending || isRefreshPending || !isValid || !isChanged}
           onClick={handleSave}
         >
           저장하기

@@ -15,12 +15,11 @@ export const usePatchTournamentItem = (tournamentId: number, tournamentItemId: n
 
   const { mutate: patchTournamentItemMutation, isPending: isPatchTournamentItemPending } =
     useMutation({
-      mutationFn: (body: Omit<PatchItemRequestT, 'currency'>) => {
+      mutationFn: (body: PatchItemRequestT) => {
         const formData = new FormData();
         formData.append('name', body.name);
-        formData.append('currency', 'KRW');
-        formData.append('image', body.image);
         formData.append('price', String(body.price));
+        if (body.image) formData.append('image', body.image);
         return patchTournamentItem(tournamentId, tournamentItemId, formData);
       },
       onSuccess: () => {
