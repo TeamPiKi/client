@@ -38,28 +38,27 @@ async function TournamentPage({ params }: TournamentPageProps) {
       // 응답 tournamentId 활용:
       // - 주최자(ROOT): 요청 tournamentId 와 동일
       // - 참여자(CLONE): 새로 생성된 CLONE id (이후 본인 인스턴스로 진행)
-      const { tournamentId: nextTournamentId, items } = await postStartTournament(tournamentId);
+      const { tournamentId: nextTournamentId } = await postStartTournament(tournamentId);
 
       // CLONE 이 생성됐다면 본인 인스턴스 URL 로 이동 (재진입 시 IN_PROGRESS 분기로 흘러감)
       if (nextTournamentId !== tournamentId) {
         redirect(ROUTES.TOURNAMENT_MATCH(nextTournamentId));
       }
 
-      // start 후 서버는 IN_PROGRESS로 전환됨 — 클라 캐시도 IN_PROGRESS 형태로 시드
+      // start 응답에는 브래킷(currentMatch)이 없어 서버 권위 상태를 다시 받는다.
+      // RSC 내부 왕복이라 브라우저 지연이 아니고, 아래 409 복구 경로와 같은 패턴이다.
       playTournamentId = nextTournamentId;
-      hydratedTournament = {
-        tournamentId: nextTournamentId,
-        name: tournamentData.name,
-        isOwner: tournamentData.isOwner,
-        // CLONE 이 만들어졌다면 isRoot=false, ROOT 그대로면 원본 값 승계
-        isRoot: nextTournamentId === tournamentId ? tournamentData.isRoot : false,
-        status: 'IN_PROGRESS',
-        inProgress: {
-          currentRound: items.length,
-          lastHistory: null,
-          remainingItems: items,
-        },
-      };
+      const started = await getTournament(nextTournamentId);
+
+      if (started.status === 'COMPLETED') {
+        redirect(ROUTES.TOURNAMENT_RESULT(nextTournamentId));
+      }
+      if (started.status !== 'IN_PROGRESS' || started.pending) {
+        // start 직후인데 진행 상태가 아님 — 예상 밖이라 대기 화면으로 돌려보낸다
+        redirect(ROUTES.TOURNAMENT_CREATE(nextTournamentId));
+      }
+
+      hydratedTournament = started;
     } catch (error) {
       // 409: 다른 탭/요청이 먼저 start 호출한 경우 — 서버 권위 상태로 복구
       if (!isAxiosError(error) || error.response?.status !== 409) throw error;
