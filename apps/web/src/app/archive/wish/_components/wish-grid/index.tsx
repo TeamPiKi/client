@@ -55,7 +55,7 @@ function WishGrid({ items, isDeleteMode = false, selectedIds, onToggleSelect }: 
             >
               <WishCard
                 name={item.name}
-                price={item.currentPrice}
+                price={item.price}
                 imageUrl={item.imageUrl}
                 sourcePlatform={item.sourcePlatform}
               />
@@ -86,7 +86,7 @@ function WishGrid({ items, isDeleteMode = false, selectedIds, onToggleSelect }: 
           >
             <WishCard
               name={item.name}
-              price={item.currentPrice}
+              price={item.price}
               imageUrl={item.imageUrl}
               sourcePlatform={item.sourcePlatform}
               preload={index < 4}

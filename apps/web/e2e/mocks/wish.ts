@@ -14,7 +14,7 @@ export const MOCK_WISHLIST_ENTRIES: GetWishlistResponseT[] = MOCK_TOURNAMENT_ITE
       id: tournamentItem.itemId,
       status: 'READY',
       name: tournamentItem.name,
-      currentPrice: tournamentItem.price,
+      price: tournamentItem.price,
       currency: 'KRW',
       imageUrl: MOCK_IMAGE_URLS.product,
       sourceUrl: null,

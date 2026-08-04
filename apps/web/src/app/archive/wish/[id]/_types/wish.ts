@@ -8,7 +8,7 @@ export type GetWishResponseT = {
         status: (typeof ITEM_STATUS)['PROCESSING'] | (typeof ITEM_STATUS)['FAILED'];
         name: null;
         imageUrl: null;
-        currentPrice: null;
+        price: null;
         currency: null;
         sourceUrl: string | null; // 확인필
       }
@@ -16,7 +16,7 @@ export type GetWishResponseT = {
         status: (typeof ITEM_STATUS)['READY'] | (typeof ITEM_STATUS)['PENDING'];
         name: string;
         imageUrl: string;
-        currentPrice: number;
+        price: number;
         currency: string;
         sourceUrl: string | null;
       }

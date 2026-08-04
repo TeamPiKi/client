@@ -17,9 +17,9 @@ export const usePatchWish = (wishId: number) => {
     mutationFn: (body: Omit<PatchItemRequestT, 'currency'>) => {
       const formData = new FormData();
       formData.append('name', body.name);
-      formData.append('currentPrice', String(body.currentPrice));
       formData.append('currency', 'KRW');
       formData.append('image', body.image);
+      formData.append('price', String(body.price));
       return patchWish(wishId, formData);
     },
     onSuccess: () => {

@@ -18,9 +18,9 @@ export const usePatchTournamentItem = (tournamentId: number, tournamentItemId: n
       mutationFn: (body: Omit<PatchItemRequestT, 'currency'>) => {
         const formData = new FormData();
         formData.append('name', body.name);
-        formData.append('price', String(body.currentPrice));
         formData.append('currency', 'KRW');
         formData.append('image', body.image);
+        formData.append('price', String(body.price));
         return patchTournamentItem(tournamentId, tournamentItemId, formData);
       },
       onSuccess: () => {

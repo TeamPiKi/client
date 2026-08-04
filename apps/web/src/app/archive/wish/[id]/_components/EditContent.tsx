@@ -26,7 +26,7 @@ function EditContent({ wishId }: EditContentProps) {
           itemStatus={wishData.item.status}
           initialImageUrl={wishData.item.imageUrl ?? ''}
           initialName={wishData.item.name ?? ''}
-          initialPrice={wishData.item.currentPrice ?? 0}
+          initialPrice={wishData.item.price ?? 0}
         />
 
         {wishData.item.sourceUrl && <ItemLinkBanner href={wishData.item.sourceUrl} />}
