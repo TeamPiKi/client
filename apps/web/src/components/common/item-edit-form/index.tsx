@@ -6,7 +6,7 @@ import BottomCta from '@/components/bottom-cta';
 import Button from '@/components/button';
 import Input from '@/components/input';
 import Spacing from '@/components/spacing';
-import type { ItemStatusT } from '@/types/item';
+import type { ItemStatusT, PatchItemRequestT } from '@/types/item';
 import formatPrice from '@/utils/formatPrice';
 import parsePriceToNumber from '@/utils/parsePriceToNumber';
 
@@ -17,7 +17,7 @@ type ItemEditFormProps = {
   initialImageUrl: string | null;
   initialName: string;
   initialPrice: number;
-  onSave?: (data: { name: string; price: number; image?: File }) => void;
+  onSave?: (data: PatchItemRequestT) => void;
   isSavePending?: boolean;
   onDelete: () => void;
   isDeletePending?: boolean;
@@ -46,9 +46,11 @@ function ItemEditForm({
 
   const isActionPending = isSavePending || isDeletePending || isRefreshPending;
 
+  const isNameChanged = trimmedName !== initialName.trim();
+  const isPriceChanged = parsedPrice !== initialPrice;
+
   const hasImage = initialImageUrl !== null || selectedImage !== null;
-  const isChanged =
-    trimmedName !== initialName.trim() || parsedPrice !== initialPrice || selectedImage !== null;
+  const isChanged = isNameChanged || isPriceChanged || selectedImage !== null;
   /**
    * 저장 가능한 경우
    * - READY: 이미지, 상품명, 가격 필드 중 일부 수정 가능. 생략은 불가
@@ -56,10 +58,11 @@ function ItemEditForm({
    */
   const isSavable = isChanged && hasImage && trimmedName.length > 0 && parsedPrice > 0;
 
+  /** 폼은 name·price 를 항상 검증하되, 전송은 실제로 바뀐 필드만 한다 */
   const handleSave = () => {
     onSave?.({
-      name: trimmedName,
-      price: parsedPrice,
+      ...(isNameChanged && { name: trimmedName }),
+      ...(isPriceChanged && { price: parsedPrice }),
       ...(selectedImage && { image: selectedImage }),
     });
   };

@@ -17,8 +17,8 @@ export const usePatchTournamentItem = (tournamentId: number, tournamentItemId: n
     useMutation({
       mutationFn: (body: PatchItemRequestT) => {
         const formData = new FormData();
-        formData.append('name', body.name);
-        formData.append('price', String(body.price));
+        if (body.name) formData.append('name', body.name);
+        if (body.price) formData.append('price', String(body.price));
         if (body.image) formData.append('image', body.image);
         return patchTournamentItem(tournamentId, tournamentItemId, formData);
       },

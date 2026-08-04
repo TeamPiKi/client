@@ -16,9 +16,8 @@ export type ItemT = {
 export type ItemStatusT = (typeof ITEM_STATUS)[keyof typeof ITEM_STATUS];
 
 export type PatchItemRequestT = {
-  /** NOTE: name, price가 서버에서는 optional 이지만, 클라이언트에서는 required로 처리함 */
-  name: string;
-  price: number;
+  name?: string;
+  price?: number;
   image?: File;
   /** NOTE: currency는 optional이지만, 사용하지 않는 필드이므로 삭제함. 추후 필요할 때 다시 추가할 수 있음 */
   // currency?: string;
