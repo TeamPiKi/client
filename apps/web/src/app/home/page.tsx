@@ -16,7 +16,6 @@ import TournamentList from './_components/tournament-list';
 async function HomePage() {
   const queryClient = getQueryClient();
 
-  /** 위시 담기 게스트 분기를 위해 유저 정보 프리페치 (AddWishHomeDialog가 useGetMe로 소비) */
   await queryClient.prefetchQuery({
     queryKey: ['me'],
     queryFn: getMe,
