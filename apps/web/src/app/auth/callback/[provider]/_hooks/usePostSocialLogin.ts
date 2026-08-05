@@ -40,7 +40,10 @@ export const usePostSocialLogin = (provider: SocialProviderT) => {
         return;
       }
 
-      /** 4xx 는 code 를 함께 넘겨 로그인 페이지가 카탈로그 문구를 띄우게 한다 (OAUTH-* 구분 유지) */
+      /**
+       * 4xx 는 code 를 함께 넘겨 로그인 페이지가 카탈로그 문구를 띄우게 한다 (OAUTH-* 구분 유지).
+       * 401 도 여기서 처리 — 로그인 실패이지 세션 만료가 아니고, client.ts 인터셉터도 callback 경로는 리다이렉트에서 제외한다.
+       */
       const code = isAxiosError<ApiErrorResponseT>(error) ? error.response?.data?.code : null;
       router.replace(getLoginPath(variables.redirect, QUERY_ACTION.VALUE.SOCIAL_LOGIN_ERROR, code));
     },

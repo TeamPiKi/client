@@ -3,6 +3,7 @@ import * as Sentry from '@sentry/nextjs';
 import type { AxiosError } from 'axios';
 import axios from 'axios';
 
+import { ENDPOINTS } from '@/consts/api';
 import { QUERY_ACTION } from '@/consts/queryAction';
 import { ROUTES } from '@/consts/route';
 import { CLIENT_TYPE } from '@/consts/webBridge';
@@ -16,6 +17,13 @@ import { WebBridge, isWebview } from '@/utils/webBridge';
 export const clientApi = axios.create({
   withCredentials: true,
 });
+
+/** 로그인 요청 — 아직 세션이 없어 refresh 가 성공할 수 없고, 401 도 세션 만료가 아니라 로그인 실패다 */
+const isLoginRequest = (url?: string) => {
+  const path = url?.split('?')[0] ?? '';
+
+  return path.startsWith(ENDPOINTS.AUTH_LOGIN('')) || path === ENDPOINTS.AUTH_GUEST;
+};
 
 clientApi.interceptors.request.use(config => {
   const accessToken = getCookie('access_token');
@@ -34,7 +42,12 @@ clientApi.interceptors.response.use(
     const originalRequest = error.config;
     const hasRetried = originalRequest?.headers.get('x-retry-attempted') === 'true';
 
-    if (error.response?.status === 401 && originalRequest && !hasRetried) {
+    if (
+      error.response?.status === 401 &&
+      originalRequest &&
+      !hasRetried &&
+      !isLoginRequest(originalRequest.url)
+    ) {
       originalRequest.headers.set('x-retry-attempted', 'true');
 
       try {
