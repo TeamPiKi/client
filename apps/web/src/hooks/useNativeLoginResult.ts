@@ -1,4 +1,4 @@
-import { DEFAULT_ERROR_MESSAGE, WEBBRIDGE_MESSAGE_TYPE } from '@piki/core';
+import { DEFAULT_ERROR_MESSAGE, ERROR_MESSAGE_MAP, WEBBRIDGE_MESSAGE_TYPE } from '@piki/core';
 import { useRouter } from 'next/navigation';
 import { useCallback } from 'react';
 import { toast } from 'sonner';
@@ -7,6 +7,8 @@ import { useWebBridgeMessage } from '@/hooks/useWebBridgeMessage';
 import { setCookie } from '@/utils/cookie';
 import { getLoginPath, getLoginRedirectPath } from '@/utils/loginRedirect';
 import { WebBridge } from '@/utils/webBridge';
+
+const CATALOG_MESSAGES = new Set<string>(Object.values(ERROR_MESSAGE_MAP));
 
 type UseNativeLoginResultOptionsT = {
   redirect?: string | null;
@@ -32,7 +34,13 @@ export const useNativeLoginResult = ({
           router.replace(getLoginRedirectPath(redirect));
         } else if (message.type === WEBBRIDGE_MESSAGE_TYPE.APP_RES_SOCIAL_LOGIN_ERROR) {
           onSettled?.();
-          toast.error(DEFAULT_ERROR_MESSAGE);
+          /** 앱 payload 는 런타임 검증이 없다 — 카탈로그 문구일 때만 노출하고 SDK 예외 원문은 버린다 */
+          const detail = message.payload?.detail;
+          toast.error(
+            typeof detail === 'string' && CATALOG_MESSAGES.has(detail)
+              ? detail
+              : DEFAULT_ERROR_MESSAGE
+          );
           router.replace(getLoginPath(redirect));
         }
       },
