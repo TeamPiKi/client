@@ -38,11 +38,16 @@ export const usePostJoin = ({
       if (getApiErrorStatus(error) === 409) {
         const code = getApiErrorCode(error);
 
-        /** 그 외 참여 불가(만료 · PENDING 아님)는 onUnavailable 담당 */
-        let handleConflict = onUnavailable;
+        /** 아는 code 만 전용 UX 로 — 미등록 409 를 만료로 오인하지 않도록 아래 generic 토스트로 흘린다 */
+        let handleConflict: (() => void) | undefined;
         if (code === ERROR_CODE.TOURNAMENT_ALREADY_PARTICIPANT) handleConflict = onAlreadyJoined;
         else if (code === ERROR_CODE.TOURNAMENT_PARTICIPANT_LIMIT_EXCEEDED)
           handleConflict = onParticipantsFull;
+        else if (
+          code === ERROR_CODE.TOURNAMENT_INVITE_EXPIRED ||
+          code === ERROR_CODE.TOURNAMENT_NOT_PENDING
+        )
+          handleConflict = onUnavailable;
 
         /** 콜백 미전달 시 아래 generic 토스트로 fallback — 409 무피드백 방지 */
         if (handleConflict) {
