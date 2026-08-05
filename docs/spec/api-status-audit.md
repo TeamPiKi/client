@@ -8,7 +8,7 @@
 
 ## 전역 동작 (공통 전제)
 
-- **401**: `apis/client.ts` 인터셉터가 토큰 refresh 후 자동 재시도, 실패 시 로그인 리다이렉트 → clientApi 호출은 사실상 401 전역 커버. **단 `serverApi`(SSR)에는 응답 인터셉터가 없어** 서버 렌더 경로의 4xx/5xx는 그대로 throw.
+- **401**: `apis/client.ts` 인터셉터가 토큰 refresh 후 자동 재시도, 실패 시 로그인 리다이렉트 → clientApi 호출은 사실상 401 전역 커버. **단 로그인 요청(`/auth/login/*`·`/auth/guest`)은 세션이 없어 refresh 대상에서 제외** — 이 401 은 로그인 실패이므로 개별 `onError` 가 안내한다. **`serverApi`(SSR) 응답 인터셉터는 409 `USER-003` 리다이렉트와 5xx 수집만 하므로** 서버 렌더 경로의 나머지 4xx/5xx는 그대로 throw.
 - **409 `USER-003`(탈퇴한 계정)**: `clientApi` 인터셉터가 토큰 정리 + 로그인 리다이렉트(`?action=withdrawn-account`), `serverApi` 인터셉터가 SSR 경로에서 동일하게 `redirect`.
 - **Mutation 전역 안전망** (`utils/queryClient.ts` `MutationCache.onError`):
   - **5xx·네트워크**: 항상 `getApiErrorMessage` 토스트 + Sentry (개별 `onError` 유무와 무관)
@@ -224,7 +224,7 @@
 - 200: ✅ create 페이지(WELCOME_JOIN)로 이동
 - 400 / 404: ✅ 카탈로그 문구 토스트 / InviteClient 경로는 `state='invalid'` 화면
 - 401: ✅ 전역
-- 409: ✅ code 2차 분기 — `TOURNAMENT-022`(이미 참여) 진입 · `TOURNAMENT-030`(인원 초과) 다이얼로그 · 그 외 `LINK_EXPIRED` 다이얼로그
+- 409: ✅ code 2차 분기 — `TOURNAMENT-022`(이미 참여) 진입 · `TOURNAMENT-030`(인원 초과) 다이얼로그 · `TOURNAMENT-021`/`TOURNAMENT-005`(만료·시작됨) `LINK_EXPIRED` 다이얼로그 · 그 외 카탈로그 문구 토스트
 
 ### POST /api/v1/tournaments/{id}/join/guest (게스트 참여) · 201, 400, 404, 409
 

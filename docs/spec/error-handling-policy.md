@@ -104,7 +104,7 @@
 >   if (getApiErrorStatus(error) === 404) router.replace(...); // 이탈이 필요한 status 만 추가 동작
 > }
 > ```
-
+>
 > **전역 net(③)이 커버하지 못하는 것** (= 개별에 반드시 남겨야 하는 것):
 >
 > - **낙관적 업데이트 롤백** — 전역은 토스트만, 상태 되돌림은 개별 `onMutate`/`onError`
@@ -246,7 +246,7 @@ export const usePostJoin = ({ onConflict }: { onConflict?: () => void } = {}) =>
 에러 → 사용자 문구 변환을 한 곳으로 일원화한다.
 문구 카탈로그는 web·app 공유를 위해 `@piki/core`에 두고, web은 axios 파싱만 담당한다.
 
-```
+```text
 packages/core/src/
 ├── consts/errorCode.ts            # ERROR_MESSAGE_MAP (code → 문구) + fallback 상수
 ├── types/error.ts                 # ErrorCodeT, ApiErrorCodeT
