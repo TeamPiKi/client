@@ -1,45 +1,35 @@
 'use client';
 
-import { Suspense, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { Suspense } from 'react';
 
 import Spacing from '@/components/spacing';
 
-import {
-  PLAY_TYPE_BY_FILTER,
-  PLAY_TYPE_FILTER,
-  type TournamentPlayTypeFilterT,
-} from '../_consts/tournamentPlayType';
+import type { TournamentPlayTypeFilterT } from '../_consts/tournamentPlayType';
+import { PLAY_TYPE_BY_FILTER, PLAY_TYPE_FILTER } from '../_consts/tournamentPlayType';
 import { STATUS_BY_TAB, type TournamentStatusTabT } from '../_consts/tournamentTab';
+import { parsePlayParam, parseTabParam } from '../_utils/tournamentSearchParams';
 import TournamentHistoryList from './TournamentHistoryList';
 import TournamentHistorySkeleton from './TournamentHistorySkeleton';
 import TournamentPlayTypeFilter from './TournamentPlayTypeFilter';
 import TournamentStatusTab from './TournamentStatusTab';
 
-type Props = {
-  initialTab: TournamentStatusTabT;
-  initialPlayTypeFilter: TournamentPlayTypeFilterT;
-};
-
-function TournamentHistorySection({ initialTab, initialPlayTypeFilter }: Props) {
-  const [activeTab, setActiveTab] = useState<TournamentStatusTabT>(initialTab);
-  const [activePlayTypeFilter, setActivePlayTypeFilter] =
-    useState<TournamentPlayTypeFilterT>(initialPlayTypeFilter);
+function TournamentHistorySection() {
+  const searchParams = useSearchParams();
+  const activeTab = parseTabParam(searchParams.get('tab'));
+  const activePlayTypeFilter = parsePlayParam(searchParams.get('play'));
 
   /** 서버 왕복 없이 주소만 동기화 */
   const syncSearchParams = (tab: TournamentStatusTabT, play: TournamentPlayTypeFilterT) => {
     window.history.replaceState(null, '', `?tab=${tab}&play=${play}`);
   };
 
+  /** 탭을 옮기면 플레이 유형 필터는 항상 '전체'로 초기화 */
   const handleTabChange = (tab: TournamentStatusTabT) => {
-    setActiveTab(tab);
-
-    /** 탭을 옮기면 플레이 유형 필터는 항상 '전체'로 초기화 */
-    setActivePlayTypeFilter(PLAY_TYPE_FILTER.ALL);
     syncSearchParams(tab, PLAY_TYPE_FILTER.ALL);
   };
 
   const handlePlayTypeFilterChange = (play: TournamentPlayTypeFilterT) => {
-    setActivePlayTypeFilter(play);
     syncSearchParams(activeTab, play);
   };
 
