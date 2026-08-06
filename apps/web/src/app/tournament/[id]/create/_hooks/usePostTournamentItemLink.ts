@@ -1,12 +1,23 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { isAxiosError } from 'axios';
+import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
-import type { ApiErrorResponseT } from '@/types/api';
+import { ROUTES } from '@/consts/route';
+import { getApiErrorStatus, isGlobalNetError } from '@/utils/apiError';
+import { getApiErrorMessage } from '@/utils/getApiErrorMessage';
 
 import { postTournamentItemLink } from '../_apis/postTournamentItemLink';
 
-export const usePostTournamentItemLink = (tournamentId: number) => {
+type UsePostTournamentItemLinkOptionsT = {
+  /** 입력 폼처럼 에러를 화면 안에서 안내하는 경우 false — 4xx 토스트를 끈다 */
+  showErrorToast?: boolean;
+};
+
+export const usePostTournamentItemLink = (
+  tournamentId: number,
+  { showErrorToast = true }: UsePostTournamentItemLinkOptionsT = {}
+) => {
+  const router = useRouter();
   const queryClient = useQueryClient();
 
   const { mutate: postTournamentItemLinkMutation, isPending: isPostTournamentItemLinkPending } =
@@ -16,20 +27,18 @@ export const usePostTournamentItemLink = (tournamentId: number) => {
         queryClient.invalidateQueries({ queryKey: ['tournament', tournamentId] });
       },
       onError: error => {
-        if (!isAxiosError<ApiErrorResponseT>(error) || !error.response) return;
+        if (isGlobalNetError(error)) return;
 
-        const {
-          status,
-          data: { detail },
-        } = error.response;
+        /**
+         * 400: 링크 형식 오류·미지원 쇼핑몰·아이템 32개 초과
+         * 403: 토너먼트 참여 권한 없음
+         * 404: 토너먼트 존재하지 않음
+         * 409: PENDING 상태 아닌 토너먼트
+         */
+        if (showErrorToast) toast.error(getApiErrorMessage(error));
 
-        if (status < 500) {
-          const clientErrorMessage = detail ?? '요청을 처리하지 못했습니다.';
-          toast.error(clientErrorMessage);
-          return;
-        }
-
-        throw error;
+        const status = getApiErrorStatus(error);
+        if (status === 403 || status === 404 || status === 409) router.replace(ROUTES.HOME);
       },
     });
 

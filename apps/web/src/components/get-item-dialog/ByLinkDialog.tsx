@@ -10,7 +10,9 @@ import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/compone
 import Input from '@/components/input';
 import { usePostWishLink } from '@/hooks/usePostWishLink';
 import type { ItemTypeT } from '@/types/item';
+import { isGlobalNetError } from '@/utils/apiError';
 import { URL_PATTERN, extractUrlFromText } from '@/utils/extractUrl';
+import { getApiErrorMessage } from '@/utils/getApiErrorMessage';
 
 type ByLinkProps = {
   type: ItemTypeT;
@@ -20,12 +22,15 @@ type ByLinkProps = {
 
 function ByLinkDialog({ type, open, onOpenChange }: ByLinkProps) {
   const { id: tournamentId } = useParams<{ id: string }>();
-  const { postWishLinkMutation, isPostWishLinkPending } = usePostWishLink();
+
+  const { postWishLinkMutation, isPostWishLinkPending } = usePostWishLink({
+    showErrorToast: false,
+  });
   const { postTournamentItemLinkMutation, isPostTournamentItemLinkPending } =
-    usePostTournamentItemLink(Number(tournamentId));
+    usePostTournamentItemLink(Number(tournamentId), { showErrorToast: false });
 
   const [url, setUrl] = useState('');
-  const [hasError, setHasError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const trimmedUrl = url.trim();
   const isEmpty = trimmedUrl.length === 0;
@@ -33,40 +38,46 @@ function ByLinkDialog({ type, open, onOpenChange }: ByLinkProps) {
 
   const resetState = () => {
     setUrl('');
-    setHasError(false);
+    setErrorMessage(null);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
     if (isEmpty) return;
 
     // 상품 설명과 URL 이 함께 붙여넣어진 경우 URL 만 추출해 제출한다 (onPaste 를 타지 않은 경로 안전망).
     const submitUrl = URL_PATTERN.test(trimmedUrl) ? trimmedUrl : extractUrlFromText(trimmedUrl);
 
     if (!submitUrl) {
-      setHasError(true);
+      setErrorMessage('올바른 URL 형식으로 입력해주세요.');
+      return;
+    }
+
+    if (!submitUrl.startsWith('https://')) {
+      setErrorMessage('https 링크만 등록할 수 있어요');
       return;
     }
 
     /** 닫기/초기화는 성공 시에만 — 실패 시 URL을 고칠 수 있게 유지. 위시리스트 이동은 usePostWishLink 훅이 조건부로 처리 */
-    if (type === 'wish')
-      postWishLinkMutation(submitUrl, {
-        onSuccess: () => {
-          onOpenChange(false);
-          resetState();
-        },
-      });
-    else
-      postTournamentItemLinkMutation(submitUrl, {
-        onSuccess: () => {
-          onOpenChange(false);
-          resetState();
-        },
-      });
+    const mutationOptions = {
+      onSuccess: () => {
+        onOpenChange(false);
+        resetState();
+      },
+      /** 5xx·네트워크는 전역 토스트가 안내 — 인라인까지 겹치지 않게 4xx만 표시 */
+      onError: (error: Error) => {
+        if (isGlobalNetError(error)) return;
+        setErrorMessage(getApiErrorMessage(error));
+      },
+    };
+
+    if (type === 'wish') postWishLinkMutation(submitUrl, mutationOptions);
+    else postTournamentItemLinkMutation(submitUrl, mutationOptions);
   };
 
   const handleChange = (value: string) => {
     setUrl(value);
-    if (hasError) setHasError(false);
+    if (errorMessage) setErrorMessage(null);
   };
 
   /** 상품 설명 + URL 형태로 붙여넣으면 URL 만 입력창에 반영한다 */
@@ -90,7 +101,7 @@ function ByLinkDialog({ type, open, onOpenChange }: ByLinkProps) {
           링크로 담기
         </DialogTitle>
         <DialogDescription className="sr-only">상품 URL을 입력해 담습니다.</DialogDescription>
-        <div className="flex flex-col gap-4">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <Input
             label="링크 URL"
             placeholder="복사한 링크를 입력해주세요."
@@ -98,21 +109,21 @@ function ByLinkDialog({ type, open, onOpenChange }: ByLinkProps) {
             onChange={event => handleChange(event.target.value)}
             onPaste={handlePaste}
             left={<LinkIconFill className="size-5" />}
-            aria-invalid={hasError}
-            {...(hasError ? { helperText: '올바른 URL 형식으로 입력해주세요.' } : {})}
+            aria-invalid={Boolean(errorMessage)}
+            {...(errorMessage ? { helperText: errorMessage } : {})}
             autoFocus
           />
           <Button
+            type="submit"
             size="lg"
             variant="primary"
             disabled={isEmpty}
             isLoading={isPending}
-            onClick={handleSubmit}
           >
             {type === 'wish' && '위시리스트에 담기'}
             {type === 'tournament' && '후보 바구니에 담기'}
           </Button>
-        </div>
+        </form>
       </DialogContent>
     </Dialog>
   );

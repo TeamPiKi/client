@@ -24,6 +24,13 @@ export type TournamentRankingT = TournamentItemT & {
   rank: number;
 };
 
+export type GetTournamentListRequestT = {
+  status?: TournamentStatusT[];
+  limit?: number;
+  /** 내가 만든 토너먼트만 조회 */
+  ownedOnly?: boolean;
+};
+
 export type GetTournamentListResponseT = {
   tournamentId: number;
   name: string;
@@ -45,4 +52,22 @@ export type PostCreateTournamentRequestT = {
 
 export type PostCreateTournamentResponseT = {
   tournamentId: number;
+};
+
+export type TournamentErrorTypeT =
+  | 'NO_WISH_EXISTS'
+  | 'ALREADY_STARTED'
+  | 'ALREADY_ENDED'
+  | 'LINK_EXPIRED'
+  | 'PARTICIPANTS_FULL'
+  | 'REQUEST_FAILED';
+
+/** 초대 코드 / 토너먼트 미리보기 응답 */
+export type GetInvitePreviewResponseT = {
+  tournamentId: number;
+  tournamentName: string;
+  itemCount: number;
+  participantCount: number;
+  /** 요청자(게스트/회원)가 이미 이 토너먼트에 참여 중인지. 미인증·미참여면 false */
+  joined: boolean;
 };
