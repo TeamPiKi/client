@@ -1,6 +1,7 @@
 import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
 
 import { getTournamentList } from '@/apis/getTournamentList';
+import { QUERY_KEYS } from '@/consts/queryKeys';
 import { getQueryClient } from '@/utils/queryClient';
 
 import TournamentFab from './_components/TournamentFab';
@@ -16,10 +17,11 @@ async function ArchiveTournamentPage({ searchParams }: Props) {
   const initialTab: TournamentStatusTabT = tab === 'completed' ? 'completed' : 'ongoing';
 
   const queryClient = getQueryClient();
-  const statuses = STATUS_BY_TAB[initialTab];
+
+  const params = { status: STATUS_BY_TAB[initialTab] };
   await queryClient.prefetchQuery({
-    queryKey: ['tournamentList', statuses],
-    queryFn: () => getTournamentList(statuses),
+    queryKey: QUERY_KEYS.TOURNAMENT.LIST.BY_PARAMS(params),
+    queryFn: () => getTournamentList(params),
   });
 
   return (

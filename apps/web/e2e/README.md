@@ -71,7 +71,7 @@ api.post(ENDPOINTS.AUTH_GUEST, mockData); // POST 성공 응답
 api.error('GET', ENDPOINTS.TOURNAMENT(1), { status: 500 }); // 에러 응답 (에러 화면 테스트용)
 ```
 
-경로는 항상 `@/consts/api` 의 `ENDPOINTS` 상수를 쓰세요. 응답은 팀 규약 `{ status, data, detail, code }` 로 자동 래핑되므로 **data 안에 들어갈 내용만** 넘기면 됩니다.
+경로는 항상 `@/consts/api` 의 `ENDPOINTS` 상수를 쓰세요. 응답은 팀 규약 `{ data, code }` 로 자동 래핑되므로 (HTTP status 는 본문이 아니라 실제 status code) **data 안에 들어갈 내용만** 넘기면 됩니다.
 
 ## 2. 목 데이터 작성하기
 
@@ -104,6 +104,19 @@ export const MOCK_TOURNAMENT_LIST: TournamentT[] = [
 
 ```ts
 [`GET ${ENDPOINTS.TOURNAMENT(1)}`]: createApiSuccess(MOCK_TOURNAMENT_PENDING),
+```
+
+#### "데이터 없음" 화면을 테스트할 때
+
+RSC 가 prefetch 한 데이터는 클라이언트에서 그대로 하이드레이션되고 `staleTime`(60초) 안에는 다시 요청하지 않습니다. 즉 **`api.get(path, [])` 만으로는 화면이 비지 않습니다** — SSR 스텁이 준 목 데이터가 그대로 보입니다. `setSsrEmpty` 로 스텁 쪽도 비워주세요:
+
+```ts
+import { setSsrEmpty } from '@e2e/helpers/ssrEmpty';
+
+api.get(ENDPOINTS.TOURNAMENTS, []);
+
+await setSsrEmpty(page, ENDPOINTS.TOURNAMENTS); // goto 전에
+await page.goto('/home');
 ```
 
 ## 목킹 구조

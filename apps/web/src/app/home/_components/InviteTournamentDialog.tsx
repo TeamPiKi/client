@@ -1,7 +1,6 @@
 'use client';
 
 import { useMutation } from '@tanstack/react-query';
-import { isAxiosError } from 'axios';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
@@ -24,6 +23,7 @@ import Spinner from '@/components/spinner';
 import TournamentErrorDialog from '@/components/tournament-error-dialog';
 import { ANALYTICS_EVENT } from '@/consts/analytics';
 import { logAnalyticsEvent } from '@/utils/analytics';
+import { getApiErrorStatus, isGlobalNetError } from '@/utils/apiError';
 
 import InvalidCodeDialog from './invite-code-dialog/InvalidCodeDialog';
 
@@ -47,8 +47,10 @@ function InviteTournamentDialog() {
       setOpen(false);
       reset();
 
+      if (isGlobalNetError(error)) return;
+
       /** 409: 초대 코드 만료 */
-      if (isAxiosError(error) && error.response?.status === 409) {
+      if (getApiErrorStatus(error) === 409) {
         setIsTournamentErrorDialogOpen(true);
         return;
       }

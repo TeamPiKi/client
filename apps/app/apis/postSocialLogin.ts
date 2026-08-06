@@ -1,4 +1,5 @@
-import type { SocialLoginSuccessPayloadT, SocialProviderT } from '@piki/core';
+import type { ApiErrorCodeT, SocialLoginSuccessPayloadT, SocialProviderT } from '@piki/core';
+import { DEFAULT_ERROR_MESSAGE, SERVER_ERROR_MESSAGE, getErrorMessageByCode } from '@piki/core';
 
 import { captureError } from '@/utils/captureError';
 
@@ -26,7 +27,7 @@ export const postSocialLogin = async (
     throw error;
   }
 
-  let data: { data: SocialLoginSuccessPayloadT; detail?: string } | null = null;
+  let data: { data: SocialLoginSuccessPayloadT | null; code: ApiErrorCodeT | null } | null = null;
   try {
     data = await response.json();
   } catch {
@@ -36,22 +37,30 @@ export const postSocialLogin = async (
   if (!response.ok) {
     /** 5xx 서버 오류만 수집 (4xx는 예상된 흐름이라 제외) */
     if (response.status >= 500) {
-      captureError(new Error(`postSocialLogin ${response.status}: ${data?.detail ?? 'unknown'}`), {
+      captureError(new Error(`postSocialLogin ${response.status}: ${data?.code ?? 'unknown'}`), {
         tags: { source: 'api', api: 'postSocialLogin', provider },
         extra: { status: response.status },
       });
     }
-    throw new Error(data?.detail ?? '로그인에 실패했습니다.');
+    const fallback = response.status >= 500 ? SERVER_ERROR_MESSAGE : DEFAULT_ERROR_MESSAGE;
+    throw new Error(getErrorMessageByCode(data?.code) ?? fallback);
   }
 
-  if (!data) {
-    /** 2xx인데 본문이 비었거나 깨짐 — 예상 못 한 이상 응답이라 수집 */
+  const payload = data?.data;
+
+  /** 200 응답이나 예상치 못한 응답인 경우 기록 */
+  if (
+    !payload ||
+    data?.code !== null ||
+    typeof payload.accessToken !== 'string' ||
+    typeof payload.refreshToken !== 'string'
+  ) {
     captureError(new Error(`postSocialLogin ${response.status}: empty/invalid body`), {
       tags: { source: 'api', api: 'postSocialLogin', provider },
       extra: { status: response.status },
     });
-    throw new Error('서버 응답을 해석할 수 없습니다.');
+    throw new Error(getErrorMessageByCode(data?.code) ?? DEFAULT_ERROR_MESSAGE);
   }
 
-  return data.data;
+  return payload;
 };

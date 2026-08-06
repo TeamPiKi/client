@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { Dialog } from '@/components/dialog';
 import GetItemDialogContent from '@/components/get-item-dialog';
@@ -30,9 +30,22 @@ type TournamentCreateClientProps = {
 };
 
 function TournamentCreateClient({ tournamentId }: TournamentCreateClientProps) {
-  const { isActive: scrollToLast } = useQueryAction({
+  // back() 복귀는 URL에 쿼리를 추가할 수 없어 sessionStorage로 전달한다.
+  const scrollToLastKey = `piki:scrollToLast:${tournamentId}`;
+
+  const { isActive: isScrollToLastQuery } = useQueryAction({
     action: QUERY_ACTION.VALUE.SCROLL_TO_LAST,
   });
+  const [isScrollToLastSession] = useState(
+    () => typeof window !== 'undefined' && sessionStorage.getItem(scrollToLastKey) === '1'
+  );
+
+  const scrollToLast = isScrollToLastQuery || isScrollToLastSession;
+
+  useEffect(() => {
+    sessionStorage.removeItem(scrollToLastKey);
+  }, [scrollToLastKey]);
+
   const { tournamentData } = useGetTournament(tournamentId);
   const { userData } = useGetMe();
 
@@ -72,8 +85,7 @@ function TournamentCreateClient({ tournamentId }: TournamentCreateClientProps) {
   // 단, 주최자는 만료 영향 없이 본인 토너먼트에 후보를 담을 수 있다.
   // ownerStarted 면 어차피 시작 흐름으로 넘어가야 하므로 마감 처리하지 않는다.
   // 협업 의도가 없는 토너먼트는 만료 자체를 무시한다.
-  const isDepositClosed =
-    !tournamentData.isOwner && !ownerStarted && isExpired && isCollaborative;
+  const isDepositClosed = !tournamentData.isOwner && !ownerStarted && isExpired && isCollaborative;
 
   const participantImageMap = new Map(
     (pending?.participants ?? []).map(p => [p.userId, p.profileImage])

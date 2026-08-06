@@ -10,7 +10,7 @@ type Props = {
 };
 
 function TournamentHistoryList({ statuses }: Props) {
-  const { tournamentListData } = useGetTournamentList(statuses);
+  const { tournamentListData } = useGetTournamentList({ status: statuses });
 
   if (tournamentListData.length === 0)
     return (
