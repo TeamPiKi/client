@@ -2,7 +2,6 @@
 
 import { Kode_Mono } from 'next/font/google';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 import {
@@ -13,6 +12,8 @@ import {
 import PikiLogo from '@/assets/images/piki-logo-cart.svg';
 import ReceiptZigzag from '@/assets/images/tournament/result/receipt-zigzag.svg';
 import TrophyBadge from '@/assets/images/tournament/result/trophy-badge.svg';
+import { ROUTES } from '@/consts/route';
+import { useBackWithFallback } from '@/hooks/useBackWithFallback';
 import { cn } from '@/utils/cn';
 
 import { useGetTournament } from '../../../_common/_hooks/useGetTournament';
@@ -50,7 +51,7 @@ const PlaceLabel = ({ label }: { label: string }) => (
 );
 
 function GroupResultClient({ tournamentId }: GroupResultClientProps) {
-  const router = useRouter();
+  const backWithFallback = useBackWithFallback();
   const { tournamentData } = useGetTournament(tournamentId);
   const { groupResultData, isGroupResultPending, isGroupResultError } =
     useGetGroupResult(tournamentId);
@@ -66,7 +67,7 @@ function GroupResultClient({ tournamentId }: GroupResultClientProps) {
           <button
             type="button"
             aria-label="뒤로가기"
-            onClick={() => router.back()}
+            onClick={() => backWithFallback(ROUTES.TOURNAMENT_RESULT(tournamentId))}
             className="cursor-pointer p-0.75"
           >
             <ChevronBackwardIconFill className="size-6 text-icon-neutral-secondary" />
@@ -97,7 +98,7 @@ function GroupResultClient({ tournamentId }: GroupResultClientProps) {
         <button
           type="button"
           aria-label="뒤로가기"
-          onClick={() => router.back()}
+          onClick={() => backWithFallback(ROUTES.TOURNAMENT_RESULT(tournamentId))}
           className="cursor-pointer p-0.75"
         >
           <ChevronBackwardIconFill className="size-6 text-icon-neutral-secondary" />

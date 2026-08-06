@@ -1,6 +1,6 @@
 import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
 
-import type { WishlistPageT } from '@/apis/getWishlist';
+import type { GetWishlistApiResponseT } from '@/apis/getWishlist';
 import { getWishlist } from '@/apis/getWishlist';
 import { getQueryClient } from '@/utils/queryClient';
 
@@ -11,9 +11,10 @@ async function WishContent() {
 
   await queryClient.prefetchInfiniteQuery({
     queryKey: ['wishlists'],
-    queryFn: ({ pageParam }) => getWishlist(pageParam as string | null),
+    queryFn: ({ pageParam }) => getWishlist(pageParam),
     initialPageParam: null as string | null,
-    getNextPageParam: (page: WishlistPageT) => (page.hasNext ? page.nextCursor : null),
+    getNextPageParam: (page: GetWishlistApiResponseT) =>
+      page.pageResponse.hasNext ? page.pageResponse.nextCursor : null,
   });
 
   return (

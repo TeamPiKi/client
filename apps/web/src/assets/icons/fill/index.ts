@@ -111,7 +111,7 @@ export { default as PieChartIconFill } from './pie-chart.svg';
 export { default as PinIconFill } from './pin.svg';
 export { default as ProfileCircledIconFill } from './profile-circled.svg';
 export { default as PromoIconFill } from './promo.svg';
-export { default as ReciptIconFill } from './recipt.svg';
+export { default as ReceiptIconFill } from './receipt.svg';
 export { default as RedoIconFill } from './redo.svg';
 export { default as ReloaderIconFill } from './reloader.svg';
 export { default as RemoveIconFill } from './remove.svg';

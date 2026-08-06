@@ -1,12 +1,13 @@
 import { useSuspenseQuery } from '@tanstack/react-query';
 
 import { getTournamentList } from '@/apis/getTournamentList';
-import type { TournamentStatusT } from '@/types/tournament';
+import { QUERY_KEYS } from '@/consts/queryKeys';
+import type { GetTournamentListRequestT } from '@/types/tournament';
 
-export const useGetTournamentList = (status: TournamentStatusT[] = [], limit?: number) => {
+export const useGetTournamentList = (params: GetTournamentListRequestT) => {
   const { data: tournamentListData } = useSuspenseQuery({
-    queryKey: ['tournamentList', status, limit],
-    queryFn: () => getTournamentList(status, limit),
+    queryKey: QUERY_KEYS.TOURNAMENT.LIST.BY_PARAMS(params),
+    queryFn: () => getTournamentList(params),
   });
 
   return { tournamentListData };

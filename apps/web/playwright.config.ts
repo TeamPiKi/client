@@ -1,8 +1,6 @@
 import { defineConfig, devices } from '@playwright/test';
 
-import { MOCK_API_URL } from './e2e/consts';
-
-const BASE_URL = 'http://localhost:3000';
+import { BASE_URL, MOCK_API_URL } from './e2e/consts';
 
 /**
  * NEXT_PUBLIC_API_URL 을 로컬 목 스텁 주소로 강제해 실서버 접근을 차단한다(결정성 보장).

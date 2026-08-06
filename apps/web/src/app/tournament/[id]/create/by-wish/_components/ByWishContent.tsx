@@ -1,11 +1,13 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { toast } from 'sonner';
 
 import BottomCta from '@/components/bottom-cta';
 import Button from '@/components/button';
 import { Header, HeaderIcon } from '@/components/header';
+import TournamentErrorDialog from '@/components/tournament-error-dialog';
 import { useGetWishlist } from '@/hooks/useGetWishlist';
 
 import { useGetTournament } from '../../../_common/_hooks/useGetTournament';
@@ -20,6 +22,7 @@ type ByWishContentProps = {
 };
 
 function ByWishContent({ tournamentId }: ByWishContentProps) {
+  const router = useRouter();
   const { selectedIds, isMaxExceeded, handleSelect } = useWishSelection(MAX_SELECT);
   const { wishlistData, fetchNextPage, hasNextPage, isFetchingNextPage } = useGetWishlist();
   const { tournamentData } = useGetTournament(tournamentId);
@@ -29,12 +32,15 @@ function ByWishContent({ tournamentId }: ByWishContentProps) {
   const pending = 'pending' in tournamentData ? tournamentData.pending : null;
   const existingItemIds = new Set(pending?.items.map(i => i.itemId) ?? []);
   const items = wishlistData.filter(
-    item =>
-      item.status !== 'FAILED' &&
-      item.status !== 'PROCESSING' &&
-      item.itemId != null &&
-      !existingItemIds.has(item.itemId)
+    ({ item }) =>
+      item.status !== 'FAILED' && item.status !== 'PROCESSING' && !existingItemIds.has(item.id)
   );
+
+  /**
+   * 가져올 위시가 하나도 없는 경우 — 위시가 아예 없거나, 남은 게 전부 이미 담겼거나 추출 실패/진행 중이다.
+   * 전체 페이지를 다 받은 뒤에 판단해야 로딩 중 잘못 뜨지 않는다.
+   */
+  const hasNoSelectableWish = !hasNextPage && !isFetchingNextPage && items.length === 0;
 
   useEffect(() => {
     if (!isMaxExceeded) return;
@@ -50,8 +56,8 @@ function ByWishContent({ tournamentId }: ByWishContentProps) {
 
   const handleNext = () => {
     const itemIds = items
-      .filter(item => selectedIds.includes(item.id))
-      .map(item => item.itemId as number);
+      .filter(({ wish }) => selectedIds.includes(wish.id))
+      .map(({ item }) => item.id);
     postTournamentItemsByWishMutation(itemIds);
   };
 
@@ -60,7 +66,9 @@ function ByWishContent({ tournamentId }: ByWishContentProps) {
       <div className="px-5">
         <Header
           left={<HeaderIcon name="BACK" />}
-          center={<h1 className="heading-1-bold text-text-neutral-primary">내 위시에서 가져오기</h1>}
+          center={
+            <h1 className="heading-1-bold text-text-neutral-primary">내 위시에서 가져오기</h1>
+          }
         />
         <WishSelectHeader
           selectedCount={selectedIds.length}
@@ -72,15 +80,15 @@ function ByWishContent({ tournamentId }: ByWishContentProps) {
 
       <main className="mt-6 hide-scrollbar flex flex-1 flex-col overflow-y-auto pb-32">
         <div className="grid grid-cols-2">
-          {items.map(item => (
+          {items.map(({ wish, item }) => (
             <WishSelectCard
-              key={item.id}
+              key={wish.id}
               name={item.name}
               price={item.price}
               imageUrl={item.imageUrl}
               sourcePlatform={item.sourcePlatform}
-              isSelected={selectedIds.includes(item.id)}
-              onSelect={() => handleSelect(item.id)}
+              isSelected={selectedIds.includes(wish.id)}
+              onSelect={() => handleSelect(wish.id)}
             />
           ))}
         </div>
@@ -97,6 +105,12 @@ function ByWishContent({ tournamentId }: ByWishContentProps) {
           다음
         </Button>
       </BottomCta>
+
+      <TournamentErrorDialog
+        type="NO_WISH_EXISTS"
+        open={hasNoSelectableWish}
+        onOpenChange={() => router.back()}
+      />
     </div>
   );
 }

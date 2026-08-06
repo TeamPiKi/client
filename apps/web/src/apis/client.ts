@@ -1,20 +1,29 @@
+import { ERROR_CODE, WEBBRIDGE_MESSAGE_TYPE } from '@piki/core';
 import * as Sentry from '@sentry/nextjs';
 import type { AxiosError } from 'axios';
 import axios from 'axios';
 
+import { ENDPOINTS } from '@/consts/api';
 import { QUERY_ACTION } from '@/consts/queryAction';
 import { ROUTES } from '@/consts/route';
 import { CLIENT_TYPE } from '@/consts/webBridge';
 import type { ApiErrorResponseT } from '@/types/api';
 import { captureError } from '@/utils/captureError';
-import { getCookie } from '@/utils/cookie';
+import { deleteCookie, getCookie } from '@/utils/cookie';
 import { getLoginPath } from '@/utils/loginRedirect';
 import { refreshClientToken } from '@/utils/refreshClientToken';
-import { isWebview } from '@/utils/webBridge';
+import { WebBridge, isWebview } from '@/utils/webBridge';
 
 export const clientApi = axios.create({
   withCredentials: true,
 });
+
+/** 로그인 요청 — 아직 세션이 없어 refresh 가 성공할 수 없고, 401 도 세션 만료가 아니라 로그인 실패다 */
+const isLoginRequest = (url?: string) => {
+  const path = url?.split('?')[0] ?? '';
+
+  return path.startsWith(ENDPOINTS.AUTH_LOGIN('')) || path === ENDPOINTS.AUTH_GUEST;
+};
 
 clientApi.interceptors.request.use(config => {
   const accessToken = getCookie('access_token');
@@ -33,7 +42,12 @@ clientApi.interceptors.response.use(
     const originalRequest = error.config;
     const hasRetried = originalRequest?.headers.get('x-retry-attempted') === 'true';
 
-    if (error.response?.status === 401 && originalRequest && !hasRetried) {
+    if (
+      error.response?.status === 401 &&
+      originalRequest &&
+      !hasRetried &&
+      !isLoginRequest(originalRequest.url)
+    ) {
       originalRequest.headers.set('x-retry-attempted', 'true');
 
       try {
@@ -61,6 +75,27 @@ clientApi.interceptors.response.use(
       }
     }
 
+    /** 탈퇴한 계정인 경우 로그아웃 후 로그인 페이지로 리다이렉트 */
+    if (
+      error.response?.status === 409 &&
+      error.response.data?.code === ERROR_CODE.USER_DELETED &&
+      typeof window !== 'undefined'
+    ) {
+      Sentry.setUser(null);
+      deleteCookie('access_token');
+      deleteCookie('refresh_token');
+
+      if (isWebview()) WebBridge.postMessage({ type: WEBBRIDGE_MESSAGE_TYPE.WEB_REQ_LOGOUT });
+
+      const loginRedirectDisabled =
+        window.location.pathname === ROUTES.LOGIN || window.location.pathname === ROUTES.ROOT;
+
+      if (!loginRedirectDisabled)
+        window.location.href = getLoginPath(null, QUERY_ACTION.VALUE.WITHDRAWN_ACCOUNT);
+
+      return Promise.reject(error);
+    }
+
     /** 5xx·네트워크 오류만 수집 (4xx는 예상된 흐름이라 제외) */
     const status = error.response?.status;
     const shouldReport =
@@ -82,7 +117,7 @@ clientApi.interceptors.response.use(
           method: originalRequest?.method,
           status,
           code: error.code,
-          detail: error.response?.data?.detail,
+          apiCode: error.response?.data?.code,
         },
       });
     }

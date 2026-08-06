@@ -2,7 +2,7 @@
 
 import type { ComponentType, SVGProps } from 'react';
 
-import { BasketIconOutline, ReciptIconOutline } from '@/assets/icons';
+import { BasketIconOutline, ReceiptIconOutline } from '@/assets/icons';
 import { cn } from '@/utils/cn';
 
 import type { TournamentStatusTabT } from '../_consts/tournamentTab';
@@ -18,7 +18,7 @@ const TABS: {
   Icon: ComponentType<SVGProps<SVGSVGElement>>;
 }[] = [
   { value: 'ongoing', label: '진행 중', Icon: BasketIconOutline },
-  { value: 'completed', label: '완료', Icon: ReciptIconOutline },
+  { value: 'completed', label: '완료', Icon: ReceiptIconOutline },
 ];
 
 function TournamentStatusTab({ activeTab, onTabChange }: Props) {

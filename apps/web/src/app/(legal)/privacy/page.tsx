@@ -9,7 +9,7 @@ function PrivacyPage() {
       <Header
         left={<HeaderIcon name="BACK" />}
         center="개인정보 처리방침"
-        centerClassName="title-1"
+        centerClassName="heading-1-bold"
       />
       <Spacing size={48} />
 
