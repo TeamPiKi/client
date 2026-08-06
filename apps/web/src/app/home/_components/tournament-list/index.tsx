@@ -14,8 +14,8 @@ function TournamentList() {
   const queryClient = getQueryClient();
 
   queryClient.prefetchQuery({
-    queryKey: ['tournamentList', [], 3],
-    queryFn: () => getTournamentList([], 3),
+    queryKey: ['tournamentList', { limit: 3, ownedOnly: true }],
+    queryFn: () => getTournamentList({ limit: 3, ownedOnly: true }),
   });
 
   return (

@@ -16,10 +16,11 @@ async function ArchiveTournamentPage({ searchParams }: Props) {
   const initialTab: TournamentStatusTabT = tab === 'completed' ? 'completed' : 'ongoing';
 
   const queryClient = getQueryClient();
-  const statuses = STATUS_BY_TAB[initialTab];
+
+  const params = { status: STATUS_BY_TAB[initialTab] };
   await queryClient.prefetchQuery({
-    queryKey: ['tournamentList', statuses, null],
-    queryFn: () => getTournamentList(statuses),
+    queryKey: ['tournamentList', params],
+    queryFn: () => getTournamentList(params),
   });
 
   return (
