@@ -16,9 +16,18 @@
     "production": {
       "autoIncrement": true,
       "channel": "production"
+    },
+    "production-dev": {
+      "extends": "production",
+      "environment": "development",
+      "channel": "development",
+      "env": {
+        "SENTRY_DISABLE_AUTO_UPLOAD": "true"
+      }
     }
   },
   "submit": {
-    "production": {}
+    "production": {},
+    "production-dev": {}
   }
 }

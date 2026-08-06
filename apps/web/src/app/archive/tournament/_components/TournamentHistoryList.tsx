@@ -15,9 +15,9 @@ function TournamentHistoryList({ statuses, playType }: Props) {
 
   if (tournamentListData.length === 0)
     return (
-      <main className="flex flex-1 flex-col items-center justify-center pb-24">
+      <div className="flex flex-1 flex-col items-center justify-center pb-24">
         <TournamentEmptyState />
-      </main>
+      </div>
     );
 
   return (

@@ -1,16 +1,18 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { isAxiosError } from 'axios';
 import { usePathname, useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
 import { ROUTES } from '@/consts/route';
-import type { ApiErrorResponseT } from '@/types/api';
+import { useBackWithFallback } from '@/hooks/useBackWithFallback';
+import { getApiErrorStatus, isGlobalNetError } from '@/utils/apiError';
+import { getApiErrorMessage } from '@/utils/getApiErrorMessage';
 
 import { deleteTournamentItem } from '../_apis/deleteTournamentItem';
 
 export const useDeleteTournamentItem = (tournamentId: number, tournamentItemId: number) => {
   const router = useRouter();
   const pathname = usePathname();
+  const backWithFallback = useBackWithFallback();
   const queryClient = useQueryClient();
 
   const { mutate: deleteTournamentItemMutation, isPending: isDeleteTournamentItemPending } =
@@ -21,26 +23,22 @@ export const useDeleteTournamentItem = (tournamentId: number, tournamentItemId: 
         queryClient.invalidateQueries({
           queryKey: ['tournamentItem', tournamentId, tournamentItemId],
         });
+
         if (pathname !== ROUTES.TOURNAMENT_CREATE(tournamentId))
-          router.replace(ROUTES.TOURNAMENT_CREATE(tournamentId));
+          backWithFallback(ROUTES.TOURNAMENT_CREATE(tournamentId));
       },
       onError: error => {
-        if (!isAxiosError<ApiErrorResponseT>(error) || !error.response) return;
-
-        const {
-          status,
-          data: { detail },
-        } = error.response;
-
-        const clientErrorMessage = detail ?? '요청을 처리하지 못했습니다.';
+        if (isGlobalNetError(error)) return;
 
         /**
          * 403: 토너먼트 참여 권한 없음
-         * 404: 토너먼트 or 토너먼트 아이템 존재하지w 않음
+         * 404: 토너먼트 or 토너먼트 아이템 존재하지 않음
          * 409: PENDING 상태 아닌 토너먼트
          */
+        toast.error(getApiErrorMessage(error));
+
+        const status = getApiErrorStatus(error);
         if (status === 403 || status === 404 || status === 409) {
-          toast.error(clientErrorMessage);
           if (pathname !== ROUTES.TOURNAMENT_CREATE(tournamentId))
             router.replace(ROUTES.TOURNAMENT_CREATE(tournamentId));
         }

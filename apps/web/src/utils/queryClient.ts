@@ -6,10 +6,14 @@ import {
   defaultShouldDehydrateQuery,
   environmentManager,
 } from '@tanstack/react-query';
-import { isAxiosError } from 'axios';
 import { cache } from 'react';
 import { toast } from 'sonner';
 
+import {
+  getApiErrorStatus,
+  isServerOrNetworkError,
+  isWithdrawnAccountError,
+} from '@/utils/apiError';
 import { getApiErrorMessage } from '@/utils/getApiErrorMessage';
 
 /** REF: https://tanstack.com/query/latest/docs/framework/react/guides/advanced-ssr */
@@ -19,13 +23,11 @@ const makeQueryClient = () => {
     /** mutation — 사용자 액션 실패: 토스트 + (Sentry) 로깅 */
     mutationCache: new MutationCache({
       onError: (error, _variables, _context, mutation) => {
-        const status = isAxiosError(error) ? error.response?.status : null;
-
-        /** 401은 전역 인터셉터(apis/client.ts)가 refresh·redirect로 처리 → 이중 토스트 방지 */
-        if (status === 401) return;
+        /** 401·탈퇴 계정은 전역 인터셉터(apis/client.ts)가 refresh·redirect로 처리 → 이중 토스트 방지 */
+        if (getApiErrorStatus(error) === 401 || isWithdrawnAccountError(error)) return;
 
         /** 5xx·네트워크는 전역이 단독 처리 (개별 onError는 5xx를 건드리지 않음) */
-        if (!status || status >= 500) {
+        if (isServerOrNetworkError(error)) {
           toast.error(getApiErrorMessage(error));
           Sentry.captureException(error);
           return;

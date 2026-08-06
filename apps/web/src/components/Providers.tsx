@@ -8,6 +8,7 @@ import NavigationOverlay from '@/components/navigation-overlay';
 import NotificationSSEProvider from '@/components/notification-sse-provider';
 import { Toaster } from '@/components/toast';
 import { useAppNavigate } from '@/hooks/useAppNavigate';
+import { useTrackAppHistoryDepth } from '@/hooks/useBackWithFallback';
 import { useDeepLink } from '@/hooks/useDeepLink';
 import { useFcmTokenSync } from '@/hooks/useFcmTokenSync';
 import { getQueryClient } from '@/utils/queryClient';
@@ -41,6 +42,8 @@ function AppNavigateHandler() {
 
 function Providers({ children }: Readonly<{ children: ReactNode }>) {
   const queryClient = getQueryClient();
+
+  useTrackAppHistoryDepth();
 
   return (
     <QueryClientProvider client={queryClient}>

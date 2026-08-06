@@ -11,11 +11,11 @@ import { getRoleFromToken } from '@/utils/auth';
 import LoginButtons from './_components/LoginButtons';
 
 type LoginPageProps = {
-  searchParams: Promise<{ redirect?: string; action?: string }>;
+  searchParams: Promise<{ redirect?: string; action?: string; code?: string }>;
 };
 
 async function LoginPage({ searchParams }: LoginPageProps) {
-  const { redirect: redirectParam, action } = await searchParams;
+  const { redirect: redirectParam, action, code } = await searchParams;
 
   /** 멤버가 로그인 페이지 직접 진입 시 홈으로 리다이렉트 */
   const accessToken = (await cookies()).get('access_token')?.value;
@@ -33,10 +33,7 @@ async function LoginPage({ searchParams }: LoginPageProps) {
   return (
     <div className="flex min-h-dvh flex-col items-center bg-gray-50 px-4 pt-padding-top pb-10">
       <div className="mt-15 flex flex-col items-center gap-6">
-        <PikiLogo
-          aria-label="PiKi"
-          className="h-[106px] w-[146px] shrink-0 text-text-neutral-primary"
-        />
+        <PikiLogo aria-label="PiKi" className="h-[106px] w-[146px] shrink-0 text-sky-blue-400" />
         <p className="animate-in text-center body-1-bold whitespace-pre-line text-text-neutral-secondary duration-500 fade-in-0">
           {'매일 쌓여만 가던\n위시리스트가 오늘의 결정으로'}
         </p>
@@ -46,6 +43,7 @@ async function LoginPage({ searchParams }: LoginPageProps) {
         <LoginButtons
           redirect={redirectParam ?? null}
           action={action ?? null}
+          errorCode={code ?? null}
           showAppleLogin={!isAndroidWebview}
         />
 

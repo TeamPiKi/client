@@ -55,7 +55,7 @@ function TournamentHistorySection({ initialTab, initialPlayTypeFilter }: Props) 
           onFilterChange={handlePlayTypeFilterChange}
         />
       </div>
-      <main className="hide-scrollbar flex flex-1 flex-col gap-4 overflow-y-auto pt-6 pb-24">
+      <div className="hide-scrollbar flex flex-1 flex-col gap-4 overflow-y-auto pt-6 pb-24">
         <Suspense
           key={`${activeTab}-${activePlayTypeFilter}`}
           fallback={<TournamentHistorySkeleton />}
@@ -65,7 +65,7 @@ function TournamentHistorySection({ initialTab, initialPlayTypeFilter }: Props) 
             playType={PLAY_TYPE_BY_FILTER[activePlayTypeFilter]}
           />
         </Suspense>
-      </main>
+      </div>
     </>
   );
 }

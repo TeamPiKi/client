@@ -1,6 +1,7 @@
 import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
 
 import { getTournamentList } from '@/apis/getTournamentList';
+import { QUERY_KEYS } from '@/consts/queryKeys';
 import { getQueryClient } from '@/utils/queryClient';
 
 import TournamentFab from './_components/TournamentFab';
@@ -25,17 +26,18 @@ async function ArchiveTournamentPage({ searchParams }: Props) {
       : PLAY_TYPE_FILTER.ALL;
 
   const queryClient = getQueryClient();
+
   const params = {
     status: STATUS_BY_TAB[initialTab],
     playType: PLAY_TYPE_BY_FILTER[initialPlayTypeFilter],
   };
   await queryClient.prefetchQuery({
-    queryKey: ['tournamentList', params],
+    queryKey: QUERY_KEYS.TOURNAMENT.LIST.BY_PARAMS(params),
     queryFn: () => getTournamentList(params),
   });
 
   return (
-    <div className="flex min-h-dvh flex-col bg-bg-layer-basement px-5">
+    <main className="flex min-h-dvh flex-col bg-bg-layer-basement px-5">
       <HydrationBoundary state={dehydrate(queryClient)}>
         <TournamentHistorySection
           initialTab={initialTab}
@@ -43,7 +45,7 @@ async function ArchiveTournamentPage({ searchParams }: Props) {
         />
       </HydrationBoundary>
       <TournamentFab />
-    </div>
+    </main>
   );
 }
 

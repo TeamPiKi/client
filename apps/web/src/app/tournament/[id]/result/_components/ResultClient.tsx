@@ -2,10 +2,9 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { toast } from 'sonner';
+import { useEffect, useRef, useState } from 'react';
 
-import { ChevronForwardIconFill, DownloadIconFill, UploadIconFill } from '@/assets/icons';
+import { ChevronForwardIconFill, ReceiptIconOutline, TrophyIconOutline } from '@/assets/icons';
 import BottomCta from '@/components/bottom-cta';
 import Button from '@/components/button';
 import { Header } from '@/components/header';
@@ -16,10 +15,10 @@ import { useQueryAction } from '@/hooks/useQueryAction';
 import { logAnalyticsEvent } from '@/utils/analytics';
 
 import { useGetTournament } from '../../_common/_hooks/useGetTournament';
-import { shareReceiptImage } from '../_utils/shareReceiptImage';
-import ReceiptDrawMachine, { type ReceiptDrawMachineHandleT } from './ReceiptDrawMachine';
+import ReceiptDrawMachine from './ReceiptDrawMachine';
 import GroupResultEntryCard from './group-result-entry-card/GroupResultEntryCard';
 import PlateShareDialog from './plate-share-dialog/PlateShareDialog';
+import ReceiptShareDialog from './receipt-share-dialog/ReceiptShareDialog';
 
 type ResultClientProps = {
   tournamentId: number;
@@ -30,12 +29,7 @@ function ResultClient({ tournamentId }: ResultClientProps) {
   const { tournamentData } = useGetTournament(tournamentId);
   const [date] = useState(() => new Date());
   const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
-  const [isCapturing, setIsCapturing] = useState(false);
-  // 동기 락 — setState 가 비동기라 빠른 연속 클릭 시 같은 이벤트 루프에서 재진입되는 걸 막는다.
-  const isCapturingRef = useRef(false);
-  const receiptMachineRef = useRef<ReceiptDrawMachineHandleT | null>(null);
-  // SHARE_RECEIPT 액션 진입 시 예약한 setTimeout id — 언마운트 시 정리해 stale 호출을 막는다.
-  const shareTimeoutRef = useRef<number | null>(null);
+  const [isReceiptShareDialogOpen, setIsReceiptShareDialogOpen] = useState(false);
 
   // RSC에서 status 검사를 하지만, 클라에서 status가 바뀐 경우 방어
   useEffect(() => {
@@ -53,42 +47,11 @@ function ResultClient({ tournamentId }: ResultClientProps) {
     logAnalyticsEvent(ANALYTICS_EVENT.RESULT_VIEW, { tournament_id: tournamentId });
   }, [tournamentData.status, tournamentId]);
 
-  const handleShareReceiptImage = useCallback(async () => {
-    const element = receiptMachineRef.current?.getReceiptPaperElement();
-    if (!element || isCapturingRef.current) return;
-
-    isCapturingRef.current = true;
-    setIsCapturing(true);
-    try {
-      await shareReceiptImage(element);
-      logAnalyticsEvent(ANALYTICS_EVENT.RECEIPT_SHARE, { tournament_id: tournamentId });
-    } catch (error) {
-      console.error('[shareReceiptImage]', error);
-      toast.error('영수증 이미지를 만들지 못했어요');
-    } finally {
-      isCapturingRef.current = false;
-      setIsCapturing(false);
-    }
-  }, [tournamentId]);
-
-  // 보관함의 "결과 공유하기" 메뉴에서 진입 시 자동으로 영수증 이미지 공유 시트를 띄운다.
-  // 영수증 슬라이드 애니메이션(~2초) 이 끝난 뒤 캡처해야 정상이라 약간 지연.
+  // 보관함의 "결과 공유하기" 메뉴에서 진입 시 영수증 공유 시트를 자동으로 띄운다.
   useQueryAction({
     action: QUERY_ACTION.VALUE.SHARE_RECEIPT,
-    onAction: () => {
-      shareTimeoutRef.current = window.setTimeout(handleShareReceiptImage, 2_000);
-    },
+    onAction: () => setIsReceiptShareDialogOpen(true),
   });
-
-  // 언마운트 시 예약된 공유 타이머 정리.
-  useEffect(() => {
-    return () => {
-      if (shareTimeoutRef.current !== null) {
-        window.clearTimeout(shareTimeoutRef.current);
-        shareTimeoutRef.current = null;
-      }
-    };
-  }, []);
 
   if (tournamentData.status !== 'COMPLETED') {
     return (
@@ -113,7 +76,6 @@ function ResultClient({ tournamentId }: ResultClientProps) {
 
       <div className="mx-auto mt-4 flex min-h-0 w-full max-w-120 flex-1 flex-col gap-3">
         <ReceiptDrawMachine
-          ref={receiptMachineRef}
           tournamentId={tournamentId}
           tournamentName={tournamentName}
           result={result}
@@ -136,25 +98,24 @@ function ResultClient({ tournamentId }: ResultClientProps) {
 
       {/* 하단 CTA — 저장/공유 버튼 → 홈으로 가기 순 위계, 항상 화면 하단 고정 */}
       <BottomCta hasGradient className="flex-col items-stretch gap-6.5 pb-[30px]">
-        {/* 영수증 저장 (모든 사용자) + 토너먼트 공유 (ROOT 소유자만, 플레이 링크 공유) */}
+        {/* 영수증 공유 (모든 사용자) + 토너먼트 공유 (ROOT 소유자만, 플레이 링크 공유) */}
         <div className="flex gap-3">
           <Button
             variant="secondary"
             size="lg"
             icon="leading"
-            leadingIcon={<DownloadIconFill aria-hidden className="size-5" />}
-            onClick={handleShareReceiptImage}
-            disabled={isCapturing}
+            leadingIcon={<ReceiptIconOutline aria-hidden className="size-5" />}
+            onClick={() => setIsReceiptShareDialogOpen(true)}
             className="flex-1 border-gray-75 bg-gray-75 text-text-neutral-secondary"
           >
-            {isCapturing ? '이미지 만드는 중...' : '영수증 저장'}
+            영수증 공유
           </Button>
           {canSharePlayLink && (
             <Button
               variant="primary"
               size="lg"
               icon="leading"
-              leadingIcon={<UploadIconFill aria-hidden className="size-5" />}
+              leadingIcon={<TrophyIconOutline aria-hidden className="size-5" />}
               onClick={handleSharePlayLink}
               className="flex-1"
             >
@@ -177,6 +138,15 @@ function ResultClient({ tournamentId }: ResultClientProps) {
         onOpenChange={setIsShareDialogOpen}
         tournamentId={tournamentId}
         initialPlayLinkExpiresAt={tournamentData.completed.playLinkExpiresAt}
+      />
+
+      <ReceiptShareDialog
+        open={isReceiptShareDialogOpen}
+        onOpenChange={setIsReceiptShareDialogOpen}
+        tournamentId={tournamentId}
+        tournamentName={tournamentName}
+        result={result}
+        date={date}
       />
     </main>
   );

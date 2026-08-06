@@ -1,5 +1,5 @@
 import type { Route } from '@playwright/test';
-import { expect, test as base } from '@playwright/test';
+import { test as base, expect } from '@playwright/test';
 
 import { ENDPOINTS } from '@/consts/api';
 
@@ -15,16 +15,26 @@ type MockEntryT = {
 
 type ApiErrorOptionsT = {
   status?: number;
-  detail?: string;
   code?: string;
+};
+
+type PageResponseT = {
+  nextCursor: string | null;
+  hasNext: boolean;
 };
 
 export type ApiMockT = {
   get: <T>(path: string, data: T) => void;
+  /** 커서 페이지네이션 응답 (`pageResponse` 최상위 필드 포함) — 위시리스트 등 */
+  getPage: <T>(path: string, data: T, pageResponse?: PageResponseT) => void;
   post: <T>(path: string, data: T) => void;
   patch: <T>(path: string, data: T) => void;
   delete: <T>(path: string, data: T) => void;
-  error: (method: 'GET' | 'POST' | 'PATCH' | 'DELETE', path: string, options?: ApiErrorOptionsT) => void;
+  error: (
+    method: 'GET' | 'POST' | 'PATCH' | 'DELETE',
+    path: string,
+    options?: ApiErrorOptionsT
+  ) => void;
 };
 
 /**
@@ -71,13 +81,10 @@ export const test = base.extend<{ api: ApiMockT }>({
         return route.fulfill({
           status: 500,
           contentType: 'application/json',
-          body: JSON.stringify(
-            createApiError({
-              status: 500,
-              code: 'E2E_UNMOCKED',
-              detail: `목킹되지 않은 요청: ${method} ${pathname}`,
-            })
-          ),
+          body: JSON.stringify({
+            ...createApiError({ code: 'E2E_UNMOCKED' }),
+            debug: `목킹되지 않은 요청: ${method} ${pathname}`,
+          }),
         });
       }
 
@@ -127,6 +134,16 @@ export const test = base.extend<{ api: ApiMockT }>({
     await provide({
       get: (path, data) =>
         entries.push({ method: 'GET', path, status: 200, body: createApiSuccess(data) }),
+      getPage: (path, data, pageResponse) =>
+        entries.push({
+          method: 'GET',
+          path,
+          status: 200,
+          body: {
+            ...createApiSuccess(data),
+            pageResponse: pageResponse ?? { nextCursor: null, hasNext: false },
+          },
+        }),
       post: (path, data) =>
         entries.push({ method: 'POST', path, status: 200, body: createApiSuccess(data) }),
       patch: (path, data) =>

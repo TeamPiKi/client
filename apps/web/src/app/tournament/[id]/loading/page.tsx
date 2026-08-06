@@ -17,7 +17,7 @@ function TournamentLoadingPage() {
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      router.push(ROUTES.TOURNAMENT_MATCH(tournamentId));
+      router.replace(ROUTES.TOURNAMENT_MATCH(tournamentId));
     }, LOADING_DURATION_MS);
     return () => clearTimeout(timer);
   }, [router, tournamentId]);

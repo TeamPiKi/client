@@ -6,7 +6,7 @@ import { ENDPOINTS } from '@/consts/api';
 import type { ApiResponseT } from '@/types/api';
 import type { GetTournamentListRequestT, GetTournamentListResponseT } from '@/types/tournament';
 
-export const getTournamentList = async (params: GetTournamentListRequestT = {}) => {
+export const getTournamentList = async (params: GetTournamentListRequestT) => {
   if (environmentManager.isServer()) {
     const { data } = await serverApi.get<ApiResponseT<GetTournamentListResponseT>>(
       ENDPOINTS.TOURNAMENTS,

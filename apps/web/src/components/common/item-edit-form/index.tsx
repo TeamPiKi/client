@@ -6,7 +6,7 @@ import BottomCta from '@/components/bottom-cta';
 import Button from '@/components/button';
 import Input from '@/components/input';
 import Spacing from '@/components/spacing';
-import type { ItemStatusT } from '@/types/item';
+import type { ItemStatusT, PatchItemRequestT } from '@/types/item';
 import formatPrice from '@/utils/formatPrice';
 import parsePriceToNumber from '@/utils/parsePriceToNumber';
 
@@ -17,7 +17,7 @@ type ItemEditFormProps = {
   initialImageUrl: string | null;
   initialName: string;
   initialPrice: number;
-  onSave?: (data: { name: string; currentPrice: number; image: File }) => void;
+  onSave?: (data: PatchItemRequestT) => void;
   isSavePending?: boolean;
   onDelete: () => void;
   isDeletePending?: boolean;
@@ -37,44 +37,39 @@ function ItemEditForm({
   onRefresh,
   isRefreshPending = false,
 }: ItemEditFormProps) {
-  const initialPriceFormatted = initialPrice ? formatPrice(String(initialPrice)) : '';
-
   const [name, setName] = useState(initialName);
-  const [price, setPrice] = useState(initialPriceFormatted);
+  const [price, setPrice] = useState(initialPrice ? formatPrice(String(initialPrice)) : '');
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
 
-  const isActionPending = isDeletePending || isRefreshPending || isSavePending;
   const trimmedName = name.trim();
   const parsedPrice = parsePriceToNumber(price);
-  const isValid = trimmedName.length > 0 && parsedPrice > 0 && selectedImage !== null;
 
+  const isActionPending = isSavePending || isDeletePending || isRefreshPending;
+
+  const isNameChanged = trimmedName !== initialName.trim();
+  const isPriceChanged = parsedPrice !== initialPrice;
+
+  const hasImage = initialImageUrl !== null || selectedImage !== null;
+  const isChanged = isNameChanged || isPriceChanged || selectedImage !== null;
+  /**
+   * 저장 가능한 경우
+   * - READY: 이미지, 상품명, 가격 필드 중 일부 수정 가능. 생략은 불가
+   * - FAILED: 이미지, 상품명, 가격 필드가 모두 추가되어야 함
+   */
+  const isSavable = isChanged && hasImage && trimmedName.length > 0 && parsedPrice > 0;
+
+  /** 폼은 name·price 를 항상 검증하되, 전송은 실제로 바뀐 필드만 한다 */
   const handleSave = () => {
-    const isChanged =
-      trimmedName !== initialName.trim() ||
-      formatPrice(price) !== initialPriceFormatted ||
-      selectedImage !== null;
-    if (!isChanged || isActionPending || !selectedImage) return;
-
-    onSave?.({ name: trimmedName, currentPrice: parsedPrice, image: selectedImage });
-  };
-
-  const handleDelete = () => {
-    if (isActionPending) return;
-    onDelete();
-  };
-
-  const handleRefresh = () => {
-    if (isActionPending) return;
-    onRefresh?.();
+    onSave?.({
+      ...(isNameChanged && { name: trimmedName }),
+      ...(isPriceChanged && { price: parsedPrice }),
+      ...(selectedImage && { image: selectedImage }),
+    });
   };
 
   return (
     <>
-      <ItemImageSection
-        imageUrl={initialImageUrl}
-        onImageSelect={setSelectedImage}
-        disabled={itemStatus === 'READY'}
-      />
+      <ItemImageSection imageUrl={initialImageUrl} onImageSelect={setSelectedImage} />
 
       <Spacing size={24} />
 
@@ -86,7 +81,6 @@ function ItemEditForm({
           onChange={event => setName(event.target.value)}
           maxLength={50}
           autoCorrect="off"
-          disabled={itemStatus === 'READY'}
         />
         <Input
           label="가격"
@@ -97,59 +91,46 @@ function ItemEditForm({
           onBlur={() => setPrice(prev => formatPrice(prev))}
           inputMode="numeric"
           autoCorrect="off"
-          disabled={itemStatus === 'READY'}
         />
       </div>
 
-      {itemStatus === 'READY' && onRefresh && (
-        <BottomCta>
-          <Button
-            variant="secondary"
-            size="lg"
-            className="flex-1"
-            isLoading={isDeletePending}
-            disabled={isRefreshPending || isSavePending}
-            onClick={handleDelete}
-          >
-            삭제하기
-          </Button>
+      <BottomCta>
+        <Button
+          variant="secondary"
+          size="lg"
+          className="flex-1"
+          isLoading={isDeletePending}
+          disabled={isActionPending}
+          onClick={onDelete}
+        >
+          삭제하기
+        </Button>
+
+        {/** 정보 갱신은 READY만 가능 */}
+        {itemStatus === 'READY' && !!onRefresh && (
           <Button
             variant="primary"
             size="lg"
             className="flex-1"
             isLoading={isRefreshPending}
-            disabled={isDeletePending || isSavePending}
-            onClick={handleRefresh}
+            disabled={isActionPending}
+            onClick={onRefresh}
           >
             다시 불러오기
           </Button>
-        </BottomCta>
-      )}
+        )}
 
-      {itemStatus === 'FAILED' && (
-        <BottomCta>
-          <Button
-            variant="secondary"
-            size="lg"
-            className="flex-1"
-            isLoading={isDeletePending}
-            disabled={isRefreshPending || isSavePending}
-            onClick={handleDelete}
-          >
-            삭제하기
-          </Button>
-          <Button
-            variant="primary"
-            size="lg"
-            className="flex-1"
-            isLoading={isSavePending}
-            disabled={isDeletePending || isRefreshPending || !isValid}
-            onClick={handleSave}
-          >
-            저장하기
-          </Button>
-        </BottomCta>
-      )}
+        <Button
+          variant="primary"
+          size="lg"
+          className="flex-1"
+          isLoading={isSavePending}
+          disabled={isActionPending || !isSavable}
+          onClick={handleSave}
+        >
+          저장하기
+        </Button>
+      </BottomCta>
     </>
   );
 }
