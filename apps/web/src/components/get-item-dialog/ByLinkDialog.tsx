@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { usePostTournamentItemLink } from '@/app/tournament/[id]/create/_hooks/usePostTournamentItemLink';
 import { LinkIconFill } from '@/assets/icons';
 import Button from '@/components/button';
+import AddItemErrorDialog from '@/components/common/add-item-error-dialog';
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/dialog';
 import Input from '@/components/input';
 import { usePostWishLink } from '@/hooks/usePostWishLink';
@@ -26,7 +27,7 @@ function ByLinkDialog({ type, open, onOpenChange }: ByLinkProps) {
   const { postWishLinkMutation, isPostWishLinkPending } = usePostWishLink({
     showErrorToast: false,
   });
-  const { postTournamentItemLinkMutation, isPostTournamentItemLinkPending } =
+  const { postTournamentItemLinkMutation, isPostTournamentItemLinkPending, addItemErrorType } =
     usePostTournamentItemLink(Number(tournamentId), { showErrorToast: false });
 
   const [url, setUrl] = useState('');
@@ -93,6 +94,8 @@ function ByLinkDialog({ type, open, onOpenChange }: ByLinkProps) {
     if (!nextOpen) resetState();
     onOpenChange(nextOpen);
   };
+
+  if (addItemErrorType) return <AddItemErrorDialog type={addItemErrorType} />;
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>

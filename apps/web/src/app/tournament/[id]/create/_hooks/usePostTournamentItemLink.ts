@@ -1,9 +1,12 @@
+import { ERROR_CODE } from '@piki/core';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 import { toast } from 'sonner';
 
+import type { AddItemErrorTypeT } from '@/components/common/add-item-error-dialog';
 import { ROUTES } from '@/consts/route';
-import { getApiErrorStatus, isGlobalNetError } from '@/utils/apiError';
+import { getApiErrorCode, getApiErrorStatus, isGlobalNetError } from '@/utils/apiError';
 import { getApiErrorMessage } from '@/utils/getApiErrorMessage';
 
 import { postTournamentItemLink } from '../_apis/postTournamentItemLink';
@@ -20,6 +23,8 @@ export const usePostTournamentItemLink = (
   const router = useRouter();
   const queryClient = useQueryClient();
 
+  const [addItemErrorType, setAddItemErrorType] = useState<AddItemErrorTypeT | null>(null);
+
   const { mutate: postTournamentItemLinkMutation, isPending: isPostTournamentItemLinkPending } =
     useMutation({
       mutationFn: (url: string) => postTournamentItemLink(tournamentId, url),
@@ -35,12 +40,17 @@ export const usePostTournamentItemLink = (
          * 404: 토너먼트 존재하지 않음
          * 409: PENDING 상태 아닌 토너먼트
          */
+        const status = getApiErrorStatus(error);
+        const apiErrorCode = getApiErrorCode(error);
+
         if (showErrorToast) toast.error(getApiErrorMessage(error));
 
-        const status = getApiErrorStatus(error);
-        if (status === 403 || status === 404 || status === 409) router.replace(ROUTES.HOME);
+        if (status === 403) router.replace(ROUTES.HOME);
+
+        if (apiErrorCode === ERROR_CODE.TOURNAMENT_NOT_PENDING)
+          setAddItemErrorType('ALREADY_STARTED');
       },
     });
 
-  return { postTournamentItemLinkMutation, isPostTournamentItemLinkPending };
+  return { postTournamentItemLinkMutation, isPostTournamentItemLinkPending, addItemErrorType };
 };
