@@ -7,7 +7,7 @@ import { ANALYTICS_EVENT } from '@/consts/analytics';
 import { QUERY_ACTION } from '@/consts/queryAction';
 import type { ApiErrorResponseT } from '@/types/api';
 import { logAnalyticsEvent } from '@/utils/analytics';
-import { isServerOrNetworkError } from '@/utils/apiError';
+import { isServerOrNetworkError, isWithdrawnAccountError } from '@/utils/apiError';
 import { getLoginPath, getLoginRedirectPath } from '@/utils/loginRedirect';
 
 import { postSocialLogin } from '../_apis/postSocialLogin';
@@ -34,6 +34,9 @@ export const usePostSocialLogin = (provider: SocialProviderT) => {
       window.location.replace(getLoginRedirectPath(variables.redirect));
     },
     onError: (error, variables) => {
+      /** 탈퇴 계정(409 USER-003)은 client.ts 인터셉터가 세션 정리 + WITHDRAWN_ACCOUNT 이동까지 끝낸다 */
+      if (isWithdrawnAccountError(error)) return;
+
       /** 5xx·네트워크 문구는 전역 안전망이 띄운다 → 액션 쿼리 없이 이동해 토스트 중복을 막는다 */
       if (isServerOrNetworkError(error)) {
         router.replace(getLoginPath(variables.redirect));
