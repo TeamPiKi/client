@@ -24,6 +24,13 @@ export type TournamentRankingT = TournamentItemT & {
   rank: number;
 };
 
+export type GetTournamentListRequestT = {
+  status?: TournamentStatusT[];
+  limit?: number;
+  /** 내가 만든 토너먼트만 조회 */
+  ownedOnly?: boolean;
+};
+
 export type GetTournamentListResponseT = {
   tournamentId: number;
   name: string;

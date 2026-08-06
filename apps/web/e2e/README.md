@@ -106,6 +106,19 @@ export const MOCK_TOURNAMENT_LIST: TournamentT[] = [
 [`GET ${ENDPOINTS.TOURNAMENT(1)}`]: createApiSuccess(MOCK_TOURNAMENT_PENDING),
 ```
 
+#### "데이터 없음" 화면을 테스트할 때
+
+RSC 가 prefetch 한 데이터는 클라이언트에서 그대로 하이드레이션되고 `staleTime`(60초) 안에는 다시 요청하지 않습니다. 즉 **`api.get(path, [])` 만으로는 화면이 비지 않습니다** — SSR 스텁이 준 목 데이터가 그대로 보입니다. `setSsrEmpty` 로 스텁 쪽도 비워주세요:
+
+```ts
+import { setSsrEmpty } from '@e2e/helpers/ssrEmpty';
+
+api.get(ENDPOINTS.TOURNAMENTS, []);
+
+await setSsrEmpty(page, ENDPOINTS.TOURNAMENTS); // goto 전에
+await page.goto('/home');
+```
+
 ## 목킹 구조
 
 요청 경로별로 3겹입니다. 테스트 작성 시엔 몰라도 되지만, 구조가 궁금할 때:

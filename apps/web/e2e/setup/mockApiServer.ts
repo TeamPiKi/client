@@ -2,6 +2,7 @@ import http from 'node:http';
 
 import { ENDPOINTS } from '@/consts/api';
 
+import { SSR_EMPTY_COOKIE } from '../consts';
 import { createApiError, createApiSuccess } from '../helpers/apiResponse';
 import { MOCK_MEMBER_ME } from '../mocks/me';
 import {
@@ -47,6 +48,25 @@ const SSR_MOCK_ROUTES: Record<string, unknown> = {
 };
 
 /**
+ * 테스트가 `setSsrEmpty` 로 심은 쿠키에 이 경로가 있으면 빈 목록을 응답한다.
+ * 조회(GET)에만 적용한다 — 같은 경로의 POST 등 다른 메서드까지 빈 응답이 되면 안 된다.
+ */
+const isEmptyRequested = (req: http.IncomingMessage, pathname: string) => {
+  if (req.method !== 'GET') return false;
+
+  const cookie = req.headers.cookie
+    ?.split(';')
+    .map(part => part.trim())
+    .find(part => part.startsWith(`${SSR_EMPTY_COOKIE}=`));
+
+  if (!cookie) return false;
+
+  return decodeURIComponent(cookie.slice(SSR_EMPTY_COOKIE.length + 1))
+    .split(',')
+    .includes(pathname);
+};
+
+/**
  * 스텁 서버를 띄운다. 이미 다른 세션(UI 모드 등)이 같은 포트에 띄워둔 경우
  * null 을 반환하고 기존 서버를 재사용한다 — UI 모드를 켜둔 채 CLI 실행 시 크래시 방지.
  */
@@ -54,7 +74,9 @@ export const startMockApiServer = (port: number) =>
   new Promise<http.Server | null>((resolve, reject) => {
     const server = http.createServer((req, res) => {
       const pathname = new URL(req.url ?? '/', `http://127.0.0.1:${port}`).pathname;
-      const body = SSR_MOCK_ROUTES[`${req.method} ${pathname}`];
+      const body = isEmptyRequested(req, pathname)
+        ? createApiSuccess([])
+        : SSR_MOCK_ROUTES[`${req.method} ${pathname}`];
 
       if (!body) {
         res.writeHead(404, { 'content-type': 'application/json' });

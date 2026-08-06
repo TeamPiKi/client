@@ -3,14 +3,9 @@
 import TournamentEmptyState from '@/components/common/tournament-empty-state';
 import TournamentCard from '@/components/tournament-card';
 import { useGetTournamentList } from '@/hooks/useGetTournamentList';
-import type { TournamentStatusT } from '@/types/tournament';
 
-type Props = {
-  statuses: TournamentStatusT[];
-};
-
-function TournamentListClient({ statuses }: Props) {
-  const { tournamentListData } = useGetTournamentList(statuses, 3);
+function TournamentListClient() {
+  const { tournamentListData } = useGetTournamentList({ limit: 3, ownedOnly: true });
 
   if (tournamentListData.length === 0)
     return (
