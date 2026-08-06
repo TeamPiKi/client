@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
 import { ROUTES } from '@/consts/route';
+import { isGlobalNetError } from '@/utils/apiError';
 import { deleteCookie } from '@/utils/cookie';
 import { getApiErrorMessage } from '@/utils/getApiErrorMessage';
 import { WebBridge, isWebview } from '@/utils/webBridge';
@@ -28,6 +29,12 @@ export const useDeleteMe = () => {
       router.replace(ROUTES.ROOT);
     },
     onError: error => {
+      if (isGlobalNetError(error)) return;
+
+      /**
+       * 403: 게스트는 탈퇴 불가
+       * 404: 존재하지 않는 계정
+       */
       toast.error(getApiErrorMessage(error));
     },
   });

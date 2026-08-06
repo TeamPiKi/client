@@ -1,13 +1,14 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { isAxiosError } from 'axios';
 import { usePathname, useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
 import { postWishLink } from '@/apis/postWishLink';
 import { ANALYTICS_EVENT } from '@/consts/analytics';
 import { ROUTES } from '@/consts/route';
-import type { ApiErrorResponseT } from '@/types/api';
 import { logAnalyticsEvent } from '@/utils/analytics';
+import { getApiErrorStatus, isGlobalNetError } from '@/utils/apiError';
+import { getApiErrorMessage } from '@/utils/getApiErrorMessage';
+import { getLoginPath } from '@/utils/loginRedirect';
 
 type UsePostWishLinkOptionsT = {
   /** 입력 폼처럼 에러를 화면 안에서 안내하는 경우 false — 4xx 토스트를 끈다 */
@@ -31,20 +32,17 @@ export const usePostWishLink = ({ showErrorToast = true }: UsePostWishLinkOption
       if (pathname !== ROUTES.WISHLIST) router.push(ROUTES.WISHLIST);
     },
     onError: error => {
-      if (!isAxiosError<ApiErrorResponseT>(error) || !error.response) return;
+      if (isGlobalNetError(error)) return;
 
-      const {
-        status,
-        data: { detail },
-      } = error.response;
+      /**
+       * 400: 링크 형식 오류·미지원 쇼핑몰
+       * 403: 게스트인 경우
+       * 409: 이미 등록된 상품
+       */
+      if (showErrorToast) toast.error(getApiErrorMessage(error));
 
-      if (status < 500) {
-        const clientErrorMessage = detail ?? '요청을 처리하지 못했습니다.';
-        if (showErrorToast) toast.error(clientErrorMessage);
-        return;
-      }
-
-      throw error;
+      if (getApiErrorStatus(error) === 403)
+        router.replace(getLoginPath(`${window.location.pathname}${window.location.search}`));
     },
   });
 

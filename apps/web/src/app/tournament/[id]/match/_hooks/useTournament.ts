@@ -9,7 +9,6 @@ import { toast } from 'sonner';
 import { ROUTES } from '@/consts/route';
 import type { ApiErrorResponseT } from '@/types/api';
 import type { TournamentItemT } from '@/types/tournament';
-import { getApiErrorMessage } from '@/utils/getApiErrorMessage';
 
 import { getTournament } from '../../_common/_apis/getTournament';
 import type {
@@ -162,13 +161,13 @@ const useTournament = ({ tournamentId, inProgress }: UseTournamentArgs) => {
             }
           }
         },
+        // 문구는 usePostRecordMatch(4xx)·전역(5xx·네트워크)이 담당 — 여기선 복구 동작만 한다
         onError: async error => {
           const status = isAxiosError<ApiErrorResponseT>(error) ? error.response?.status : null;
 
           // 400 TOURNAMENT-034(브래킷에 없는 조합) · 409 TOURNAMENT-035(이미 기록된 대결)
           // — 클라 상태가 서버 브래킷과 어긋난 것이라 재선택이 아니라 재동기화가 필요하다.
           if (status === 400 || status === 409) {
-            toast.error(getApiErrorMessage(error));
             try {
               await syncWithServer();
             } catch {
@@ -177,8 +176,7 @@ const useTournament = ({ tournamentId, inProgress }: UseTournamentArgs) => {
             return;
           }
 
-          // 그 외(네트워크·5xx) — 매치는 그대로라 재선택할 수 있게 카드 락만 푼다
-          toast.error('선택을 저장하지 못했어요. 다시 골라주세요.');
+          // 그 외 — 매치는 그대로라 재선택할 수 있게 카드 락만 푼다
           unlockSelection();
         },
       }

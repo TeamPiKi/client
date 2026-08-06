@@ -4,6 +4,7 @@ import { toast } from 'sonner';
 
 import { QUERY_ACTION } from '@/consts/queryAction';
 import { ROUTES } from '@/consts/route';
+import { isGlobalNetError } from '@/utils/apiError';
 import { getApiErrorMessage } from '@/utils/getApiErrorMessage';
 
 import { postTournamentItemsByWish } from '../_apis/postTournamentItemsByWish';
@@ -24,6 +25,14 @@ export const usePostTournamentItemsByWish = (tournamentId: number) => {
       );
     },
     onError: error => {
+      if (isGlobalNetError(error)) return;
+
+      /**
+       * 400: 아이템 32개 초과
+       * 403: 토너먼트 참여 권한 없음·위시에 없는 아이템
+       * 404: 토너먼트 or 아이템 존재하지 않음
+       * 409: 이미 담은 아이템·아직 추출 중인 상품
+       */
       toast.error(getApiErrorMessage(error));
     },
   });

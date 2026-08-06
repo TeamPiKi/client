@@ -1,9 +1,12 @@
+import { ERROR_CODE } from '@piki/core';
 import type { AxiosError } from 'axios';
 import axios from 'axios';
 
+import { QUERY_ACTION } from '@/consts/queryAction';
 import { CLIENT_TYPE } from '@/consts/webBridge';
 import type { ApiErrorResponseT } from '@/types/api';
 import { captureError } from '@/utils/captureError';
+import { getLoginPath } from '@/utils/loginRedirect';
 import { isWebview } from '@/utils/webBridge';
 
 // 서버 컴포넌트 전용 인스턴스
@@ -28,7 +31,14 @@ serverApi.interceptors.request.use(async config => {
 
 serverApi.interceptors.response.use(
   response => response,
-  (error: AxiosError<ApiErrorResponseT>) => {
+  async (error: AxiosError<ApiErrorResponseT>) => {
+    /** 탈퇴한 계정인 경우 로그아웃 후 로그인 페이지로 리다이렉트 */
+    if (error.response?.status === 409 && error.response.data?.code === ERROR_CODE.USER_DELETED) {
+      const { redirect } = await import('next/navigation');
+
+      redirect(getLoginPath(null, QUERY_ACTION.VALUE.WITHDRAWN_ACCOUNT));
+    }
+
     /** 5xx·네트워크 오류만 수집 (4xx는 예상된 흐름이라 제외) */
     const status = error.response?.status;
     const shouldReport =
@@ -50,7 +60,7 @@ serverApi.interceptors.response.use(
           method: error.config?.method,
           status,
           code: error.code,
-          detail: error.response?.data?.detail,
+          apiCode: error.response?.data?.code,
         },
       });
     }
