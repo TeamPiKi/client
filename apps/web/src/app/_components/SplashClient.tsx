@@ -120,7 +120,7 @@ function SplashClient() {
       style={{
         height: '100dvh',
         width: '100%',
-        backgroundColor: isBackgroundShifted ? 'var(--color-gray-50)' : '#A2DEFF',
+        backgroundColor: isBackgroundShifted ? 'var(--color-gray-50)' : '#FAFAFA',
         transition: isBackgroundShifted ? 'background-color 0.7s ease-in-out' : 'none',
       }}
     >
@@ -146,7 +146,7 @@ function SplashClient() {
       >
         <PikiLogo
           aria-label="PiKi"
-          className="block h-[106px] w-[146px] shrink-0 text-text-neutral-primary"
+          className="block h-[106px] w-[146px] shrink-0 text-sky-blue-400"
         />
       </div>
     </main>
