@@ -3,6 +3,7 @@ import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
 import { ROUTES } from '@/consts/route';
+import { useBackWithFallback } from '@/hooks/useBackWithFallback';
 import type { PatchItemRequestT } from '@/types/item';
 import { getApiErrorStatus, isGlobalNetError } from '@/utils/apiError';
 import { getApiErrorMessage } from '@/utils/getApiErrorMessage';
@@ -11,6 +12,7 @@ import { patchTournamentItem } from '../_apis/patchTournamentItem';
 
 export const usePatchTournamentItem = (tournamentId: number, tournamentItemId: number) => {
   const router = useRouter();
+  const backWithFallback = useBackWithFallback();
   const queryClient = useQueryClient();
 
   const { mutate: patchTournamentItemMutation, isPending: isPatchTournamentItemPending } =
@@ -27,7 +29,7 @@ export const usePatchTournamentItem = (tournamentId: number, tournamentItemId: n
           queryKey: ['tournamentItem', tournamentId, tournamentItemId],
         });
         queryClient.invalidateQueries({ queryKey: ['tournament', tournamentId] });
-        router.back();
+        backWithFallback(ROUTES.TOURNAMENT_CREATE(tournamentId));
       },
       onError: error => {
         if (isGlobalNetError(error)) return;

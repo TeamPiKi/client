@@ -138,7 +138,7 @@ const useTournament = ({ tournamentId, inProgress }: UseTournamentArgs) => {
           // 토너먼트 종료 — 캐시 정리(훅 onSuccess)까지 끝난 뒤 결과 페이지로
           if (data.completed) {
             setIsNavigatingToResult(true);
-            router.push(ROUTES.TOURNAMENT_RESULT(tournamentId));
+            router.replace(ROUTES.TOURNAMENT_RESULT(tournamentId));
             return;
           }
 

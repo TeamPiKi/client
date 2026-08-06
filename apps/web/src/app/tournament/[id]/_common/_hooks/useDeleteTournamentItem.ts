@@ -3,6 +3,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
 import { ROUTES } from '@/consts/route';
+import { useBackWithFallback } from '@/hooks/useBackWithFallback';
 import { getApiErrorStatus, isGlobalNetError } from '@/utils/apiError';
 import { getApiErrorMessage } from '@/utils/getApiErrorMessage';
 
@@ -11,6 +12,7 @@ import { deleteTournamentItem } from '../_apis/deleteTournamentItem';
 export const useDeleteTournamentItem = (tournamentId: number, tournamentItemId: number) => {
   const router = useRouter();
   const pathname = usePathname();
+  const backWithFallback = useBackWithFallback();
   const queryClient = useQueryClient();
 
   const { mutate: deleteTournamentItemMutation, isPending: isDeleteTournamentItemPending } =
@@ -21,8 +23,9 @@ export const useDeleteTournamentItem = (tournamentId: number, tournamentItemId: 
         queryClient.invalidateQueries({
           queryKey: ['tournamentItem', tournamentId, tournamentItemId],
         });
+
         if (pathname !== ROUTES.TOURNAMENT_CREATE(tournamentId))
-          router.replace(ROUTES.TOURNAMENT_CREATE(tournamentId));
+          backWithFallback(ROUTES.TOURNAMENT_CREATE(tournamentId));
       },
       onError: error => {
         if (isGlobalNetError(error)) return;

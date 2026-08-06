@@ -1,16 +1,15 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
-import { QUERY_ACTION } from '@/consts/queryAction';
 import { ROUTES } from '@/consts/route';
+import { useBackWithFallback } from '@/hooks/useBackWithFallback';
 import { isGlobalNetError } from '@/utils/apiError';
 import { getApiErrorMessage } from '@/utils/getApiErrorMessage';
 
 import { postTournamentItemsByWish } from '../_apis/postTournamentItemsByWish';
 
 export const usePostTournamentItemsByWish = (tournamentId: number) => {
-  const router = useRouter();
+  const backWithFallback = useBackWithFallback();
   const queryClient = useQueryClient();
 
   const {
@@ -20,9 +19,9 @@ export const usePostTournamentItemsByWish = (tournamentId: number) => {
     mutationFn: (itemIds: number[]) => postTournamentItemsByWish(tournamentId, { itemIds }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tournament', tournamentId] });
-      router.push(
-        `${ROUTES.TOURNAMENT_CREATE(tournamentId)}?${QUERY_ACTION.KEY}=${QUERY_ACTION.VALUE.SCROLL_TO_LAST}`
-      );
+
+      sessionStorage.setItem(`piki:scrollToLast:${tournamentId}`, '1');
+      backWithFallback(ROUTES.TOURNAMENT_CREATE(tournamentId));
     },
     onError: error => {
       if (isGlobalNetError(error)) return;
