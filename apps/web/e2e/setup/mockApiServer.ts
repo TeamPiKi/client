@@ -47,9 +47,14 @@ const SSR_MOCK_ROUTES: Record<string, unknown> = {
   },
 };
 
-/** 테스트가 `setSsrEmpty` 로 심은 쿠키에 이 경로가 있으면 빈 목록을 응답한다 */
-const isEmptyRequested = (cookieHeader: string | undefined, pathname: string) => {
-  const cookie = cookieHeader
+/**
+ * 테스트가 `setSsrEmpty` 로 심은 쿠키에 이 경로가 있으면 빈 목록을 응답한다.
+ * 조회(GET)에만 적용한다 — 같은 경로의 POST 등 다른 메서드까지 빈 응답이 되면 안 된다.
+ */
+const isEmptyRequested = (req: http.IncomingMessage, pathname: string) => {
+  if (req.method !== 'GET') return false;
+
+  const cookie = req.headers.cookie
     ?.split(';')
     .map(part => part.trim())
     .find(part => part.startsWith(`${SSR_EMPTY_COOKIE}=`));
@@ -69,7 +74,7 @@ export const startMockApiServer = (port: number) =>
   new Promise<http.Server | null>((resolve, reject) => {
     const server = http.createServer((req, res) => {
       const pathname = new URL(req.url ?? '/', `http://127.0.0.1:${port}`).pathname;
-      const body = isEmptyRequested(req.headers.cookie, pathname)
+      const body = isEmptyRequested(req, pathname)
         ? createApiSuccess([])
         : SSR_MOCK_ROUTES[`${req.method} ${pathname}`];
 

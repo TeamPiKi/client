@@ -111,6 +111,8 @@ export const MOCK_TOURNAMENT_LIST: TournamentT[] = [
 RSC 가 prefetch 한 데이터는 클라이언트에서 그대로 하이드레이션되고 `staleTime`(60초) 안에는 다시 요청하지 않습니다. 즉 **`api.get(path, [])` 만으로는 화면이 비지 않습니다** — SSR 스텁이 준 목 데이터가 그대로 보입니다. `setSsrEmpty` 로 스텁 쪽도 비워주세요:
 
 ```ts
+import { setSsrEmpty } from '@e2e/helpers/ssrEmpty';
+
 api.get(ENDPOINTS.TOURNAMENTS, []);
 
 await setSsrEmpty(page, ENDPOINTS.TOURNAMENTS); // goto 전에
