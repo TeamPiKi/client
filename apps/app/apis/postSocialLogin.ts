@@ -59,7 +59,7 @@ export const postSocialLogin = async (
       tags: { source: 'api', api: 'postSocialLogin', provider },
       extra: { status: response.status },
     });
-    throw new Error('서버 응답을 해석할 수 없습니다.');
+    throw new Error(getErrorMessageByCode(data?.code) ?? DEFAULT_ERROR_MESSAGE);
   }
 
   return payload;
