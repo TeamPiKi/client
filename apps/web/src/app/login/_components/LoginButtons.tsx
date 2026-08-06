@@ -142,7 +142,7 @@ function LoginButtons({ redirect, action, errorCode, showAppleLogin }: LoginButt
       <SocialLoginButton
         variant="google"
         icon={<GoogleIcon width={20} height={20} aria-hidden />}
-        label="구글 계정으로 시작하기"
+        label="Google로 시작하기"
         isLoading={activePendingProvider === 'google'}
         disabled={isAnyPending && activePendingProvider !== 'google'}
         onClick={handleGoogleLogin}

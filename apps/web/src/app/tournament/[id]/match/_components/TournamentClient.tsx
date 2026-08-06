@@ -2,6 +2,7 @@
 
 import type { GetTournamentInProgressResponseT } from '../../_common/_types/tournamentResponse';
 import useTournament from '../_hooks/useTournament';
+import MatchSkeleton from './MatchSkeleton';
 import RoundBadge from './RoundBadge';
 import RoundTransitionSheet from './RoundTransitionSheet';
 import TournamentQuestion from './TournamentQuestion';
@@ -20,6 +21,7 @@ function TournamentClient({ tournamentId, tournamentName, inProgress }: Tourname
     isFinalRound,
     transitionStage,
     selectionEpoch,
+    isRecordingMatch,
     handleSelect,
     handleTransitionComplete,
   } = useTournament({ tournamentId, tournamentName, inProgress });
@@ -42,12 +44,15 @@ function TournamentClient({ tournamentId, tournamentName, inProgress }: Tourname
         )}
       </div>
       <div className={`w-full ${isFinalRound ? 'mt-29' : 'mt-8'}`}>
-        {currentMatch && (
+        {/* 다음 매치는 서버 응답으로 오므로 기록 대기 동안 스켈레톤을 보여준다 */}
+        {isRecordingMatch || !currentMatch ? (
+          <MatchSkeleton isFinal={isFinalRound} />
+        ) : (
           <VsSection
-            // selectionEpoch: 기록 실패 시 remount 로 카드 선택 락을 풀어 재선택 가능하게 한다
-            key={`${roundLabel}-${selectionEpoch}`}
-            left={currentMatch[0]}
-            right={currentMatch[1]}
+            // 매치가 바뀌면 remount — selectionEpoch 는 기록 실패 시 카드 선택 락을 푸는 용도
+            key={`${currentMatch.first.tournamentItemId}-${currentMatch.second.tournamentItemId}-${selectionEpoch}`}
+            left={currentMatch.first}
+            right={currentMatch.second}
             isFinal={isFinalRound}
             onSelect={handleSelect}
           />

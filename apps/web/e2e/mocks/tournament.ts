@@ -2,6 +2,7 @@ import type {
   GetTournamentCompletedResponseT,
   GetTournamentInProgressResponseT,
   GetTournamentPendingResponseT,
+  TournamentMatchT,
   TournamentPendingItemT,
 } from '@/app/tournament/[id]/_common/_types/tournamentResponse';
 import type {
@@ -132,6 +133,27 @@ export const MOCK_TOURNAMENT_PENDING_WITH_ITEMS = createPendingTournament(1, 4);
  * SSR 목 응답은 실행 내내 고정이라 상태 전이(PENDING→IN_PROGRESS→COMPLETED)를
  * 한 id 로 표현할 수 없어, 단계별로 토너먼트 id 를 분리한다 (1=PENDING, 2=IN_PROGRESS, 3=COMPLETED).
  */
+const findItem = (tournamentItemId: number) =>
+  MOCK_TOURNAMENT_ITEMS.find(item => item.tournamentItemId === tournamentItemId)!;
+
+/** 4강 첫 매치 — 서버 브래킷이 정한 조합 */
+export const MOCK_MATCH_SEMI_FIRST: TournamentMatchT = {
+  first: findItem(11),
+  second: findItem(12),
+};
+
+/** 4강 두 번째 매치 — 첫 매치 기록 응답의 nextMatch */
+export const MOCK_MATCH_SEMI_SECOND: TournamentMatchT = {
+  first: findItem(13),
+  second: findItem(14),
+};
+
+/** 결승 매치 — 각 4강에서 왼쪽(더 저렴한 아이템)이 올라온 조합 */
+export const MOCK_MATCH_FINAL: TournamentMatchT = {
+  first: findItem(11),
+  second: findItem(13),
+};
+
 export const MOCK_TOURNAMENT_IN_PROGRESS: GetTournamentInProgressResponseT = {
   tournamentId: 2,
   name: 'E2E 매치 토너먼트',
@@ -142,15 +164,13 @@ export const MOCK_TOURNAMENT_IN_PROGRESS: GetTournamentInProgressResponseT = {
     currentRound: 4,
     lastHistory: null,
     remainingItems: MOCK_TOURNAMENT_ITEMS,
+    currentMatch: MOCK_MATCH_SEMI_FIRST,
   },
 };
 
 /**
  * 4강 두 매치 종료 후 서버 재조회 응답 — 결승 라운드.
- * pairByPriceAsc 는 [11,12], [13,14] 로 페어를 만들고 shufflePairs 는 페어 순서만 섞을 뿐
- * 페어 내부 좌/우는 유지하며, VsSection 은 왼쪽 카드를 먼저 렌더링한다.
- * tournamentMatch.spec 이 매 매치 `.first()`(왼쪽=더 저렴한 아이템)를 클릭하므로
- * 실제 결승 진출자는 항상 11·13 이다 — 같은 매치에서 맞붙은 11·12 가 둘 다 남을 수 없다.
+ * tournamentMatch.spec 이 매 매치 `.first()`(왼쪽 카드)를 클릭하므로 결승 진출자는 11·13 이다.
  */
 export const MOCK_TOURNAMENT_IN_PROGRESS_FINAL: GetTournamentInProgressResponseT = {
   ...MOCK_TOURNAMENT_IN_PROGRESS,
@@ -158,6 +178,7 @@ export const MOCK_TOURNAMENT_IN_PROGRESS_FINAL: GetTournamentInProgressResponseT
     currentRound: 2,
     lastHistory: null,
     remainingItems: MOCK_TOURNAMENT_ITEMS.filter(item => [11, 13].includes(item.tournamentItemId)),
+    currentMatch: MOCK_MATCH_FINAL,
   },
 };
 

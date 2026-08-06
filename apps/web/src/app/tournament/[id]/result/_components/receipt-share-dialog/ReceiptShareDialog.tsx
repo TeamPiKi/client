@@ -3,8 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 
-import { CopyIconFill, DownloadIconFill } from '@/assets/icons';
-import KakaoIcon from '@/assets/icons/social/kakao.svg';
+import { CopyIconFill, DownloadIconFill, LinkIconOutline } from '@/assets/icons';
 import { Drawer, DrawerContent, DrawerDescription, DrawerTitle } from '@/components/drawer';
 import Skeleton from '@/components/skeleton';
 import { ANALYTICS_EVENT } from '@/consts/analytics';
@@ -32,7 +31,7 @@ type ReceiptShareDialogProps = {
 type ShareActionProps = {
   icon: React.ReactNode;
   label: string;
-  /** 원형 배경색 클래스 — 브랜드 액션(카카오 등)은 고유 색을 쓴다 */
+  /** 원형 배경색 클래스 — 브랜드 아이콘은 고유 배경을 쓴다 */
   iconBackgroundClassName?: string;
   disabled?: boolean;
   onClick: () => void;
@@ -141,7 +140,7 @@ function ReceiptShareDialog({
     toast.success('이미지를 복사했어요.');
   };
 
-  const handleShareToChat = async () => {
+  const handleShareLink = async () => {
     if (!imageBlob) return;
 
     const shareResult = await shareReceiptImageFile(imageBlob);
@@ -153,7 +152,7 @@ function ReceiptShareDialog({
 
     logAnalyticsEvent(ANALYTICS_EVENT.RECEIPT_SHARE, {
       tournament_id: tournamentId,
-      method: 'share',
+      method: 'link',
     });
     onOpenChange(false);
   };
@@ -208,11 +207,10 @@ function ReceiptShareDialog({
                 onClick={handleCopy}
               />
               <ShareAction
-                icon={<KakaoIcon className="size-7" />}
-                iconBackgroundClassName="bg-[#FEE500]"
-                label="채팅방에 공유"
+                icon={<LinkIconOutline className="size-6 text-text-neutral-secondary" />}
+                label="링크 공유"
                 disabled={!imageBlob}
-                onClick={handleShareToChat}
+                onClick={handleShareLink}
               />
             </div>
           </div>
