@@ -33,16 +33,16 @@ export const JOIN_ERROR_CONTENT: Record<JoinErrorTypeT, JoinErrorContentT> = {
     Icon: FireIconFill,
     iconClassName: 'text-icon-accent',
     title: '이미 시작된 토너먼트예요.',
-    description: '진행 중인 토너먼트에는 아이템을 추가할 수 없어요.',
+    description: '진행 중인 토너먼트에는 접근할 수 없어요.',
     buttonText: '확인',
     buttonLink: ROUTES.HOME,
   },
-  /** `TOURNAMENT-005` 진행 중/완료 분리 전까지 소비처 없음 — 완료된 토너먼트 진입 안내 예약분 */
+  /** TODO: `TOURNAMENT-005` 진행 중/완료 분리 전까지 소비처 없음 — 완료된 토너먼트 진입 안내 예약분 */
   ALREADY_ENDED: {
     Icon: HistoryIconFill,
     iconClassName: 'text-icon-neutral-secondary',
     title: '종료된 토너먼트예요.',
-    description: '종료된 토너먼트에는 아이템을 추가할 수 없어요.',
+    description: '종료된 토너먼트에는 접근할 수 없어요.',
     buttonText: '홈으로 가기',
     buttonLink: ROUTES.HOME,
   },
