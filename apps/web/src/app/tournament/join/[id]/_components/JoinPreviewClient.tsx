@@ -34,7 +34,7 @@ const MAX_NICKNAME_LENGTH = 10;
  * 회원 자동 참여 화면 상태.
  * - joining: 참여 요청 진행 중 (스피너)
  * - retryable: 일시적 실패 — 재시도 가능
- * - blocked: 409(이미 참여 / 만료) — 재시도가 무의미하므로 종료 화면
+ * - blocked: 만료·정원 초과·삭제 등 영구 실패 — 재시도가 무의미하므로 종료 화면
  */
 type AutoJoinStatusT = 'joining' | 'retryable' | 'blocked';
 
@@ -54,6 +54,7 @@ function JoinPreviewClient({ tournamentId, inviteCode, preview }: JoinPreviewCli
     onAlreadyJoined: () => router.replace(ROUTES.TOURNAMENT_CREATE(tournamentId)),
     onParticipantsFull: () => setJoinErrorType('PARTICIPANTS_FULL'),
     onUnavailable: () => setJoinErrorType('LINK_EXPIRED'),
+    onDeleted: () => setJoinErrorType('DELETED'),
   });
 
   const {
@@ -206,9 +207,7 @@ function JoinPreviewClient({ tournamentId, inviteCode, preview }: JoinPreviewCli
         </div>
       </main>
 
-      {joinErrorType && (
-        <JoinErrorDialog type={joinErrorType} open onOpenChange={() => setJoinErrorType(null)} />
-      )}
+      {joinErrorType && <JoinErrorDialog type={joinErrorType} />}
     </>
   );
 }

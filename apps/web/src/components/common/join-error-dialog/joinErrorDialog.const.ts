@@ -15,7 +15,9 @@ export type JoinErrorTypeT =
   /** 초대 코드 유효하지 않은 경우 */
   | 'INVALID_CODE'
   /** 참여 인원이 가득 찬 경우 */
-  | 'PARTICIPANTS_FULL';
+  | 'PARTICIPANTS_FULL'
+  /** 삭제된 토너먼트에 참여한 경우 */
+  | 'DELETED';
 
 type JoinErrorContentT = {
   Icon: FC<SVGProps<SVGSVGElement>>;
@@ -41,6 +43,14 @@ export const JOIN_ERROR_CONTENT: Record<JoinErrorTypeT, JoinErrorContentT> = {
     iconClassName: 'text-icon-neutral-secondary',
     title: '종료된 토너먼트예요.',
     description: '종료된 토너먼트에는 아이템을 추가할 수 없어요.',
+    buttonText: '홈으로 가기',
+    buttonLink: ROUTES.HOME,
+  },
+  DELETED: {
+    Icon: HistoryIconFill,
+    iconClassName: 'text-icon-neutral-secondary',
+    title: '삭제된 토너먼트예요.',
+    description: '삭제된 토너먼트에는 접근할 수 없어요.',
     buttonText: '홈으로 가기',
     buttonLink: ROUTES.HOME,
   },

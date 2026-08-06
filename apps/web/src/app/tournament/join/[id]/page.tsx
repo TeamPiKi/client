@@ -56,9 +56,8 @@ async function TournamentJoinPage({ params, searchParams }: TournamentJoinPagePr
   } catch (error) {
     if (isServerOrNetworkError(error)) throw error;
 
+    const apiErrorCode = getApiErrorCode(error);
     if (getApiErrorStatus(error) === 409) {
-      const apiErrorCode = getApiErrorCode(error);
-
       /** 토너먼트 이미 시작한 경우 */
       /** TODO: `TOURNAMENT-005` 가 진행 중·완료를 한 코드로 덮어 완료된 토너먼트에도 "이미 시작된" 안내가 나간다 . 서버 수정 후 변경 필요 */
       if (apiErrorCode === ERROR_CODE.TOURNAMENT_NOT_PENDING)
@@ -68,6 +67,9 @@ async function TournamentJoinPage({ params, searchParams }: TournamentJoinPagePr
       if (apiErrorCode === ERROR_CODE.TOURNAMENT_INVITE_EXPIRED)
         return <JoinErrorScreen type="LINK_EXPIRED" />;
     }
+
+    /** 삭제된 토너먼트인 경우 */
+    if (apiErrorCode === ERROR_CODE.TOURNAMENT_NOT_FOUND) return <JoinErrorScreen type="DELETED" />;
 
     return <JoinErrorScreen type="INVALID_CODE" />;
   }

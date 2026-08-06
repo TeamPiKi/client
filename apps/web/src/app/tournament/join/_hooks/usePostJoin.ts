@@ -13,12 +13,14 @@ type UsePostJoinParams = {
   onAlreadyJoined?: () => void;
   onParticipantsFull?: () => void;
   onUnavailable?: () => void;
+  onDeleted?: () => void;
 };
 
 export const usePostJoin = ({
   onAlreadyJoined,
   onParticipantsFull,
   onUnavailable,
+  onDeleted,
 }: UsePostJoinParams = {}) => {
   const {
     mutate: postJoinMutation,
@@ -35,7 +37,10 @@ export const usePostJoin = ({
     onError: error => {
       if (isGlobalNetError(error)) return;
 
-      if (getApiErrorStatus(error) === 409) {
+      const apiErrorCode = getApiErrorCode(error);
+      const apiStatus = getApiErrorStatus(error);
+
+      if (apiStatus === 409) {
         const code = getApiErrorCode(error);
 
         /** 아는 code 만 전용 UX 로 — 미등록 409 를 만료로 오인하지 않도록 아래 generic 토스트로 흘린다 */
@@ -56,10 +61,13 @@ export const usePostJoin = ({
         }
       }
 
-      /**
-       * 400: 초대 코드 형식 오류·코드 불일치
-       * 404: 토너먼트 존재하지 않음
-       */
+      /** 삭제됐거나 존재하지 않는 토너먼트인 경우 */
+      if (apiErrorCode === ERROR_CODE.TOURNAMENT_NOT_FOUND && onDeleted) {
+        onDeleted();
+        return;
+      }
+
+      /** 400: 초대 코드 형식 오류·코드 불일치 */
       toast.error(getApiErrorMessage(error));
     },
   });

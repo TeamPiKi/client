@@ -12,8 +12,8 @@ import {
 } from '@/app/tournament/join/_utils/verifyInviteCode';
 import { GroupIconFill } from '@/assets/icons';
 import Button from '@/components/button';
-import JoinErrorDialog from '@/components/common/join-error-dialog';
 import type { JoinErrorTypeT } from '@/components/common/join-error-dialog';
+import JoinErrorDialog from '@/components/common/join-error-dialog';
 import {
   Dialog,
   DialogContent,
@@ -49,14 +49,23 @@ function InviteTournamentDialog() {
 
       if (isGlobalNetError(error)) return;
 
+      const apiErrorCode = getApiErrorCode(error);
+      const apiStatus = getApiErrorStatus(error);
+
       /** 409(참여 불가): `TOURNAMENT-005`(이미 시작), `TOURNAMENT-021`(만료) 및 매핑되지 않은 409 는 만료 안내 */
-      if (getApiErrorStatus(error) === 409) {
+      if (apiStatus === 409) {
         /** TODO: `TOURNAMENT-005` 가 진행 중·완료를 한 코드로 덮어 완료된 토너먼트에도 "이미 시작된" 안내가 나간다 (docs/spec/api-status-audit.md §E) */
         setJoinErrorType(
           getApiErrorCode(error) === ERROR_CODE.TOURNAMENT_NOT_PENDING
             ? 'ALREADY_STARTED'
             : 'LINK_EXPIRED'
         );
+        return;
+      }
+
+      /** 삭제된 토너먼트인 경우 */
+      if (apiErrorCode === ERROR_CODE.TOURNAMENT_NOT_FOUND) {
+        setJoinErrorType('DELETED');
         return;
       }
 
