@@ -1,9 +1,10 @@
+import { ERROR_CODE } from '@piki/core';
 import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
-import { isAxiosError } from 'axios';
 import { notFound, redirect } from 'next/navigation';
 
+import { QUERY_ACTION } from '@/consts/queryAction';
 import { ROUTES } from '@/consts/route';
-import type { ApiErrorResponseT } from '@/types/api';
+import { getApiErrorCode, getApiErrorStatus, isGlobalNetError } from '@/utils/apiError';
 import { parseIdParam } from '@/utils/parseIdParam';
 import { getQueryClient } from '@/utils/queryClient';
 
@@ -36,12 +37,19 @@ async function TournamentItemLayout({ children, params }: TournamentItemLayoutPr
     if (tournamentItemData.status === 'PROCESSING' || tournamentItemData.status === 'PENDING')
       redirect(ROUTES.TOURNAMENT_CREATE(tournamentId));
   } catch (error) {
-    if (!isAxiosError<ApiErrorResponseT>(error)) throw error;
+    if (isGlobalNetError(error)) return;
+
+    const apiErrorCode = getApiErrorCode(error);
+    const apiErrorStatus = getApiErrorStatus(error);
+
+    /** 토너먼트 아이템이 존재하지 않는 경우 */
+    if (apiErrorCode === ERROR_CODE.TOURNAMENT_NOT_FOUND_ITEM)
+      redirect(
+        `${ROUTES.TOURNAMENT_CREATE(tournamentId)}?${QUERY_ACTION.KEY}=${QUERY_ACTION.VALUE.TOURNAMENT_ITEM_NOT_FOUND}`
+      );
 
     /** 토너먼트 아이템 접근 권한 없는 경우 */
-    if (error.response?.status === 403) redirect(ROUTES.HOME);
-    /** 토너먼트 아이템이 존재하지 않는 경우 */ else if (error.response?.status === 404)
-      redirect(ROUTES.TOURNAMENT_CREATE(tournamentId));
+    if (apiErrorStatus === 403) redirect(ROUTES.HOME);
 
     throw error;
   }

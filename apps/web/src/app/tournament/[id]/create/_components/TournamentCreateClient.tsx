@@ -15,6 +15,7 @@ import { useGetTournament } from '../../_common/_hooks/useGetTournament';
 import { useCountdown } from '../_hooks/useCountdown';
 import { usePostTournamentStart } from '../_hooks/usePostTournamentStart';
 import { hasSentInvite } from '../_utils/inviteSentSession';
+import TournamentItemNotFoundToast from './TournamentItemNotFoundToast';
 import DepositClosedDialog from './deposit-closed-dialog/DepositClosedDialog';
 import MemberJoinConfirmDialog from './member-join-confirm-dialog/MemberJoinConfirmDialog';
 import OwnerStartedDialog from './owner-started-dialog/OwnerStartedDialog';
@@ -253,6 +254,8 @@ function TournamentCreateClient({ tournamentId }: TournamentCreateClientProps) {
           onConfirm={handleCloseConfirm}
         />
       )}
+
+      <TournamentItemNotFoundToast />
     </div>
   );
 }
