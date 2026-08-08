@@ -4,6 +4,7 @@ import { type NextRequest, NextResponse } from 'next/server';
 
 import { postTokenRefreshServer } from './apis/postTokenRefresh';
 import { postGuestLoginServer } from './app/login/_apis/postGuestLogin';
+import { ROUTES } from './consts/route';
 import { getRouteType } from './utils/getRouteType';
 import { getLoginPath } from './utils/loginRedirect';
 import { isWebview } from './utils/webBridge';
@@ -197,6 +198,9 @@ const handleTokenRefresh = async (request: NextRequest) => {
 
     return nextResponse;
   } catch {
+    /** 로그인 페이지 자체의 갱신 실패는 로그인으로 리다이렉트하면 자기 자신 무한 루프라 그대로 렌더 */
+    if (pathname === ROUTES.LOGIN) return NextResponse.next();
+
     return NextResponse.redirect(new URL(getLoginPath(`${pathname}${search}`), request.url));
   }
 };
@@ -208,12 +212,22 @@ export const proxy = async (request: NextRequest) => {
 
   if (!routeType) return NextResponse.next();
 
-  /** 퍼블릭 영역 */
-  if (routeType === 'PUBLIC') return NextResponse.next();
-
-  /** 멤버 및 게스트 공통 영역 */
   const accessToken = request.cookies.get('access_token');
   const refreshToken = request.cookies.get('refresh_token');
+
+  /** 퍼블릭 영역 */
+  if (routeType === 'PUBLIC') {
+    /**
+     * 로그인 페이지는 만료로 소멸한 access(15분) 를 살아있는 refresh 로 먼저 복원한다.
+     * 페이지의 "멤버면 홈으로" 리다이렉트가 access_token 쿠키만 보므로, 복원 없이는
+     * 세션이 살아있는 멤버도 매번 로그인 화면을 보게 된다. (#450)
+     */
+    const needsRestore =
+      pathname === ROUTES.LOGIN && !(accessToken && isTokenValid(accessToken.value)) && refreshToken;
+    if (needsRestore) return await handleTokenRefresh(request);
+
+    return NextResponse.next();
+  }
 
   if (routeType === 'MEMBER_AND_GUEST') {
     /** access(O): 통과 */
