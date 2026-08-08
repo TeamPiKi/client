@@ -13,6 +13,7 @@ type ItemEditFormProps = {
   initialImageUrl: string | null;
   initialName: string;
   initialPrice: number;
+  sourceUrl: string | null;
 };
 
 function ItemEditForm({
@@ -21,6 +22,7 @@ function ItemEditForm({
   initialImageUrl,
   initialName,
   initialPrice,
+  sourceUrl,
 }: ItemEditFormProps) {
   const { patchWishMutation, isPatchWishPending } = usePatchWish(wishId);
   const { deleteWishMutation, isDeleteWishPending } = useDeleteWish(wishId);
@@ -32,6 +34,7 @@ function ItemEditForm({
       initialImageUrl={initialImageUrl}
       initialName={initialName}
       initialPrice={initialPrice}
+      sourceUrl={sourceUrl}
       onSave={data => patchWishMutation(data)}
       isSavePending={isPatchWishPending}
       onDelete={() => deleteWishMutation()}
