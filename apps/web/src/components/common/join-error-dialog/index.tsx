@@ -1,5 +1,8 @@
 'use client';
 
+import { usePathname } from 'next/navigation';
+
+import Button from '@/components/button';
 import ButtonLink from '@/components/button/ButtonLink';
 import {
   Dialog,
@@ -9,6 +12,7 @@ import {
   DialogFooter,
   DialogTitle,
 } from '@/components/dialog';
+import { ROUTES } from '@/consts/route';
 import { cn } from '@/utils/cn';
 
 import type { JoinErrorTypeT } from './joinErrorDialog.const';
@@ -24,8 +28,10 @@ type JoinErrorDialogProps = {
 };
 
 function JoinErrorDialog({ type, open = true, onOpenChange }: JoinErrorDialogProps) {
-  const { Icon, iconClassName, title, description, buttonText, buttonLink } =
-    JOIN_ERROR_CONTENT[type];
+  const { Icon, iconClassName, title, description } = JOIN_ERROR_CONTENT[type];
+
+  /** 합류 실패의 종착지는 항상 홈이다 — 이미 홈이면 이동할 곳이 없으므로 닫기만 한다 */
+  const isAlreadyHome = usePathname() === ROUTES.HOME;
 
   const handleBlockClose = (event: Event) => {
     if (!onOpenChange) event.preventDefault();
@@ -50,9 +56,13 @@ function JoinErrorDialog({ type, open = true, onOpenChange }: JoinErrorDialogPro
         </div>
         <DialogFooter className="w-full">
           <DialogClose asChild>
-            <ButtonLink size="lg" href={buttonLink}>
-              {buttonText}
-            </ButtonLink>
+            {isAlreadyHome ? (
+              <Button size="lg">확인</Button>
+            ) : (
+              <ButtonLink size="lg" href={ROUTES.HOME}>
+                홈으로 가기
+              </ButtonLink>
+            )}
           </DialogClose>
         </DialogFooter>
       </DialogContent>
