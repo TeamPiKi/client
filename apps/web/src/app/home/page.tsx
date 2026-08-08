@@ -10,6 +10,7 @@ import AddWishHomeDialog from './_components/AddWishHomeDialog';
 import CreateTournamentDialog from './_components/CreateTournamentDialog';
 import InviteTournamentDialog from './_components/InviteTournamentDialog';
 import MemberOnlyToast from './_components/MemberOnlyToast';
+import TournamentForbiddenToast from './_components/TournamentForbiddenToast';
 import HomeOnboarding from './_components/home-onboarding';
 import TournamentList from './_components/tournament-list';
 
@@ -43,6 +44,7 @@ async function HomePage() {
         </main>
 
         <MemberOnlyToast />
+        <TournamentForbiddenToast />
         <HomeOnboarding />
       </div>
     </HydrationBoundary>

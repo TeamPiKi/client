@@ -1,9 +1,10 @@
+import { ERROR_CODE } from '@piki/core';
 import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
-import { isAxiosError } from 'axios';
 import { notFound, redirect } from 'next/navigation';
 
+import { QUERY_ACTION } from '@/consts/queryAction';
 import { ROUTES } from '@/consts/route';
-import type { ApiErrorResponseT } from '@/types/api';
+import { getApiErrorCode, isGlobalNetError } from '@/utils/apiError';
 import { parseIdParam } from '@/utils/parseIdParam';
 import { getQueryClient } from '@/utils/queryClient';
 
@@ -26,10 +27,14 @@ async function TournamentLayout({ children, params }: TournamentLayoutProps) {
     const tournamentData = await getTournament(tournamentId);
     queryClient.setQueryData(['tournament', tournamentId], tournamentData);
   } catch (error) {
-    if (!isAxiosError<ApiErrorResponseT>(error)) throw error;
+    if (isGlobalNetError(error)) throw error;
 
-    if (error.response?.status === 403) redirect(ROUTES.HOME);
-    else if (error.response?.status === 404) notFound(); // TODO: 아직 미정
+    const code = getApiErrorCode(error);
+
+    /** 진입 자체가 막힌 경우라 화면에 안내할 자리가 없다 — 홈으로 보내고 쿼리로 토스트를 넘긴다 */
+    if (code === ERROR_CODE.TOURNAMENT_FORBIDDEN)
+      redirect(`${ROUTES.HOME}?${QUERY_ACTION.KEY}=${QUERY_ACTION.VALUE.TOURNAMENT_FORBIDDEN}`);
+    // else if (error.response?.status === 404) notFound(); // TODO: 아직 미정
 
     throw error;
   }
