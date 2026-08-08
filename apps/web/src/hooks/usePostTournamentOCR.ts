@@ -1,11 +1,9 @@
 import { ERROR_CODE } from '@piki/core';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
 import { toast } from 'sonner';
 
 import { postTournamentOCR } from '@/apis/postTournamentOCR';
-import type { AddItemErrorTypeT } from '@/components/common/add-item-error-dialog';
 import { ROUTES } from '@/consts/route';
 import { getApiErrorCode, getApiErrorStatus, isGlobalNetError } from '@/utils/apiError';
 import { getApiErrorMessage } from '@/utils/getApiErrorMessage';
@@ -13,8 +11,6 @@ import { getApiErrorMessage } from '@/utils/getApiErrorMessage';
 export const usePostTournamentOCR = (tournamentId: number) => {
   const router = useRouter();
   const queryClient = useQueryClient();
-
-  const [addItemErrorType, setAddItemErrorType] = useState<AddItemErrorTypeT | null>(null);
 
   const {
     mutate: postTournamentOCRMutation,
@@ -28,28 +24,23 @@ export const usePostTournamentOCR = (tournamentId: number) => {
     onError: error => {
       if (isGlobalNetError(error)) return;
 
+      const code = getApiErrorCode(error);
+
+      /** 토너먼트가 시작됐거나 삭제, 존재하지 않는 경우 */
+      if (code === ERROR_CODE.TOURNAMENT_NOT_PENDING || code === ERROR_CODE.TOURNAMENT_NOT_FOUND) {
+        queryClient.invalidateQueries({ queryKey: ['tournament', tournamentId] });
+        return;
+      }
+
       /**
        * 400: 이미지 개수/형식/크기 초과·아이템 32개 초과
        * 403: 토너먼트 참여 권한 없음
-       * 404: 토너먼트 존재하지 않음
-       * 409: PENDING 상태 아닌 토너먼트
        */
-      const status = getApiErrorStatus(error);
-      const apiErrorCode = getApiErrorCode(error);
-
       toast.error(getApiErrorMessage(error));
 
-      if (status === 403 || status === 404) router.replace(ROUTES.HOME);
-
-      if (apiErrorCode === ERROR_CODE.TOURNAMENT_NOT_PENDING)
-        setAddItemErrorType('ALREADY_STARTED');
+      if (getApiErrorStatus(error) === 403) router.replace(ROUTES.HOME);
     },
   });
 
-  return {
-    postTournamentOCRMutation,
-    isPostTournamentOCRPending,
-    resetPostTournamentOCRMutation,
-    addItemErrorType,
-  };
+  return { postTournamentOCRMutation, isPostTournamentOCRPending, resetPostTournamentOCRMutation };
 };

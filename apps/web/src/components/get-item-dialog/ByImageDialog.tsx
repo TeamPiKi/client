@@ -7,7 +7,6 @@ import { toast } from 'sonner';
 
 import { ImageIconFill } from '@/assets/icons';
 import Button from '@/components/button';
-import AddItemErrorDialog from '@/components/common/add-item-error-dialog';
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/dialog';
 import { useImagePicker } from '@/hooks/useImagePicker';
 import { usePostTournamentOCR } from '@/hooks/usePostTournamentOCR';
@@ -27,12 +26,8 @@ type Props = {
 function ByImageDialog({ type, open, onOpenChange }: Props) {
   const { id: tournamentId } = useParams<{ id: string }>();
   const { postWishOCRMutation, isPostWishOCRPending, resetPostWishOCRMutation } = usePostWishOCR();
-  const {
-    postTournamentOCRMutation,
-    isPostTournamentOCRPending,
-    resetPostTournamentOCRMutation,
-    addItemErrorType,
-  } = usePostTournamentOCR(Number(tournamentId));
+  const { postTournamentOCRMutation, isPostTournamentOCRPending, resetPostTournamentOCRMutation } =
+    usePostTournamentOCR(Number(tournamentId));
 
   const {
     openPicker,
@@ -67,20 +62,12 @@ function ByImageDialog({ type, open, onOpenChange }: Props) {
   });
 
   useEffect(() => {
-    if (open || addItemErrorType) return;
+    if (open) return;
 
     resetImagePicker();
     resetPostWishOCRMutation();
     resetPostTournamentOCRMutation();
-  }, [
-    open,
-    addItemErrorType,
-    resetImagePicker,
-    resetPostTournamentOCRMutation,
-    resetPostWishOCRMutation,
-  ]);
-
-  if (addItemErrorType) return <AddItemErrorDialog type={addItemErrorType} />;
+  }, [open, resetImagePicker, resetPostTournamentOCRMutation, resetPostWishOCRMutation]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
