@@ -53,6 +53,7 @@ function JoinPreviewClient({ tournamentId, inviteCode, preview }: JoinPreviewCli
     /** 참여 완료 후 뒤로가기로 join 화면에 돌아오면 재참여(409)가 되므로 히스토리에서 제거 */
     onAlreadyJoined: () => router.replace(ROUTES.TOURNAMENT_CREATE(tournamentId)),
     onParticipantsFull: () => setJoinErrorType('PARTICIPANTS_FULL'),
+    onAlreadyStarted: () => setJoinErrorType('ALREADY_STARTED'),
     onUnavailable: () => setJoinErrorType('LINK_EXPIRED'),
     onDeleted: () => setJoinErrorType('DELETED'),
   });
@@ -156,9 +157,7 @@ function JoinPreviewClient({ tournamentId, inviteCode, preview }: JoinPreviewCli
           )}
         </main>
 
-        {joinErrorType && (
-          <JoinErrorDialog type={joinErrorType} open onOpenChange={() => setJoinErrorType(null)} />
-        )}
+        {joinErrorType && <JoinErrorDialog type={joinErrorType} />}
       </>
     );
   }
