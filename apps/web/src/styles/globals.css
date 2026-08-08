@@ -168,6 +168,57 @@
   scrollbar-width: none; /* Firefox */
 }
 
+/** 리퀴드 글래스 — 블러·틴트·반사광 레이어 (::before / ::after) */
+@utility liquid-glass {
+  position: relative;
+  isolation: isolate;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -30;
+    border-radius: inherit;
+    backdrop-filter: blur(3px) saturate(1.2);
+    pointer-events: none;
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -10;
+    border-radius: inherit;
+    background-color: rgb(255 255 255 / 0.8);
+    box-shadow:
+      inset 2px 2px 1px 0 rgb(255 255 255 / 0.6),
+      inset -1px -1px 1px 1px rgb(255 255 255 / 0.4);
+    transition: background-color 200ms ease-out;
+    pointer-events: none;
+  }
+}
+
+/** liquid-glass 와 함께 — 홀드/드래그 시 틴트를 더 투명하게 */
+@utility liquid-glass-active {
+  &::after {
+    background-color: rgb(255 255 255 / 0.4);
+  }
+}
+
+/** liquid-glass 와 함께 — 렌즈 버블 (홀드/드래그 상태) */
+@utility liquid-glass-lens {
+  background-color: rgb(255 255 255 / 0.02);
+  box-shadow:
+    inset 1.5px 1.5px 1px 0 rgb(255 255 255 / 0.6),
+    inset -1px -1px 1px 0 rgb(255 255 255 / 0.35),
+    0 4px 12px 0 rgb(0 0 0 / 0.18);
+}
+
+/** liquid-glass-lens 위 반사광 오버레이 */
+@utility liquid-glass-glint {
+  background: radial-gradient(75% 45% at 40% -12%, rgb(255 255 255 / 0.55), transparent 55%);
+}
+
 /**
  * 기본 배경색 중앙화.
  * iOS 26 Safari 가 `<meta name="theme-color">` 를 무시하기 시작하면서, 노치(safe-area-top)/홈 인디케이터
