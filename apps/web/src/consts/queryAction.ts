@@ -3,7 +3,6 @@ export const QUERY_ACTION = {
   KEY: 'action',
   VALUE: {
     OPEN_GET_ITEM_DIALOG: 'get-item',
-    SHARE_RECEIPT: 'share-receipt',
     WELCOME_JOIN: 'welcome-join',
     SESSION_EXPIRED: 'session-expired',
     WITHDRAWN_ACCOUNT: 'withdrawn-account', // 탈퇴한 계정(USER-003) 세션으로 API 를 호출한 경우
