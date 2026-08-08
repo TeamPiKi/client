@@ -10,5 +10,8 @@ import type { ApiErrorCodeT } from '../types/error';
 export const getErrorMessageByCode = (code: ApiErrorCodeT | null | undefined): string | null => {
   if (!code) return null;
 
+  /** code 는 URL 쿼리 등 외부 입력에서도 들어온다 — `toString` 같은 상속 속성이 새지 않도록 자체 속성만 */
+  if (!Object.hasOwn(ERROR_MESSAGE_MAP, code)) return null;
+
   return (ERROR_MESSAGE_MAP as Record<string, string>)[code] ?? null;
 };
