@@ -31,7 +31,7 @@ async function TournamentLayout({ children, params }: TournamentLayoutProps) {
 
     const code = getApiErrorCode(error);
 
-    /** 진입 자체가 막힌 경우라 화면에 안내할 자리가 없다 — 홈으로 보내고 쿼리로 토스트를 넘긴다 */
+    /** 토너먼트 접근 권한이 없는 경우 */
     if (code === ERROR_CODE.TOURNAMENT_FORBIDDEN)
       redirect(`${ROUTES.HOME}?${QUERY_ACTION.KEY}=${QUERY_ACTION.VALUE.TOURNAMENT_FORBIDDEN}`);
     // else if (error.response?.status === 404) notFound(); // TODO: 아직 미정
