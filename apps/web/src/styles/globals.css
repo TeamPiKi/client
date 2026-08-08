@@ -148,7 +148,7 @@
 
   /** User Accent Color */
   --color-uac-light: #0a7aff;
-  --color-icon-warning: var(--color-yellow-600);
+  --color-icon-warning: var(--color-yellow-500);
   --color-icon-error: var(--color-red-300);
   --color-icon-success: var(--color-green-600);
   --color-icon-informative: var(--color-blue-600);
