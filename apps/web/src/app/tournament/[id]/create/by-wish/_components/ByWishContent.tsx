@@ -1,12 +1,13 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { toast } from 'sonner';
 
 import BottomCta from '@/components/bottom-cta';
 import Button from '@/components/button';
 import { Header, HeaderIcon } from '@/components/header';
+import { ROUTES } from '@/consts/route';
+import { useBackWithFallback } from '@/hooks/useBackWithFallback';
 import { useGetWishlist } from '@/hooks/useGetWishlist';
 
 import { useGetTournament } from '../../../_common/_hooks/useGetTournament';
@@ -22,7 +23,7 @@ type ByWishContentProps = {
 };
 
 function ByWishContent({ tournamentId }: ByWishContentProps) {
-  const router = useRouter();
+  const backWithFallback = useBackWithFallback();
   const { selectedIds, isMaxExceeded, handleSelect } = useWishSelection(MAX_SELECT);
   const { wishlistData, fetchNextPage, hasNextPage, isFetchingNextPage } = useGetWishlist();
   const { tournamentData } = useGetTournament(tournamentId);
@@ -106,7 +107,10 @@ function ByWishContent({ tournamentId }: ByWishContentProps) {
         </Button>
       </BottomCta>
 
-      <NoWishDialog open={hasNoSelectableWish} onOpenChange={() => router.back()} />
+      <NoWishDialog
+        open={hasNoSelectableWish}
+        onOpenChange={() => backWithFallback(ROUTES.TOURNAMENT_CREATE(tournamentId))}
+      />
     </div>
   );
 }

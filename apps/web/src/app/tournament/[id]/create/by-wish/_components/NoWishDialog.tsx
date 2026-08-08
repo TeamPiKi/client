@@ -4,7 +4,6 @@ import { SadIconFill } from '@/assets/icons';
 import ButtonLink from '@/components/button/ButtonLink';
 import {
   Dialog,
-  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -31,11 +30,9 @@ function NoWishDialog({ open, onOpenChange }: NoWishDialogProps) {
           </DialogDescription>
         </div>
         <DialogFooter className="w-full">
-          <DialogClose asChild>
-            <ButtonLink size="lg" href={ROUTES.WISHLIST}>
-              위시 추가하기
-            </ButtonLink>
-          </DialogClose>
+          <ButtonLink size="lg" href={ROUTES.WISHLIST}>
+            위시 추가하기
+          </ButtonLink>
         </DialogFooter>
       </DialogContent>
     </Dialog>
