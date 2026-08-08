@@ -34,7 +34,10 @@ async function TournamentLayout({ children, params }: TournamentLayoutProps) {
     /** 토너먼트 접근 권한이 없는 경우 */
     if (code === ERROR_CODE.TOURNAMENT_FORBIDDEN)
       redirect(`${ROUTES.HOME}?${QUERY_ACTION.KEY}=${QUERY_ACTION.VALUE.TOURNAMENT_FORBIDDEN}`);
-    // else if (error.response?.status === 404) notFound(); // TODO: 아직 미정
+
+    /** 삭제된 토너먼트인 경우 */
+    if (code === ERROR_CODE.TOURNAMENT_NOT_FOUND)
+      redirect(`${ROUTES.HOME}?${QUERY_ACTION.KEY}=${QUERY_ACTION.VALUE.TOURNAMENT_NOT_FOUND}`);
 
     throw error;
   }
