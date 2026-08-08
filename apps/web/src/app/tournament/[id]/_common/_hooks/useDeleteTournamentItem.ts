@@ -1,11 +1,13 @@
 import { ERROR_CODE } from '@piki/core';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { usePathname, useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 
 import { QUERY_ACTION } from '@/consts/queryAction';
 import { ROUTES } from '@/consts/route';
 import { useBackWithFallback } from '@/hooks/useBackWithFallback';
 import { getApiErrorCode, getApiErrorStatus, isGlobalNetError } from '@/utils/apiError';
+import { getApiErrorMessage } from '@/utils/getApiErrorMessage';
 
 import { deleteTournamentItem } from '../_apis/deleteTournamentItem';
 
@@ -44,10 +46,14 @@ export const useDeleteTournamentItem = (tournamentId: number, tournamentItemId: 
         }
 
         /** 토너먼트 접근 권한 없는 경우 */
-        if (code === ERROR_CODE.TOURNAMENT_FORBIDDEN)
+        if (code === ERROR_CODE.TOURNAMENT_FORBIDDEN) {
           router.replace(
             `${ROUTES.HOME}?${QUERY_ACTION.KEY}=${QUERY_ACTION.VALUE.TOURNAMENT_FORBIDDEN}`
           );
+          return;
+        }
+
+        toast.error(getApiErrorMessage(error));
 
         /**
          * 403: 토너먼트 참여 권한 없음
