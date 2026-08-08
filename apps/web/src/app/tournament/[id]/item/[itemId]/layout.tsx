@@ -37,7 +37,7 @@ async function TournamentItemLayout({ children, params }: TournamentItemLayoutPr
     if (tournamentItemData.status === 'PROCESSING' || tournamentItemData.status === 'PENDING')
       redirect(ROUTES.TOURNAMENT_CREATE(tournamentId));
   } catch (error) {
-    if (isGlobalNetError(error)) return;
+    if (isGlobalNetError(error)) throw error;
 
     const apiErrorCode = getApiErrorCode(error);
     const apiErrorStatus = getApiErrorStatus(error);
