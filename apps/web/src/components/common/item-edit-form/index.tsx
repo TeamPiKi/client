@@ -79,7 +79,11 @@ function ItemEditForm({
         </div>
       )}
 
-      <ItemImageSection imageUrl={initialImageUrl} onImageSelect={setSelectedImage} />
+      <ItemImageSection
+        itemStatus={itemStatus}
+        imageUrl={initialImageUrl}
+        onImageSelect={setSelectedImage}
+      />
 
       <Spacing size={24} />
 

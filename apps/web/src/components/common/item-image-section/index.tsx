@@ -6,15 +6,16 @@ import { useEffect, useState } from 'react';
 
 import { ImageIconFill } from '@/assets/icons';
 import { useImagePicker } from '@/hooks/useImagePicker';
+import type { ItemStatusT } from '@/types/item';
 import { cn } from '@/utils/cn';
 
 type Props = {
+  itemStatus: ItemStatusT;
   imageUrl: string | null;
   onImageSelect?: (file: File) => void;
-  disabled?: boolean;
 };
 
-function ItemImageSection({ imageUrl, onImageSelect, disabled = false }: Props) {
+function ItemImageSection({ itemStatus, imageUrl, onImageSelect }: Props) {
   /** 사용자가 추가한 이미지 URL */
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
@@ -52,19 +53,12 @@ function ItemImageSection({ imageUrl, onImageSelect, disabled = false }: Props) 
     />
   ) : (
     <>
-      <ImageIconFill className="size-8 text-icon-neutral-secondary" />
-      <span className="body-2-medium text-text-neutral-secondary underline underline-offset-3">
+      <ImageIconFill className="size-9 text-icon-neutral-secondary" />
+      <span className="body-2-medium text-text-neutral-secondary underline underline-offset-2">
         이미지를 추가해주세요
       </span>
     </>
   );
-
-  const containerClassName = cn(
-    'relative mx-auto mt-8 block size-[200px] overflow-hidden rounded-xl bg-gray-100',
-    !displayUrl && 'flex flex-col items-center justify-center gap-3'
-  );
-
-  if (disabled) return <div className={containerClassName}>{imageContent}</div>;
 
   return (
     <>
@@ -72,7 +66,11 @@ function ItemImageSection({ imageUrl, onImageSelect, disabled = false }: Props) 
         type="button"
         onClick={openPicker}
         disabled={isPending}
-        className={cn(containerClassName, 'cursor-pointer')}
+        className={cn(
+          'relative mx-auto block aspect-square w-full max-w-[440px] cursor-pointer overflow-hidden rounded-xl bg-gray-50',
+          !displayUrl && 'flex flex-col items-center justify-center gap-3',
+          itemStatus === 'FAILED' ? 'mt-4' : 'mt-7'
+        )}
       >
         {imageContent}
       </button>
