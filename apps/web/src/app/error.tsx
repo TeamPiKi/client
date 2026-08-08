@@ -7,6 +7,7 @@ import { useEffect } from 'react';
 
 import { WarningIconFill } from '@/assets/icons';
 import { buttonStyles } from '@/components/button/button.style';
+import ErrorScreen from '@/components/common/error-screen';
 import { ROUTES } from '@/consts/route';
 import { getApiErrorCode } from '@/utils/apiError';
 
@@ -26,29 +27,23 @@ function Error({ error, reset }: Props) {
   const description = getErrorMessageByCode(getApiErrorCode(error)) ?? DEFAULT_DESCRIPTION;
 
   return (
-    <div className="h-full bg-bg-layer-basement pt-padding-top">
-      <div className="flex flex-col items-center gap-[30px] pt-[calc(253px_-_env(safe-area-inset-top))]">
-        <div className="flex flex-col items-center gap-[25px]">
-          <WarningIconFill className="size-15 text-icon-warning" />
-          <div className="flex flex-col items-center gap-2">
-            <h1 className="heading-1-semibold text-text-neutral-primary">오류가 발생했어요</h1>
-            <p className="body-1-medium text-text-neutral-tertiary">{description}</p>
-          </div>
-        </div>
-        <div className="flex gap-3">
-          <button
-            type="button"
-            onClick={reset}
-            className={buttonStyles({ variant: 'secondary', size: 'md' })}
-          >
-            다시 시도
-          </button>
-          <Link href={ROUTES.HOME} className={buttonStyles({ variant: 'primary', size: 'md' })}>
-            홈으로 가기
-          </Link>
-        </div>
-      </div>
-    </div>
+    <ErrorScreen
+      Icon={WarningIconFill}
+      iconClassName="text-icon-warning"
+      title="오류가 발생했어요"
+      description={description}
+    >
+      <button
+        type="button"
+        onClick={reset}
+        className={buttonStyles({ variant: 'secondary', size: 'md' })}
+      >
+        다시 시도
+      </button>
+      <Link href={ROUTES.HOME} className={buttonStyles({ variant: 'primary', size: 'md' })}>
+        홈으로 가기
+      </Link>
+    </ErrorScreen>
   );
 }
 
