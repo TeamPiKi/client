@@ -1,6 +1,6 @@
 'use client';
 
-import ItemLinkBanner from '@/components/common/item-link-banner';
+import ItemLinkBanner from '@/components/common/item-edit-form/ItemLinkBanner';
 import { Header, HeaderIcon } from '@/components/header';
 import { cn } from '@/utils/cn';
 

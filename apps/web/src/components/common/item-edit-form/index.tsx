@@ -11,7 +11,7 @@ import type { ItemStatusT, PatchItemRequestT } from '@/types/item';
 import formatPrice from '@/utils/formatPrice';
 import parsePriceToNumber from '@/utils/parsePriceToNumber';
 
-import ItemImageSection from '../item-image-section';
+import ItemImageSection from './ItemImageSection';
 
 type ItemEditFormProps = {
   itemStatus: ItemStatusT;
