@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 
+import { WarningIconFill } from '@/assets/icons';
 import BottomCta from '@/components/bottom-cta';
 import Button from '@/components/button';
 import Input from '@/components/input';
@@ -69,6 +70,15 @@ function ItemEditForm({
 
   return (
     <>
+      {itemStatus === 'FAILED' && (
+        <div className="mt-6 flex items-center gap-2 rounded-xl bg-bg-warning p-3">
+          <WarningIconFill className="size-6 text-icon-warning" />
+          <span className="body-2-regular text-text-warning">
+            상품 정보를 가져오는데 실패했어요. 직접 입력해주세요.
+          </span>
+        </div>
+      )}
+
       <ItemImageSection imageUrl={initialImageUrl} onImageSelect={setSelectedImage} />
 
       <Spacing size={24} />
