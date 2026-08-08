@@ -11,6 +11,7 @@ export const QUERY_ACTION = {
     SCROLL_TO_LAST: 'scroll-to-last', // 토너먼트 생성 화면 진입 시 마지막 아이템 바구니로 스크롤
     TOURNAMENT_ITEM_NOT_FOUND: 'tournament-item-not-found', // 삭제된 토너먼트 아이템 접근 시 create 로 폴백 후 토스트
     TOURNAMENT_FORBIDDEN: 'tournament-forbidden', // 참여 권한 없는 토너먼트 접근 시 홈으로 폴백 후 토스트
+    TOURNAMENT_NOT_FOUND: 'tournament-not-found', // 삭제된 토너먼트에 액션을 시도한 경우 홈으로 폴백 후 토스트
   },
 } as const;
 

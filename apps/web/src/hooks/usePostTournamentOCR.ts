@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
 import { postTournamentOCR } from '@/apis/postTournamentOCR';
+import { QUERY_ACTION } from '@/consts/queryAction';
 import { ROUTES } from '@/consts/route';
 import { getApiErrorCode, getApiErrorStatus, isGlobalNetError } from '@/utils/apiError';
 import { getApiErrorMessage } from '@/utils/getApiErrorMessage';
@@ -26,9 +27,17 @@ export const usePostTournamentOCR = (tournamentId: number) => {
 
       const code = getApiErrorCode(error);
 
-      /** 토너먼트가 시작됐거나 삭제, 존재하지 않는 경우 */
-      if (code === ERROR_CODE.TOURNAMENT_NOT_PENDING || code === ERROR_CODE.TOURNAMENT_NOT_FOUND) {
+      /** 토너먼트가 시작된 경우 */
+      if (code === ERROR_CODE.TOURNAMENT_NOT_PENDING) {
         queryClient.invalidateQueries({ queryKey: ['tournament', tournamentId] });
+        return;
+      }
+
+      /** 토너먼트가 삭제된 경우 */
+      if (code === ERROR_CODE.TOURNAMENT_NOT_FOUND) {
+        router.replace(
+          `${ROUTES.HOME}?${QUERY_ACTION.KEY}=${QUERY_ACTION.VALUE.TOURNAMENT_NOT_FOUND}`
+        );
         return;
       }
 

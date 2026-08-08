@@ -29,4 +29,8 @@ export const QUERY_ACTION_TOAST: Partial<Record<QueryActionValueT, QueryActionTo
     message: ERROR_MESSAGE_MAP[ERROR_CODE.TOURNAMENT_FORBIDDEN],
     variant: 'error',
   },
+  [QUERY_ACTION.VALUE.TOURNAMENT_NOT_FOUND]: {
+    message: ERROR_MESSAGE_MAP[ERROR_CODE.TOURNAMENT_NOT_FOUND],
+    variant: 'error',
+  },
 };
