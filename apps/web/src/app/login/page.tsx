@@ -17,10 +17,20 @@ type LoginPageProps = {
 async function LoginPage({ searchParams }: LoginPageProps) {
   const { redirect: redirectParam, action, code } = await searchParams;
 
-  /** 멤버가 로그인 페이지 직접 진입 시 홈으로 리다이렉트 */
+  /**
+   * 멤버가 로그인 페이지 직접 진입 시 홈으로 리다이렉트
+   * - 세션 만료나 탈퇴한 경우에는 홈으로 리다이렉트하지 않음
+   */
   const accessToken = (await cookies()).get('access_token')?.value;
   const role = getRoleFromToken(accessToken);
-  if (role === 'MEMBER' && action !== QUERY_ACTION.VALUE.SESSION_EXPIRED) redirect(ROUTES.HOME);
+  if (
+    role === 'MEMBER' &&
+    !(
+      action === QUERY_ACTION.VALUE.SESSION_EXPIRED ||
+      action === QUERY_ACTION.VALUE.WITHDRAWN_ACCOUNT
+    )
+  )
+    redirect(ROUTES.HOME);
 
   /**
    * Android 웹뷰에서는 Apple 로그인 미노출.
