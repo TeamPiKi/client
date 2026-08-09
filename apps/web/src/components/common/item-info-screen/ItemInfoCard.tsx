@@ -3,7 +3,7 @@ import Spacing from '@/components/spacing';
 import Spinner from '@/components/spinner';
 import formatPrice from '@/utils/formatPrice';
 
-import type { PriceRefreshT } from './itemInfoScreen.const';
+import type { PriceRefreshT } from './itemInfoScreen.type';
 
 type ItemInfoCardProps = {
   name: string;

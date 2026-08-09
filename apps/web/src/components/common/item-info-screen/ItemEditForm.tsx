@@ -13,7 +13,7 @@ import formatPrice from '@/utils/formatPrice';
 import parsePriceToNumber from '@/utils/parsePriceToNumber';
 
 import ItemImagePicker from './ItemImagePicker';
-import type { ItemInfoT } from './itemInfoScreen.const';
+import type { ItemInfoT } from './itemInfoScreen.type';
 
 type ItemEditFormProps = {
   item: ItemInfoT;

@@ -41,6 +41,7 @@ function WishInfoScreen({ wishId }: WishInfoScreenProps) {
       isSavePending={isPatchWishPending}
       onDelete={() => deleteWishMutation()}
       isDeletePending={isDeleteWishPending}
+      memo={{ value: wishData.memo ?? '', save: memo => patchWishMutation({ memo }) }}
       {...(canRefresh && {
         priceRefresh: {
           refresh: () => postWishRefreshMutation(),

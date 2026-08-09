@@ -11,12 +11,8 @@ import { cn } from '@/utils/cn';
 import ItemDetailView from './ItemDetailView';
 import ItemEditForm from './ItemEditForm';
 import PriceRefreshFailedDialog from './PriceRefreshFailedDialog';
-import {
-  ITEM_INFO_SCREEN_CONFIG,
-  type ItemInfoT,
-  type PriceRefreshT,
-  isReadyItemInfo,
-} from './itemInfoScreen.const';
+import { ITEM_INFO_SCREEN_CONFIG, isReadyItemInfo } from './itemInfoScreen.const';
+import type { ItemInfoT, MemoT, PriceRefreshT } from './itemInfoScreen.type';
 
 type ItemInfoScreenProps = {
   itemType: ItemTypeT;
@@ -25,8 +21,9 @@ type ItemInfoScreenProps = {
   isSavePending?: boolean;
   onDelete: () => void;
   isDeletePending?: boolean;
-  /** 링크로 담은 상품에만 전달 — 없으면 새로고침 버튼을 노출하지 않는다 */
+  /** 가격 정보 새로고침 가능 여부 */
   priceRefresh?: PriceRefreshT;
+  memo?: MemoT;
 };
 
 /**
@@ -43,11 +40,12 @@ function ItemInfoScreen({
   onDelete,
   isDeletePending,
   priceRefresh,
+  memo,
 }: ItemInfoScreenProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
-  const { viewTitle, deleteConfirmTitle, hasMemo } = ITEM_INFO_SCREEN_CONFIG[itemType];
+  const { viewTitle, deleteConfirmTitle } = ITEM_INFO_SCREEN_CONFIG[itemType];
 
   /** 조회 모드 여부 — READY 이면서 수정 버튼을 누르지 않은 상태 */
   const isDetailMode = isReadyItemInfo(item) && !isEditing;
@@ -88,7 +86,7 @@ function ItemInfoScreen({
         {isDetailMode ? (
           <ItemDetailView
             item={item}
-            hasMemo={hasMemo}
+            memo={memo}
             priceRefresh={priceRefresh}
             onEdit={() => setIsEditing(true)}
           />

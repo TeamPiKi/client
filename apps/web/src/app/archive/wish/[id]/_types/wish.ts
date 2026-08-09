@@ -1,8 +1,15 @@
 import type { ITEM_STATUS } from '@/consts/item';
+import type { PatchItemRequestT } from '@/types/item';
 import type { WishT } from '@/types/wish';
+
+export type PatchWishRequestT = PatchItemRequestT & {
+  memo?: string;
+};
 
 export type GetWishResponseT = {
   wish: WishT;
+  /** 개인 메모 — 본인만 볼 수 있음 */
+  memo: string | null;
   item: { id: number } & (
     | {
         status: (typeof ITEM_STATUS)['PROCESSING'] | (typeof ITEM_STATUS)['FAILED'];
@@ -35,4 +42,4 @@ export type GetWishResponseT = {
   reused: boolean | null;
 };
 
-export type PatchWishResponseT = GetWishResponseT;
+export type PatchWishResponseT = Omit<GetWishResponseT, 'memo'>;

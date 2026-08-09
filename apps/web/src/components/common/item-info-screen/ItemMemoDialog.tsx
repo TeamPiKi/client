@@ -12,7 +12,8 @@ import {
 } from '@/components/dialog';
 import Spacing from '@/components/spacing';
 
-const MEMO_MAX_LENGTH = 200;
+/** 서버가 허용하는 메모 길이 */
+const MEMO_MAX_LENGTH = 100;
 
 type ItemMemoDialogProps = {
   open: boolean;
