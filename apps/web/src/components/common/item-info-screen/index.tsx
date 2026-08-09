@@ -17,7 +17,7 @@ import type { ItemInfoT, MemoT, PriceRefreshT } from './itemInfoScreen.type';
 type ItemInfoScreenProps = {
   itemType: ItemTypeT;
   item: ItemInfoT;
-  onSave: (data: PatchItemRequestT) => void;
+  onSave: (data: PatchItemRequestT, onSuccess: () => void) => void;
   isSavePending?: boolean;
   onDelete: () => void;
   isDeletePending?: boolean;
@@ -91,7 +91,11 @@ function ItemInfoScreen({
             onEdit={() => setIsEditing(true)}
           />
         ) : (
-          <ItemEditForm item={item} onSave={onSave} isSavePending={isSavePending} />
+          <ItemEditForm
+            item={item}
+            onSave={data => onSave(data, () => setIsEditing(false))}
+            isSavePending={isSavePending}
+          />
         )}
       </main>
 

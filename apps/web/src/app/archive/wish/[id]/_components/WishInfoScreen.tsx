@@ -37,7 +37,7 @@ function WishInfoScreen({ wishId }: WishInfoScreenProps) {
         price: item.price ?? 0,
         sourceUrl: item.sourceUrl,
       }}
-      onSave={data => patchWishMutation(data)}
+      onSave={(data, onSuccess) => patchWishMutation(data, { onSuccess })}
       isSavePending={isPatchWishPending}
       onDelete={() => deleteWishMutation()}
       isDeletePending={isDeleteWishPending}
