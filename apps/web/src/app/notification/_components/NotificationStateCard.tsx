@@ -33,7 +33,7 @@ function NotificationStateCard({ variant, onAction }: NotificationStateCardProps
       <NotificationIconFill width={74} height={74} className="text-gray-100" aria-hidden />
       <div className="flex flex-col items-center gap-[15px]">
         <h1 className="heading-2-semibold text-text-neutral-secondary">{heading}</h1>
-        <p className="text-center body-2-medium text-text-neutral-tertiary">{body}</p>
+        {body && <p className="text-center body-2-medium text-text-neutral-tertiary">{body}</p>}
       </div>
       <Button variant="primary" size="md" onClick={onAction}>
         {buttonLabel}
