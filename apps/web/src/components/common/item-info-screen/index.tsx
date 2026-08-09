@@ -5,8 +5,8 @@ import type { ItemStatusT, PatchItemRequestT } from '@/types/item';
 import FailedItemEditForm from './FailedItemEditForm';
 import ReadyItemInfoSection from './ReadyItemInfoSection';
 
-type ItemEditFormProps = {
-  sourceUrl: string | null;
+type ItemInfoScreenProps = {
+  sourceUrl?: string | null;
   itemStatus: ItemStatusT;
   initialImageUrl: string | null;
   initialName: string;
@@ -19,7 +19,7 @@ type ItemEditFormProps = {
   isRefreshPending?: boolean;
 };
 
-function ItemEditForm({ itemStatus, ...props }: ItemEditFormProps) {
+function ItemInfoScreen({ itemStatus, ...props }: ItemInfoScreenProps) {
   if (itemStatus === 'FAILED') return <FailedItemEditForm itemStatus={itemStatus} {...props} />;
 
   if (itemStatus === 'READY') return <ReadyItemInfoSection itemStatus={itemStatus} {...props} />;
@@ -27,4 +27,4 @@ function ItemEditForm({ itemStatus, ...props }: ItemEditFormProps) {
   return null;
 }
 
-export default ItemEditForm;
+export default ItemInfoScreen;

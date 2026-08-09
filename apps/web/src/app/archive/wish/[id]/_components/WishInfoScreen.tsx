@@ -1,18 +1,23 @@
 'use client';
 
 import { TrashIconOutline } from '@/assets/icons';
-import ItemLinkBanner from '@/components/common/item-edit-form/ItemLinkBanner';
+import ItemInfoScreen from '@/components/common/item-info-screen';
 import { Header, HeaderIcon } from '@/components/header';
 
+import { useDeleteWish } from '../_hooks/useDeleteWish';
 import { useGetWish } from '../_hooks/useGetWish';
-import ItemEditForm from './ItemEditForm';
+import { usePatchWish } from '../_hooks/usePatchWish';
+import { usePostWishRefresh } from '../_hooks/usePostWishRefresh';
 
-type EditContentProps = {
+type WishInfoScreenProps = {
   wishId: number;
 };
 
-function EditContent({ wishId }: EditContentProps) {
+function WishInfoScreen({ wishId }: WishInfoScreenProps) {
   const { wishData } = useGetWish(wishId);
+  const { patchWishMutation, isPatchWishPending } = usePatchWish(wishId);
+  const { deleteWishMutation, isDeleteWishPending } = useDeleteWish(wishId);
+  const { postWishRefreshMutation, isPostWishRefreshPending } = usePostWishRefresh(wishId);
 
   return (
     <div className="to-bg-gray-50 hide-scrollbar min-h-dvh overflow-y-auto bg-linear-to-b from-bg-layer-default px-5 pt-padding-top pb-[78px]">
@@ -27,19 +32,22 @@ function EditContent({ wishId }: EditContentProps) {
         }
       />
       <main>
-        <ItemEditForm
-          wishId={wishId}
+        <ItemInfoScreen
           itemStatus={wishData.item.status}
           initialImageUrl={wishData.item.imageUrl}
           initialName={wishData.item.name ?? ''}
           initialPrice={wishData.item.price ?? 0}
           sourceUrl={wishData.item.sourceUrl}
+          onSave={data => patchWishMutation(data)}
+          isSavePending={isPatchWishPending}
+          onDelete={() => deleteWishMutation()}
+          isDeletePending={isDeleteWishPending}
+          onRefresh={() => postWishRefreshMutation()}
+          isRefreshPending={isPostWishRefreshPending}
         />
-
-        {wishData.item.sourceUrl && <ItemLinkBanner href={wishData.item.sourceUrl} />}
       </main>
     </div>
   );
 }
 
-export default EditContent;
+export default WishInfoScreen;

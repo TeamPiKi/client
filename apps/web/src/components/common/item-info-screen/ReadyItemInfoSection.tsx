@@ -13,7 +13,7 @@ import ItemLinkBanner from './ItemLinkBanner';
 import ItemMemoDialog from './ItemMemoDialog';
 
 type ReadyItemInfoSectionProps = {
-  sourceUrl: string | null;
+  sourceUrl?: string | null;
   itemStatus: ItemStatusT;
   initialImageUrl: string | null;
   initialName: string;
