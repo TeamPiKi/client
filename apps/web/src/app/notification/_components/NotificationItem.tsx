@@ -39,7 +39,7 @@ function NotificationItem({ kind, message, time, isRead, onClick }: Notification
 
   if (onClick) {
     return (
-      <li className={cn(isRead && 'opacity-50')}>
+      <li className={cn(isRead && 'opacity-40')}>
         <button
           type="button"
           onClick={onClick}
@@ -52,7 +52,7 @@ function NotificationItem({ kind, message, time, isRead, onClick }: Notification
   }
 
   return (
-    <li className={cn('flex items-center gap-3 py-5', isRead && 'opacity-50')}>{innerContent}</li>
+    <li className={cn('flex items-center gap-3 py-5', isRead && 'opacity-40')}>{innerContent}</li>
   );
 }
 
