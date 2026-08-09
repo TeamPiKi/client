@@ -99,9 +99,9 @@ function NotificationContent() {
             {notificationsData.map(notification => (
               <NotificationItem
                 key={notification.id}
+                kind={notification.kind}
                 message={notification.title}
                 time={formatTimeKo(notification.createdAt)}
-                profileImage={notification.imageUrl}
                 isRead={notification.isRead}
                 onClick={() => handleNotificationClick(notification)}
               />
