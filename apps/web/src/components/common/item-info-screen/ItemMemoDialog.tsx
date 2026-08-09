@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { type RefObject, useRef, useState } from 'react';
 
 import Button from '@/components/button';
 import {
@@ -23,13 +23,13 @@ type ItemMemoDialogProps = {
 };
 
 type ItemMemoFormProps = {
+  ref: RefObject<HTMLTextAreaElement | null>;
   memo: string;
   onCancel: () => void;
   onSave: (memo: string) => void;
 };
 
-/** 닫힐 때 통째로 언마운트되므로, 열 때마다 저장된 메모에서 다시 시작한다 */
-function ItemMemoForm({ memo, onCancel, onSave }: ItemMemoFormProps) {
+function ItemMemoForm({ ref, memo, onCancel, onSave }: ItemMemoFormProps) {
   const [draft, setDraft] = useState(memo);
 
   return (
@@ -43,6 +43,7 @@ function ItemMemoForm({ memo, onCancel, onSave }: ItemMemoFormProps) {
       <Spacing size={20} />
 
       <textarea
+        ref={ref}
         value={draft}
         onChange={event => setDraft(event.target.value)}
         maxLength={MEMO_MAX_LENGTH}
@@ -66,17 +67,38 @@ function ItemMemoForm({ memo, onCancel, onSave }: ItemMemoFormProps) {
   );
 }
 
-/** 메모 입력 다이얼로그 — 확인을 눌러야 저장된다 */
 function ItemMemoDialog({ open, onOpenChange, memo, onSave }: ItemMemoDialogProps) {
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
   const handleSave = (nextMemo: string) => {
     onSave(nextMemo);
     onOpenChange(false);
   };
 
+  /** 저장된 메모 끝에 포커스 오도록 직접 제어 */
+  const handleOpenAutoFocus = (event: Event) => {
+    event.preventDefault();
+
+    const textarea = textareaRef.current;
+    if (!textarea) return;
+
+    textarea.focus();
+    textarea.setSelectionRange(textarea.value.length, textarea.value.length);
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent showCloseButton={false} className="bg-bg-layer-floating">
-        <ItemMemoForm memo={memo} onCancel={() => onOpenChange(false)} onSave={handleSave} />
+      <DialogContent
+        showCloseButton={false}
+        className="bg-bg-layer-floating"
+        onOpenAutoFocus={handleOpenAutoFocus}
+      >
+        <ItemMemoForm
+          ref={textareaRef}
+          memo={memo}
+          onCancel={() => onOpenChange(false)}
+          onSave={handleSave}
+        />
       </DialogContent>
     </Dialog>
   );
