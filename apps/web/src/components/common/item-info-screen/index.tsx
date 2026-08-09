@@ -58,12 +58,7 @@ function ItemInfoScreen({
   };
 
   return (
-    <div
-      className={cn(
-        'hide-scrollbar min-h-dvh overflow-y-auto bg-linear-to-b from-bg-layer-default to-bg-layer-basement px-5 pt-padding-top',
-        isDetailMode ? 'pb-[98px]' : 'pb-[102px]'
-      )}
-    >
+    <div className="flex h-dvh flex-col bg-linear-to-b from-bg-layer-default to-bg-layer-basement px-5 pt-padding-top">
       <Header
         /** 수정 모드에서의 뒤로가기는 페이지 이탈이 아니라 조회 화면 복귀다 */
         left={<HeaderIcon name="BACK" {...(isEditing && { onClick: () => setIsEditing(false) })} />}
@@ -84,7 +79,12 @@ function ItemInfoScreen({
         }
       />
 
-      <main>
+      <main
+        className={cn(
+          'mt-2 hide-scrollbar min-h-0 flex-1 overflow-y-auto',
+          isDetailMode ? 'pb-[98px]' : 'pb-40'
+        )}
+      >
         {isDetailMode ? (
           <ItemDetailView
             item={item}

@@ -18,7 +18,7 @@ type ItemDetailViewProps = {
 function ItemDetailView({ item, hasMemo, priceRefresh, onEdit }: ItemDetailViewProps) {
   return (
     <>
-      <div className="relative mt-7 aspect-square w-full overflow-hidden rounded-xl bg-gray-50">
+      <div className="relative mt-5 aspect-square w-full overflow-hidden rounded-xl bg-gray-50">
         <Image src={item.imageUrl} alt="상품 이미지" fill sizes="440px" className="object-cover" />
         {item.sourceUrl && <ItemLinkBanner href={item.sourceUrl} />}
       </div>

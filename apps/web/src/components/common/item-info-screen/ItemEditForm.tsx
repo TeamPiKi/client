@@ -42,9 +42,6 @@ function ItemEditForm({ item, onSave, isSavePending = false }: ItemEditFormProps
    */
   const isSavable = isChanged && hasImage && trimmedName.length > 0 && parsedPrice > 0;
 
-  /** 상품 정보를 아예 못 가져온 경우에만 안내 배너를 띄운다 */
-  const hasFetchFailed = item.status === ITEM_STATUS.FAILED;
-
   const handleSave = () => {
     onSave({
       ...(isNameChanged && { name: trimmedName }),
@@ -55,8 +52,8 @@ function ItemEditForm({ item, onSave, isSavePending = false }: ItemEditFormProps
 
   return (
     <>
-      {hasFetchFailed && (
-        <div className="mt-6 flex items-center gap-2 rounded-xl bg-bg-warning p-3">
+      {item.status === ITEM_STATUS.FAILED && (
+        <div className="mt-4 flex items-center gap-2 rounded-xl bg-bg-warning p-3">
           <WarningIconFill className="size-5 shrink-0 text-icon-warning" />
           <span className="body-2-regular text-text-warning">
             상품 정보를 가져오는데 실패했어요. 직접 입력해주세요.
@@ -67,7 +64,7 @@ function ItemEditForm({ item, onSave, isSavePending = false }: ItemEditFormProps
       <ItemImagePicker
         imageUrl={item.imageUrl}
         onImageSelect={setSelectedImage}
-        className={hasFetchFailed ? 'mt-4' : 'mt-7'}
+        className={item.status === ITEM_STATUS.FAILED ? 'mt-2' : 'mt-5'}
       />
 
       <Spacing size={16} />
