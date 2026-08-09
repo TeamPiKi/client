@@ -1,7 +1,6 @@
 'use client';
 
 import ItemInfoScreen from '@/components/common/item-info-screen';
-import { ITEM_STATUS } from '@/consts/item';
 
 import { useDeleteWish } from '../_hooks/useDeleteWish';
 import { useGetWish } from '../_hooks/useGetWish';
@@ -28,36 +27,27 @@ function WishInfoScreen({ wishId }: WishInfoScreenProps) {
   /** 이미지로 담은 위시는 다시 불러올 원본 링크가 없다 */
   const canRefresh = wishData.refreshNeeded !== null;
 
-  /** READY 만 이미지·상품명·가격이 모두 채워져 있다 */
-  const itemProps =
-    item.status === ITEM_STATUS.READY
-      ? {
-          itemStatus: item.status,
-          imageUrl: item.imageUrl,
-          name: item.name,
-          price: item.price,
-        }
-      : {
-          itemStatus: item.status,
-          imageUrl: item.imageUrl,
-          name: item.name ?? '',
-          price: item.price ?? 0,
-        };
-
   return (
     <ItemInfoScreen
-      {...itemProps}
-      sourceUrl={item.sourceUrl}
-      hasMemo
+      itemType="wish"
+      item={{
+        status: item.status,
+        imageUrl: item.imageUrl,
+        name: item.name ?? '',
+        price: item.price ?? 0,
+        sourceUrl: item.sourceUrl,
+      }}
       onSave={data => patchWishMutation(data)}
       isSavePending={isPatchWishPending}
       onDelete={() => deleteWishMutation()}
       isDeletePending={isDeleteWishPending}
       {...(canRefresh && {
-        onRefresh: () => postWishRefreshMutation(),
-        isRefreshPending: isPostWishRefreshPending,
-        isRefreshFailed: isPostWishRefreshFailed,
-        onRefreshFailedClose: closePostWishRefreshFailed,
+        priceRefresh: {
+          refresh: () => postWishRefreshMutation(),
+          isPending: isPostWishRefreshPending,
+          isFailed: isPostWishRefreshFailed,
+          closeFailedDialog: closePostWishRefreshFailed,
+        },
       })}
     />
   );

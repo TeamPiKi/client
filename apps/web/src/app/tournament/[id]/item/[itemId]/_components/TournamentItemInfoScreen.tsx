@@ -1,7 +1,6 @@
 'use client';
 
 import ItemInfoScreen from '@/components/common/item-info-screen';
-import { ITEM_STATUS } from '@/consts/item';
 
 import { useDeleteTournamentItem } from '../../../_common/_hooks/useDeleteTournamentItem';
 import { useGetTournamentItem } from '../_hooks/useGetTournamentItem';
@@ -26,28 +25,16 @@ function TournamentItemInfoScreen({
     tournamentItemId
   );
 
-  /** READY 만 이미지·상품명·가격이 모두 채워져 있다 */
-  const itemProps =
-    tournamentItemData.status === ITEM_STATUS.READY
-      ? {
-          itemStatus: tournamentItemData.status,
-          imageUrl: tournamentItemData.imageUrl,
-          name: tournamentItemData.name,
-          price: tournamentItemData.price,
-        }
-      : {
-          itemStatus: tournamentItemData.status,
-          imageUrl: null,
-          name: '',
-          price: 0,
-        };
-
   return (
     <ItemInfoScreen
-      {...itemProps}
-      sourceUrl={tournamentItemData.sourceUrl}
-      viewTitle="위시 정보 확인"
-      deleteConfirmTitle="상품을 삭제할까요?"
+      itemType="tournament"
+      item={{
+        status: tournamentItemData.status,
+        imageUrl: tournamentItemData.imageUrl ?? null,
+        name: tournamentItemData.name ?? '',
+        price: tournamentItemData.price ?? 0,
+        sourceUrl: tournamentItemData.sourceUrl ?? null,
+      }}
       onSave={data => patchTournamentItemMutation(data)}
       isSavePending={isPatchTournamentItemPending}
       onDelete={() => deleteTournamentItemMutation()}

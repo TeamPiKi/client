@@ -8,41 +8,32 @@ import Button from '@/components/button';
 import Input from '@/components/input';
 import Spacing from '@/components/spacing';
 import { ITEM_STATUS } from '@/consts/item';
-import type { ItemStatusT, PatchItemRequestT } from '@/types/item';
+import type { PatchItemRequestT } from '@/types/item';
 import formatPrice from '@/utils/formatPrice';
 import parsePriceToNumber from '@/utils/parsePriceToNumber';
 
 import ItemImagePicker from './ItemImagePicker';
+import type { ItemInfoT } from './itemInfoScreen.const';
 
 type ItemEditFormProps = {
-  itemStatus: ItemStatusT;
-  initialImageUrl: string | null;
-  initialName: string;
-  initialPrice: number;
+  item: ItemInfoT;
   onSave: (data: PatchItemRequestT) => void;
   isSavePending?: boolean;
 };
 
 /** 상품 정보를 직접 입력·수정하는 폼 — FAILED 진입과 READY 의 "상품 정보 수정"이 공유한다 */
-function ItemEditForm({
-  itemStatus,
-  initialImageUrl,
-  initialName,
-  initialPrice,
-  onSave,
-  isSavePending = false,
-}: ItemEditFormProps) {
-  const [name, setName] = useState(initialName);
-  const [price, setPrice] = useState(initialPrice ? formatPrice(String(initialPrice)) : '');
+function ItemEditForm({ item, onSave, isSavePending = false }: ItemEditFormProps) {
+  const [name, setName] = useState(item.name);
+  const [price, setPrice] = useState(item.price ? formatPrice(String(item.price)) : '');
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
 
   const trimmedName = name.trim();
   const parsedPrice = parsePriceToNumber(price);
 
-  const isNameChanged = trimmedName !== initialName.trim();
-  const isPriceChanged = parsedPrice !== initialPrice;
+  const isNameChanged = trimmedName !== item.name.trim();
+  const isPriceChanged = parsedPrice !== item.price;
 
-  const hasImage = initialImageUrl !== null || selectedImage !== null;
+  const hasImage = item.imageUrl !== null || selectedImage !== null;
   const isChanged = isNameChanged || isPriceChanged || selectedImage !== null;
   /**
    * 저장하기 버튼 활성화 조건
@@ -52,7 +43,7 @@ function ItemEditForm({
   const isSavable = isChanged && hasImage && trimmedName.length > 0 && parsedPrice > 0;
 
   /** 상품 정보를 아예 못 가져온 경우에만 안내 배너를 띄운다 */
-  const hasFetchFailed = itemStatus === ITEM_STATUS.FAILED;
+  const hasFetchFailed = item.status === ITEM_STATUS.FAILED;
 
   const handleSave = () => {
     onSave({
@@ -74,7 +65,7 @@ function ItemEditForm({
       )}
 
       <ItemImagePicker
-        imageUrl={initialImageUrl}
+        imageUrl={item.imageUrl}
         onImageSelect={setSelectedImage}
         className={hasFetchFailed ? 'mt-4' : 'mt-7'}
       />

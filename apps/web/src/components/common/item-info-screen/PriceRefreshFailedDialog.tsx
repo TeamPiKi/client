@@ -11,14 +11,19 @@ import {
 
 type PriceRefreshFailedDialogProps = {
   open: boolean;
-  onOpenChange: (open: boolean) => void;
+  onClose: () => void;
   onEdit: () => void;
 };
 
 /** 가격 정보 새로고침 실패 안내 — 직접 수정하기를 고르면 입력 폼으로 넘어간다 */
-function PriceRefreshFailedDialog({ open, onOpenChange, onEdit }: PriceRefreshFailedDialogProps) {
+function PriceRefreshFailedDialog({ open, onClose, onEdit }: PriceRefreshFailedDialogProps) {
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog
+      open={open}
+      onOpenChange={isOpen => {
+        if (!isOpen) onClose();
+      }}
+    >
       <DialogContent showCloseButton={false} className="pt-8 text-center">
         <DialogHeader className="gap-1">
           <DialogTitle className="heading-2-semibold text-text-neutral-primary">
@@ -28,12 +33,7 @@ function PriceRefreshFailedDialog({ open, onOpenChange, onEdit }: PriceRefreshFa
         </DialogHeader>
 
         <DialogFooter className="mt-5 flex-row gap-2.5">
-          <Button
-            variant="secondary"
-            size="lg"
-            className="flex-1"
-            onClick={() => onOpenChange(false)}
-          >
+          <Button variant="secondary" size="lg" className="flex-1" onClick={onClose}>
             확인
           </Button>
           <Button variant="primary" size="lg" className="flex-1" onClick={onEdit}>
