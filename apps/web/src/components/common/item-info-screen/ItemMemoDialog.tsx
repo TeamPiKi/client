@@ -1,4 +1,7 @@
-import { NoteIconFill } from '@/assets/icons';
+'use client';
+
+import { useState } from 'react';
+
 import Button from '@/components/button';
 import {
   Dialog,
@@ -6,45 +9,73 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from '@/components/dialog';
 import Spacing from '@/components/spacing';
 
-function ItemMemoDialog() {
+const MEMO_MAX_LENGTH = 200;
+
+type ItemMemoDialogProps = {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  memo: string;
+  onSave: (memo: string) => void;
+};
+
+type ItemMemoFormProps = {
+  memo: string;
+  onCancel: () => void;
+  onSave: (memo: string) => void;
+};
+
+/** 닫힐 때 통째로 언마운트되므로, 열 때마다 저장된 메모에서 다시 시작한다 */
+function ItemMemoForm({ memo, onCancel, onSave }: ItemMemoFormProps) {
+  const [draft, setDraft] = useState(memo);
+
   return (
-    <Dialog>
-      <DialogTrigger className="w-full space-y-2 rounded-xl bg-bg-layer-floating p-4">
-        <div className="flex items-center gap-1">
-          <NoteIconFill className="size-4 text-icon-neutral-secondary" />
-          <span className="body-2-regular text-text-neutral-secondary">Memo</span>
-        </div>
-        <div className="text-left body-2-medium">메모내용</div>
-      </DialogTrigger>
+    <>
+      <DialogHeader>
+        <DialogTitle className="text-center body-1-bold text-text-neutral-primary">
+          메모
+        </DialogTitle>
+      </DialogHeader>
+
+      <Spacing size={20} />
+
+      <textarea
+        value={draft}
+        onChange={event => setDraft(event.target.value)}
+        maxLength={MEMO_MAX_LENGTH}
+        placeholder="위시에 대한 생각을 메모해보세요."
+        autoCapitalize="off"
+        autoCorrect="off"
+        className="hide-scrollbar h-[154px] w-full resize-none rounded-xl border border-border-neutral-muted p-4 body-1-medium text-text-neutral-secondary transition-colors outline-none placeholder:text-text-neutral-tertiary focus-within:border-border-accent"
+      />
+
+      <Spacing size={24} />
+
+      <DialogFooter className="flex-row gap-3">
+        <Button variant="secondary" size="lg" className="flex-1" onClick={onCancel}>
+          취소
+        </Button>
+        <Button variant="primary" size="lg" className="flex-1" onClick={() => onSave(draft.trim())}>
+          확인
+        </Button>
+      </DialogFooter>
+    </>
+  );
+}
+
+/** 메모 입력 다이얼로그 — 확인을 눌러야 저장된다 */
+function ItemMemoDialog({ open, onOpenChange, memo, onSave }: ItemMemoDialogProps) {
+  const handleSave = (nextMemo: string) => {
+    onSave(nextMemo);
+    onOpenChange(false);
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent showCloseButton={false} className="bg-bg-layer-floating">
-        <DialogHeader>
-          <DialogTitle className="text-center body-1-bold text-text-neutral-primary">
-            메모
-          </DialogTitle>
-        </DialogHeader>
-
-        <Spacing size={20} />
-
-        <textarea
-          autoCapitalize="off"
-          autoCorrect="off"
-          className="hide-scrollbar h-[122px] w-full resize-none rounded-xl border border-border-neutral-muted p-4 text-text-neutral-secondary transition-colors outline-none focus-within:border-border-accent"
-        />
-
-        <Spacing size={24} />
-
-        <DialogFooter className="flex items-center gap-3">
-          <Button variant="secondary" size="lg">
-            취소
-          </Button>
-          <Button variant="primary" size="lg">
-            저장
-          </Button>
-        </DialogFooter>
+        <ItemMemoForm memo={memo} onCancel={() => onOpenChange(false)} onSave={handleSave} />
       </DialogContent>
     </Dialog>
   );
