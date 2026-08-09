@@ -24,7 +24,7 @@ type NotificationItemProps = {
 };
 
 function NotificationItem({ kind, message, time, isRead, onClick }: NotificationItemProps) {
-  const { label, Icon } = KIND_DISPLAY[kind];
+  const { label, Icon } = KIND_DISPLAY[kind] ?? KIND_DISPLAY.SYSTEM;
 
   const innerContent = (
     <div className="flex w-full flex-col gap-1">
