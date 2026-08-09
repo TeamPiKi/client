@@ -119,7 +119,7 @@ function NotificationContent() {
           <div ref={bottomRef} />
         )}
 
-        {!hasNextPage && (
+        {!isPending && !isFetchingNextPage && !isFetchNextPageError && !hasNextPage && (
           <p className="mt-3 text-center caption-1-regular text-text-neutral-tertiary">
             알림은 14일간 보관되며, 14일 후 자동 삭제돼요.
           </p>
