@@ -46,6 +46,13 @@ export type {
   WebReqLogoutMessageT,
   WebReqTokenRefreshedMessageT,
 } from './types/login';
+export type {
+  AppResShareInstagramStoryMessageT,
+  ShareInstagramStoryPayloadT,
+  ShareInstagramStoryResultPayloadT,
+  ShareInstagramStoryStatusT,
+  WebReqShareInstagramStoryMessageT,
+} from './types/instagramStory';
 export type { AppReqNavigateMessageT, NavigatePayloadT } from './types/navigation';
 export type { ShareIntentFileT, ShareIntentMetaT, ShareIntentPayloadT } from './types/shareIntent';
 export type {

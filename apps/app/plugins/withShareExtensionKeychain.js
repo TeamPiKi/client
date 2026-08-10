@@ -1,5 +1,7 @@
 const { IOSConfig, withDangerousMod } = require('@expo/config-plugins');
-const plist = require('@expo/plist');
+/** @expo/plist 는 버전에 따라 named / default 로 갈려 둘 다 지원한다 */
+const plistModule = require('@expo/plist');
+const plist = plistModule.parse ? plistModule : plistModule.default;
 const fs = require('fs');
 const path = require('path');
 
