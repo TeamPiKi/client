@@ -31,7 +31,7 @@ function ItemMemoCard({ memo, onSave }: ItemMemoCardProps) {
         </span>
         <span
           className={cn(
-            'line-clamp-2 block body-2-medium break-keep',
+            'block body-2-medium break-keep whitespace-pre-line',
             memo ? 'text-text-neutral-primary' : 'text-text-neutral-tertiary'
           )}
         >
@@ -43,7 +43,6 @@ function ItemMemoCard({ memo, onSave }: ItemMemoCardProps) {
         open={isDialogOpen}
         onOpenChange={setIsDialogOpen}
         memo={memo}
-        /** 그대로 확인만 눌렀다면 저장하지 않는다 */
         onSave={nextMemo => nextMemo !== memo && onSave(nextMemo)}
       />
     </>
