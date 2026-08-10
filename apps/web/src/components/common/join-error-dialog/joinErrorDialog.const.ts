@@ -48,7 +48,7 @@ export const JOIN_ERROR_CONTENT: Record<JoinErrorTypeT, JoinErrorContentT> = {
   LINK_EXPIRED: {
     Icon: HistoryIconFill,
     iconClassName: 'text-icon-neutral-secondary',
-    title: '만료된 초대 링크에요.',
+    title: '만료된 초대 링크예요.',
     description: '초대 링크의 만료 기간이 지나면 접근할 수 없어요.',
   },
   INVALID_CODE: {
