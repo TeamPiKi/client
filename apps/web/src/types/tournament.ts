@@ -31,8 +31,6 @@ export type GetTournamentListRequestT = {
   /** 플레이 유형 필터 (SOLO · SOCIAL). 생략 시 전체이며 status 와 AND 로 걸린다. */
   playType?: TournamentPlayTypeT;
   limit?: number;
-  /** 내가 만든 토너먼트만 조회 */
-  ownedOnly?: boolean;
 };
 
 export type GetTournamentListResponseT = {
