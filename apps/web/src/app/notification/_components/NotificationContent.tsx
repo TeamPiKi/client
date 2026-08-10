@@ -74,9 +74,16 @@ function NotificationContent() {
     if (isEmpty)
       return <NotificationStateCard variant="empty" onAction={openNotificationSettings} />;
 
+    const isPushBannerVisible = isWebview() && isPushEnabled === false;
+
     return (
-      <div className={cn('flex flex-col gap-4 pb-9', unreadCount <= 0 && 'pt-9')}>
-        {isWebview() && isPushEnabled === false && (
+      <div
+        className={cn(
+          'flex flex-col gap-4 pb-9',
+          !isPushBannerVisible && unreadCount <= 0 && 'pt-9'
+        )}
+      >
+        {isPushBannerVisible && (
           <div className="pt-5">
             <PushDisabledBanner onOpenNotificationSettings={openNotificationSettings} />
           </div>
