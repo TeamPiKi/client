@@ -100,8 +100,8 @@ const nextConfig = async () => {
 
     /** NOTE: 실기기 테스트 시 LAN IP를 .env.local의 NEXT_PUBLIC_DEV_ORIGIN에 추가 */
     allowedDevOrigins: process.env.NEXT_PUBLIC_DEV_ORIGIN
-      ? [process.env.NEXT_PUBLIC_DEV_ORIGIN]
-      : [],
+      ? [process.env.NEXT_PUBLIC_DEV_ORIGIN, '192.168.2.177']
+      : ['192.168.2.177'],
   };
 };
 

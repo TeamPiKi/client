@@ -19,6 +19,7 @@ const isPublicRoute = (pathname: string) => {
   if (pathname === ROUTES.TERMS) return true;
   if (pathname === ROUTES.POLICY) return true;
   if (pathname === ROUTES.LOGIN) return true;
+  if (pathname === ROUTES.OPEN) return true;
   if (/^\/auth\/callback\/[^/]+$/.test(pathname)) return true; // 소셜 로그인 콜백 경로
 
   return false;
