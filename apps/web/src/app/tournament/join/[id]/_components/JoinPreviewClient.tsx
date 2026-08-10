@@ -6,24 +6,26 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { usePatchMe } from '@/app/mypage/edit/_hooks/usePatchMe';
 import { EditIconFill } from '@/assets/icons/fill';
 import Button from '@/components/button';
+import JoinErrorDialog from '@/components/common/join-error-dialog';
+import type { JoinErrorTypeT } from '@/components/common/join-error-dialog';
 import { Header } from '@/components/header';
 import Input from '@/components/input';
 import Spinner from '@/components/spinner';
-import TournamentErrorDialog from '@/components/tournament-error-dialog';
 import { QUERY_ACTION } from '@/consts/queryAction';
 import { ROUTES } from '@/consts/route';
 import { useGetMe } from '@/hooks/useGetMe';
 import { useNicknameValidation } from '@/hooks/useNicknameValidation';
 import { usePageBackground } from '@/hooks/usePageBackground';
-import type { TournamentErrorTypeT } from '@/types/tournament';
+import type { GetInvitePreviewResponseT } from '@/types/tournament';
 
-import { useGetInvitePreview } from '../../_hooks/useGetInvitePreview';
 import { usePostJoin } from '../../_hooks/usePostJoin';
 
 type JoinPreviewClientProps = {
   tournamentId: number;
-  /** 친구 초대 코드 — invite 진입 시 query 로 전달됨. join 호출 시 필수 */
+  /** 친구 초대 코드 — 링크 query 로 전달됨. join 호출 시 필수 */
   inviteCode: string;
+  /** 링크 유효성과 함께 RSC 가 이미 조회한 미리보기 */
+  preview: GetInvitePreviewResponseT;
 };
 
 const MAX_NICKNAME_LENGTH = 10;
@@ -32,27 +34,28 @@ const MAX_NICKNAME_LENGTH = 10;
  * 회원 자동 참여 화면 상태.
  * - joining: 참여 요청 진행 중 (스피너)
  * - retryable: 일시적 실패 — 재시도 가능
- * - blocked: 409(이미 참여 / 만료) — 재시도가 무의미하므로 종료 화면
+ * - blocked: 만료·정원 초과·삭제 등 영구 실패 — 재시도가 무의미하므로 종료 화면
  */
 type AutoJoinStatusT = 'joining' | 'retryable' | 'blocked';
 
-function JoinPreviewClient({ tournamentId, inviteCode }: JoinPreviewClientProps) {
+function JoinPreviewClient({ tournamentId, inviteCode, preview }: JoinPreviewClientProps) {
   /** 이 페이지는 흰색 배경(bg-layer-default) — iOS 노치 영역까지 흰색으로 칠해야 자연스럽다. */
   usePageBackground('var(--color-bg-layer-default)');
 
   const router = useRouter();
   const { userData } = useGetMe();
-  const { invitePreviewData } = useGetInvitePreview(tournamentId);
   const { patchMeMutation, isPatchMePending } = usePatchMe();
 
   const [nickname, setNickname] = useState(userData.nickname);
-  const [tournamentErrorType, setTournamentErrorType] = useState<TournamentErrorTypeT | null>(null);
+  const [joinErrorType, setJoinErrorType] = useState<JoinErrorTypeT | null>(null);
 
   const { postJoinMutation, isPostJoinPending, isPostJoinError } = usePostJoin({
     /** 참여 완료 후 뒤로가기로 join 화면에 돌아오면 재참여(409)가 되므로 히스토리에서 제거 */
     onAlreadyJoined: () => router.replace(ROUTES.TOURNAMENT_CREATE(tournamentId)),
-    onParticipantsFull: () => setTournamentErrorType('PARTICIPANTS_FULL'),
-    onUnavailable: () => setTournamentErrorType('LINK_EXPIRED'),
+    onParticipantsFull: () => setJoinErrorType('PARTICIPANTS_FULL'),
+    onAlreadyStarted: () => setJoinErrorType('ALREADY_STARTED'),
+    onUnavailable: () => setJoinErrorType('LINK_EXPIRED'),
+    onDeleted: () => setJoinErrorType('DELETED'),
   });
 
   const {
@@ -105,20 +108,14 @@ function JoinPreviewClient({ tournamentId, inviteCode }: JoinPreviewClientProps)
 
   useEffect(() => {
     if (!isMember || hasAutoJoinRunRef.current) return;
+
     hasAutoJoinRunRef.current = true;
-
-    /** 이미 참여한 회원 — join 없이 바로 이동 */
-    if (invitePreviewData.joined) {
-      router.replace(ROUTES.TOURNAMENT_CREATE(tournamentId));
-      return;
-    }
-
     joinTournament();
-  }, [isMember, invitePreviewData.joined, router, tournamentId, joinTournament]);
+  }, [isMember, joinTournament]);
 
   /** 실패 문구는 usePostJoin 훅이 토스트로 안내 — 화면은 상태만 고른다 */
   const getAutoJoinStatus = (): AutoJoinStatusT => {
-    if (tournamentErrorType) return 'blocked';
+    if (joinErrorType) return 'blocked';
     if (isPostJoinError) return 'retryable';
 
     return 'joining';
@@ -160,13 +157,7 @@ function JoinPreviewClient({ tournamentId, inviteCode }: JoinPreviewClientProps)
           )}
         </main>
 
-        {tournamentErrorType && (
-          <TournamentErrorDialog
-            type={tournamentErrorType}
-            open
-            onOpenChange={() => setTournamentErrorType(null)}
-          />
-        )}
+        {joinErrorType && <JoinErrorDialog type={joinErrorType} />}
       </>
     );
   }
@@ -183,11 +174,9 @@ function JoinPreviewClient({ tournamentId, inviteCode }: JoinPreviewClientProps)
         <section className="mt-8.75 flex flex-col gap-2 px-5">
           <p className="body-2-semibold text-text-neutral-primary">공유받은 토너먼트</p>
           <div className="flex flex-col gap-1 rounded-xl bg-gray-50 p-4">
-            <p className="body-1-semibold text-text-neutral-primary">
-              {invitePreviewData.tournamentName}
-            </p>
+            <p className="body-1-semibold text-text-neutral-primary">{preview.tournamentName}</p>
             <p className="body-2-medium text-text-neutral-secondary">
-              후보 {invitePreviewData.itemCount}개 · 참여 {invitePreviewData.participantCount}명
+              후보 {preview.itemCount}개 · 참여 {preview.participantCount}명
             </p>
           </div>
         </section>
@@ -217,13 +206,7 @@ function JoinPreviewClient({ tournamentId, inviteCode }: JoinPreviewClientProps)
         </div>
       </main>
 
-      {tournamentErrorType && (
-        <TournamentErrorDialog
-          type={tournamentErrorType}
-          open
-          onOpenChange={() => setTournamentErrorType(null)}
-        />
-      )}
+      {joinErrorType && <JoinErrorDialog type={joinErrorType} />}
     </>
   );
 }

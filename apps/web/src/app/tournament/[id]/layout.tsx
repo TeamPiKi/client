@@ -1,9 +1,10 @@
+import { ERROR_CODE } from '@piki/core';
 import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
-import { isAxiosError } from 'axios';
 import { notFound, redirect } from 'next/navigation';
 
+import { QUERY_ACTION } from '@/consts/queryAction';
 import { ROUTES } from '@/consts/route';
-import type { ApiErrorResponseT } from '@/types/api';
+import { getApiErrorCode, isGlobalNetError } from '@/utils/apiError';
 import { parseIdParam } from '@/utils/parseIdParam';
 import { getQueryClient } from '@/utils/queryClient';
 
@@ -26,10 +27,17 @@ async function TournamentLayout({ children, params }: TournamentLayoutProps) {
     const tournamentData = await getTournament(tournamentId);
     queryClient.setQueryData(['tournament', tournamentId], tournamentData);
   } catch (error) {
-    if (!isAxiosError<ApiErrorResponseT>(error)) throw error;
+    if (isGlobalNetError(error)) throw error;
 
-    if (error.response?.status === 403) redirect(ROUTES.HOME);
-    else if (error.response?.status === 404) notFound(); // TODO: 아직 미정
+    const code = getApiErrorCode(error);
+
+    /** 토너먼트 접근 권한이 없는 경우 */
+    if (code === ERROR_CODE.TOURNAMENT_FORBIDDEN)
+      redirect(`${ROUTES.HOME}?${QUERY_ACTION.KEY}=${QUERY_ACTION.VALUE.TOURNAMENT_FORBIDDEN}`);
+
+    /** 삭제된 토너먼트인 경우 */
+    if (code === ERROR_CODE.TOURNAMENT_NOT_FOUND)
+      redirect(`${ROUTES.HOME}?${QUERY_ACTION.KEY}=${QUERY_ACTION.VALUE.TOURNAMENT_NOT_FOUND}`);
 
     throw error;
   }
