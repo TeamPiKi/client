@@ -5,6 +5,7 @@ import { type NextRequest, NextResponse } from 'next/server';
 import { postTokenRefreshServer } from './apis/postTokenRefresh';
 import { postGuestLoginServer } from './app/login/_apis/postGuestLogin';
 import { ROUTES } from './consts/route';
+import { getApiErrorStatus } from './utils/apiError';
 import { getRouteType } from './utils/getRouteType';
 import { getLoginPath } from './utils/loginRedirect';
 import { isWebview } from './utils/webBridge';
@@ -197,11 +198,20 @@ const handleTokenRefresh = async (request: NextRequest) => {
     } else setCookieHeaders.forEach(cookie => nextResponse.headers.append('set-cookie', cookie));
 
     return nextResponse;
-  } catch {
+  } catch (error) {
     /** 로그인 페이지 자체의 갱신 실패는 로그인으로 리다이렉트하면 자기 자신 무한 루프라 그대로 렌더 */
-    if (pathname === ROUTES.LOGIN) return NextResponse.next();
+    const response =
+      pathname === ROUTES.LOGIN
+        ? NextResponse.next()
+        : NextResponse.redirect(new URL(getLoginPath(`${pathname}${search}`), request.url));
 
-    return NextResponse.redirect(new URL(getLoginPath(`${pathname}${search}`), request.url));
+    /** 죽은 토큰은 다음 진입에 사용되지 않도록 폐기 */
+    if (getApiErrorStatus(error) === 401) {
+      response.cookies.delete('access_token');
+      response.cookies.delete('refresh_token');
+    }
+
+    return response;
   }
 };
 
@@ -217,13 +227,10 @@ export const proxy = async (request: NextRequest) => {
 
   /** 퍼블릭 영역 */
   if (routeType === 'PUBLIC') {
-    /**
-     * 로그인 페이지는 만료로 소멸한 access(15분) 를 살아있는 refresh 로 먼저 복원한다.
-     * 페이지의 "멤버면 홈으로" 리다이렉트가 access_token 쿠키만 보므로, 복원 없이는
-     * 세션이 살아있는 멤버도 매번 로그인 화면을 보게 된다. (#450)
-     */
     const needsRestore =
-      pathname === ROUTES.LOGIN && !(accessToken && isTokenValid(accessToken.value)) && refreshToken;
+      pathname === ROUTES.LOGIN &&
+      !(accessToken && isTokenValid(accessToken.value)) &&
+      isTokenValid(refreshToken?.value ?? null);
     if (needsRestore) return await handleTokenRefresh(request);
 
     return NextResponse.next();
