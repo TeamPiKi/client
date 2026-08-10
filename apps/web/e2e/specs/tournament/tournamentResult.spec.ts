@@ -30,7 +30,7 @@ test('결과 페이지에 영수증과 순위, 공유 버튼이 렌더링된다'
     await expect(page.getByText(rankedItem.name).last()).toBeVisible();
   }
 
-  await expect(page.getByRole('button', { name: '영수증 공유' })).toBeVisible();
+  await expect(page.getByRole('button', { name: '영수증 저장' })).toBeVisible();
   /** isRoot && isOwner — 플레이 링크 공유 버튼 노출 */
   await expect(page.getByRole('button', { name: '토너먼트 공유' })).toBeVisible();
 });
