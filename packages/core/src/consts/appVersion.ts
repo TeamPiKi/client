@@ -38,6 +38,8 @@ export const BRIDGE_GATE: Record<WebBridgeMessageT['type'], BridgeGateT> = {
   WEB_REQ_LOG_ANALYTICS_EVENT: { minAppVersion: '1.0.4', notifyOnBlock: false },
   WEB_REQ_TOKEN_REFRESHED: { minAppVersion: '1.0.4', notifyOnBlock: false },
   WEB_REQ_SET_BADGE: { minAppVersion: '1.0.4', notifyOnBlock: false },
+  /** TODO: 앱 핸들러 릴리즈 후 `git tag --contains <sha>` 로 실제 태그 확인해 교체 */
+  WEB_REQ_SHARE_INSTAGRAM_STORY: { minAppVersion: '1.1.2', notifyOnBlock: true },
 
   /** 앱 → 웹 — 웹이 보내는 메시지가 아니므로 게이트 대상이 아님 */
   APP_RES_IMAGE_PICKER_SUCCESS: { minAppVersion: null, notifyOnBlock: false },
@@ -50,4 +52,5 @@ export const BRIDGE_GATE: Record<WebBridgeMessageT['type'], BridgeGateT> = {
   APP_RES_FCM_TOKEN: { minAppVersion: null, notifyOnBlock: false },
   APP_REQ_DEEP_LINK: { minAppVersion: null, notifyOnBlock: false },
   APP_REQ_NAVIGATE: { minAppVersion: null, notifyOnBlock: false },
+  APP_RES_SHARE_INSTAGRAM_STORY: { minAppVersion: null, notifyOnBlock: false },
 };
