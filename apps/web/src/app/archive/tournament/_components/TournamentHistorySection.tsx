@@ -19,9 +19,15 @@ function TournamentHistorySection() {
   const activeTab = parseTabParam(searchParams.get('tab'));
   const activePlayTypeFilter = parsePlayParam(searchParams.get('play'));
 
-  /** 서버 왕복 없이 주소만 동기화 */
+  /**
+   * 서버 왕복 없이 주소만 동기화.
+   * 스크롤 복원 키가 history.state 에 저장되므로 기존 state 를 반드시 보존한다.
+   */
   const syncSearchParams = (tab: TournamentStatusTabT, play: TournamentPlayTypeFilterT) => {
-    window.history.replaceState(null, '', `?tab=${tab}&play=${play}`);
+    const { __NA, _N, __PRIVATE_NEXTJS_INTERNALS_TREE, ...customState } =
+      (window.history.state as Record<string, unknown> | null) ?? {};
+
+    window.history.replaceState(customState, '', `?tab=${tab}&play=${play}`);
   };
 
   /** 탭을 옮기면 플레이 유형 필터는 항상 '전체'로 초기화 */
@@ -53,6 +59,7 @@ function TournamentHistorySection() {
           <TournamentHistoryList
             statuses={STATUS_BY_TAB[activeTab]}
             playType={PLAY_TYPE_BY_FILTER[activePlayTypeFilter]}
+            statusTab={activeTab}
           />
         </Suspense>
       </div>
