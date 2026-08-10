@@ -1,4 +1,5 @@
 import { FireIconFill, HistoryIconFill, InboxIconFill, WarningIconFill } from '@/assets/icons';
+import Button from '@/components/button';
 import ButtonLink from '@/components/button/ButtonLink';
 import { ROUTES } from '@/consts/route';
 
@@ -15,6 +16,8 @@ type Props = {
   type: 'NO_WISH_EXISTS' | 'ALREADY_STARTED' | 'ALREADY_ENDED' | 'LINK_EXPIRED' | 'REQUEST_FAILED';
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  secondaryButtonText?: string;
+  onSecondaryClick?: () => void;
 };
 
 const CONTENT = {
@@ -22,7 +25,7 @@ const CONTENT = {
     icon: <InboxIconFill className="size-10 text-icon-neutral-secondary" />,
     title: '가져올 위시가 없어요.',
     description: '위시를 먼저 추가해주세요.',
-    buttonText: '위시템 담기',
+    buttonText: '위시 담기',
     buttonLink: ROUTES.WISHLIST,
   },
   ALREADY_STARTED: {
@@ -55,7 +58,13 @@ const CONTENT = {
   },
 };
 
-function TournamentErrorDialog({ type, open, onOpenChange }: Props) {
+function TournamentErrorDialog({
+  type,
+  open,
+  onOpenChange,
+  secondaryButtonText,
+  onSecondaryClick,
+}: Props) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent showCloseButton={false} className="flex flex-col items-center gap-5">
@@ -68,7 +77,12 @@ function TournamentErrorDialog({ type, open, onOpenChange }: Props) {
             {CONTENT[type].description}
           </DialogDescription>
         </div>
-        <DialogFooter className="w-full">
+        <DialogFooter className="flex w-full gap-2">
+          {secondaryButtonText && (
+            <Button variant="secondary" size="lg" onClick={onSecondaryClick}>
+              {secondaryButtonText}
+            </Button>
+          )}
           <DialogClose asChild>
             <ButtonLink size="lg" href={CONTENT[type].buttonLink}>
               {CONTENT[type].buttonText}

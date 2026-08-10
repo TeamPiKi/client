@@ -1,20 +1,19 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { toast } from 'sonner';
 
 import BottomCta from '@/components/bottom-cta';
 import Button from '@/components/button';
 import { Header, HeaderIcon } from '@/components/header';
-import { ROUTES } from '@/consts/route';
-import { useBackWithFallback } from '@/hooks/useBackWithFallback';
+import TournamentErrorDialog from '@/components/tournament-error-dialog';
 import { useGetWishlist } from '@/hooks/useGetWishlist';
 
 import { useGetTournament } from '../../../_common/_hooks/useGetTournament';
 import { MAX_SELECT } from '../_consts/selectLimits';
 import { usePostTournamentItemsByWish } from '../_hooks/usePostTournamentItemsByWish';
 import useWishSelection from '../_hooks/useWishSelection';
-import NoWishDialog from './NoWishDialog';
 import WishSelectCard from './WishSelectCard';
 import WishSelectHeader from './WishSelectHeader';
 
@@ -22,8 +21,10 @@ type ByWishContentProps = {
   tournamentId: number;
 };
 
+const noop = () => {};
+
 function ByWishContent({ tournamentId }: ByWishContentProps) {
-  const backWithFallback = useBackWithFallback();
+  const router = useRouter();
   const { selectedIds, isMaxExceeded, handleSelect } = useWishSelection(MAX_SELECT);
   const { wishlistData, fetchNextPage, hasNextPage, isFetchingNextPage } = useGetWishlist();
   const { tournamentData } = useGetTournament(tournamentId);
@@ -37,7 +38,10 @@ function ByWishContent({ tournamentId }: ByWishContentProps) {
       item.status !== 'FAILED' && item.status !== 'PROCESSING' && !existingItemIds.has(item.id)
   );
 
-  const hasNoSelectableWish = !hasNextPage && !isFetchingNextPage && items.length === 0;
+  const isWishlistLoaded = !hasNextPage && !isFetchingNextPage;
+
+  const hasNoWish = isWishlistLoaded && wishlistData.length === 0;
+  const hasNoSelectableWish = isWishlistLoaded && !hasNoWish && items.length === 0;
 
   useEffect(() => {
     if (!isMaxExceeded) return;
@@ -57,6 +61,22 @@ function ByWishContent({ tournamentId }: ByWishContentProps) {
       .map(({ item }) => item.id);
     postTournamentItemsByWishMutation(itemIds);
   };
+
+  const handleBackToCreate = () => router.back();
+
+  if (hasNoWish) {
+    return (
+      <div className="h-full bg-bg-layer-basement">
+        <TournamentErrorDialog
+          type="NO_WISH_EXISTS"
+          open
+          onOpenChange={noop}
+          secondaryButtonText="돌아가기"
+          onSecondaryClick={handleBackToCreate}
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="flex h-full flex-col bg-bg-layer-basement pt-padding-top">
@@ -89,15 +109,15 @@ function ByWishContent({ tournamentId }: ByWishContentProps) {
           </div>
         ) : (
           <div className="grid grid-cols-2">
-            {items.map(item => (
+            {items.map(({ wish, item }) => (
               <WishSelectCard
-                key={item.id}
+                key={wish.id}
                 name={item.name}
                 price={item.price}
                 imageUrl={item.imageUrl}
                 sourcePlatform={item.sourcePlatform}
-                isSelected={selectedIds.includes(item.id)}
-                onSelect={() => handleSelect(item.id)}
+                isSelected={selectedIds.includes(wish.id)}
+                onSelect={() => handleSelect(wish.id)}
               />
             ))}
           </div>
@@ -115,11 +135,6 @@ function ByWishContent({ tournamentId }: ByWishContentProps) {
           다음
         </Button>
       </BottomCta>
-
-      <NoWishDialog
-        open={hasNoSelectableWish}
-        onOpenChange={() => backWithFallback(ROUTES.TOURNAMENT_CREATE(tournamentId))}
-      />
     </div>
   );
 }

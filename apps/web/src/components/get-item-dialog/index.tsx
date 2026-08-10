@@ -1,13 +1,10 @@
 'use client';
 
-import { useInfiniteQuery } from '@tanstack/react-query';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import { useState } from 'react';
 
-import { wishlistInfiniteQueryOptions } from '@/apis/getWishlist';
 import { HeartIconFill, ImageIconFill, LinkIconFill } from '@/assets/icons';
 import { DialogContent, DialogDescription, DialogTitle } from '@/components/dialog';
-import TournamentErrorDialog from '@/components/tournament-error-dialog';
 import { ROUTES } from '@/consts/route';
 import { useGetMe } from '@/hooks/useGetMe';
 import type { ItemTypeT } from '@/types/item';
@@ -22,32 +19,14 @@ type GetItemDialogContentProps = {
 };
 
 function GetItemDialogContent({ type }: GetItemDialogContentProps) {
-  const router = useRouter();
   const { userData } = useGetMe();
-  const [isSubDialogOpen, setIsSubDialogOpen] = useState<'link' | 'image' | 'no-wish' | null>(null);
+  const [isSubDialogOpen, setIsSubDialogOpen] = useState<'link' | 'image' | null>(null);
 
   const { id } = useParams<{ id: string }>();
   const tournamentId = parseIdParam(id);
   const isWishOptionVisible = type === 'tournament' && userData.identityType === 'MEMBER';
 
-  /** 클릭 시점에 위시 유무를 즉시 판단할 수 있도록 미리 받아둔다 */
-  const { data: wishlistData } = useInfiniteQuery({
-    ...wishlistInfiniteQueryOptions,
-    enabled: isWishOptionVisible,
-  });
-
   if (type === 'tournament' && !tournamentId) return null;
-
-  const handleWishClick = () => {
-    const hasNoWish = wishlistData?.pages.every(page => page.data.length === 0) ?? false;
-
-    if (hasNoWish) {
-      setIsSubDialogOpen('no-wish');
-      return;
-    }
-
-    router.push(ROUTES.TOURNAMENT_ADD_ITEM_BY_WISH(tournamentId ?? -1));
-  };
 
   return (
     <>
@@ -62,10 +41,10 @@ function GetItemDialogContent({ type }: GetItemDialogContentProps) {
         <ul className="flex w-full flex-col gap-2">
           {isWishOptionVisible && (
             <OptionButton
+              href={ROUTES.TOURNAMENT_ADD_ITEM_BY_WISH(tournamentId ?? -1)}
               label="위시에서 가져오기"
               description="내 위시리스트에서 상품을 가져와요"
               Icon={HeartIconFill}
-              onClick={handleWishClick}
             />
           )}
           <OptionButton
@@ -92,11 +71,6 @@ function GetItemDialogContent({ type }: GetItemDialogContentProps) {
         type={type}
         open={isSubDialogOpen === 'image'}
         onOpenChange={open => setIsSubDialogOpen(open ? 'image' : null)}
-      />
-      <TournamentErrorDialog
-        type="NO_WISH_EXISTS"
-        open={isSubDialogOpen === 'no-wish'}
-        onOpenChange={open => setIsSubDialogOpen(open ? 'no-wish' : null)}
       />
     </>
   );
