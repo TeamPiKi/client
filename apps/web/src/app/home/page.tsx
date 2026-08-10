@@ -9,14 +9,12 @@ import { getQueryClient } from '@/utils/queryClient';
 import AddWishHomeDialog from './_components/AddWishHomeDialog';
 import CreateTournamentDialog from './_components/CreateTournamentDialog';
 import InviteTournamentDialog from './_components/InviteTournamentDialog';
-import MemberOnlyToast from './_components/MemberOnlyToast';
 import HomeOnboarding from './_components/home-onboarding';
 import TournamentList from './_components/tournament-list';
 
 async function HomePage() {
   const queryClient = getQueryClient();
 
-  /** 위시 담기 게스트 분기를 위해 유저 정보 프리페치 (AddWishHomeDialog가 useGetMe로 소비) */
   await queryClient.prefetchQuery({
     queryKey: ['me'],
     queryFn: getMe,
@@ -43,7 +41,6 @@ async function HomePage() {
           <TournamentList />
         </main>
 
-        <MemberOnlyToast />
         <HomeOnboarding />
       </div>
     </HydrationBoundary>

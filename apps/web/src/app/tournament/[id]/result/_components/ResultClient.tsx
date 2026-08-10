@@ -9,9 +9,7 @@ import BottomCta from '@/components/bottom-cta';
 import Button from '@/components/button';
 import { Header } from '@/components/header';
 import { ANALYTICS_EVENT } from '@/consts/analytics';
-import { QUERY_ACTION } from '@/consts/queryAction';
 import { ROUTES } from '@/consts/route';
-import { useQueryAction } from '@/hooks/useQueryAction';
 import { logAnalyticsEvent } from '@/utils/analytics';
 
 import { useGetTournament } from '../../_common/_hooks/useGetTournament';
@@ -46,12 +44,6 @@ function ResultClient({ tournamentId }: ResultClientProps) {
     loggedCompleteForRef.current = tournamentId;
     logAnalyticsEvent(ANALYTICS_EVENT.RESULT_VIEW, { tournament_id: tournamentId });
   }, [tournamentData.status, tournamentId]);
-
-  // 보관함의 "결과 공유하기" 메뉴에서 진입 시 영수증 공유 시트를 자동으로 띄운다.
-  useQueryAction({
-    action: QUERY_ACTION.VALUE.SHARE_RECEIPT,
-    onAction: () => setIsReceiptShareDialogOpen(true),
-  });
 
   if (tournamentData.status !== 'COMPLETED') {
     return (

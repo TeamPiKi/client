@@ -21,16 +21,16 @@ function GroupResultEntryCard({ tournamentId }: GroupResultEntryCardProps) {
         <div className="[&_.rounded-full]:border! [&_.rounded-full]:border-white!">
           <UserProfileGroup
             profileImageUrls={[
-              'https://dev-piki-images-250758375457.s3.ap-northeast-2.amazonaws.com/defaults/user-profile-1.png',
-              'https://dev-piki-images-250758375457.s3.ap-northeast-2.amazonaws.com/defaults/user-profile-2.png',
-              'https://dev-piki-images-250758375457.s3.ap-northeast-2.amazonaws.com/defaults/user-profile-3.png',
+              'https://dev-piki-images-996918499382.s3.ap-northeast-2.amazonaws.com/defaults/user-profile-1.png',
+              'https://dev-piki-images-996918499382.s3.ap-northeast-2.amazonaws.com/defaults/user-profile-2.png',
+              'https://dev-piki-images-996918499382.s3.ap-northeast-2.amazonaws.com/defaults/user-profile-3.png',
             ]}
             max={3}
           />
         </div>
         <p className="truncate body-1-semibold text-sky-400">전체 결과 보기</p>
       </div>
-      <ChevronForwardIconFill className="text-icon-neutral-secondary size-6 shrink-0" />
+      <ChevronForwardIconFill className="size-6 shrink-0 text-icon-neutral-secondary" />
     </Link>
   );
 }
