@@ -1,14 +1,7 @@
 import { clientApi } from '@/apis/client';
-import type { NotificationListDataT } from '@/types/notification';
 import { ENDPOINTS } from '@/consts/api';
 import type { ApiResponseT } from '@/types/api';
-
-type GetNotificationsResponseT = ApiResponseT<NotificationListDataT> & {
-  pageResponse: {
-    nextCursor: string | null;
-    hasNext: boolean;
-  };
-};
+import type { NotificationListDataT } from '@/types/notification';
 
 type GetNotificationsRequestT = {
   cursor?: string | null;
@@ -20,7 +13,7 @@ export const getNotifications = async ({ cursor, size = 10 }: GetNotificationsRe
   if (cursor) params.set('cursor', cursor);
   params.set('size', String(size));
 
-  const { data } = await clientApi.get<GetNotificationsResponseT>(
+  const { data } = await clientApi.get<ApiResponseT<NotificationListDataT>>(
     `${ENDPOINTS.NOTIFICATIONS}?${params.toString()}`
   );
 

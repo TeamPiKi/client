@@ -5,7 +5,7 @@ import TournamentCard from '@/components/tournament-card';
 import { useGetTournamentList } from '@/hooks/useGetTournamentList';
 
 function TournamentListClient() {
-  const { tournamentListData } = useGetTournamentList({ limit: 3, ownedOnly: true });
+  const { tournamentListData } = useGetTournamentList({ limit: 3 });
 
   if (tournamentListData.length === 0)
     return (
