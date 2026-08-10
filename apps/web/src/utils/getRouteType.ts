@@ -26,7 +26,6 @@ const isPublicRoute = (pathname: string) => {
 
 const isMemberAndGuestRoute = (pathname: string) => {
   if (matchesPath(pathname, ROUTES.HOME)) return true;
-  if (matchesPath(pathname, ROUTES.INVITE_BASE)) return true;
   if (matchesPath(pathname, ROUTES.TOURNAMENT_JOIN_BY_CODE)) return true;
   if (matchesPath(pathname, '/play')) return true;
   if (matchesPath(pathname, ROUTES.NOTIFICATION)) return true;

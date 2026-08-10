@@ -1,14 +1,19 @@
+import { ERROR_CODE } from '@piki/core';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
 import { ANALYTICS_EVENT } from '@/consts/analytics';
+import { QUERY_ACTION } from '@/consts/queryAction';
+import { ROUTES } from '@/consts/route';
 import { logAnalyticsEvent } from '@/utils/analytics';
-import { isGlobalNetError } from '@/utils/apiError';
+import { getApiErrorCode, isGlobalNetError } from '@/utils/apiError';
 import { getApiErrorMessage } from '@/utils/getApiErrorMessage';
 
 import { type PatchInviteExpiryRequestT, patchInviteExpiry } from '../_apis/patchInviteExpiry';
 
 export const usePatchInviteExpiry = (tournamentId: number) => {
+  const router = useRouter();
   const queryClient = useQueryClient();
 
   const { mutate: patchInviteExpiryMutation, isPending: isPatchInviteExpiryPending } = useMutation({
@@ -22,11 +27,25 @@ export const usePatchInviteExpiry = (tournamentId: number) => {
     onError: error => {
       if (isGlobalNetError(error)) return;
 
+      const code = getApiErrorCode(error);
+
+      /** 토너먼트가 시작된 경우 */
+      if (code === ERROR_CODE.TOURNAMENT_NOT_PENDING) {
+        queryClient.invalidateQueries({ queryKey: ['tournament', tournamentId] });
+        return;
+      }
+
+      /** 토너먼트가 삭제된 경우 */
+      if (code === ERROR_CODE.TOURNAMENT_NOT_FOUND) {
+        router.replace(
+          `${ROUTES.HOME}?${QUERY_ACTION.KEY}=${QUERY_ACTION.VALUE.TOURNAMENT_NOT_FOUND}`
+        );
+        return;
+      }
+
       /**
        * 400: 마감 시각 형식 오류
        * 403: 토너먼트 수정 권한 없음
-       * 404: 토너먼트 존재하지 않음
-       * 409: PENDING 상태 아닌 토너먼트
        */
       toast.error(getApiErrorMessage(error));
     },

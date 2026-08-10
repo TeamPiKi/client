@@ -1,10 +1,12 @@
+import { ERROR_CODE } from '@piki/core';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { usePathname, useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
+import { QUERY_ACTION } from '@/consts/queryAction';
 import { ROUTES } from '@/consts/route';
 import { useBackWithFallback } from '@/hooks/useBackWithFallback';
-import { getApiErrorStatus, isGlobalNetError } from '@/utils/apiError';
+import { getApiErrorCode, getApiErrorStatus, isGlobalNetError } from '@/utils/apiError';
 import { getApiErrorMessage } from '@/utils/getApiErrorMessage';
 
 import { deleteTournamentItem } from '../_apis/deleteTournamentItem';
@@ -30,15 +32,40 @@ export const useDeleteTournamentItem = (tournamentId: number, tournamentItemId: 
       onError: error => {
         if (isGlobalNetError(error)) return;
 
-        /**
-         * 403: 토너먼트 참여 권한 없음
-         * 404: 토너먼트 or 토너먼트 아이템 존재하지 않음
-         * 409: PENDING 상태 아닌 토너먼트
-         */
+        const code = getApiErrorCode(error);
+
+        /** 토너먼트가 시작된 경우 */
+        if (code === ERROR_CODE.TOURNAMENT_NOT_PENDING) {
+          queryClient.invalidateQueries({ queryKey: ['tournament', tournamentId] });
+          if (pathname !== ROUTES.TOURNAMENT_CREATE(tournamentId))
+            router.replace(ROUTES.TOURNAMENT_CREATE(tournamentId));
+          return;
+        }
+
+        /** 토너먼트가 삭제된 경우 */
+        if (code === ERROR_CODE.TOURNAMENT_NOT_FOUND) {
+          router.replace(
+            `${ROUTES.HOME}?${QUERY_ACTION.KEY}=${QUERY_ACTION.VALUE.TOURNAMENT_NOT_FOUND}`
+          );
+          return;
+        }
+
+        /** 토너먼트 접근 권한 없는 경우 */
+        if (code === ERROR_CODE.TOURNAMENT_FORBIDDEN) {
+          router.replace(
+            `${ROUTES.HOME}?${QUERY_ACTION.KEY}=${QUERY_ACTION.VALUE.TOURNAMENT_FORBIDDEN}`
+          );
+          return;
+        }
+
         toast.error(getApiErrorMessage(error));
 
+        /**
+         * 403: 토너먼트 참여 권한 없음
+         * 404: 토너먼트 or 아이템 존재하지 않음
+         */
         const status = getApiErrorStatus(error);
-        if (status === 403 || status === 404 || status === 409) {
+        if (status === 403 || status === 404) {
           if (pathname !== ROUTES.TOURNAMENT_CREATE(tournamentId))
             router.replace(ROUTES.TOURNAMENT_CREATE(tournamentId));
         }

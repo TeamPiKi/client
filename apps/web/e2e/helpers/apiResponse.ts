@@ -1,9 +1,16 @@
 import type { ApiErrorResponseT, ApiResponseT } from '@/types/api';
 
-/** 팀 응답 규약 `{ data, code }` 성공 래핑 — 성공 응답의 code 는 항상 null */
-export const createApiSuccess = <T>(data: T): ApiResponseT<T> => ({
+/**
+ * 팀 응답 규약 `{ data, code, pageResponse }` 성공 래핑 — 성공 응답의 code 는 항상 null.
+ * 페이징 응답은 `pageResponse` 를 넘겨 덮어쓴다.
+ */
+export const createApiSuccess = <T>(
+  data: T,
+  pageResponse: ApiResponseT<T>['pageResponse'] = { nextCursor: null, hasNext: false }
+): ApiResponseT<T> => ({
   data,
   code: null,
+  pageResponse,
 });
 
 type CreateApiErrorOptionsT = {
