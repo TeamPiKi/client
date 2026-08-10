@@ -21,12 +21,18 @@ function QueryActionToast() {
   const action = searchParams.get(QUERY_ACTION.KEY);
   const toastEntry = action ? QUERY_ACTION_TOAST[action as QueryActionValueT] : null;
 
+  /** action 만 걷어낸다 — 도착지가 함께 실어 보낸 쿼리(redirect·필터 등)까지 지우면 안 된다 */
+  const restParams = new URLSearchParams(searchParams.toString());
+  restParams.delete(QUERY_ACTION.KEY);
+  const rest = restParams.toString();
+  const nextUrl = rest ? `${pathname}?${rest}` : pathname;
+
   useEffect(() => {
     if (!toastEntry) return;
 
     toast[toastEntry.variant](toastEntry.message);
-    router.replace(pathname, { scroll: false });
-  }, [toastEntry, pathname, router]);
+    router.replace(nextUrl, { scroll: false });
+  }, [toastEntry, nextUrl, router]);
 
   return null;
 }
