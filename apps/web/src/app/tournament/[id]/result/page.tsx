@@ -2,6 +2,7 @@ import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
 import { redirect } from 'next/navigation';
 
 import { ROUTES } from '@/consts/route';
+import { getIsGuest } from '@/utils/getIsGuest';
 import { getQueryClient } from '@/utils/queryClient';
 
 import { getTournament } from '../_common/_apis/getTournament';
@@ -26,9 +27,11 @@ async function TournamentResultPage({ params }: TournamentResultPageProps) {
     redirect(ROUTES.TOURNAMENT_MATCH(tournamentId));
   }
 
+  const isGuest = await getIsGuest();
+
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <ResultClient tournamentId={tournamentId} />
+      <ResultClient tournamentId={tournamentId} isGuest={isGuest} />
     </HydrationBoundary>
   );
 }
