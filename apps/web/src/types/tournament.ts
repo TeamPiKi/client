@@ -1,7 +1,9 @@
-import type { TOURNAMENT_STATUS } from '@/consts/tournament';
+import type { TOURNAMENT_PLAY_TYPE, TOURNAMENT_STATUS } from '@/consts/tournament';
 import type { ItemStatusT } from '@/types/item';
 
 export type TournamentStatusT = (typeof TOURNAMENT_STATUS)[keyof typeof TOURNAMENT_STATUS];
+
+export type TournamentPlayTypeT = (typeof TOURNAMENT_PLAY_TYPE)[keyof typeof TOURNAMENT_PLAY_TYPE];
 
 export type TournamentItemT = {
   tournamentItemId: number;
@@ -26,9 +28,9 @@ export type TournamentRankingT = TournamentItemT & {
 
 export type GetTournamentListRequestT = {
   status?: TournamentStatusT[];
+  /** 플레이 유형 필터 (SOLO · SOCIAL). 생략 시 전체이며 status 와 AND 로 걸린다. */
+  playType?: TournamentPlayTypeT;
   limit?: number;
-  /** 내가 만든 토너먼트만 조회 */
-  ownedOnly?: boolean;
 };
 
 export type GetTournamentListResponseT = {
@@ -53,14 +55,6 @@ export type PostCreateTournamentRequestT = {
 export type PostCreateTournamentResponseT = {
   tournamentId: number;
 };
-
-export type TournamentErrorTypeT =
-  | 'NO_WISH_EXISTS'
-  | 'ALREADY_STARTED'
-  | 'ALREADY_ENDED'
-  | 'LINK_EXPIRED'
-  | 'PARTICIPANTS_FULL'
-  | 'REQUEST_FAILED';
 
 /** 초대 코드 / 토너먼트 미리보기 응답 */
 export type GetInvitePreviewResponseT = {

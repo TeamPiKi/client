@@ -8,7 +8,7 @@ import type { GetInvitePreviewResponseT } from '@/types/tournament';
 
 /**
  * 초대 코드로 토너먼트 미리보기.
- * 홈 다이얼로그(코드 입력)와 invite RSC(링크 진입 분기)에서 사용.
+ * 홈 다이얼로그와 /join/id에서 사용.
  * 응답으로 받은 tournamentId 를 이후 /join 호출에 사용.
  *
  * 에러 코드:

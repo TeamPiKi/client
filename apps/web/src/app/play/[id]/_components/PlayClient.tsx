@@ -2,13 +2,13 @@
 
 import { SERVER_ERROR_MESSAGE } from '@piki/core';
 import { isAxiosError } from 'axios';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 
 import { postGuestLogin } from '@/app/login/_apis/postGuestLogin';
 import { getTournament } from '@/app/tournament/[id]/_common/_apis/getTournament';
 import Button from '@/components/button';
+import ButtonLink from '@/components/button/ButtonLink';
 import Spinner from '@/components/spinner';
 import { ANALYTICS_EVENT } from '@/consts/analytics';
 import { ROUTES } from '@/consts/route';
@@ -109,7 +109,7 @@ function PlayClient({ sourceTournamentId }: PlayClientProps) {
     return (
       <main className="flex min-h-dvh flex-col items-center justify-center gap-6 bg-bg-layer-basement px-5 pt-padding-top">
         <div className="flex flex-col items-center gap-2">
-          <p className="heading-1-bold text-text-neutral-primary">오류가 발생했어요</p>
+          <h1 className="heading-1-bold text-text-neutral-primary">오류가 발생했어요</h1>
           <p className="text-center body-1-medium text-text-neutral-tertiary">
             {SERVER_ERROR_MESSAGE}
           </p>
@@ -124,11 +124,9 @@ function PlayClient({ sourceTournamentId }: PlayClientProps) {
           >
             다시 시도
           </Button>
-          <Link href={ROUTES.HOME} className="w-full">
-            <Button size="lg" variant="secondary" className="w-full">
-              홈으로 가기
-            </Button>
-          </Link>
+          <ButtonLink href={ROUTES.HOME} size="lg" variant="secondary" className="w-full">
+            홈으로 가기
+          </ButtonLink>
         </div>
       </main>
     );
@@ -137,7 +135,7 @@ function PlayClient({ sourceTournamentId }: PlayClientProps) {
   return (
     <main className="flex min-h-dvh flex-col items-center justify-center gap-6 bg-bg-layer-basement px-5 pt-padding-top">
       <div className="flex flex-col items-center gap-2">
-        <p className="heading-1-bold text-text-neutral-primary">플레이 링크가 유효하지 않아요</p>
+        <h1 className="heading-1-bold text-text-neutral-primary">플레이 링크가 유효하지 않아요</h1>
         <p className="text-center body-1-medium text-text-neutral-tertiary">
           만료됐거나 이미 진행한 토너먼트일 수 있어요.
           <br />
@@ -145,11 +143,9 @@ function PlayClient({ sourceTournamentId }: PlayClientProps) {
         </p>
       </div>
 
-      <Link href={ROUTES.HOME} className="w-full max-w-80">
-        <Button size="lg" variant="primary" className="w-full">
-          홈으로 가기
-        </Button>
-      </Link>
+      <ButtonLink href={ROUTES.HOME} size="lg" variant="primary" className="w-full max-w-80">
+        홈으로 가기
+      </ButtonLink>
     </main>
   );
 }

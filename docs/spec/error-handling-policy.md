@@ -12,7 +12,7 @@
 - **401 (인증 만료)** → **전역 인터셉터**가 토큰 refresh 후 자동 재시도, 실패 시 로그인 redirect.
 - **인증/권한 게이팅** → **layout 가드(SSR)** 가 진입 시점에 차단.
 - **조용히 실패 금지** → 개별 onError가 없어도 **전역 안전망**이 최소 토스트를 보장.
-- **문구는 `code`, 동작은 `status`** → 사용자 문구는 100% 에러 코드 카탈로그. 분기(이동/다이얼로그)는 status가 1차, code는 같은 status에서 동작이 갈릴 때만.
+- **문구는 `code`, 동작은 `status`** → 사용자 문구는 `getApiErrorMessage(error)` 하나로 — code가 카탈로그에 있으면 그 문구, 없으면 generic fallback. 분기(이동/다이얼로그)는 status가 1차, code는 같은 status에서 동작이 갈릴 때만.
 
 ---
 
@@ -143,7 +143,7 @@
 
 ### 규칙
 
-1. **문구는 항상 `code`** — `getApiErrorMessage(error)` 하나로 통일. 호출부에서 문구를 직접 쓰지 않는다.
+1. **문구는 항상 `code`** — `getApiErrorMessage(error)` 하나로 통일. 호출부에서 문구를 직접 쓰지 않는다. 카탈로그에 없는 code는 generic fallback으로 흘러간다 (아래 구현 참고).
 2. **동작 1차 분기는 `status`** — "머무를까 / 이탈할까 / 재시도할까"는 HTTP 시맨틱으로 충분하다.
    403/404/409가 전부 "이 화면에 더 못 있음 → 목록으로 replace"로 수렴한다면 code를 나열하지 않는다.
 3. **`code`는 같은 status 안에서 동작이 갈릴 때만 2차 분기** — 아래 판단 기준 참고.

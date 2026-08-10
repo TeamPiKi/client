@@ -1,13 +1,17 @@
+import { ERROR_CODE } from '@piki/core';
 import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
 import type { Metadata } from 'next';
 import { headers } from 'next/headers';
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 
+import { getInvitePreviewByCode } from '@/apis/getInvitePreviewByCode';
 import { getMe } from '@/apis/getMe';
+import { ROUTES } from '@/consts/route';
+import { getApiErrorCode, getApiErrorStatus, isServerOrNetworkError } from '@/utils/apiError';
 import { parseIdParam } from '@/utils/parseIdParam';
 import { getQueryClient } from '@/utils/queryClient';
 
-import { getInvitePreview } from '../_apis/getInvitePreview';
+import JoinErrorScreen from './_components/JoinErrorScreen';
 import JoinPreviewClient from './_components/JoinPreviewClient';
 
 type TournamentJoinPageProps = {
@@ -43,12 +47,40 @@ async function TournamentJoinPage({ params, searchParams }: TournamentJoinPagePr
 
   if (tournamentId === null) notFound();
 
-  const queryClient = getQueryClient();
-  queryClient.prefetchQuery({
-    queryKey: ['invitePreview', tournamentId],
-    queryFn: () => getInvitePreview(tournamentId),
-  });
+  /** 초대 코드가 없는 경우 */
+  if (!code) return <JoinErrorScreen type="INVALID_CODE" />;
 
+  let preview;
+  try {
+    preview = await getInvitePreviewByCode(code);
+  } catch (error) {
+    if (isServerOrNetworkError(error)) throw error;
+
+    const apiErrorCode = getApiErrorCode(error);
+    if (getApiErrorStatus(error) === 409) {
+      /** 토너먼트 이미 시작한 경우 */
+      /** TODO: `TOURNAMENT-005` 가 진행 중·완료를 한 코드로 덮어 완료된 토너먼트에도 "이미 시작된" 안내가 나간다 . 서버 수정 후 변경 필요 */
+      if (apiErrorCode === ERROR_CODE.TOURNAMENT_NOT_PENDING)
+        return <JoinErrorScreen type="ALREADY_STARTED" />;
+
+      /** 초대 링크 만료된 경우 */
+      if (apiErrorCode === ERROR_CODE.TOURNAMENT_INVITE_EXPIRED)
+        return <JoinErrorScreen type="LINK_EXPIRED" />;
+    }
+
+    /** 삭제된 토너먼트인 경우 */
+    if (apiErrorCode === ERROR_CODE.TOURNAMENT_NOT_FOUND) return <JoinErrorScreen type="DELETED" />;
+
+    return <JoinErrorScreen type="INVALID_CODE" />;
+  }
+
+  /** 코드의 토너먼트가 URL path 와 다르면 잘못된 링크 */
+  if (preview.tournamentId !== tournamentId) return <JoinErrorScreen type="INVALID_CODE" />;
+
+  /** 이미 참여한 유저인 경우 - 바로 토너먼트 준비 화면으로 진입 */
+  if (preview.joined) redirect(ROUTES.TOURNAMENT_CREATE(tournamentId));
+
+  const queryClient = getQueryClient();
   queryClient.prefetchQuery({
     queryKey: ['me'],
     queryFn: getMe,
@@ -56,7 +88,7 @@ async function TournamentJoinPage({ params, searchParams }: TournamentJoinPagePr
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <JoinPreviewClient tournamentId={tournamentId} inviteCode={code ?? ''} />
+      <JoinPreviewClient tournamentId={tournamentId} inviteCode={code} preview={preview} />
     </HydrationBoundary>
   );
 }

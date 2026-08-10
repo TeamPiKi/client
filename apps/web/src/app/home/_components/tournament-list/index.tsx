@@ -15,8 +15,8 @@ function TournamentList() {
   const queryClient = getQueryClient();
 
   queryClient.prefetchQuery({
-    queryKey: QUERY_KEYS.TOURNAMENT.LIST.BY_PARAMS({ limit: 3, ownedOnly: true }),
-    queryFn: () => getTournamentList({ limit: 3, ownedOnly: true }),
+    queryKey: QUERY_KEYS.TOURNAMENT.LIST.BY_PARAMS({ limit: 3 }),
+    queryFn: () => getTournamentList({ limit: 3 }),
   });
 
   return (

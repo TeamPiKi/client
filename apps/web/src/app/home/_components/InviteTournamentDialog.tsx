@@ -1,5 +1,6 @@
 'use client';
 
+import { ERROR_CODE } from '@piki/core';
 import { useMutation } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -11,6 +12,8 @@ import {
 } from '@/app/tournament/join/_utils/verifyInviteCode';
 import { GroupIconFill } from '@/assets/icons';
 import Button from '@/components/button';
+import type { JoinErrorTypeT } from '@/components/common/join-error-dialog';
+import JoinErrorDialog from '@/components/common/join-error-dialog';
 import {
   Dialog,
   DialogContent,
@@ -20,20 +23,17 @@ import {
 } from '@/components/dialog';
 import Input from '@/components/input';
 import Spinner from '@/components/spinner';
-import TournamentErrorDialog from '@/components/tournament-error-dialog';
 import { ANALYTICS_EVENT } from '@/consts/analytics';
+import { ROUTES } from '@/consts/route';
 import { logAnalyticsEvent } from '@/utils/analytics';
-import { getApiErrorStatus, isGlobalNetError } from '@/utils/apiError';
-
-import InvalidCodeDialog from './invite-code-dialog/InvalidCodeDialog';
+import { getApiErrorCode, getApiErrorStatus, isGlobalNetError } from '@/utils/apiError';
 
 function InviteTournamentDialog() {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [code, setCode] = useState('');
   const [showFormatError, setShowFormatError] = useState(false);
-  const [isInvalidDialogOpen, setIsInvalidDialogOpen] = useState(false);
-  const [isTournamentErrorDialogOpen, setIsTournamentErrorDialogOpen] = useState(false);
+  const [joinErrorType, setJoinErrorType] = useState<JoinErrorTypeT | null>(null);
 
   const { mutate: previewMutation, isPending: isPreviewPending } = useMutation({
     mutationFn: getInvitePreviewByCode,
@@ -41,7 +41,7 @@ function InviteTournamentDialog() {
     onSuccess: (data, enteredCode) => {
       setOpen(false);
       reset();
-      router.push(`/tournament/join/${data.tournamentId}?code=${enteredCode}`);
+      router.push(`${ROUTES.TOURNAMENT_JOIN_BY_LINK(data.tournamentId)}?code=${enteredCode}`);
     },
     onError: error => {
       setOpen(false);
@@ -49,14 +49,28 @@ function InviteTournamentDialog() {
 
       if (isGlobalNetError(error)) return;
 
-      /** 409: 초대 코드 만료 */
-      if (getApiErrorStatus(error) === 409) {
-        setIsTournamentErrorDialogOpen(true);
+      const apiErrorCode = getApiErrorCode(error);
+      const apiStatus = getApiErrorStatus(error);
+
+      /** 409(참여 불가): `TOURNAMENT-005`(이미 시작), `TOURNAMENT-021`(만료) 및 매핑되지 않은 409 는 만료 안내 */
+      if (apiStatus === 409) {
+        /** TODO: `TOURNAMENT-005` 가 진행 중·완료를 한 코드로 덮어 완료된 토너먼트에도 "이미 시작된" 안내가 나간다 (docs/spec/api-status-audit.md §E) */
+        setJoinErrorType(
+          getApiErrorCode(error) === ERROR_CODE.TOURNAMENT_NOT_PENDING
+            ? 'ALREADY_STARTED'
+            : 'LINK_EXPIRED'
+        );
+        return;
+      }
+
+      /** 삭제된 토너먼트인 경우 */
+      if (apiErrorCode === ERROR_CODE.TOURNAMENT_NOT_FOUND) {
+        setJoinErrorType('DELETED');
         return;
       }
 
       /** 그 외(400 코드 불일치 포함): 유효하지 않은 코드로 안내 */
-      setIsInvalidDialogOpen(true);
+      setJoinErrorType('INVALID_CODE');
     },
   });
 
@@ -139,12 +153,9 @@ function InviteTournamentDialog() {
         </DialogContent>
       </Dialog>
 
-      <InvalidCodeDialog open={isInvalidDialogOpen} onOpenChange={setIsInvalidDialogOpen} />
-      <TournamentErrorDialog
-        type="LINK_EXPIRED"
-        open={isTournamentErrorDialogOpen}
-        onOpenChange={setIsTournamentErrorDialogOpen}
-      />
+      {joinErrorType && (
+        <JoinErrorDialog type={joinErrorType} open onOpenChange={() => setJoinErrorType(null)} />
+      )}
     </>
   );
 }
