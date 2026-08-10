@@ -2,7 +2,7 @@
   "expo": {
     "name": "PiKi",
     "slug": "piki",
-    "version": "1.1.1",
+    "version": "1.1.2",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "piki",
@@ -102,17 +102,17 @@
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 200,
           "resizeMode": "contain",
-          "backgroundColor": "#A2DEFF",
+          "backgroundColor": "#FAFAFA",
           "dark": {
-            "backgroundColor": "#A2DEFF"
+            "backgroundColor": "#FAFAFA"
           },
           "android": {
             "image": "./assets/images/splash-android-blank.png",
             "imageWidth": 200,
             "resizeMode": "contain",
-            "backgroundColor": "#A2DEFF",
+            "backgroundColor": "#FAFAFA",
             "dark": {
-              "backgroundColor": "#A2DEFF"
+              "backgroundColor": "#FAFAFA"
             }
           }
         }

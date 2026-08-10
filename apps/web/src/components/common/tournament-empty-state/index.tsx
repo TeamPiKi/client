@@ -15,10 +15,8 @@ function TournamentEmptyState({ variant }: TournamentEmptyStateProps) {
     <div className={tournamentEmptyStateStyles({ variant })} role="status">
       <BasketEmptyIcon className={tournamentEmptyStateIconStyles({ variant })} aria-hidden />
       <div className={tournamentEmptyStateTextGroupStyles({ variant })}>
-        <p className={tournamentEmptyStateTitleStyles({ variant })}>
-          최근 생성한 토너먼트가 없어요
-        </p>
-        <p className="body-1-medium text-center text-text-neutral-tertiary">
+        <p className={tournamentEmptyStateTitleStyles({ variant })}>최근 토너먼트가 없어요</p>
+        <p className="text-center body-1-medium text-text-neutral-tertiary">
           새 토너먼트를 만들거나
           <br />
           초대를 받아 시작해보세요.

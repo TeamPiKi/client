@@ -1,7 +1,7 @@
 import { Image, StyleSheet, View } from 'react-native';
 
 /** app.json expo-splash-screen 설정과 동일하게 유지 (backgroundColor / imageWidth) */
-const SPLASH_BACKGROUND_COLOR = '#A2DEFF';
+const SPLASH_BACKGROUND_COLOR = '#FAFAFA';
 const SPLASH_LOGO_WIDTH = 200;
 
 /**
