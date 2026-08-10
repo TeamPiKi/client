@@ -4,9 +4,10 @@ import { useEffect, useRef } from 'react';
 
 import { useGetWishlist } from '@/hooks/useGetWishlist';
 import { useSSEFallback } from '@/hooks/useSSEFallback';
+import { useScrollRestoration } from '@/hooks/useScrollRestoration';
 import { hasParsingItems } from '@/utils/item';
+import { SCROLL_NAMESPACE } from '@/utils/scrollRestoration';
 
-import { useScrollRestoration } from '../_hooks/useScrollRestoration';
 import WishCardSkeleton from './WishCardSkeleton';
 import WishGridContent from './WishGridContent';
 
@@ -23,7 +24,7 @@ function WishlistList({ isDeleteMode, selectedIds, onToggleSelect }: WishlistLis
   const hasPendingItem = hasParsingItems(wishlistData.map(({ item }) => item));
 
   useSSEFallback(['wishlists'], hasPendingItem);
-  useScrollRestoration();
+  useScrollRestoration({ namespace: SCROLL_NAMESPACE.ARCHIVE_WISH });
 
   useEffect(() => {
     const el = sentinelRef.current;
