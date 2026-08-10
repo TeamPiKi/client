@@ -1,10 +1,13 @@
 import Link from 'next/link';
+import type { MouseEvent } from 'react';
 
 import StatusChip from '@/components/status-chip';
 import UserProfileGroup from '@/components/user-profile-group';
 import { ROUTES } from '@/consts/route';
 import type { TournamentStatusT } from '@/types/tournament';
 import { cn } from '@/utils/cn';
+import type { ScrollRestorationTargetT } from '@/utils/scrollRestoration';
+import { saveScrollAnchor } from '@/utils/scrollRestoration';
 
 import ItemImageThumbnails from './ItemImageThumbnails';
 import MorePopover from './MorePopover';
@@ -21,6 +24,7 @@ type TournamentCardProps = {
   participantCount?: number;
   className?: string;
   showMorePopover?: boolean;
+  scrollRestoration?: ScrollRestorationTargetT;
 };
 
 function TournamentCard({
@@ -33,7 +37,17 @@ function TournamentCard({
   participantCount,
   className,
   showMorePopover = true,
+  scrollRestoration,
 }: TournamentCardProps) {
+  const handleLinkClick = (event: MouseEvent<HTMLAnchorElement>) => {
+    if (!scrollRestoration) return;
+
+    /** 새 탭/새 창 열기는 현재 페이지를 떠나지 않으므로 스크롤 위치를 저장하지 않는다 */
+    if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+
+    saveScrollAnchor(scrollRestoration, event.currentTarget, tournamentId);
+  };
+
   const HREF = {
     PENDING: ROUTES.TOURNAMENT_CREATE(tournamentId),
     IN_PROGRESS: ROUTES.TOURNAMENT_MATCH(tournamentId),
@@ -52,7 +66,13 @@ function TournamentCard({
        * 카드 전체를 덮는 링크
        * NOTE: MorePopover와 형제로 두어 인터랙티브 요소 중첩 방지
        */}
-      <Link href={HREF[status]} aria-label={name} className="absolute inset-0 z-0 rounded-xl" />
+      <Link
+        href={HREF[status]}
+        aria-label={name}
+        data-scroll-anchor-id={tournamentId}
+        onClick={handleLinkClick}
+        className="absolute inset-0 z-0 rounded-xl"
+      />
 
       <ItemImageThumbnails imageUrls={imageUrls} />
 

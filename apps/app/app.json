@@ -38,7 +38,8 @@
           "kakaokompassauth",
           "kakaolink",
           "kakaotalk",
-          "kakao326734abdf8de5c7e090a2fc72e1dce6"
+          "kakao326734abdf8de5c7e090a2fc72e1dce6",
+          "instagram-stories"
         ]
       },
       "privacyManifests": {
@@ -180,6 +181,7 @@
         }
       ],
       "./plugins/withShareExtensionKeychain.js",
+      "./plugins/withInstagramQueries.js",
       [
         "./plugins/withKakaoLoginConfig.js",
         {

@@ -2,9 +2,10 @@
 
 import { useRouter } from 'next/navigation';
 
+import { CheckCircledIconOutline } from '@/assets/icons';
 import Button from '@/components/button';
 import { Header, HeaderIcon } from '@/components/header';
-import Spacing from '@/components/spacing';
+import { cn } from '@/utils/cn';
 import { formatTimeKo } from '@/utils/formatDate';
 import { isWebview } from '@/utils/webBridge';
 
@@ -22,6 +23,7 @@ function NotificationContent() {
   const { openNotificationSettings, isPushEnabled } = usePushPermission();
   const {
     notificationsData,
+    unreadCount,
     isPending,
     isError,
     isFetchNextPageError,
@@ -33,6 +35,11 @@ function NotificationContent() {
   const { postNotificationsReadMutation, isPostNotificationsReadPending } =
     usePostNotificationsRead();
   const isEmpty = !isPending && notificationsData.length === 0;
+
+  const handleMarkAllRead = () => {
+    if (isPostNotificationsReadPending) return;
+    postNotificationsReadMutation({ all: true });
+  };
 
   const bottomRef = useIntersectionObserver(
     fetchNextPage,
@@ -56,9 +63,8 @@ function NotificationContent() {
         center="알림 히스토리"
         centerClassName="heading-1-bold"
       />
-      <Spacing size={16} />
 
-      <div className="hide-scrollbar flex-1 overflow-y-auto pt-5">{renderContent()}</div>
+      <div className="hide-scrollbar flex-1 overflow-y-auto">{renderContent()}</div>
     </div>
   );
 
@@ -69,9 +75,23 @@ function NotificationContent() {
       return <NotificationStateCard variant="empty" onAction={openNotificationSettings} />;
 
     return (
-      <div className="flex flex-col gap-4 pb-9">
+      <div className={cn('flex flex-col gap-4 pb-9', unreadCount <= 0 && 'pt-9')}>
         {isWebview() && isPushEnabled === false && (
-          <PushDisabledBanner onOpenNotificationSettings={openNotificationSettings} />
+          <div className="pt-5">
+            <PushDisabledBanner onOpenNotificationSettings={openNotificationSettings} />
+          </div>
+        )}
+
+        {unreadCount > 0 && (
+          <button
+            type="button"
+            onClick={handleMarkAllRead}
+            disabled={isPostNotificationsReadPending}
+            className="flex w-full cursor-pointer items-center justify-end gap-1 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            <CheckCircledIconOutline className="size-5 text-icon-neutral-secondary" aria-hidden />
+            <span className="body-2-semibold text-text-neutral-secondary">모두 읽음</span>
+          </button>
         )}
 
         <div className="rounded-xl bg-base-50">
