@@ -39,6 +39,7 @@ function TournamentItemInfoScreen({
       isSavePending={isPatchTournamentItemPending}
       onDelete={() => deleteTournamentItemMutation()}
       isDeletePending={isDeleteTournamentItemPending}
+      {...(tournamentItemData.memo && { memo: { value: tournamentItemData.memo } })}
     />
   );
 }

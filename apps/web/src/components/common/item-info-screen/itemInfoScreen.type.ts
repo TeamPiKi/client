@@ -21,9 +21,9 @@ export type PriceRefreshT = {
   closeFailedDialog: () => void;
 };
 
-/** 개인 메모. 위시에서만 지원해 한 묶음으로 받는다 */
+/** 개인 메모. 없으면 카드를 그리지 않는다 */
 export type MemoT = {
   value: string;
   /** 빈 문자열이면 메모 삭제 */
-  save: (memo: string) => void;
+  save?: (memo: string) => void;
 };
