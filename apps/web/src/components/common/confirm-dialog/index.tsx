@@ -16,7 +16,6 @@ type ConfirmDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   title: string;
-  /** 스크린리더가 참조하는 설명 — 비우면 Radix 가 경고한다 */
   description: string;
   confirmLabel?: string;
   cancelLabel?: string;
