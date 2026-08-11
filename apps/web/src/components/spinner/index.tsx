@@ -1,12 +1,7 @@
 import type { CSSProperties } from 'react';
 
 import './Spinner.css';
-
-type SpinnerProps = {
-  size?: number;
-  timing?: number;
-  color?: string;
-};
+import type { SpinnerProps } from './spinner.type';
 
 const VIEWBOX_SIZE = 24;
 const CENTER = VIEWBOX_SIZE / 2;
