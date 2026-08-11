@@ -56,11 +56,13 @@ function LoginButtons({ redirect, action, errorCode, showAppleLogin }: LoginButt
   useEffect(() => {
     const handleLoginError = () => {
       if (action === QUERY_ACTION.VALUE.SESSION_EXPIRED) {
+        if (isWebview()) WebBridge.postMessage({ type: WEBBRIDGE_MESSAGE_TYPE.WEB_REQ_LOGOUT });
         toast.error(ERROR_MESSAGE_MAP[ERROR_CODE.AUTH_INVALID_TOKEN]);
         router.replace(getLoginPath(validRedirect), { scroll: false });
         return;
       }
       if (action === QUERY_ACTION.VALUE.WITHDRAWN_ACCOUNT) {
+        if (isWebview()) WebBridge.postMessage({ type: WEBBRIDGE_MESSAGE_TYPE.WEB_REQ_LOGOUT });
         toast.error(ERROR_MESSAGE_MAP[ERROR_CODE.USER_DELETED]);
         router.replace(getLoginPath(validRedirect), { scroll: false });
         return;
