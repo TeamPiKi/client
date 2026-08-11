@@ -1,5 +1,7 @@
 'use client';
 
+import type { ReactNode } from 'react';
+
 import { WarningIconFill } from '@/assets/icons';
 import Button from '@/components/button';
 import {
@@ -10,6 +12,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/dialog';
+import { cn } from '@/utils/cn';
 
 type ConfirmDialogProps = {
   open: boolean;
@@ -19,6 +22,7 @@ type ConfirmDialogProps = {
   confirmLabel?: string;
   cancelLabel?: string;
   isPending?: boolean;
+  icon?: ReactNode;
   onConfirm: () => void;
 };
 
@@ -30,6 +34,7 @@ function ConfirmDialog({
   confirmLabel = '확인',
   cancelLabel = '취소',
   isPending = false,
+  icon = <WarningIconFill width={48} height={48} className="text-red-300" aria-hidden />,
   onConfirm,
 }: ConfirmDialogProps) {
   const handleOpenChange = (isOpen: boolean) => {
@@ -39,15 +44,11 @@ function ConfirmDialog({
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent showCloseButton={false} className="text-center">
-        <div className="flex justify-center">
-          <WarningIconFill width={48} height={48} className="text-red-300" aria-hidden />
-        </div>
-        <DialogHeader className="mt-4 gap-1">
+      <DialogContent showCloseButton={false} className={cn('text-center', !icon && 'pt-9')}>
+        {icon && <div className="flex justify-center">{icon}</div>}
+        <DialogHeader className={cn('gap-1', icon && 'mt-4')}>
           <DialogTitle className="heading-1-bold">{title}</DialogTitle>
-          {description && (
-            <p className="body-1-medium text-text-neutral-tertiary">{description}</p>
-          )}
+          {description && <p className="body-1-medium text-text-neutral-tertiary">{description}</p>}
         </DialogHeader>
         <DialogFooter className="mt-6 flex-row gap-3">
           <DialogClose asChild>
