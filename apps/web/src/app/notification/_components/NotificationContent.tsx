@@ -105,6 +105,7 @@ function NotificationContent() {
                 key={notification.id}
                 kind={notification.kind}
                 message={notification.title}
+                body={notification.body}
                 time={formatTimeKo(notification.createdAt)}
                 isRead={notification.isRead}
                 onClick={() => handleNotificationClick(notification)}

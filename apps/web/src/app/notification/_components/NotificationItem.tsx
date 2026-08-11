@@ -18,12 +18,13 @@ const KIND_DISPLAY: Record<NotificationKindT, NotificationKindDisplayT> = {
 type NotificationItemProps = {
   kind: NotificationKindT;
   message: string;
+  body?: string;
   time: string;
   isRead?: boolean;
   onClick?: () => void;
 };
 
-function NotificationItem({ kind, message, time, isRead, onClick }: NotificationItemProps) {
+function NotificationItem({ kind, message, body, time, isRead, onClick }: NotificationItemProps) {
   const { label, Icon } = KIND_DISPLAY[kind] ?? KIND_DISPLAY.SYSTEM;
 
   const innerContent = (
@@ -32,7 +33,10 @@ function NotificationItem({ kind, message, time, isRead, onClick }: Notification
         <Icon aria-hidden className="size-4 text-icon-accent" />
         {label}
       </span>
-      <p className="mt-1 body-1-semibold text-text-neutral-primary">{message}</p>
+      <p className="mt-1 body-1-semibold text-text-neutral-primary">
+        {message}
+        {body && ` ${body}`}
+      </p>
       <span className="caption-1-regular text-text-neutral-tertiary">{time}</span>
     </div>
   );
