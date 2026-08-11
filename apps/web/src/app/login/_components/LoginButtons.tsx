@@ -73,13 +73,14 @@ function LoginButtons({ redirect, action, errorCode, showAppleLogin }: LoginButt
       }
     };
 
-    /** NOTE: dev 모드에서는 strict mode 로 인해 두 번 실행되는 문제를 방지하기 위해 setTimeout 을 사용 */
-    if (process.env.NODE_ENV === 'development') {
-      const timer = window.setTimeout(handleLoginError, 0);
-      return () => window.clearTimeout(timer);
-    }
-
-    handleLoginError();
+    /**
+     * setTimeout 으로 한 틱 지연:
+     * - Toaster 는 effect 에서 구독을 시작하고 구독 전 toast 는 유실된다(sonner) — 풀 페이지 로드 직후
+     *   이 effect 가 Toaster 구독보다 먼저 실행되므로 즉시 쏘면 안내가 사라진다
+     * - dev strict mode 의 effect 2회 실행으로 인한 중복 토스트도 함께 방지
+     */
+    const timer = window.setTimeout(handleLoginError, 0);
+    return () => window.clearTimeout(timer);
   }, [action, errorCode, validRedirect, router]);
 
   const isGuestPending = isPostGuestLoginPending || isGuestRefreshing;
