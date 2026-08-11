@@ -1,4 +1,4 @@
-import { BRIDGE_GATE, WEBBRIDGE_MESSAGE_TYPE, WEBVIEW_UA_TOKEN } from '@piki/core';
+import { WEBVIEW_UA_TOKEN } from '@piki/core';
 
 import { ENDPOINTS } from '@/consts/api';
 
@@ -65,13 +65,10 @@ test('웹 브라우저에서는 공유 시트에 스토리 공유 버튼이 없�
 
 test.describe('앱(웹뷰) 환경', () => {
   /**
-   * BRIDGE_GATE 를 통과하려면 UA 에 `PIKI_APP/<version>` 형태로 버전이 있어야 한다.
-   * 게이트 값이 올라가도 테스트가 따라가도록 상수에서 직접 읽는다.
+   * 모든 BRIDGE_GATE 기준과 앱 업데이트 유도 targetVersion 을 넘는 최신 앱을 시뮬레이션한다.
+   * 낮은 버전이면 업데이트 유도 모달이 화면을 가리고, APP_UPDATE_PROMPT 는 SVG 를 import 해서 spec 에서 못 읽는다.
    */
-  const supportedAppVersion =
-    BRIDGE_GATE[WEBBRIDGE_MESSAGE_TYPE.WEB_REQ_SHARE_INSTAGRAM_STORY].minAppVersion ?? '1.0.0';
-
-  test.use({ userAgent: `Mozilla/5.0 ${WEBVIEW_UA_TOKEN}/${supportedAppVersion}` });
+  test.use({ userAgent: `Mozilla/5.0 ${WEBVIEW_UA_TOKEN}/99.0.0` });
 
   test('스토리 공유 버튼이 노출되고, 인스타그램 미설치면 안내 토스트를 띄운다', async ({
     page,
