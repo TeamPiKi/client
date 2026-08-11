@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { AddIconOutline, ChevronDownIconOutline, ChevronUpIconOutline } from '@/assets/icons';
 import UserProfileGroup from '@/components/user-profile-group';
 import type { UserT } from '@/components/user-profile-group/userProfile.const';
+import { ROUTES } from '@/consts/route';
 import { cn } from '@/utils/cn';
 
 import DepositCountdown from '../deposit-countdown/DepositCountdown';
@@ -13,8 +14,10 @@ import InviteFriendsDialog from '../invite-friends/InviteFriendsDialog';
 import ParticipantChip from './ParticipantChip';
 
 const buildInviteUrl = (tournamentId: string, inviteCode: string) => {
-  if (typeof window === 'undefined') return `/invite/${tournamentId}?code=${inviteCode}`;
-  return `${window.location.origin}/invite/${tournamentId}?code=${inviteCode}`;
+  const path = ROUTES.TOURNAMENT_JOIN_BY_LINK(Number(tournamentId)) + `?code=${inviteCode}`;
+
+  if (typeof window === 'undefined') return path;
+  return `${window.location.origin}${path}`;
 };
 
 type ParticipantT = {
@@ -70,7 +73,6 @@ function ParticipantPanel({
             >
               <div className="flex min-w-0 items-center gap-3">
                 {depositDeadline ? (
-                  // 칩 스타일(배경·라운딩·패딩)은 DepositCountdown 이 소유
                   <div className="shrink-0">
                     <DepositCountdown deadline={depositDeadline} showLabel={false} />
                   </div>
@@ -120,7 +122,7 @@ function ParticipantPanel({
                 <span
                   key={index}
                   aria-hidden
-                  className="-ml-2 inline-flex size-6.75 items-center justify-center rounded-full border-[1.6px] border-white bg-gray-50 body-2-semibold text-text-neutral-tertiary relative"
+                  className="relative -ml-2 inline-flex size-6.75 items-center justify-center rounded-full border-[1.6px] border-white bg-gray-50 body-2-semibold text-text-neutral-tertiary"
                   style={{ zIndex: index + 1 }}
                 >
                   ?

@@ -12,8 +12,6 @@ type UseQueryActionOptions = {
   paramKey?: string;
   /** 실행 후 이동할 경로. 미지정 시 현재 pathname */
   clearPath?: string;
-  /** 쿼리 매칭 시 1회 호출 (토스트 등). 다이얼로그는 `isActive` 사용 */
-  onAction?: () => void;
 };
 
 type UseQueryActionReturn = {
@@ -23,13 +21,14 @@ type UseQueryActionReturn = {
 
 /**
  * `?action=<value>` 로 진입한 뒤 쿼리를 URL에서 제거하고, 액션 상태를 반환합니다.
- * 다이얼로그: `isActive` / `setIsActive`, 토스트 등: `onAction`.
+ *
+ * 다이얼로그·스크롤처럼 화면마다 동작이 다른 action 전용입니다.
+ * 토스트 한 번으로 끝나는 action 은 `QUERY_ACTION_TOAST` 에 등록하면 루트가 알아서 처리합니다.
  */
 export const useQueryAction = ({
   action,
   paramKey = QUERY_ACTION.KEY,
   clearPath,
-  onAction,
 }: UseQueryActionOptions): UseQueryActionReturn => {
   const searchParams = useSearchParams();
   const pathname = usePathname();
@@ -40,9 +39,8 @@ export const useQueryAction = ({
   useEffect(() => {
     if (searchParams.get(paramKey) !== action) return;
 
-    onAction?.();
     router.replace(clearPath ?? pathname, { scroll: false });
-  }, [searchParams, paramKey, action, clearPath, pathname, router, onAction]);
+  }, [searchParams, paramKey, action, clearPath, pathname, router]);
 
   return { isActive, setIsActive };
 };

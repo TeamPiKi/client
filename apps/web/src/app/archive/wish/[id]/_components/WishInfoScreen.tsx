@@ -26,7 +26,7 @@ function WishInfoScreen({ wishId }: WishInfoScreenProps) {
   } = usePostWishRefresh(wishId, item);
 
   /** 이미지로 담은 위시는 다시 불러올 원본 링크가 없다 */
-  const canRefresh = wishData.refreshNeeded !== null;
+  const canRefresh = item.sourceUrl !== null;
 
   return (
     <ItemInfoScreen

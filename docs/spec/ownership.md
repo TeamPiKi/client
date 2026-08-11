@@ -54,8 +54,7 @@
 | -------------------------------------------------------------------------------------------- | ------------------------------------------------- |
 | `/tournament/[id]/create` (+layout)                                                          | 구성·초대·참여자·마감·시작 = 소셜 대기실          |
 | `/tournament/[id]/item/[itemId]` (+layout)                                                   | 아이템 편집                                       |
-| `/invite/[id]`                                                                               | 초대 링크 진입 → 구성 참여                        |
-| `/tournament/join/[id]`                                                                      | 참여 진입 → 구성 합류                             |
+| `/tournament/join/[id]`                                                                      | 링크·코드 공통 참여 진입 → 구성 합류              |
 | `/notification`                                                                              | 알림 화면                                         |
 | **실시간 SSE/FCM** (`useNotificationSSE`, `useFcmTokenSync`, `/api/notifications/subscribe`) | 재연결·백오프·푸시 토큰 (딥빌드) — 선아 공동 리뷰 |
 
