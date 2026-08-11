@@ -1,10 +1,11 @@
 'use client';
 
+import { APP_STORE_URL, WEBBRIDGE_MESSAGE_TYPE } from '@piki/core';
 import { usePathname } from 'next/navigation';
-import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
+import { type MouseEvent, useEffect, useRef, useState, useSyncExternalStore } from 'react';
 
 import { CloseIconFill } from '@/assets/icons/fill';
-import Button from '@/components/button';
+import { buttonStyles } from '@/components/button/button.style';
 import {
   Dialog,
   DialogClose,
@@ -17,9 +18,10 @@ import { APP_UPDATE_PROMPT } from '@/consts/appUpdate';
 import { ONBOARDING_KEY } from '@/consts/onboarding';
 import { ROUTES } from '@/consts/route';
 import { logAnalyticsEvent } from '@/utils/analytics';
-import { hasDismissedAppUpdate, markAppUpdateDismissed, openAppStore } from '@/utils/appUpdate';
+import { hasDismissedAppUpdate, markAppUpdateDismissed } from '@/utils/appUpdate';
 import { getRouteType } from '@/utils/getRouteType';
 import { hasSeenOnboarding } from '@/utils/onboarding';
+import { WebBridge } from '@/utils/webBridge';
 
 const { targetVersion, badge, title, description, Illustration } = APP_UPDATE_PROMPT;
 
@@ -44,6 +46,12 @@ function AppUpdateDialog() {
     () => true,
     () => false
   );
+  const isAndroid = useSyncExternalStore(
+    () => () => {},
+    () => /android/i.test(window.navigator.userAgent),
+    () => false
+  );
+  const storeUrl = isAndroid ? APP_STORE_URL.ANDROID : APP_STORE_URL.IOS;
 
   /** 홈 온보딩 오버레이와 겹치지 않도록 홈 온보딩이 뜰 차례면 건너뛴다 */
   const isHomeOnboardingVisible =
@@ -71,16 +79,22 @@ function AppUpdateDialog() {
     logAnalyticsEvent(ANALYTICS_EVENT.APP_UPDATE_PROMPT_DISMISS, { target_version: targetVersion });
   };
 
-  const handleUpdateClick = () => {
+  const handleUpdateClick = (event: MouseEvent<HTMLAnchorElement>) => {
     setIsClosed(true);
     markAppUpdateDismissed(targetVersion);
     logAnalyticsEvent(ANALYTICS_EVENT.APP_UPDATE_PROMPT_CLICK, { target_version: targetVersion });
-    openAppStore();
+
+    const isSent = WebBridge.postMessage({ type: WEBBRIDGE_MESSAGE_TYPE.WEB_REQ_OPEN_STORE });
+    if (isSent) event.preventDefault();
   };
 
   return (
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
-      <DialogContent showCloseButton={false} className="flex flex-col items-center">
+      <DialogContent
+        showCloseButton={false}
+        closeOnDimClick={false}
+        className="flex flex-col items-center"
+      >
         <DialogClose asChild>
           <button
             type="button"
@@ -100,9 +114,13 @@ function AppUpdateDialog() {
           </DialogDescription>
         </div>
         <Illustration aria-hidden className="mt-9 mb-8 h-16 w-auto" />
-        <Button size="lg" onClick={handleUpdateClick}>
+        <a
+          href={storeUrl}
+          onClick={handleUpdateClick}
+          className={buttonStyles({ variant: 'primary', size: 'lg' })}
+        >
           지금 업데이트 하기
-        </Button>
+        </a>
       </DialogContent>
     </Dialog>
   );
