@@ -1,4 +1,4 @@
-import { IN_APP_BROWSER_UA_TOKENS } from '../_consts/appLink';
+import { IN_APP_BROWSER_UA_TOKENS } from '@/consts/appLink';
 
 export type LandingPlatformT = 'ios' | 'android' | 'desktop';
 
@@ -6,6 +6,8 @@ export type LandingEnvT = {
   platform: LandingPlatformT;
   /** 인스타/스레드 인앱 브라우저 여부 — Universal Link 가 발동하지 않아 스킴이 유일한 수단 */
   isInAppBrowser: boolean;
+  /** 인스타 인앱 브라우저 — `instagram://extbrowser` 로만 외부 브라우저로 빠져나갈 수 있다 */
+  isInstagramBrowser: boolean;
 };
 
 /** iPadOS 데스크톱 모드 UA 는 Macintosh 로 위장하므로 서버에서는 데스크톱으로 판정된다 */
@@ -19,4 +21,5 @@ const getPlatform = (userAgent: string): LandingPlatformT => {
 export const getLandingEnv = (userAgent: string): LandingEnvT => ({
   platform: getPlatform(userAgent),
   isInAppBrowser: IN_APP_BROWSER_UA_TOKENS.some(token => userAgent.includes(token)),
+  isInstagramBrowser: /Instagram/i.test(userAgent),
 });

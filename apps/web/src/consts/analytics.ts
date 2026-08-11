@@ -35,7 +35,6 @@ export const ANALYTICS_EVENT = {
   /** 외부 유입 랜딩 (인스타 프로필 링크) — 인스타는 리퍼러를 안 넘겨 utm_source 로만 잡힌다 */
   LANDING_VIEW: 'landing_view',
   LANDING_APP_OPEN: 'landing_app_open',
-  LANDING_STORE_CLICK: 'landing_store_click',
   LANDING_WEB_CONTINUE: 'landing_web_continue',
 } as const;
 
