@@ -19,7 +19,7 @@ import TournamentItemBasket from './TournamentItemBasket';
 type TournamentItemBasketCarouselProps = {
   items?: TournamentPendingItemT[];
   scrollToLast?: boolean;
-  /** 위시 담기 등 재진입 시점의 기존 바구니 개수 */
+  /** 위시 담기 등 재진입 시점의 기존 아이템 개수 */
   previousItemCount?: number | null;
   isDepositClosed?: boolean;
   participantImageMap?: Map<string, string>;
