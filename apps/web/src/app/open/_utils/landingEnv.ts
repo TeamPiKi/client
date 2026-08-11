@@ -10,10 +10,16 @@ export type LandingEnvT = {
   isInstagramBrowser: boolean;
 };
 
-/** iPadOS 데스크톱 모드 UA 는 Macintosh 로 위장하므로 서버에서는 데스크톱으로 판정된다 */
+/**
+ * iPadOS 데스크톱 모드 UA 는 Macintosh 로 위장한다.
+ * 인앱 웹뷰는 `Mobile/` 토큰이 남아 구분되지만(맥 브라우저엔 없는 토큰),
+ * 사파리 데스크톱 모드는 맥과 UA 가 완전히 같아 서버에서는 데스크톱으로 판정된다.
+ * 후자는 인스타 밖 iOS 와 동선이 같아(웹 이동) 판정이 갈려도 결과는 동일하다.
+ */
 const getPlatform = (userAgent: string): LandingPlatformT => {
   if (/Android/i.test(userAgent)) return 'android';
   if (/iPhone|iPad|iPod/i.test(userAgent)) return 'ios';
+  if (/Macintosh/i.test(userAgent) && /Mobile\//i.test(userAgent)) return 'ios';
   return 'desktop';
 };
 
