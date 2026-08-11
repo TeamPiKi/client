@@ -6,6 +6,7 @@ import Button from '@/components/button';
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -38,6 +39,7 @@ function ItemMemoForm({ ref, memo, onCancel, onSave }: ItemMemoFormProps) {
         <DialogTitle className="text-center body-1-bold text-text-neutral-primary">
           메모
         </DialogTitle>
+        <DialogDescription className="sr-only">메모는 나만 볼 수 있어요.</DialogDescription>
       </DialogHeader>
 
       <Spacing size={20} />

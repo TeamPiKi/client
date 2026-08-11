@@ -16,7 +16,8 @@ type ConfirmDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   title: string;
-  description?: string;
+  /** 스크린리더가 참조하는 설명 — 비우면 Radix 가 경고한다 */
+  description: string;
   confirmLabel?: string;
   cancelLabel?: string;
   isPending?: boolean;
@@ -40,12 +41,7 @@ function ConfirmDialog({
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      {/** 설명이 없으면 Radix 가 참조할 요소도 없으므로 aria-describedby 를 비운다 */}
-      <DialogContent
-        showCloseButton={false}
-        className="text-center"
-        {...(!description && { 'aria-describedby': void 0 })}
-      >
+      <DialogContent showCloseButton={false} className="text-center">
         <div className="flex justify-center">
           <TrashIconFill
             width={40}
@@ -58,11 +54,9 @@ function ConfirmDialog({
           <DialogTitle className="heading-2-semibold text-text-neutral-primary">
             {title}
           </DialogTitle>
-          {description && (
-            <DialogDescription className="body-2-medium text-text-neutral-tertiary">
-              {description}
-            </DialogDescription>
-          )}
+          <DialogDescription className="body-2-medium text-text-neutral-tertiary">
+            {description}
+          </DialogDescription>
         </DialogHeader>
         <DialogFooter className="mt-5 flex-row gap-2.5">
           <DialogClose asChild>

@@ -4,6 +4,7 @@ import Button from '@/components/button';
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -29,7 +30,9 @@ function PriceRefreshFailedDialog({ open, onClose, onEdit }: PriceRefreshFailedD
           <DialogTitle className="heading-2-semibold text-text-neutral-primary">
             가격 정보를 불러오는 데 실패했어요
           </DialogTitle>
-          <p className="body-2-medium text-text-neutral-tertiary">다시 시도해주세요</p>
+          <DialogDescription className="body-2-medium text-text-neutral-tertiary">
+            다시 시도해주세요
+          </DialogDescription>
         </DialogHeader>
 
         <DialogFooter className="mt-5 flex-row gap-2.5">
