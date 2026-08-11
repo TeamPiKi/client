@@ -4,25 +4,28 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 
-import { ChevronForwardIconFill, ReceiptIconOutline, TrophyIconOutline } from '@/assets/icons';
+import { ChevronForwardIconFill, DownloadIconFill, UploadIconFill } from '@/assets/icons';
 import BottomCta from '@/components/bottom-cta';
 import Button from '@/components/button';
 import { Header } from '@/components/header';
 import { ANALYTICS_EVENT } from '@/consts/analytics';
 import { ROUTES } from '@/consts/route';
 import { logAnalyticsEvent } from '@/utils/analytics';
+import { cn } from '@/utils/cn';
 
 import { useGetTournament } from '../../_common/_hooks/useGetTournament';
 import ReceiptDrawMachine from './ReceiptDrawMachine';
+import ResultGuestBanner from './ResultGuestBanner';
 import GroupResultEntryCard from './group-result-entry-card/GroupResultEntryCard';
 import PlateShareDialog from './plate-share-dialog/PlateShareDialog';
 import ReceiptShareDialog from './receipt-share-dialog/ReceiptShareDialog';
 
 type ResultClientProps = {
   tournamentId: number;
+  isGuest?: boolean;
 };
 
-function ResultClient({ tournamentId }: ResultClientProps) {
+function ResultClient({ tournamentId, isGuest = false }: ResultClientProps) {
   const router = useRouter();
   const { tournamentData } = useGetTournament(tournamentId);
   const [date] = useState(() => new Date());
@@ -62,8 +65,12 @@ function ResultClient({ tournamentId }: ResultClientProps) {
     setIsShareDialogOpen(true);
   };
 
+  // 비회원 솔로(isRoot=false): 배너가 스크롤 마지막 — 버튼과 13px 간격
+  // 나머지: pb-40 (160px) → GroupResultEntryCard 또는 ReceiptDrawMachine과 BottomCta 버튼 사이 ~28px
+  const mainPb = isGuest && !tournamentData.isRoot ? 'pb-[145px]' : 'pb-40';
+
   return (
-    <main className="flex min-h-dvh flex-col overflow-x-hidden bg-bg-layer-basement pt-padding-top pb-40">
+    <main className={cn('flex min-h-dvh flex-col overflow-x-hidden bg-bg-layer-basement pt-padding-top', mainPb)}>
       <Header center="토너먼트 결과" centerClassName="heading-1-bold" />
 
       <div className="mx-auto mt-4 flex min-h-0 w-full max-w-120 flex-1 flex-col gap-3">
@@ -75,13 +82,23 @@ function ResultClient({ tournamentId }: ResultClientProps) {
         />
 
         {/*
+          비회원 유도 배너 — 게스트일 때만 노출.
+          영수증과 61px 간격: gap-3(12px) + mt-[49px](49px) = 61px.
+        */}
+        {isGuest && (
+          <div className="mx-5 mt-[49px]">
+            <ResultGuestBanner />
+          </div>
+        )}
+
+        {/*
           친구 토너먼트 결과보기 카드 노출 + 라우팅.
-          - ROOT 사용자(주최자 / 친구 초대 멤버) 에게만 노출. 본인 id 가 그대로 group-result 대상이다.
-          - CLONE 사용자(플레이 링크 게스트) 는 ROOT 토너먼트의 친구 일원이 아니라 결과 카드가 의미 없으므로 숨긴다.
+          - ROOT 사용자(주최자 / 친구 초대 멤버) 에게만 노출.
+          - CLONE 사용자(플레이 링크 게스트)는 숨긴다.
           - 친구 유무는 클릭 시 group-result API 응답으로 판단한다 (캐시 의존 X).
           - 앱 화면이 낮게 크롭될 때도 CTA 는 항상 고정돼야 해서 스크롤 영역에 둔다.
         */}
-        {tournamentData.isRoot && (
+        {tournamentData.isRoot && (!isGuest || tournamentData.completed.hasGroupResult) && (
           <div className="mx-5">
             <GroupResultEntryCard tournamentId={tournamentId} />
           </div>
@@ -96,18 +113,18 @@ function ResultClient({ tournamentId }: ResultClientProps) {
             variant="secondary"
             size="lg"
             icon="leading"
-            leadingIcon={<ReceiptIconOutline aria-hidden className="size-5" />}
+            leadingIcon={<DownloadIconFill aria-hidden className="size-5" />}
             onClick={() => setIsReceiptShareDialogOpen(true)}
             className="flex-1 border-gray-75 bg-gray-75 text-text-neutral-secondary"
           >
-            영수증 공유
+            영수증 저장
           </Button>
           {canSharePlayLink && (
             <Button
               variant="primary"
               size="lg"
               icon="leading"
-              leadingIcon={<TrophyIconOutline aria-hidden className="size-5" />}
+              leadingIcon={<UploadIconFill aria-hidden className="size-5" />}
               onClick={handleSharePlayLink}
               className="flex-1"
             >

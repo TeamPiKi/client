@@ -13,7 +13,7 @@ function NicknameField({ value, onChange, isChecking, errorText }: NicknameField
   const isError = !!errorText;
 
   return (
-    <div className="flex w-full flex-col">
+    <div className="flex w-full flex-col gap-4">
       <h2 className="heading-2-semibold text-gray-950">닉네임</h2>
       <Input
         name="nickname"
