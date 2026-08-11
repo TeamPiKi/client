@@ -1,4 +1,4 @@
-import { getTokenMaxAge, isTokenValid } from '@piki/core';
+import { getTokenMaxAge, isTokenUnexpired } from '@piki/core';
 import * as Sentry from '@sentry/nextjs';
 import { type NextRequest, NextResponse } from 'next/server';
 
@@ -220,7 +220,7 @@ export const proxy = async (request: NextRequest) => {
   const { pathname, search } = request.nextUrl;
 
   /**
-   * 세션 만료 신호 — 서버가 거부한 토큰(서명 불일치 등)은 exp 만 보는 isTokenValid 로는
+   * 세션 만료 신호 — 서버가 거부한 토큰(서명 불일치 등)은 exp 만 보는 isTokenUnexpired 로는
    * 걸러지지 않으므로, 인터셉터가 붙인 신호를 보고 여기서 쿠키를 폐기해야
    * 재진입 시 같은 죽은 토큰으로 되돌아가는 루프가 끊긴다.
    */
@@ -245,8 +245,8 @@ export const proxy = async (request: NextRequest) => {
   if (routeType === 'PUBLIC') {
     const needsRestore =
       pathname === ROUTES.LOGIN &&
-      !(accessToken && isTokenValid(accessToken.value)) &&
-      isTokenValid(refreshToken?.value ?? null);
+      !(accessToken && isTokenUnexpired(accessToken.value)) &&
+      isTokenUnexpired(refreshToken?.value ?? null);
     if (needsRestore) return await handleTokenRefresh(request);
 
     return NextResponse.next();
@@ -254,7 +254,7 @@ export const proxy = async (request: NextRequest) => {
 
   if (routeType === 'MEMBER_AND_GUEST') {
     /** access(O): 통과 */
-    if (accessToken && isTokenValid(accessToken.value)) return NextResponse.next();
+    if (accessToken && isTokenUnexpired(accessToken.value)) return NextResponse.next();
 
     /** access(X), refresh(O): 토큰 갱신, 실패 시 로그인 페이지로 리다이렉트 */
     if (refreshToken) return await handleTokenRefresh(request);
@@ -265,7 +265,7 @@ export const proxy = async (request: NextRequest) => {
 
   if (routeType === 'MEMBER_ONLY' || routeType === 'AUTHORIZED') {
     /** access(O): 통과, 헤더에 쿼리파라미터까지 포함된 이동 경로 주입 */
-    if (accessToken && isTokenValid(accessToken.value)) {
+    if (accessToken && isTokenUnexpired(accessToken.value)) {
       const headers = new Headers(request.headers);
       headers.set('x-redirect-path', `${pathname}${search}`);
       return NextResponse.next({ request: { headers } });
