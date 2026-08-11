@@ -35,6 +35,11 @@ export const ANALYTICS_EVENT = {
 
   /** 설정 */
   INVITE_EXPIRY_CHANGE: 'invite_expiry_change',
+
+  /** 앱 업데이트 유도 */
+  APP_UPDATE_PROMPT_VIEW: 'app_update_prompt_view',
+  APP_UPDATE_PROMPT_CLICK: 'app_update_prompt_click',
+  APP_UPDATE_PROMPT_DISMISS: 'app_update_prompt_dismiss',
 } as const;
 
 export type AnalyticsEventNameT = (typeof ANALYTICS_EVENT)[keyof typeof ANALYTICS_EVENT];

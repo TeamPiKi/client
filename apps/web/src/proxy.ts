@@ -4,6 +4,8 @@ import { type NextRequest, NextResponse } from 'next/server';
 
 import { postTokenRefreshServer } from './apis/postTokenRefresh';
 import { postGuestLoginServer } from './app/login/_apis/postGuestLogin';
+import { ROUTES } from './consts/route';
+import { getApiErrorStatus } from './utils/apiError';
 import { getRouteType } from './utils/getRouteType';
 import { getLoginPath } from './utils/loginRedirect';
 import { isWebview } from './utils/webBridge';
@@ -196,8 +198,20 @@ const handleTokenRefresh = async (request: NextRequest) => {
     } else setCookieHeaders.forEach(cookie => nextResponse.headers.append('set-cookie', cookie));
 
     return nextResponse;
-  } catch {
-    return NextResponse.redirect(new URL(getLoginPath(`${pathname}${search}`), request.url));
+  } catch (error) {
+    /** 로그인 페이지 자체의 갱신 실패는 로그인으로 리다이렉트하면 자기 자신 무한 루프라 그대로 렌더 */
+    const response =
+      pathname === ROUTES.LOGIN
+        ? NextResponse.next()
+        : NextResponse.redirect(new URL(getLoginPath(`${pathname}${search}`), request.url));
+
+    /** 죽은 토큰은 다음 진입에 사용되지 않도록 폐기 */
+    if (getApiErrorStatus(error) === 401) {
+      response.cookies.delete('access_token');
+      response.cookies.delete('refresh_token');
+    }
+
+    return response;
   }
 };
 
@@ -208,12 +222,19 @@ export const proxy = async (request: NextRequest) => {
 
   if (!routeType) return NextResponse.next();
 
-  /** 퍼블릭 영역 */
-  if (routeType === 'PUBLIC') return NextResponse.next();
-
-  /** 멤버 및 게스트 공통 영역 */
   const accessToken = request.cookies.get('access_token');
   const refreshToken = request.cookies.get('refresh_token');
+
+  /** 퍼블릭 영역 */
+  if (routeType === 'PUBLIC') {
+    const needsRestore =
+      pathname === ROUTES.LOGIN &&
+      !(accessToken && isTokenValid(accessToken.value)) &&
+      isTokenValid(refreshToken?.value ?? null);
+    if (needsRestore) return await handleTokenRefresh(request);
+
+    return NextResponse.next();
+  }
 
   if (routeType === 'MEMBER_AND_GUEST') {
     /** access(O): 통과 */
