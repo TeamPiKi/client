@@ -1,12 +1,5 @@
-/** Android 패키지명 — `intent://` 조립에 사용 */
+/** Android 패키지명 — `intent://` 의 package 지정에 쓴다 (스토어 URL 은 @piki/core 의 APP_STORE_URL) */
 export const ANDROID_PACKAGE_NAME = 'day.no30s.piki';
-
-export const ANDROID_STORE_URL = `https://play.google.com/store/apps/details?id=${ANDROID_PACKAGE_NAME}`;
-
-/** 없으면 스토어 대신 웹으로 폴백한다 */
-export const IOS_STORE_URL = process.env.NEXT_PUBLIC_IOS_APP_STORE_ID
-  ? `https://apps.apple.com/kr/app/id${process.env.NEXT_PUBLIC_IOS_APP_STORE_ID}`
-  : null;
 
 /** `?to=` 가 없거나 안전하지 않을 때의 목적지 */
 export const DEFAULT_LANDING_TARGET = '/';

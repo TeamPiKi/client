@@ -24,6 +24,8 @@ import { useWebviewCookieSync } from '@/hooks/useWebviewCookieSync';
 import { logAnalyticsEvent, logAppOpenEvent } from '@/utils/analytics';
 import { captureError } from '@/utils/captureError';
 import { handleOpenImagePicker } from '@/utils/handleImage';
+import { handleShareInstagramStory } from '@/utils/handleInstagramStory';
+import { handleOpenStore } from '@/utils/handleOpenStore';
 import {
   handleRequestPushPermission,
   setAppBadgeCount,
@@ -131,6 +133,14 @@ function Page() {
 
         case WEBBRIDGE_MESSAGE_TYPE.WEB_REQ_SET_BADGE:
           await setAppBadgeCount(message.payload.count);
+          return;
+
+        case WEBBRIDGE_MESSAGE_TYPE.WEB_REQ_SHARE_INSTAGRAM_STORY:
+          await handleShareInstagramStory(message.payload);
+          return;
+
+        case WEBBRIDGE_MESSAGE_TYPE.WEB_REQ_OPEN_STORE:
+          await handleOpenStore();
           return;
 
         default:

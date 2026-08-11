@@ -1,8 +1,9 @@
+import { APP_STORE_URL } from '@piki/core';
 import type { Metadata } from 'next';
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 
-import { DEFAULT_LANDING_TARGET, IOS_STORE_URL } from '@/consts/appLink';
+import { DEFAULT_LANDING_TARGET } from '@/consts/appLink';
 import isSafeInternalPath from '@/utils/isSafeInternalPath';
 import { isWebview } from '@/utils/webBridge';
 
@@ -33,9 +34,7 @@ async function OpenAppPage({ searchParams }: OpenAppPageProps) {
   /** 앱이 이 경로를 받아 웹뷰에 띄운 경우 — 이미 설치돼 있으므로 스토어로 보내면 안 된다 */
   if (isWebview(headerStore.get('user-agent'))) redirect(target);
 
-  if (!IOS_STORE_URL) redirect(target);
-
-  return <AppStoreRedirect storeUrl={IOS_STORE_URL} target={target} />;
+  return <AppStoreRedirect storeUrl={APP_STORE_URL.IOS} target={target} />;
 }
 
 export default OpenAppPage;

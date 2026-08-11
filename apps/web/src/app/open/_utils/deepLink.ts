@@ -1,11 +1,13 @@
-import { ANDROID_PACKAGE_NAME, ANDROID_STORE_URL, DEFAULT_LANDING_TARGET } from '@/consts/appLink';
+import { APP_STORE_URL } from '@piki/core';
+
+import { ANDROID_PACKAGE_NAME, DEFAULT_LANDING_TARGET } from '@/consts/appLink';
 import { ROUTES } from '@/consts/route';
 
 /** Play 스토어 URL — referrer 를 붙이면 설치 후 첫 실행에서 Install Referrer API 로 유입을 읽을 수 있다 */
 export const buildAndroidStoreUrl = (source: string | null) =>
   source
-    ? `${ANDROID_STORE_URL}&referrer=${encodeURIComponent(`utm_source=${source}`)}`
-    : ANDROID_STORE_URL;
+    ? `${APP_STORE_URL.ANDROID}&referrer=${encodeURIComponent(`utm_source=${source}`)}`
+    : APP_STORE_URL.ANDROID;
 
 /**
  * 인스타 인앱 브라우저 탈출 URL — 지정한 주소를 외부 브라우저에서 연다.
