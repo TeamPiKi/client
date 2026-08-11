@@ -64,7 +64,7 @@ function NotificationContent() {
         centerClassName="heading-1-bold"
       />
 
-      <div className="hide-scrollbar flex-1 overflow-y-auto">{renderContent()}</div>
+      <div className="mt-4 hide-scrollbar flex-1 overflow-y-auto">{renderContent()}</div>
     </div>
   );
 
@@ -77,12 +77,7 @@ function NotificationContent() {
     const isPushBannerVisible = isWebview() && isPushEnabled === false;
 
     return (
-      <div
-        className={cn(
-          'flex flex-col gap-4 pb-9',
-          !isPushBannerVisible && unreadCount <= 0 && 'pt-9'
-        )}
-      >
+      <div className={cn('flex flex-col gap-4 pb-9')}>
         {isPushBannerVisible && (
           <div className="pt-5">
             <PushDisabledBanner onOpenNotificationSettings={openNotificationSettings} />
