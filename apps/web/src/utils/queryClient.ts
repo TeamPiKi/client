@@ -46,7 +46,8 @@ const makeQueryClient = () => {
     }),
     defaultOptions: {
       queries: {
-        retry: 1,
+        /** NOTE: 401 은 인터셉터가 이미 refresh + 재시도까지 끝낸 결과라 또 retry 되지 않도록 처리 */
+        retry: (failureCount, error) => getApiErrorStatus(error) !== 401 && failureCount < 1,
         staleTime: 60 * 1000,
         refetchOnWindowFocus: false,
       },
