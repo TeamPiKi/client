@@ -15,14 +15,15 @@ function WishInfoScreen({ wishId }: WishInfoScreenProps) {
   const { wishData } = useGetWish(wishId);
   const { patchWishMutation, isPatchWishPending } = usePatchWish(wishId);
   const { deleteWishMutation, isDeleteWishPending } = useDeleteWish(wishId);
+  const { item } = wishData;
+
   const {
-    postWishRefreshMutation,
+    wishItem,
+    refreshWish,
     isPostWishRefreshPending,
     isPostWishRefreshFailed,
     closePostWishRefreshFailed,
-  } = usePostWishRefresh(wishId);
-
-  const { item } = wishData;
+  } = usePostWishRefresh(wishId, item);
 
   /** 이미지로 담은 위시는 다시 불러올 원본 링크가 없다 */
   const canRefresh = wishData.refreshNeeded !== null;
@@ -31,11 +32,11 @@ function WishInfoScreen({ wishId }: WishInfoScreenProps) {
     <ItemInfoScreen
       itemType="wish"
       item={{
-        status: item.status,
-        imageUrl: item.imageUrl,
-        name: item.name ?? '',
-        price: item.price ?? 0,
-        sourceUrl: item.sourceUrl,
+        status: wishItem.status,
+        imageUrl: wishItem.imageUrl,
+        name: wishItem.name ?? '',
+        price: wishItem.price ?? 0,
+        sourceUrl: wishItem.sourceUrl,
       }}
       onSave={(data, onSuccess) => patchWishMutation(data, { onSuccess })}
       isSavePending={isPatchWishPending}
@@ -44,7 +45,7 @@ function WishInfoScreen({ wishId }: WishInfoScreenProps) {
       memo={{ value: wishData.memo ?? '', save: memo => patchWishMutation({ memo }) }}
       {...(canRefresh && {
         priceRefresh: {
-          refresh: () => postWishRefreshMutation(),
+          refresh: refreshWish,
           isPending: isPostWishRefreshPending,
           isFailed: isPostWishRefreshFailed,
           closeFailedDialog: closePostWishRefreshFailed,
