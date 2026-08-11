@@ -4,6 +4,7 @@ import { type NextRequest, NextResponse } from 'next/server';
 
 import { postTokenRefreshServer } from './apis/postTokenRefresh';
 import { postGuestLoginServer } from './app/login/_apis/postGuestLogin';
+import { QUERY_ACTION } from './consts/queryAction';
 import { ROUTES } from './consts/route';
 import { getApiErrorStatus } from './utils/apiError';
 import { getRouteType } from './utils/getRouteType';
@@ -217,6 +218,21 @@ const handleTokenRefresh = async (request: NextRequest) => {
 
 export const proxy = async (request: NextRequest) => {
   const { pathname, search } = request.nextUrl;
+
+  /**
+   * 세션 만료 신호 — 서버가 거부한 토큰(서명 불일치 등)은 exp 만 보는 isTokenValid 로는
+   * 걸러지지 않으므로, 인터셉터가 붙인 신호를 보고 여기서 쿠키를 폐기해야
+   * 재진입 시 같은 죽은 토큰으로 되돌아가는 루프가 끊긴다.
+   */
+  if (
+    pathname === ROUTES.LOGIN &&
+    request.nextUrl.searchParams.get(QUERY_ACTION.KEY) === QUERY_ACTION.VALUE.SESSION_EXPIRED
+  ) {
+    const response = NextResponse.next();
+    response.cookies.delete('access_token');
+    response.cookies.delete('refresh_token');
+    return response;
+  }
 
   const routeType = getRouteType(pathname);
 
