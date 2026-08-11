@@ -33,7 +33,7 @@ async function HomePage() {
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <div className="to-bg-base-50 relative flex min-h-dvh flex-col bg-linear-to-b from-bg-layer-default px-5 pt-padding-top pb-32">
+      <div className="to-bg-gray-50 relative flex min-h-dvh flex-col bg-linear-to-b from-bg-layer-default px-5 pt-padding-top pb-32">
         {/* 상단 헤더 */}
         <Header left={<PiKiLogo />} right={<HeaderIcon name="ALARM" />} />
 

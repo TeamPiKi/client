@@ -8,13 +8,14 @@ import { ImageIconFill } from '@/assets/icons';
 import { useImagePicker } from '@/hooks/useImagePicker';
 import { cn } from '@/utils/cn';
 
-type Props = {
+type ItemImagePickerProps = {
   imageUrl: string | null;
   onImageSelect?: (file: File) => void;
-  disabled?: boolean;
+  className?: string;
 };
 
-function ItemImageSection({ imageUrl, onImageSelect, disabled = false }: Props) {
+/** 직접 입력 폼에서 쓰는 상품 이미지 영역 — 탭하면 이미지 피커가 열린다 */
+function ItemImagePicker({ imageUrl, onImageSelect, className }: ItemImagePickerProps) {
   /** 사용자가 추가한 이미지 URL */
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
@@ -41,40 +42,35 @@ function ItemImageSection({ imageUrl, onImageSelect, disabled = false }: Props) 
 
   const displayUrl = previewUrl ?? imageUrl;
 
-  const imageContent = displayUrl ? (
-    <Image
-      src={displayUrl}
-      alt="상품 이미지"
-      fill
-      sizes="200px"
-      className="object-cover"
-      unoptimized={previewUrl !== null}
-    />
-  ) : (
-    <>
-      <ImageIconFill className="size-8 text-icon-neutral-secondary" />
-      <span className="body-2-medium text-text-neutral-secondary underline underline-offset-3">
-        이미지를 추가해주세요
-      </span>
-    </>
-  );
-
-  const containerClassName = cn(
-    'relative mx-auto mt-8 block size-[200px] overflow-hidden rounded-xl bg-gray-100',
-    !displayUrl && 'flex flex-col items-center justify-center gap-3'
-  );
-
-  if (disabled) return <div className={containerClassName}>{imageContent}</div>;
-
   return (
     <>
       <button
         type="button"
         onClick={openPicker}
         disabled={isPending}
-        className={cn(containerClassName, 'cursor-pointer')}
+        className={cn(
+          'relative mx-auto block aspect-square w-full cursor-pointer overflow-hidden rounded-xl bg-gray-50',
+          !displayUrl && 'flex flex-col items-center justify-center gap-3',
+          className
+        )}
       >
-        {imageContent}
+        {displayUrl ? (
+          <Image
+            src={displayUrl}
+            alt="상품 이미지"
+            fill
+            sizes="440px"
+            className="object-cover"
+            unoptimized={previewUrl !== null}
+          />
+        ) : (
+          <>
+            <ImageIconFill className="size-9 text-icon-neutral-secondary" />
+            <span className="body-2-medium text-text-neutral-secondary underline underline-offset-2">
+              이미지를 추가해주세요
+            </span>
+          </>
+        )}
       </button>
 
       <input
@@ -88,4 +84,4 @@ function ItemImageSection({ imageUrl, onImageSelect, disabled = false }: Props) 
   );
 }
 
-export default ItemImageSection;
+export default ItemImagePicker;
