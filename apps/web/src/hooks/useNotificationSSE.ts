@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useRef } from 'react';
 import { toast } from 'sonner';
 
-import { getNotifications } from '@/app/notification/_apis/getNotifications';
 import { ENDPOINTS } from '@/consts/api';
 import { QUERY_ACTION } from '@/consts/queryAction';
 import { ROUTES } from '@/consts/route';
@@ -14,18 +13,6 @@ import type { NotificationSsePayloadT, SilentSyncSsePayloadT } from '@/types/not
 import { getCookie } from '@/utils/cookie';
 import { refreshClientToken } from '@/utils/refreshClientToken';
 import { WebBridge, isWebview } from '@/utils/webBridge';
-
-const syncBadgeWithServer = () => {
-  if (!isWebview()) return;
-  getNotifications({ size: 1 })
-    .then(result => {
-      WebBridge.postMessage({
-        type: WEBBRIDGE_MESSAGE_TYPE.WEB_REQ_SET_BADGE,
-        payload: { count: result.unreadCount },
-      });
-    })
-    .catch(() => {});
-};
 
 const MAX_RETRY_DELAY_MS = 30_000;
 
@@ -99,8 +86,10 @@ export const useNotificationSSE = (enabled: boolean) => {
             retryDelayRef.current = 1_000;
             authFailCountRef.current = 0;
             if (hasConnectedRef.current) {
-              // 재연결 성공 — 끊긴 동안 놓쳤을 수 있는 변경사항을 화면 재조회로 복구
-              void queryClient.invalidateQueries();
+              // 재연결 성공 — 끊긴 동안 SSE 이벤트로 놓쳤을 수 있는 도메인만 재조회 
+              void queryClient.invalidateQueries({ queryKey: ['notifications'] });
+              void queryClient.invalidateQueries({ queryKey: ['tournament'] });
+              void queryClient.invalidateQueries({ queryKey: ['wishlists'] });
             }
             hasConnectedRef.current = true;
             return;
@@ -156,8 +145,8 @@ export const useNotificationSSE = (enabled: boolean) => {
           if (event.event === 'notification') {
             try {
               const payload = JSON.parse(event.data) as NotificationSsePayloadT;
+              // 배지 갱신은 silent-sync(UNREAD_COUNT_CHANGED) 가 payload 의 count 로 처리한다 — 별도 조회 금지
               void queryClient.refetchQueries({ queryKey: ['notifications'], type: 'all' });
-              syncBadgeWithServer();
               const deepLink = resolveDeepLink(payload);
               const action = deepLink
                 ? { label: '바로가기', onClick: () => router.push(deepLink) }
