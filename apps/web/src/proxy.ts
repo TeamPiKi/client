@@ -216,23 +216,27 @@ const handleTokenRefresh = async (request: NextRequest) => {
   }
 };
 
+/** 세션 만료 신호로 진입한 로그인 - 토큰 폐기 후 페이지 진입 */
+const handleSessionExpired = (request: NextRequest) => {
+  /** 페이지 렌더링 시 죽은 토큰을 보지 않도록 남은 쿠키에서 삭제 */
+  const remainingCookies = request.cookies
+    .getAll()
+    .filter(({ name }) => name !== 'access_token' && name !== 'refresh_token')
+    .map(({ name, value }) => `${name}=${value}`);
+
+  const requestHeaders = new Headers(request.headers);
+  if (remainingCookies.length) requestHeaders.set('cookie', remainingCookies.join('; '));
+  else requestHeaders.delete('cookie');
+
+  const response = NextResponse.next({ request: { headers: requestHeaders } });
+  response.cookies.delete('access_token');
+  response.cookies.delete('refresh_token');
+
+  return response;
+};
+
 export const proxy = async (request: NextRequest) => {
   const { pathname, search } = request.nextUrl;
-
-  /**
-   * 세션 만료 신호 — 서버가 거부한 토큰(서명 불일치 등)은 exp 만 보는 isTokenUnexpired 로는
-   * 걸러지지 않으므로, 인터셉터가 붙인 신호를 보고 여기서 쿠키를 폐기해야
-   * 재진입 시 같은 죽은 토큰으로 되돌아가는 루프가 끊긴다.
-   */
-  if (
-    pathname === ROUTES.LOGIN &&
-    request.nextUrl.searchParams.get(QUERY_ACTION.KEY) === QUERY_ACTION.VALUE.SESSION_EXPIRED
-  ) {
-    const response = NextResponse.next();
-    response.cookies.delete('access_token');
-    response.cookies.delete('refresh_token');
-    return response;
-  }
 
   const routeType = getRouteType(pathname);
 
@@ -243,6 +247,11 @@ export const proxy = async (request: NextRequest) => {
 
   /** 퍼블릭 영역 */
   if (routeType === 'PUBLIC') {
+    const isSessionExpired =
+      pathname === ROUTES.LOGIN &&
+      request.nextUrl.searchParams.get(QUERY_ACTION.KEY) === QUERY_ACTION.VALUE.SESSION_EXPIRED;
+    if (isSessionExpired) return handleSessionExpired(request);
+
     const needsRestore =
       pathname === ROUTES.LOGIN &&
       !(accessToken && isTokenUnexpired(accessToken.value)) &&
