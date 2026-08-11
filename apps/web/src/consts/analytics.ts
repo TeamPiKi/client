@@ -29,8 +29,17 @@ export const ANALYTICS_EVENT = {
   FRIEND_JOIN: 'friend_join',
   GUEST_VISIT: 'guest_visit',
 
+  /** 게스트 로그인 유도 배너 */
+  GUEST_BANNER_VIEW: 'guest_banner_view',
+  GUEST_BANNER_CTA_CLICK: 'guest_banner_cta_click',
+
   /** 설정 */
   INVITE_EXPIRY_CHANGE: 'invite_expiry_change',
+
+  /** 앱 업데이트 유도 */
+  APP_UPDATE_PROMPT_VIEW: 'app_update_prompt_view',
+  APP_UPDATE_PROMPT_CLICK: 'app_update_prompt_click',
+  APP_UPDATE_PROMPT_DISMISS: 'app_update_prompt_dismiss',
 } as const;
 
 export type AnalyticsEventNameT = (typeof ANALYTICS_EVENT)[keyof typeof ANALYTICS_EVENT];

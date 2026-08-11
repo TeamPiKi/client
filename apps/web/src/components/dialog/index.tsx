@@ -46,15 +46,23 @@ function DialogContent({
   className,
   children,
   showCloseButton = true,
+  closeOnDimClick = true,
+  onInteractOutside,
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Content> & {
   showCloseButton?: boolean;
+  /** false 면 딤 클릭으로 닫히지 않음 */
+  closeOnDimClick?: boolean;
 }) {
   return (
     <DialogPortal>
       <DialogOverlay />
       <DialogPrimitive.Content
         data-slot="dialog-content"
+        onInteractOutside={event => {
+          onInteractOutside?.(event);
+          if (!closeOnDimClick) event.preventDefault();
+        }}
         className={cn(
           'fixed top-1/2 left-1/2 grid w-[calc(100%-40px)] max-w-[calc(480px-40px)] -translate-x-1/2 -translate-y-1/2 rounded-3xl bg-white p-5 duration-100 outline-none data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95 data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95',
           className

@@ -1,5 +1,6 @@
 import type { WEBBRIDGE_MESSAGE_TYPE, WEB_REQ_READY_PAYLOAD_TYPE } from '../consts/webBridge';
 import type { WebReqLogAnalyticsEventMessageT } from './analytics';
+import type { WebReqOpenStoreMessageT } from './appUpdate';
 import type {
   AppResImagePickerCancelMessageT,
   AppResImagePickerErrorMessageT,
@@ -7,12 +8,17 @@ import type {
   WebReqOpenImagePickerMessageT,
 } from './image';
 import type {
+  AppResShareInstagramStoryMessageT,
+  WebReqShareInstagramStoryMessageT,
+} from './instagramStory';
+import type {
   RequestSocialLoginMessageT,
   SocialLoginErrorMessageT,
   SocialLoginSuccessMessageT,
   WebReqLogoutMessageT,
   WebReqTokenRefreshedMessageT,
 } from './login';
+import type { AppReqNavigateMessageT } from './navigation';
 import type {
   AppReqDeepLinkMessageT,
   AppResFcmTokenMessageT,
@@ -22,7 +28,6 @@ import type {
   WebReqPushPermissionStatusMessageT,
   WebReqSetBadgeMessageT,
 } from './pushNotification';
-import type { AppReqNavigateMessageT } from './navigation';
 import type { AppResShareIntentMessageT } from './shareIntent';
 
 export type WebBridgeMessageT =
@@ -45,7 +50,10 @@ export type WebBridgeMessageT =
   | WebReqLogoutMessageT
   | WebReqLogAnalyticsEventMessageT
   | WebReqTokenRefreshedMessageT
-  | WebReqSetBadgeMessageT;
+  | WebReqSetBadgeMessageT
+  | WebReqShareInstagramStoryMessageT
+  | AppResShareInstagramStoryMessageT
+  | WebReqOpenStoreMessageT;
 
 /** 웹이 페이지 hydrate 완료 후 RN에게 메시지 수신 준비됨을 알리는 메시지 */
 export type WebReqReadyMessageT = {

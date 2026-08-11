@@ -47,6 +47,13 @@ export const WEBBRIDGE_MESSAGE_TYPE = {
 
   /** 뱃지 관련 — 웹이 읽음 처리 후 앱 아이콘 뱃지 수를 동기화 */
   WEB_REQ_SET_BADGE: 'WEB_REQ_SET_BADGE',
+
+  /** 인스타그램 스토리 공유 — 웹에서 만든 영수증 이미지를 네이티브가 스토리 편집 화면으로 전달 */
+  WEB_REQ_SHARE_INSTAGRAM_STORY: 'WEB_REQ_SHARE_INSTAGRAM_STORY',
+  APP_RES_SHARE_INSTAGRAM_STORY: 'APP_RES_SHARE_INSTAGRAM_STORY',
+
+  /** 앱 업데이트 유도 — 플랫폼에 맞는 스토어 상세 페이지 열기 */
+  WEB_REQ_OPEN_STORE: 'WEB_REQ_OPEN_STORE',
 } as const;
 
 export const PUSH_NOTIFICATION_TYPE = {

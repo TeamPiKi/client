@@ -1,4 +1,5 @@
 /** 상수 */
+export { APP_STORE_URL } from './consts/appUpdate';
 export { BRIDGE_GATE } from './consts/appVersion';
 export { WEBVIEW_UA_TOKEN } from './consts/client';
 export {
@@ -23,6 +24,7 @@ export type {
   LogAnalyticsEventPayloadT,
   WebReqLogAnalyticsEventMessageT,
 } from './types/analytics';
+export type { WebReqOpenStoreMessageT } from './types/appUpdate';
 export type {
   AppResImagePickerCancelMessageT,
   AppResImagePickerErrorMessageT,
@@ -46,6 +48,13 @@ export type {
   WebReqLogoutMessageT,
   WebReqTokenRefreshedMessageT,
 } from './types/login';
+export type {
+  AppResShareInstagramStoryMessageT,
+  ShareInstagramStoryPayloadT,
+  ShareInstagramStoryResultPayloadT,
+  ShareInstagramStoryStatusT,
+  WebReqShareInstagramStoryMessageT,
+} from './types/instagramStory';
 export type { AppReqNavigateMessageT, NavigatePayloadT } from './types/navigation';
 export type { ShareIntentFileT, ShareIntentMetaT, ShareIntentPayloadT } from './types/shareIntent';
 export type {
