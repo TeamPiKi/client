@@ -29,6 +29,8 @@ const syncBadgeWithServer = () => {
 
 const MAX_RETRY_DELAY_MS = 30_000;
 
+const MAX_AUTH_RETRY_COUNT = 2;
+
 const SCROLL_TO_LAST_QUERY = `${QUERY_ACTION.KEY}=${QUERY_ACTION.VALUE.SCROLL_TO_LAST}`;
 
 const resolveDeepLink = (payload: NotificationSsePayloadT): string | null => {
@@ -57,6 +59,7 @@ export const useNotificationSSE = (enabled: boolean) => {
   const retryDelayRef = useRef(1_000);
   const abortRef = useRef<AbortController | null>(null);
   const hasConnectedRef = useRef(false);
+  const authFailCountRef = useRef(0);
 
   useEffect(() => {
     if (!enabled) return;
@@ -94,6 +97,7 @@ export const useNotificationSSE = (enabled: boolean) => {
         onopen: async response => {
           if (response.ok) {
             retryDelayRef.current = 1_000;
+            authFailCountRef.current = 0;
             if (hasConnectedRef.current) {
               // 재연결 성공 — 끊긴 동안 놓쳤을 수 있는 변경사항을 화면 재조회로 복구
               void queryClient.invalidateQueries();
@@ -102,6 +106,12 @@ export const useNotificationSSE = (enabled: boolean) => {
             return;
           }
           if (response.status === 401) {
+            /** 새 토큰으로도 401 이 이어지면 SSE 연결 중단 */
+            authFailCountRef.current += 1;
+            if (authFailCountRef.current > MAX_AUTH_RETRY_COUNT) {
+              cancelled = true;
+              throw new Error('unauthorized');
+            }
             // 토큰 만료 시 공유 refresh 함수를 통해 갱신 후 재연결.
             // 단일 진입점 — page request / API 호출과 같은 dedupe 큐를 공유한다.
             // (직접 fetch 로 호출하면 동시 다발 race 로 백엔드가 401/500 거부 → 사용자 로그아웃)
