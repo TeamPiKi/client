@@ -7,6 +7,7 @@ import { postGuestLoginServer } from './app/login/_apis/postGuestLogin';
 import { ROUTES } from './consts/route';
 import { getApiErrorStatus } from './utils/apiError';
 import { getRouteType } from './utils/getRouteType';
+import { isLandingHost } from './utils/landingHost';
 import { getLoginPath } from './utils/loginRedirect';
 import { isWebview } from './utils/webBridge';
 
@@ -217,6 +218,13 @@ const handleTokenRefresh = async (request: NextRequest) => {
 
 export const proxy = async (request: NextRequest) => {
   const { pathname, search } = request.nextUrl;
+
+  /** 랜딩 서브도메인(open.*)의 루트 진입만 랜딩으로 rewrite — 인스타에는 open.piki.day 하나만 건다 */
+  if (pathname === '/' && isLandingHost(request.headers.get('host') ?? '')) {
+    const landingUrl = request.nextUrl.clone();
+    landingUrl.pathname = ROUTES.OPEN;
+    return NextResponse.rewrite(landingUrl);
+  }
 
   const routeType = getRouteType(pathname);
 
