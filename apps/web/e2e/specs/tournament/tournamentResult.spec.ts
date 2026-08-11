@@ -32,7 +32,7 @@ test('결과 페이지에 영수증과 순위, 공유 버튼이 렌더링된다'
     await expect(page.getByText(rankedItem.name).last()).toBeVisible();
   }
 
-  await expect(page.getByRole('button', { name: '영수증 공유' })).toBeVisible();
+  await expect(page.getByRole('button', { name: '영수증 저장' })).toBeVisible();
   /** isRoot && isOwner — 플레이 링크 공유 버튼 노출 */
   await expect(page.getByRole('button', { name: '토너먼트 공유' })).toBeVisible();
 });
@@ -57,7 +57,7 @@ test('웹 브라우저에서는 공유 시트에 스토리 공유 버튼이 없�
   api.get(ENDPOINTS.TOURNAMENT(3), MOCK_TOURNAMENT_COMPLETED);
 
   await page.goto('/tournament/3/result');
-  await page.getByRole('button', { name: '영수증 공유' }).click();
+  await page.getByRole('button', { name: '영수증 저장' }).click();
 
   await expect(page.getByRole('button', { name: '이미지 저장' })).toBeVisible();
   await expect(page.getByRole('button', { name: '스토리 공유' })).toBeHidden();
@@ -104,7 +104,7 @@ test.describe('앱(웹뷰) 환경', () => {
     });
 
     await page.goto('/tournament/3/result');
-    await page.getByRole('button', { name: '영수증 공유' }).click();
+    await page.getByRole('button', { name: '영수증 저장' }).click();
 
     const storyButton = page.getByRole('button', { name: '스토리 공유' });
     await expect(storyButton).toBeEnabled();

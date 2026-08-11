@@ -11,7 +11,11 @@ import { getQueryClient } from '@/utils/queryClient';
 
 import TournamentListClient from './client';
 
-function TournamentList() {
+type TournamentListProps = {
+  isGuest?: boolean;
+};
+
+function TournamentList({ isGuest = false }: TournamentListProps) {
   const queryClient = getQueryClient();
 
   queryClient.prefetchQuery({
@@ -38,7 +42,7 @@ function TournamentList() {
             </>
           }
         >
-          <TournamentListClient />
+          <TournamentListClient isGuest={isGuest} />
         </Suspense>
       </section>
     </HydrationBoundary>
