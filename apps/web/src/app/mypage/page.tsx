@@ -1,6 +1,7 @@
 import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
 
 import { getMe } from '@/apis/getMe';
+import { Header, HeaderIcon } from '@/components/header';
 import Spacing from '@/components/spacing';
 import { getIsGuest } from '@/utils/getIsGuest';
 import { getQueryClient } from '@/utils/queryClient';
@@ -21,8 +22,8 @@ async function MypagePage() {
 
   return (
     <main className="flex h-dvh flex-col bg-bg-layer-basement px-5 pt-padding-top">
-      <h1 className="heading-1-bold text-text-neutral-primary">내 정보</h1>
-      <Spacing size={isGuest ? 20 : 24} />
+      <Header left={<HeaderIcon name="BACK" />} center={<h1 className="heading-1-bold">마이</h1>} />
+      <Spacing size={56} />
 
       <div className="hide-scrollbar flex flex-1 flex-col overflow-y-auto pb-32">
         {isGuest && (
