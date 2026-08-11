@@ -1,6 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 
 import { CheckCircledIconOutline } from '@/assets/icons';
 import Button from '@/components/button';
@@ -14,6 +15,7 @@ import useIntersectionObserver from '../_hooks/useIntersectionObserver';
 import { usePostNotificationsRead } from '../_hooks/usePostNotificationsRead';
 import { usePushPermission } from '../_hooks/usePushPermission';
 import { getNotificationRoute } from '../_utils/getNotificationRoute';
+import MarkAllReadDialog from './MarkAllReadDialog';
 import NotificationItem from './NotificationItem';
 import NotificationStateCard from './NotificationStateCard';
 import PushDisabledBanner from './PushDisabledBanner';
@@ -34,12 +36,10 @@ function NotificationContent() {
   } = useGetNotifications();
   const { postNotificationsReadMutation, isPostNotificationsReadPending } =
     usePostNotificationsRead();
+  const [isMarkAllReadDialogOpen, setIsMarkAllReadDialogOpen] = useState(false);
   const isEmpty = !isPending && notificationsData.length === 0;
 
-  const handleMarkAllRead = () => {
-    if (isPostNotificationsReadPending) return;
-    postNotificationsReadMutation({ all: true });
-  };
+  const handleMarkAllRead = () => setIsMarkAllReadDialogOpen(true);
 
   const bottomRef = useIntersectionObserver(
     fetchNextPage,
@@ -65,6 +65,8 @@ function NotificationContent() {
       />
 
       <div className="mt-4 hide-scrollbar flex-1 overflow-y-auto">{renderContent()}</div>
+
+      <MarkAllReadDialog open={isMarkAllReadDialogOpen} onOpenChange={setIsMarkAllReadDialogOpen} />
     </div>
   );
 
