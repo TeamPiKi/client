@@ -3,7 +3,6 @@
 import type { ReactNode } from 'react';
 
 import { WarningIconFill } from '@/assets/icons';
-
 import Button from '@/components/button';
 import {
   Dialog,
@@ -50,7 +49,9 @@ function ConfirmDialog({
         {icon && <div className="flex justify-center">{icon}</div>}
         <DialogHeader className={cn('gap-1', icon && 'mt-4')}>
           <DialogTitle className="heading-1-bold">{title}</DialogTitle>
-          {description && <p className="body-1-medium text-text-neutral-tertiary">{description}</p>}
+          <DialogDescription className="body-1-medium text-text-neutral-tertiary">
+            {description}
+          </DialogDescription>
         </DialogHeader>
         <DialogFooter className="mt-5 flex-row gap-2.5">
           <DialogClose asChild>
