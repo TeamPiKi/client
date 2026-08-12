@@ -17,8 +17,8 @@ async function MyPageMemberOnlyLayout({ children }: { children: React.ReactNode 
   /** 토큰이 유효하지 않은 경우 세션 만료 처리 */
   if (role === null) redirect(getLoginPath(redirectPath, QUERY_ACTION.VALUE.SESSION_EXPIRED));
 
-  /** 탈퇴는 멤버 전용 — 게스트는 로그인 페이지로 */
-  if (role !== 'MEMBER') redirect(ROUTES.LOGIN);
+  /** 멤버가 아닌 경우 마이페이지로 리다이렉트 */
+  if (role !== 'MEMBER') redirect(ROUTES.MYPAGE);
 
   return children;
 }
