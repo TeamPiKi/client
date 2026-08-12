@@ -77,7 +77,9 @@ export const captureReceiptImage = async (element: HTMLElement): Promise<Blob> =
     // 상품 이미지는 /_next/image?url=... 로 쿼리에만 차이가 있다. 기본 캐시 키는 쿼리를 잘라내
     // 모든 상품이 첫 번째 이미지로 그려지므로 쿼리까지 키에 포함시킨다.
     includeQueryParams: true,
-    fetchRequestInit: { cache: 'force-cache', mode: 'cors' },
+    // mode 를 지정하지 않는다 — 상품 이미지는 /_next/image 프록시라 same-origin 이고,
+    // 'cors' 로 보내면 CORS 헤더가 없는 프록시 응답이 거부돼 캐시 미스일 때만 사진이 빠진다.
+    fetchRequestInit: { cache: 'force-cache' },
   });
   if (!blob) throw new Error('영수증 이미지 변환 실패');
 
