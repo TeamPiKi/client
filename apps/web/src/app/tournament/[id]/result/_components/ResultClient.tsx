@@ -60,6 +60,8 @@ function ResultClient({ tournamentId, isGuest = false }: ResultClientProps) {
   const result = tournamentData.completed.result;
   // 플레이 링크 공유는 ROOT 의 소유자만 가능 — CLONE 소유자(친구 초대 → CLONE 생성한 사람) 제외
   const canSharePlayLink = tournamentData.isRoot && tournamentData.isOwner;
+  // 그룹 결과는 원본(ROOT) 단위로 집계된다. CLONE 에서 보고 있으면 원본 id 로 조회해야 한다.
+  const groupResultTournamentId = tournamentData.sourceTournamentId ?? tournamentId;
 
   const handleSharePlayLink = () => {
     setIsShareDialogOpen(true);
@@ -70,7 +72,12 @@ function ResultClient({ tournamentId, isGuest = false }: ResultClientProps) {
   const mainPb = isGuest && !tournamentData.isRoot ? 'pb-[145px]' : 'pb-40';
 
   return (
-    <main className={cn('flex min-h-dvh flex-col overflow-x-hidden bg-bg-layer-basement pt-padding-top', mainPb)}>
+    <main
+      className={cn(
+        'flex min-h-dvh flex-col overflow-x-hidden bg-bg-layer-basement pt-padding-top',
+        mainPb
+      )}
+    >
       <Header center="토너먼트 결과" centerClassName="heading-1-bold" />
 
       <div className="mx-auto mt-4 flex min-h-0 w-full max-w-120 flex-1 flex-col gap-3">
@@ -93,14 +100,16 @@ function ResultClient({ tournamentId, isGuest = false }: ResultClientProps) {
 
         {/*
           친구 토너먼트 결과보기 카드 노출 + 라우팅.
-          - ROOT 사용자(주최자 / 친구 초대 멤버) 에게만 노출.
-          - CLONE 사용자(플레이 링크 게스트)는 숨긴다.
+          - 주최자·참여자·플레이 링크 게스트 모두에게 노출한다.
+            참여자와 게스트는 시작 시 본인 CLONE 이 생겨 isRoot=false 라, 이 값으로 거르면
+            주최자에게만 보인다. 전원이 전체 결과를 볼 수 있어야 하므로 조건에서 뺀다.
+          - 그룹 결과는 원본(ROOT) 단위로 집계되므로 CLONE 이면 sourceTournamentId 로 조회한다.
           - 친구 유무는 클릭 시 group-result API 응답으로 판단한다 (캐시 의존 X).
           - 앱 화면이 낮게 크롭될 때도 CTA 는 항상 고정돼야 해서 스크롤 영역에 둔다.
         */}
-        {tournamentData.isRoot && (!isGuest || tournamentData.completed.hasGroupResult) && (
+        {(!isGuest || tournamentData.completed.hasGroupResult) && (
           <div className="mx-5">
-            <GroupResultEntryCard tournamentId={tournamentId} />
+            <GroupResultEntryCard tournamentId={groupResultTournamentId} />
           </div>
         )}
       </div>
