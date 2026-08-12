@@ -20,9 +20,6 @@ const MAX_RETRY_DELAY_MS = 30_000;
 
 const MAX_AUTH_RETRY_COUNT = 2;
 
-/** 401 → refresh 성공 후 onerror backoff 로 넘길 때의 신호 — 다른 실패와 구분해야 해서 이름을 맞춘다 */
-const TOKEN_REFRESHED = 'token-refreshed';
-
 /** 아이템 파싱 알림의 refId 는 itemId 라서, 위시 상세 캐시(`['wish', wishId]`)는 item.id 로 찾는다 */
 // TODO: payload 에 wishId 가 추가되면 `['wish', payload.wishId]` 무효화로 대체 (tournamentId 와 동일한 형태로 요청해둠)
 const isWishQueryOfItem = (query: Query, itemId: number) =>
@@ -111,7 +108,7 @@ export const useNotificationSSE = (enabled: boolean) => {
             return;
           }
           if (response.status === 401) {
-            /** 새 토큰으로도 401 이 연속으로 이어지면 SSE 연결 중단 */
+            /** 새 토큰으로도 401 이 이어지면 SSE 연결 중단 */
             authFailCountRef.current += 1;
             if (authFailCountRef.current > MAX_AUTH_RETRY_COUNT) {
               cancelled = true;
@@ -123,9 +120,9 @@ export const useNotificationSSE = (enabled: boolean) => {
             try {
               await refreshClientToken();
               // refresh 성공 → onerror backoff 로 재연결
-              throw new Error(TOKEN_REFRESHED);
+              throw new Error('token-refreshed');
             } catch (err) {
-              if (err instanceof Error && err.message === TOKEN_REFRESHED) throw err;
+              if (err instanceof Error && err.message === 'token-refreshed') throw err;
               // refresh 실패 (만료 등) → 연결 중단 + 전역과 동일한 세션 만료 처리
               cancelled = true;
               handleSessionExpired();
@@ -215,11 +212,6 @@ export const useNotificationSSE = (enabled: boolean) => {
 
         onerror: err => {
           if (cancelled) throw err; // fetchEventSource 재시도 중단
-
-          // 401 이 아닌 실패(5xx·네트워크)가 끼면 연속이 아니므로 인증 실패 횟수를 끊는다
-          if (!(err instanceof Error && err.message === TOKEN_REFRESHED)) {
-            authFailCountRef.current = 0;
-          }
 
           const delay = retryDelayRef.current;
           retryDelayRef.current = Math.min(delay * 2, MAX_RETRY_DELAY_MS);
