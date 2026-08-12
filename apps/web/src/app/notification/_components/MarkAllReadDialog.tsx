@@ -1,5 +1,7 @@
 'use client';
 
+import { toast } from 'sonner';
+
 import ConfirmDialog from '@/components/common/confirm-dialog';
 
 import { usePostNotificationsRead } from '../_hooks/usePostNotificationsRead';
@@ -15,7 +17,15 @@ function MarkAllReadDialog({ open, onOpenChange }: MarkAllReadDialogProps) {
 
   const handleConfirm = () => {
     if (isPostNotificationsReadPending) return;
-    postNotificationsReadMutation({ all: true }, { onSuccess: () => onOpenChange(false) });
+    postNotificationsReadMutation(
+      { all: true },
+      {
+        onSuccess: () => {
+          onOpenChange(false);
+          toast.success('알림을 모두 읽음 처리했어요');
+        },
+      }
+    );
   };
 
   return (
