@@ -104,10 +104,11 @@ function ResultClient({ tournamentId, isGuest = false }: ResultClientProps) {
             참여자와 게스트는 시작 시 본인 CLONE 이 생겨 isRoot=false 라, 이 값으로 거르면
             주최자에게만 보인다. 전원이 전체 결과를 볼 수 있어야 하므로 조건에서 뺀다.
           - 그룹 결과는 원본(ROOT) 단위로 집계되므로 CLONE 이면 sourceTournamentId 로 조회한다.
-          - 친구 유무는 클릭 시 group-result API 응답으로 판단한다 (캐시 의존 X).
+          - hasGroupResult 는 완료한 CLONE 이 있는지를 뜻한다. 혼자 끝낸 토너먼트에서 누르면
+            서버가 409(TOURNAMENT-028) 를 주므로 회원·게스트 가리지 않고 이 값으로 막는다.
           - 앱 화면이 낮게 크롭될 때도 CTA 는 항상 고정돼야 해서 스크롤 영역에 둔다.
         */}
-        {(!isGuest || tournamentData.completed.hasGroupResult) && (
+        {tournamentData.completed.hasGroupResult && (
           <div className="mx-5">
             <GroupResultEntryCard tournamentId={groupResultTournamentId} />
           </div>
