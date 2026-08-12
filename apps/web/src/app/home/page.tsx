@@ -8,6 +8,7 @@ import Spacing from '@/components/spacing';
 import { QUERY_KEYS } from '@/consts/queryKeys';
 import { getIsGuest } from '@/utils/getIsGuest';
 import { getQueryClient } from '@/utils/queryClient';
+import { serverPrefetch } from '@/utils/serverPrefetch';
 
 import AddWishHomeDialog from './_components/AddWishHomeDialog';
 import CreateTournamentDialog from './_components/CreateTournamentDialog';
@@ -19,10 +20,12 @@ import TournamentList from './_components/tournament-list';
 async function HomePage() {
   const queryClient = getQueryClient();
 
-  await queryClient.prefetchQuery({
-    queryKey: ['me'],
-    queryFn: getMe,
-  });
+  await serverPrefetch(() =>
+    queryClient.fetchQuery({
+      queryKey: ['me'],
+      queryFn: getMe,
+    })
+  );
 
   queryClient.prefetchQuery({
     queryKey: QUERY_KEYS.TOURNAMENT.LIST.BY_PARAMS({ limit: 3 }),

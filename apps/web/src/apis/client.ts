@@ -10,6 +10,7 @@ import { CLIENT_TYPE } from '@/consts/webBridge';
 import type { ApiErrorResponseT } from '@/types/api';
 import { captureError } from '@/utils/captureError';
 import { deleteCookie, getCookie } from '@/utils/cookie';
+import { handleSessionExpired } from '@/utils/handleSessionExpired';
 import { getLoginPath } from '@/utils/loginRedirect';
 import { refreshClientToken } from '@/utils/refreshClientToken';
 import { WebBridge, isWebview } from '@/utils/webBridge';
@@ -55,22 +56,7 @@ clientApi.interceptors.response.use(
         await refreshClientToken();
         return clientApi(originalRequest);
       } catch (refreshError) {
-        /** 세션 만료 — Sentry 유저 컨텍스트 해제 */
-        Sentry.setUser(null);
-
-        if (typeof window !== 'undefined') {
-          const loginRedirectDisabled =
-            window.location.pathname === ROUTES.LOGIN ||
-            window.location.pathname === ROUTES.ROOT ||
-            /^\/auth\/callback\/[^/]+$/.test(window.location.pathname);
-
-          if (!loginRedirectDisabled) {
-            window.location.href = getLoginPath(
-              `${window.location.pathname}${window.location.search}`,
-              QUERY_ACTION.VALUE.SESSION_EXPIRED
-            );
-          }
-        }
+        handleSessionExpired();
         return Promise.reject(refreshError);
       }
     }
