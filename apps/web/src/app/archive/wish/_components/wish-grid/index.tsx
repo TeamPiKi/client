@@ -6,8 +6,8 @@ import WishCard from '@/components/common/wish-card';
 import { ROUTES } from '@/consts/route';
 import { Z_INDEX } from '@/consts/zIndex';
 import type { GetWishlistResponseT } from '@/types/wish';
+import { SCROLL_NAMESPACE, saveScrollAnchor } from '@/utils/scrollRestoration';
 
-import { saveWishScroll } from '../../_utils/wishScroll';
 import WishFailedCard from './WishFailedCard';
 import WishProcessingCard from './WishProcessingCard';
 
@@ -23,7 +23,7 @@ function WishGrid({ items, isDeleteMode = false, selectedIds, onToggleSelect }: 
     /** 새 탭/새 창 열기는 현재 페이지를 떠나지 않으므로 스크롤 위치를 저장하지 않는다. */
     if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
 
-    saveWishScroll(event.currentTarget, wishId);
+    saveScrollAnchor({ namespace: SCROLL_NAMESPACE.ARCHIVE_WISH }, event.currentTarget, wishId);
   };
 
   return (
@@ -34,7 +34,7 @@ function WishGrid({ items, isDeleteMode = false, selectedIds, onToggleSelect }: 
             <Link
               href={ROUTES.WISH_EDIT(wish.id)}
               key={wish.id}
-              data-wish-id={wish.id}
+              data-scroll-anchor-id={wish.id}
               onClick={event => handleCardClick(event, wish.id)}
             >
               <WishFailedCard />
@@ -81,7 +81,7 @@ function WishGrid({ items, isDeleteMode = false, selectedIds, onToggleSelect }: 
           <Link
             href={ROUTES.WISH_EDIT(wish.id)}
             key={wish.id}
-            data-wish-id={wish.id}
+            data-scroll-anchor-id={wish.id}
             onClick={event => handleCardClick(event, wish.id)}
           >
             <WishCard

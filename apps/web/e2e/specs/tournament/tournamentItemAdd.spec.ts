@@ -72,8 +72,7 @@ test('위시에서 상품 4개를 가져오면 장바구니에 담긴다', async
 
   const wishRequest = page.waitForRequest(
     request =>
-      request.method() === 'POST' &&
-      request.url().includes(ENDPOINTS.TOURNAMENT_ITEMS_FROM_WISH(1))
+      request.method() === 'POST' && request.url().includes(ENDPOINTS.TOURNAMENT_ITEMS_FROM_WISH(1))
   );
   await nextButton.click();
   const wishBody = (await wishRequest).postDataJSON() as { itemIds: number[] };

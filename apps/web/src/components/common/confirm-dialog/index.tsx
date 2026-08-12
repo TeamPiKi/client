@@ -3,11 +3,13 @@
 import type { ReactNode } from 'react';
 
 import { WarningIconFill } from '@/assets/icons';
+
 import Button from '@/components/button';
 import {
   Dialog,
   DialogClose,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -18,7 +20,7 @@ type ConfirmDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   title: string;
-  description?: string;
+  description: string;
   confirmLabel?: string;
   cancelLabel?: string;
   isPending?: boolean;
@@ -50,7 +52,7 @@ function ConfirmDialog({
           <DialogTitle className="heading-1-bold">{title}</DialogTitle>
           {description && <p className="body-1-medium text-text-neutral-tertiary">{description}</p>}
         </DialogHeader>
-        <DialogFooter className="mt-6 flex-row gap-3">
+        <DialogFooter className="mt-5 flex-row gap-2.5">
           <DialogClose asChild>
             <Button variant="secondary" size="lg" className="flex-1" disabled={isPending}>
               {cancelLabel}

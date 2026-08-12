@@ -251,21 +251,11 @@ function BottomTabBar() {
           e.stopPropagation();
         }}
         className={cn(
-          'relative isolate inline-flex h-[58px] touch-none items-center gap-2 rounded-full p-1 shadow-[0px_6px_24px_0px_rgba(0,0,0,0.16)] transition-transform duration-200 ease-out select-none',
+          'liquid-glass inline-flex h-[58px] touch-none items-center gap-2 rounded-full p-1 shadow-[0px_6px_24px_0px_rgba(0,0,0,0.16)] transition-transform duration-200 ease-out select-none',
+          isGrabbing && 'liquid-glass-active',
           isPressed && 'scale-102'
         )}
       >
-        {/* 유리 레이어: 블러 + 채도 */}
-        <div className="absolute inset-0 -z-30 rounded-full backdrop-blur-[3px] backdrop-saturate-120" />
-        {/* 틴트 레이어 — 평소엔 반투명 흰색, 렌즈 상태(홀드/드래그)에서만 더 투명해져 유리가 드러남 */}
-        <div
-          className={cn(
-            'absolute inset-0 -z-20 rounded-full transition-colors duration-200 ease-out',
-            isGrabbing ? 'bg-white/40' : 'bg-white/80'
-          )}
-        />
-        {/* 반사광 레이어 */}
-        <div className="absolute inset-0 -z-10 rounded-full shadow-[inset_2px_2px_1px_0_rgba(255,255,255,0.6),inset_-1px_-1px_1px_1px_rgba(255,255,255,0.4)]" />
         {/* 활성 탭 인디케이터 — 꾹 잡고 드래그해 다른 탭으로 옮길 수 있는 버블 */}
         {activeIndex >= 0 && (
           <div
@@ -287,9 +277,7 @@ function BottomTabBar() {
               className={cn(
                 'relative size-full overflow-hidden rounded-full transition-[scale,transform,background-color,box-shadow,backdrop-filter] duration-300',
                 // 평소엔 무광 알약, 잡는 동안만 유리 렌즈로 전환
-                isGrabbing
-                  ? 'scale-125 bg-white/2 shadow-[inset_1.5px_1.5px_1px_0_rgba(255,255,255,0.6),inset_-1px_-1px_1px_0_rgba(255,255,255,0.35),0_4px_12px_0_rgba(0,0,0,0.18)]'
-                  : 'bg-black/8'
+                isGrabbing ? 'scale-125 liquid-glass-lens' : 'bg-black/8'
               )}
               style={{ transitionTimingFunction: SPRING_EASE }}
             >
@@ -297,14 +285,9 @@ function BottomTabBar() {
               <div
                 ref={glintRef}
                 className={cn(
-                  'absolute inset-0 rounded-full transition-[translate,opacity] duration-200 ease-out',
+                  'absolute inset-0 rounded-full transition-[translate,opacity] duration-200 ease-out liquid-glass-glint',
                   isGrabbing ? 'opacity-100' : 'opacity-0'
                 )}
-                style={{
-                  // 위쪽 테두리에만 붙는 얇은 반사광 — 중앙은 침범하지 않음
-                  background:
-                    'radial-gradient(75% 45% at 40% -12%, rgba(255,255,255,0.55), transparent 55%)',
-                }}
               />
             </div>
           </div>
