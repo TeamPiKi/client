@@ -4,7 +4,26 @@ import { type ReactNode, useEffect, useState } from 'react';
 import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { postWishLinkFromShare } from '@/utils/postWishLinkFromShare';
+import { type ShareFailureReasonT, postWishLinkFromShare } from '@/utils/postWishLinkFromShare';
+
+/** 실패 사유별 서브 문구. 서버 카탈로그와 별개로 시안 문구를 그대로 쓴다. */
+const FAILURE_DESCRIPTION: Record<ShareFailureReasonT, string> = {
+  unauthenticated: '',
+  sessionExpired: '로그인이 만료됐어요',
+  network: '네트워크 연결을 확인해주세요',
+  server: '일시적인 오류가 발생했어요',
+};
+
+/** 로그인으로 유도할 사유 — 재시도해도 결과가 같다 */
+const LOGIN_REQUIRED_REASONS: ShareFailureReasonT[] = ['unauthenticated', 'sessionExpired'];
+
+/** 재시도는 1회까지. 또 실패하면 확인 버튼만 남긴다. */
+const MAX_RETRY_COUNT = 1;
+
+type SheetStateT =
+  | { status: 'loading' }
+  | { status: 'success' }
+  | { status: 'failure'; reason: ShareFailureReasonT };
 
 export default function ShareBottomSheet(props: ShareExtensionProps) {
   return (
@@ -15,12 +34,16 @@ export default function ShareBottomSheet(props: ShareExtensionProps) {
 }
 
 function ShareBottomSheetContent({ url, text }: ShareExtensionProps) {
-  const [sheetStatus, setSheetStatus] = useState<'loading' | 'success' | 'error'>('loading');
+  const [sheetState, setSheetState] = useState<SheetStateT>({ status: 'loading' });
+  const [retryCount, setRetryCount] = useState(0);
 
-  const handleOpenWishlist = () => {
-    /** openHostApp path 규칙: `/{path}?{query}` — `web=...`만 넘기면 `/web=...` 라우트로 해석됨 */
-    openHostApp(`/?web=${encodeURIComponent('/archive/wish')}`);
+  /** openHostApp path 규칙: `/{path}?{query}` — `web=...`만 넘기면 `/web=...` 라우트로 해석됨 */
+  const openHostAppAt = (webPath: string) => {
+    openHostApp(`/?web=${encodeURIComponent(webPath)}`);
   };
+
+  const handleOpenWishlist = () => openHostAppAt('/archive/wish');
+  const handleOpenLogin = () => openHostAppAt('/login');
 
   useEffect(() => {
     /**
@@ -33,8 +56,9 @@ function ShareBottomSheetContent({ url, text }: ShareExtensionProps) {
     const urlFromText = text?.match(/https?:\/\/[^\s]+/)?.[0]?.replace(/[),.]+$/, '');
     const productUrl = url ?? urlFromText;
 
+    /** 링크를 못 찾은 경우 — 재시도해도 같으므로 서버 오류와 같은 화면으로 둔다 */
     if (!productUrl) {
-      setSheetStatus('error');
+      setSheetState({ status: 'failure', reason: 'server' });
       return;
     }
 
@@ -45,12 +69,9 @@ function ShareBottomSheetContent({ url, text }: ShareExtensionProps) {
 
       if (!isMounted) return;
 
-      if (result.ok) {
-        setSheetStatus('success');
-        return;
-      }
-
-      setSheetStatus('error');
+      setSheetState(
+        result.ok ? { status: 'success' } : { status: 'failure', reason: result.reason }
+      );
     };
 
     void registerWish();
@@ -58,15 +79,21 @@ function ShareBottomSheetContent({ url, text }: ShareExtensionProps) {
     return () => {
       isMounted = false;
     };
-  }, [url, text]);
+    // retryCount 가 바뀌면 같은 링크로 다시 등록을 시도한다
+  }, [url, text, retryCount]);
 
-  if (sheetStatus === 'loading')
+  const handleRetry = () => {
+    setSheetState({ status: 'loading' });
+    setRetryCount(count => count + 1);
+  };
+
+  if (sheetState.status === 'loading')
     return (
       <SheetContainer>
         <View style={styles.handle} />
 
         <Text allowFontScaling={false} style={styles.title}>
-          위시템을 담고 있어요
+          위시를 담고 있어요
         </Text>
 
         <View style={styles.imageContainer}>
@@ -80,41 +107,83 @@ function ShareBottomSheetContent({ url, text }: ShareExtensionProps) {
       </SheetContainer>
     );
 
-  if (sheetStatus === 'error')
+  if (sheetState.status === 'failure') {
+    const { reason } = sheetState;
+    const isLoginRequired = LOGIN_REQUIRED_REASONS.includes(reason);
+    /** 토큰 자체가 없으면 실패가 아니라 로그인 유도 화면 */
+    const isLoginPrompt = reason === 'unauthenticated';
+    const canRetry = !isLoginRequired && retryCount < MAX_RETRY_COUNT;
+
     return (
       <SheetContainer onDimPress={() => close()}>
         <View style={styles.handle} />
 
-        <Text allowFontScaling={false} style={styles.title}>
-          위시템을 저장하지 못했어요
-        </Text>
-
-        <View style={styles.imageContainer}>
-          <Image
-            source={require('@/assets/images/share-bottom-sheet/basket.png')}
-            style={styles.image}
-          />
-
-          <Image
-            source={require('@/assets/images/share-bottom-sheet/icon-error.png')}
-            style={styles.icon}
-          />
+        <View style={styles.titleGroup}>
+          <Text allowFontScaling={false} style={styles.title}>
+            {isLoginPrompt ? '위시를 담으려면 로그인 해주세요' : '위시를 저장하지 못했어요'}
+          </Text>
+          {FAILURE_DESCRIPTION[reason] ? (
+            <Text allowFontScaling={false} style={styles.description}>
+              {FAILURE_DESCRIPTION[reason]}
+            </Text>
+          ) : null}
         </View>
 
-        <Pressable style={styles.button} onPress={() => close()}>
-          <Text allowFontScaling={false} style={styles.buttonText}>
-            확인
-          </Text>
-        </Pressable>
+        {isLoginPrompt ? (
+          <View style={styles.imageContainer}>
+            <Image
+              source={require('@/assets/images/share-bottom-sheet/login-tag.png')}
+              style={styles.loginImage}
+            />
+          </View>
+        ) : (
+          <View style={styles.imageContainer}>
+            <Image
+              source={require('@/assets/images/share-bottom-sheet/basket.png')}
+              style={styles.image}
+            />
+
+            <Image
+              source={require('@/assets/images/share-bottom-sheet/icon-error.png')}
+              style={styles.icon}
+            />
+          </View>
+        )}
+
+        {isLoginRequired || canRetry ? (
+          <View style={styles.buttonRow}>
+            <Pressable style={[styles.button, styles.buttonSecondary]} onPress={() => close()}>
+              <Text allowFontScaling={false} style={styles.buttonSecondaryText}>
+                {isLoginRequired ? '나중에 할게요' : '확인'}
+              </Text>
+            </Pressable>
+
+            <Pressable
+              style={[styles.button, styles.buttonPrimary]}
+              onPress={isLoginRequired ? handleOpenLogin : handleRetry}
+            >
+              <Text allowFontScaling={false} style={styles.buttonText}>
+                {isLoginRequired ? '로그인하기' : '다시 시도'}
+              </Text>
+            </Pressable>
+          </View>
+        ) : (
+          <Pressable style={[styles.button, styles.buttonFull]} onPress={() => close()}>
+            <Text allowFontScaling={false} style={styles.buttonText}>
+              확인
+            </Text>
+          </Pressable>
+        )}
       </SheetContainer>
     );
+  }
 
   return (
     <SheetContainer onDimPress={() => close()}>
       <View style={styles.handle} />
 
       <Text allowFontScaling={false} style={styles.title}>
-        위시템을 저장했어요
+        위시를 저장 했어요
       </Text>
 
       <View style={styles.imageContainer}>
@@ -129,9 +198,9 @@ function ShareBottomSheetContent({ url, text }: ShareExtensionProps) {
         />
       </View>
 
-      <Pressable style={styles.button} onPress={handleOpenWishlist}>
+      <Pressable style={[styles.button, styles.buttonFull]} onPress={handleOpenWishlist}>
         <Text allowFontScaling={false} style={styles.buttonText}>
-          위시템 보러가기
+          위시 보러가기
         </Text>
       </Pressable>
     </SheetContainer>
@@ -215,15 +284,35 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     marginBottom: 20,
   },
+  titleGroup: {
+    alignItems: 'center',
+    gap: 4,
+  },
   title: {
     fontSize: 20,
+    lineHeight: 28,
     fontWeight: 'bold',
+    color: '#2D3037',
+    textAlign: 'center',
+  },
+  description: {
+    fontSize: 16,
+    lineHeight: 22,
+    fontWeight: '500',
+    color: '#686F7E',
+    textAlign: 'center',
   },
   image: {
     width: 145,
     height: 105,
     marginTop: 52,
     marginBottom: 45,
+  },
+  /** 시안 태그 실측 117.6x142.3 — 169px 영역 안에 여백 13 을 두고 들어간다 */
+  loginImage: {
+    width: 118,
+    height: 143,
+    marginVertical: 13,
   },
   imageContainer: {
     position: 'relative',
@@ -244,17 +333,40 @@ const styles = StyleSheet.create({
     backgroundColor: '#F4F4F6',
   },
 
-  button: {
+  /** 시안 버튼 폭 175/176 + gap 12 — 기기 폭에 맞춰 균등 분할한다 */
+  buttonRow: {
+    flexDirection: 'row',
+    gap: 12,
     width: '100%',
+  },
+  button: {
     height: 54,
-    backgroundColor: '#191B1F',
     borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
   },
+  buttonFull: {
+    width: '100%',
+    backgroundColor: '#191B1F',
+  },
+  buttonPrimary: {
+    flex: 1,
+    backgroundColor: '#191B1F',
+  },
+  buttonSecondary: {
+    flex: 1,
+    backgroundColor: '#E9E9ED',
+  },
   buttonText: {
     color: '#FFFFFF',
     fontSize: 16,
+    lineHeight: 22,
+    fontWeight: '600',
+  },
+  buttonSecondaryText: {
+    color: '#686F7E',
+    fontSize: 16,
+    lineHeight: 22,
     fontWeight: '600',
   },
 
