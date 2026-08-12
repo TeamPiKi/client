@@ -34,6 +34,7 @@ export const usePostTournamentItemLink = (
 
         /** 토너먼트가 시작된 경우 */
         if (code === ERROR_CODE.TOURNAMENT_NOT_PENDING) {
+          if (showErrorToast) toast.error(getApiErrorMessage(error));
           queryClient.invalidateQueries({ queryKey: ['tournament', tournamentId] });
           return;
         }
