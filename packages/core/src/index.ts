@@ -1,4 +1,5 @@
 /** 상수 */
+export { APP_STORE_URL } from './consts/appUpdate';
 export { BRIDGE_GATE } from './consts/appVersion';
 export { WEBVIEW_UA_TOKEN } from './consts/client';
 export {
