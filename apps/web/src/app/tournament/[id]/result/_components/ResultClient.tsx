@@ -67,8 +67,7 @@ function ResultClient({ tournamentId, isGuest = false }: ResultClientProps) {
     setIsShareDialogOpen(true);
   };
 
-  // 비회원 솔로(isRoot=false): 배너가 스크롤 마지막 — 버튼과 13px 간격
-  // 나머지: pb-40 (160px) → GroupResultEntryCard 또는 ReceiptDrawMachine과 BottomCta 버튼 사이 ~28px
+  /** 비회원 솔로는 배너가 스크롤 마지막이라 하단 여백을 줄인다 */
   const mainPb = isGuest && !tournamentData.isRoot ? 'pb-[145px]' : 'pb-40';
 
   return (
@@ -88,10 +87,6 @@ function ResultClient({ tournamentId, isGuest = false }: ResultClientProps) {
           date={date}
         />
 
-        {/*
-          비회원 유도 배너 — 게스트일 때만 노출.
-          영수증과 61px 간격: gap-3(12px) + mt-[49px](49px) = 61px.
-        */}
         {isGuest && (
           <div className="mx-5 mt-[49px]">
             <ResultGuestBanner />
@@ -99,14 +94,8 @@ function ResultClient({ tournamentId, isGuest = false }: ResultClientProps) {
         )}
 
         {/*
-          친구 토너먼트 결과보기 카드 노출 + 라우팅.
-          - 주최자·참여자·플레이 링크 게스트 모두에게 노출한다.
-            참여자와 게스트는 시작 시 본인 CLONE 이 생겨 isRoot=false 라, 이 값으로 거르면
-            주최자에게만 보인다. 전원이 전체 결과를 볼 수 있어야 하므로 조건에서 뺀다.
-          - 그룹 결과는 원본(ROOT) 단위로 집계되므로 CLONE 이면 sourceTournamentId 로 조회한다.
-          - hasGroupResult 는 완료한 CLONE 이 있는지를 뜻한다. 혼자 끝낸 토너먼트에서 누르면
-            서버가 409(TOURNAMENT-028) 를 주므로 회원·게스트 가리지 않고 이 값으로 막는다.
-          - 앱 화면이 낮게 크롭될 때도 CTA 는 항상 고정돼야 해서 스크롤 영역에 둔다.
+          전체 결과 보기 — 주최자·참여자·게스트 모두에게 노출한다.
+          hasGroupResult 가 false 면(완료한 CLONE 없음) 눌러도 서버가 409 를 주므로 숨긴다.
         */}
         {tournamentData.completed.hasGroupResult && (
           <div className="mx-5">
@@ -115,9 +104,7 @@ function ResultClient({ tournamentId, isGuest = false }: ResultClientProps) {
         )}
       </div>
 
-      {/* 하단 CTA — 저장/공유 버튼 → 홈으로 가기 순 위계, 항상 화면 하단 고정 */}
       <BottomCta hasGradient className="flex-col items-stretch gap-6.5 pb-[30px]">
-        {/* 영수증 공유 (모든 사용자) + 토너먼트 공유 (ROOT 소유자만, 플레이 링크 공유) */}
         <div className="flex gap-3">
           <Button
             variant="secondary"
