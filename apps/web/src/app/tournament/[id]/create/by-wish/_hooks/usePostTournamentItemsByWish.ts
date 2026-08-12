@@ -35,6 +35,7 @@ export const usePostTournamentItemsByWish = (tournamentId: number, previousItemC
 
       /** 토너먼트가 시작됐거나 삭제, 존재하지 않는 경우 */
       if (code === ERROR_CODE.TOURNAMENT_NOT_PENDING || code === ERROR_CODE.TOURNAMENT_NOT_FOUND) {
+        toast.error(getApiErrorMessage(error));
         queryClient.invalidateQueries({ queryKey: ['tournament', tournamentId] });
         router.replace(ROUTES.TOURNAMENT_CREATE(tournamentId));
         return;
