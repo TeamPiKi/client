@@ -5,8 +5,10 @@ import PikiLogoCart from '@/assets/images/piki-logo-cart.svg';
 import type { RankedProductT } from '../../../_common/_types/tournament';
 import ReceiptPaper from '../ReceiptPaper';
 
-const RECEIPT_ZOOM = 1.28;
-const RECEIPT_RENDER_WIDTH_PX = 370 / RECEIPT_ZOOM;
+/** 종이 폭은 고정하고 zoom 으로 내용만 키운다 — 렌더 폭이 줄어 결과 폭은 동일하다 */
+const RECEIPT_PAPER_WIDTH_PX = 370;
+const RECEIPT_ZOOM = 1.42;
+const RECEIPT_RENDER_WIDTH_PX = RECEIPT_PAPER_WIDTH_PX / RECEIPT_ZOOM;
 
 const RECEIPT_BOX_HEIGHT_PX = 748;
 
@@ -22,7 +24,7 @@ const ReceiptShareCaptureLayer = forwardRef<HTMLDivElement, ReceiptShareCaptureL
     const paperRef = useRef<HTMLDivElement>(null);
     const zoomRef = useRef<HTMLDivElement>(null);
 
-    /** 내용이 고정 영역을 넘치면 zoom 을 낮춰 맞춘다 */
+    /** 내용이 넘치면 zoom 을 낮춘다. 종이 폭이 좁아지지 않게 렌더 폭도 함께 보정한다. */
     useLayoutEffect(() => {
       const paper = paperRef.current;
       const zoomWrap = zoomRef.current;
@@ -30,11 +32,13 @@ const ReceiptShareCaptureLayer = forwardRef<HTMLDivElement, ReceiptShareCaptureL
 
       /** 이전 축소가 남아 있으면 높이를 잘못 재므로 기준값으로 되돌리고 측정 */
       zoomWrap.style.zoom = String(RECEIPT_ZOOM);
+      zoomWrap.style.width = `${RECEIPT_RENDER_WIDTH_PX}px`;
       const paperHeight = paper.scrollHeight;
       if (!paperHeight) return;
 
       const fitZoom = Math.min(RECEIPT_ZOOM, RECEIPT_BOX_HEIGHT_PX / paperHeight);
       zoomWrap.style.zoom = String(fitZoom);
+      zoomWrap.style.width = `${RECEIPT_PAPER_WIDTH_PX / fitZoom}px`;
     }, [result, tournamentName, date]);
 
     return (

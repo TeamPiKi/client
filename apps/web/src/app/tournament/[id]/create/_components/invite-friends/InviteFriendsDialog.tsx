@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 
 import { CheckIconFill, StopwatchIconFill } from '@/assets/icons/fill';
@@ -30,13 +30,13 @@ const isSameDay = (a: Date, b: Date) =>
   a.getMonth() === b.getMonth() &&
   a.getDate() === b.getDate();
 
-const formatExpiresInfo = (expiresAt: string | undefined) => {
+const formatExpiresInfo = (expiresAt: string | undefined, nowMs: number) => {
   if (!expiresAt) return null;
   const expires = parseServerLocalDateTime(expiresAt);
   if (Number.isNaN(expires.getTime())) return null;
 
-  const now = new Date();
-  const remainingMs = expires.getTime() - now.getTime();
+  const now = new Date(nowMs);
+  const remainingMs = expires.getTime() - nowMs;
   if (remainingMs <= 0) return { remainingLabel: '마감', absoluteLabel: '만료됨' };
 
   const totalMinutes = Math.floor(remainingMs / 60_000);
@@ -69,8 +69,22 @@ function InviteFriendsDialog({
   inviteUrl,
   inviteExpiresAt,
 }: InviteFriendsDialogProps) {
-  const expiresInfo = useMemo(() => formatExpiresInfo(inviteExpiresAt), [inviteExpiresAt]);
   const [isPickerOpen, setIsPickerOpen] = useState(false);
+  // 남은 시간 라벨은 시간이 흐르면 스스로 낡는다. 열려 있는 동안만 분 단위로 기준 시각을 갱신한다.
+  const [now, setNow] = useState(() => Date.now());
+
+  useEffect(() => {
+    if (!open) return;
+
+    const timerId = setInterval(() => setNow(Date.now()), 60_000);
+
+    return () => clearInterval(timerId);
+  }, [open]);
+
+  const expiresInfo = useMemo(
+    () => formatExpiresInfo(inviteExpiresAt, now),
+    [inviteExpiresAt, now]
+  );
   const { patchInviteExpiryMutation, isPatchInviteExpiryPending } =
     usePatchInviteExpiry(tournamentId);
 
