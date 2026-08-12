@@ -81,6 +81,9 @@ function ReceiptShareDialog({
   const captureLayerRef = useRef<HTMLDivElement | null>(null);
   const [imageBlob, setImageBlob] = useState<Blob | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  /** state 는 버튼 비활성화용, ref 는 즉시 차단용 */
+  const [isSharingLink, setIsSharingLink] = useState(false);
+  const isSharingLinkRef = useRef(false);
   const { shareToStory, isSharing } = useInstagramStoryShare();
 
   /**
@@ -168,6 +171,9 @@ function ReceiptShareDialog({
     /** WebBridge 가 이미 업데이트 안내를 띄웠다 */
     if (status === 'blocked') return;
 
+    /** 연타로 인한 중복 호출 — 안내 없이 무시 */
+    if (status === 'busy') return;
+
     if (status === 'notInstalled') {
       toast.warning('인스타그램 앱을 설치하면 스토리에 공유할 수 있어요.');
       return;
@@ -187,8 +193,19 @@ function ReceiptShareDialog({
 
   const handleShareLink = async () => {
     if (!imageBlob) return;
+    /** 연타 방지 — state 는 리렌더 후에야 반영돼 그 사이 클릭을 막지 못한다 */
+    if (isSharingLinkRef.current) return;
 
-    const shareResult = await shareReceiptImageFile(imageBlob);
+    isSharingLinkRef.current = true;
+    setIsSharingLink(true);
+
+    const shareResult = await shareReceiptImageFile(imageBlob).finally(() => {
+      isSharingLinkRef.current = false;
+      setIsSharingLink(false);
+    });
+
+    /** 이미 열린 공유 시트에서 발생한 중복 호출 — 사용자 입장에선 정상이므로 조용히 무시한다 */
+    if (shareResult === 'busy') return;
     if (shareResult === 'unsupported') {
       toast.warning('이 환경에서는 공유를 지원하지 않아요. 저장을 이용해주세요.');
       return;
@@ -255,7 +272,7 @@ function ReceiptShareDialog({
               <ShareAction
                 icon={<LinkIconOutline className="size-6 text-text-neutral-secondary" />}
                 label="링크 공유"
-                disabled={!imageBlob}
+                disabled={!imageBlob || isSharingLink}
                 onClick={handleShareLink}
               />
               {isAppEnvironment && (

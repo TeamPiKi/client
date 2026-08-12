@@ -7,22 +7,26 @@ import { getIsGuest } from '@/utils/getIsGuest';
 import { getQueryClient } from '@/utils/queryClient';
 
 import { getTournament } from '../_common/_apis/getTournament';
-import type { GetTournamentResponseT } from '../_common/_types/tournamentResponse';
 import ResultClient from './_components/ResultClient';
 
 type TournamentResultPageProps = {
   params: Promise<{ id: string }>;
 };
 
-async function TournamentResultPage({ params }: TournamentResultPageProps) {
-  const { id } = await params;
-  const tournamentId = Number(id);
-
+/**
+ * 데이터를 기다리는 부분은 page 가 아닌 이 async 자식에 둔다.
+ * page 자체가 await 하면 layout 의 Suspense 경계 바깥에서 블로킹돼
+ * 결승 직후 내비게이션이 커밋되지 않는다.
+ */
+async function ResultContent({ tournamentId }: { tournamentId: number }) {
   const queryClient = getQueryClient();
-  // prefetchQuery 가 아닌 직접 fetch — 매치 결승 직후 시드(hasGroupResult=false 등)는
-  // 결과 페이지에서는 권위 응답으로 반드시 덮어써야 한다.
-  const tournamentData = await getTournament(tournamentId);
-  queryClient.setQueryData<GetTournamentResponseT>(['tournament', tournamentId], tournamentData);
+
+  // 상위 layout 이 이미 같은 요청 안에서 조회해 캐시에 심어둔다(서버 QueryClient 는 요청 단위 공유).
+  // ensureQueryData 로 그 값을 재사용해 결과 진입 시 중복 HTTP 요청을 없앤다.
+  const tournamentData = await queryClient.ensureQueryData({
+    queryKey: ['tournament', tournamentId],
+    queryFn: () => getTournament(tournamentId),
+  });
 
   if (tournamentData.status !== 'COMPLETED') {
     redirect(ROUTES.TOURNAMENT_MATCH(tournamentId));
@@ -35,6 +39,12 @@ async function TournamentResultPage({ params }: TournamentResultPageProps) {
       <ResultClient tournamentId={tournamentId} isGuest={isGuest} isApp={isApp} />
     </HydrationBoundary>
   );
+}
+
+async function TournamentResultPage({ params }: TournamentResultPageProps) {
+  const { id } = await params;
+
+  return <ResultContent tournamentId={Number(id)} />;
 }
 
 export default TournamentResultPage;

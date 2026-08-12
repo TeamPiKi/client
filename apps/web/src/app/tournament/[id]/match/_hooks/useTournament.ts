@@ -13,6 +13,7 @@ import type { TournamentItemT } from '@/types/tournament';
 import { getTournament } from '../../_common/_apis/getTournament';
 import type {
   GetTournamentInProgressResponseT,
+  GetTournamentResponseT,
   TournamentMatchT,
 } from '../../_common/_types/tournamentResponse';
 import { type TransitionStageT, getRoundLabel, getTransitionStage } from '../_consts/rounds';
@@ -33,11 +34,39 @@ const useTournament = ({ tournamentId, inProgress }: UseTournamentArgs) => {
   const { postRecordMatchMutation, isPostRecordMatchPending } = usePostRecordMatch({
     tournamentId,
     onSuccess: data => {
-      if (!data.completed) return;
-      // 결승 종료 후 result 페이지가 권위 응답(hasGroupResult/playLinkExpiresAt/isRoot 등)
-      // 을 받아야 하므로 클라 캐시는 비워 두고 SSR fresh data 로 채우게 한다.
-      // (시드해두면 stale 한 hasGroupResult=false 가 클라에 남아 카드 노출이 늦어짐)
-      queryClient.removeQueries({ queryKey: ['tournament', tournamentId] });
+      const completed = data.completed;
+      if (!completed) return;
+
+      // 결승 기록 응답에 결과가 이미 들어 있으므로 캐시를 비우지 않고 COMPLETED 로 시드한다.
+      // hasGroupResult 도 이 응답에 포함돼 stale 우려가 없다.
+      // 정체성 필드(name/isOwner/isRoot 등)는 응답에 없어 기존 캐시에서 가져온다.
+      const previous = queryClient.getQueryData<GetTournamentInProgressResponseT>([
+        'tournament',
+        tournamentId,
+      ]);
+
+      // 캐시가 없으면 조합할 수 없다 — 결과 페이지의 SSR 응답에 맡긴다.
+      if (!previous) {
+        queryClient.removeQueries({ queryKey: ['tournament', tournamentId] });
+        return;
+      }
+
+      const { playLinkExpiresAt } = completed;
+      const { sourceTournamentId } = previous;
+
+      queryClient.setQueryData<GetTournamentResponseT>(['tournament', tournamentId], {
+        tournamentId: previous.tournamentId,
+        name: previous.name,
+        isOwner: previous.isOwner,
+        isRoot: previous.isRoot,
+        ...(sourceTournamentId ? { sourceTournamentId } : {}),
+        status: 'COMPLETED',
+        completed: {
+          result: completed.result,
+          hasGroupResult: completed.hasGroupResult,
+          ...(playLinkExpiresAt ? { playLinkExpiresAt } : {}),
+        },
+      });
     },
   });
 
