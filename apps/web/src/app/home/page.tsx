@@ -1,6 +1,5 @@
 import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
 
-import { getMe } from '@/apis/getMe';
 import { getTournamentList } from '@/apis/getTournamentList';
 import PiKiLogo from '@/assets/images/piki-logo-text.svg';
 import { Header, HeaderIcon } from '@/components/header';
@@ -18,11 +17,6 @@ import TournamentList from './_components/tournament-list';
 
 async function HomePage() {
   const queryClient = getQueryClient();
-
-  await queryClient.prefetchQuery({
-    queryKey: ['me'],
-    queryFn: getMe,
-  });
 
   queryClient.prefetchQuery({
     queryKey: QUERY_KEYS.TOURNAMENT.LIST.BY_PARAMS({ limit: 3 }),
