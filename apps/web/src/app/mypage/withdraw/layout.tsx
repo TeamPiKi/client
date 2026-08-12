@@ -3,7 +3,7 @@ import { isAxiosError } from 'axios';
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 
-import { getMe } from '@/apis/getMe';
+import { getMeQueryOptions } from '@/apis/getMe';
 import { QUERY_ACTION } from '@/consts/queryAction';
 import { ROUTES } from '@/consts/route';
 import type { ApiErrorResponseT } from '@/types/api';
@@ -17,10 +17,7 @@ async function MyPageMemberOnlyLayout({ children }: { children: React.ReactNode 
 
   /** 유저 정보 조회 */
   try {
-    const userData = await queryClient.fetchQuery({
-      queryKey: ['me'],
-      queryFn: getMe,
-    });
+    const userData = await queryClient.fetchQuery(getMeQueryOptions);
 
     if (userData.identityType !== 'MEMBER') redirect(ROUTES.LOGIN);
   } catch (error) {

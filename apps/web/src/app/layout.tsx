@@ -5,7 +5,7 @@ import type { Metadata, Viewport } from 'next';
 import { cookies, headers } from 'next/headers';
 import React from 'react';
 
-import { getMe } from '@/apis/getMe';
+import { getMeQueryOptions } from '@/apis/getMe';
 import BottomTabBar from '@/components/bottom-tab-bar';
 import AppUpdateDialog from '@/components/common/app-update-dialog';
 import { APP_UPDATE_PROMPT } from '@/consts/appUpdate';
@@ -45,7 +45,7 @@ async function RootLayout({
   const queryClient = getQueryClient();
   const accessToken = (await cookies()).get('access_token')?.value;
   if (isTokenValid(accessToken ?? null)) {
-    queryClient.prefetchQuery({ queryKey: ['me'], queryFn: getMe });
+    queryClient.prefetchQuery(getMeQueryOptions);
   }
 
   const shouldUpdateApp =

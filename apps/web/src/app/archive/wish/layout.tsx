@@ -3,7 +3,7 @@ import { isAxiosError } from 'axios';
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 
-import { getMe } from '@/apis/getMe';
+import { getMeQueryOptions } from '@/apis/getMe';
 import WishLoginRequired from '@/components/common/wish-login-required';
 import { QUERY_ACTION } from '@/consts/queryAction';
 import type { ApiErrorResponseT } from '@/types/api';
@@ -23,10 +23,7 @@ async function WishArchiveLayout({ children }: WishArchiveLayoutProps) {
   /** MEMBER 권한 조회 - 멤버 권한 없으면 로그인 페이지로 리다이렉트 */
   let user: UserT;
   try {
-    user = await queryClient.fetchQuery({
-      queryKey: ['me'],
-      queryFn: getMe,
-    });
+    user = await queryClient.fetchQuery(getMeQueryOptions);
   } catch (error) {
     if (!isAxiosError<ApiErrorResponseT>(error)) throw error;
 

@@ -1,6 +1,11 @@
 import type { GetTournamentListRequestT } from '@/types/tournament';
 
 export const QUERY_KEYS = {
+  /** 유저 */
+  USER: {
+    /** 내 정보 */
+    ME: ['me'] as const,
+  },
   /** 토너먼트 */
   TOURNAMENT: {
     /** 토너먼트 리스트 */
