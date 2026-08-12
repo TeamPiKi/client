@@ -41,9 +41,10 @@ const toUser = (friend: FriendListItemT): UserT => ({
 
 function FriendListDialog({ open, onOpenChange, tournamentId }: FriendListDialogProps) {
   // 모달이 열렸을 때만 group-result fetch.
-  const { groupResultData, isGroupResultPending } = useGetGroupResult(tournamentId, {
-    enabled: open,
-  });
+  const { groupResultData, isGroupResultPending, isGroupResultError } = useGetGroupResult(
+    tournamentId,
+    { enabled: open }
+  );
   const { userData } = useGetMe();
   const myUserId = userData.id;
 
@@ -78,7 +79,11 @@ function FriendListDialog({ open, onOpenChange, tournamentId }: FriendListDialog
           이 토너먼트에 참여한 친구 목록입니다.
         </DialogDescription>
 
-        <FriendListBody isPending={isGroupResultPending} friends={friends} />
+        <FriendListBody
+          isPending={isGroupResultPending}
+          isError={isGroupResultError}
+          friends={friends}
+        />
       </DialogContent>
     </Dialog>
   );
@@ -86,15 +91,25 @@ function FriendListDialog({ open, onOpenChange, tournamentId }: FriendListDialog
 
 type FriendListBodyProps = {
   isPending: boolean;
+  isError: boolean;
   friends: FriendListItemT[];
 };
 
-function FriendListBody({ isPending, friends }: FriendListBodyProps) {
+function FriendListBody({ isPending, isError, friends }: FriendListBodyProps) {
   if (isPending) {
     return (
       <div className="flex h-50 items-center justify-center">
         <Spinner size={24} />
       </div>
+    );
+  }
+
+  /** 조회 실패를 빈 목록으로 뭉뚱그리면 "친구 없음" 으로 잘못 안내된다 */
+  if (isError) {
+    return (
+      <p className="py-10 text-center body-1-medium text-text-neutral-tertiary">
+        친구 목록을 불러오지 못했어요.
+      </p>
     );
   }
 
