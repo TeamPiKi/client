@@ -23,7 +23,7 @@ async function WishArchiveLayout({ children }: WishArchiveLayoutProps) {
   /** MEMBER 권한 조회 - 멤버 권한 없으면 로그인 페이지로 리다이렉트 */
   let user: UserT;
   try {
-    user = await queryClient.fetchQuery(getMeQueryOptions);
+    user = await queryClient.ensureQueryData(getMeQueryOptions);
   } catch (error) {
     if (!isAxiosError<ApiErrorResponseT>(error)) throw error;
 

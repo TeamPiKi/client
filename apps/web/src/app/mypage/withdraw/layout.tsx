@@ -17,7 +17,7 @@ async function MyPageMemberOnlyLayout({ children }: { children: React.ReactNode 
 
   /** 유저 정보 조회 */
   try {
-    const userData = await queryClient.fetchQuery(getMeQueryOptions);
+    const userData = await queryClient.ensureQueryData(getMeQueryOptions);
 
     if (userData.identityType !== 'MEMBER') redirect(ROUTES.LOGIN);
   } catch (error) {
