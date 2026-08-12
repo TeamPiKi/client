@@ -35,6 +35,7 @@
     "expo-image-picker": "^17.0.11",
     "expo-intent-launcher": "~13.0.8",
     "expo-linking": "~8.0.11",
+    "expo-modules-core": "3.0.29",
     "expo-notifications": "^0.32.17",
     "expo-router": "~6.0.23",
     "expo-secure-store": "~15.0.8",

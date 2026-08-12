@@ -9,6 +9,7 @@ import type { UserT } from '@/components/user-profile-group/userProfile.const';
 import { ROUTES } from '@/consts/route';
 import { cn } from '@/utils/cn';
 
+import { useGetTournament } from '../../../_common/_hooks/useGetTournament';
 import DepositCountdown from '../deposit-countdown/DepositCountdown';
 import InviteFriendsDialog from '../invite-friends/InviteFriendsDialog';
 import ParticipantChip from './ParticipantChip';
@@ -44,6 +45,7 @@ function ParticipantPanel({
   depositDeadline,
 }: ParticipantPanelProps) {
   const { id: tournamentId } = useParams<{ id: string }>();
+  const { refetchTournament } = useGetTournament(Number(tournamentId));
   const [isExpanded, setIsExpanded] = useState(false);
   const [isInviteDialogOpen, setIsInviteDialogOpen] = useState(false);
 
@@ -54,7 +56,12 @@ function ParticipantPanel({
   const inviteUrl = inviteCode ? buildInviteUrl(tournamentId, inviteCode) : '';
 
   const handleToggleExpand = () => setIsExpanded(prev => !prev);
-  const handleOpenInvite = () => setIsInviteDialogOpen(true);
+
+  const handleOpenInvite = () => {
+    // 화면을 오래 열어두면 inviteExpiresAt 이 낡아 시트가 만료된 시각을 보여준다.
+    void refetchTournament();
+    setIsInviteDialogOpen(true);
+  };
 
   return (
     <>

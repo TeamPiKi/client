@@ -18,7 +18,7 @@ type TournamentItemBasketProps = {
   basketIndex: number;
   items: TournamentPendingItemT[];
   maxHeight?: number;
-  isDepositClosed?: boolean;
+  isAddItemBlocked?: boolean;
   participantImageMap?: Map<string, string>;
 };
 
@@ -26,7 +26,7 @@ function TournamentItemBasket({
   basketIndex,
   items,
   maxHeight,
-  isDepositClosed = false,
+  isAddItemBlocked = false,
   participantImageMap,
 }: TournamentItemBasketProps) {
   const { id } = useParams<{ id: string }>();
@@ -41,7 +41,7 @@ function TournamentItemBasket({
   };
 
   const isFull = items.length >= ITEMS_PER_BASKET;
-  const showAddButton = !isDepositClosed && !isFull;
+  const showAddButton = !isAddItemBlocked && !isFull;
 
   const addSlot = showAddButton ? (
     <Dialog>
