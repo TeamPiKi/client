@@ -23,7 +23,7 @@ const MAX_RETRY_COUNT = 1;
 type SheetStateT =
   | { status: 'loading' }
   | { status: 'success' }
-  | { status: 'failure'; reason: ShareFailureReasonT };
+  | { status: 'failure'; reason: ShareFailureReasonT; retryable: boolean };
 
 export default function ShareBottomSheet(props: ShareExtensionProps) {
   return (
@@ -56,9 +56,9 @@ function ShareBottomSheetContent({ url, text }: ShareExtensionProps) {
     const urlFromText = text?.match(/https?:\/\/[^\s]+/)?.[0]?.replace(/[),.]+$/, '');
     const productUrl = url ?? urlFromText;
 
-    /** 링크를 못 찾은 경우 — 재시도해도 같으므로 서버 오류와 같은 화면으로 둔다 */
+    /** 링크를 못 찾은 경우 — 공유된 내용이 그대로라 다시 눌러도 같다 */
     if (!productUrl) {
-      setSheetState({ status: 'failure', reason: 'server' });
+      setSheetState({ status: 'failure', reason: 'server', retryable: false });
       return;
     }
 
@@ -70,7 +70,9 @@ function ShareBottomSheetContent({ url, text }: ShareExtensionProps) {
       if (!isMounted) return;
 
       setSheetState(
-        result.ok ? { status: 'success' } : { status: 'failure', reason: result.reason }
+        result.ok
+          ? { status: 'success' }
+          : { status: 'failure', reason: result.reason, retryable: result.retryable }
       );
     };
 
@@ -108,11 +110,11 @@ function ShareBottomSheetContent({ url, text }: ShareExtensionProps) {
     );
 
   if (sheetState.status === 'failure') {
-    const { reason } = sheetState;
+    const { reason, retryable } = sheetState;
     const isLoginRequired = LOGIN_REQUIRED_REASONS.includes(reason);
-    /** 토큰 자체가 없으면 실패가 아니라 로그인 유도 화면 */
+    /** 토큰 자체가 없으면 실패가 아니라 로그인 유도 화면 (세션 만료는 실패 화면 + 로그인 버튼) */
     const isLoginPrompt = reason === 'unauthenticated';
-    const canRetry = !isLoginRequired && retryCount < MAX_RETRY_COUNT;
+    const canRetry = retryable && retryCount < MAX_RETRY_COUNT;
 
     return (
       <SheetContainer onDimPress={() => close()}>
