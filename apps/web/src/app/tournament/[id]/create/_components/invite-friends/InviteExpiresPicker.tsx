@@ -44,14 +44,19 @@ const from24Hour = (hour24: number): { hour12: number; meridiem: MeridiemT } => 
   return { hour12, meridiem };
 };
 
+/** 기본 마감 — 값이 없거나 이미 지났을 때 쓰는 "지금부터 30분 후" */
+const DEFAULT_EXPIRES_OFFSET_MS = 30 * 60 * 1000;
+const getDefaultExpires = () => new Date(Date.now() + DEFAULT_EXPIRES_OFFSET_MS);
+
 /** ISO 시각을 picker 의 초기 hour12/minute/meridiem 인덱스로 변환 */
 const parseInitial = (
   initialExpiresAt: string | undefined
 ): { hourIndex: number; minuteIndex: number; meridiemIndex: number } => {
   const base = (() => {
-    if (!initialExpiresAt) return new Date(Date.now() + 30 * 60 * 1000); // 기본 30분 후
+    if (!initialExpiresAt) return getDefaultExpires();
     const d = parseServerLocalDateTime(initialExpiresAt);
-    return Number.isNaN(d.getTime()) ? new Date(Date.now() + 30 * 60 * 1000) : d;
+    if (Number.isNaN(d.getTime())) return getDefaultExpires();
+    return d.getTime() <= Date.now() ? getDefaultExpires() : d;
   })();
   const { hour12, meridiem } = from24Hour(base.getHours());
   return {
