@@ -78,6 +78,9 @@ function ReceiptShareDialog({
   const captureLayerRef = useRef<HTMLDivElement | null>(null);
   const [imageBlob, setImageBlob] = useState<Blob | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  // 버튼 비활성화용 state 와, 리렌더를 기다리지 않고 즉시 막기 위한 ref 를 함께 둔다.
+  const [isSharingLink, setIsSharingLink] = useState(false);
+  const isSharingLinkRef = useRef(false);
   const { shareToStory, isSharing } = useInstagramStoryShare();
 
   /** 스토리 공유는 네이티브 전용 — SSR 은 false 로 두어 hydration mismatch 를 피한다 */
@@ -178,8 +181,19 @@ function ReceiptShareDialog({
 
   const handleShareLink = async () => {
     if (!imageBlob) return;
+    // 연타 방지 — state 로 두면 리렌더 전에 두 번째 클릭이 들어와 공유 시트가 중복 호출된다.
+    if (isSharingLinkRef.current) return;
 
-    const shareResult = await shareReceiptImageFile(imageBlob);
+    isSharingLinkRef.current = true;
+    setIsSharingLink(true);
+
+    const shareResult = await shareReceiptImageFile(imageBlob).finally(() => {
+      isSharingLinkRef.current = false;
+      setIsSharingLink(false);
+    });
+
+    /** 이미 열린 공유 시트에서 발생한 중복 호출 — 사용자 입장에선 정상이므로 조용히 무시한다 */
+    if (shareResult === 'busy') return;
     if (shareResult === 'unsupported') {
       toast.warning('이 환경에서는 공유를 지원하지 않아요. 저장을 이용해주세요.');
       return;
@@ -246,7 +260,7 @@ function ReceiptShareDialog({
               <ShareAction
                 icon={<LinkIconOutline className="size-6 text-text-neutral-secondary" />}
                 label="링크 공유"
-                disabled={!imageBlob}
+                disabled={!imageBlob || isSharingLink}
                 onClick={handleShareLink}
               />
               {isAppEnvironment && (
