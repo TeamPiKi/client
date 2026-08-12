@@ -11,6 +11,7 @@ import { ROUTES } from '@/consts/route';
 import { CLIENT_TYPE } from '@/consts/webBridge';
 import type { NotificationSsePayloadT, SilentSyncSsePayloadT } from '@/types/notification';
 import { getCookie } from '@/utils/cookie';
+import { handleSessionExpired } from '@/utils/handleSessionExpired';
 import { refreshClientToken } from '@/utils/refreshClientToken';
 import { WebBridge, isWebview } from '@/utils/webBridge';
 
@@ -52,6 +53,8 @@ export const useNotificationSSE = (enabled: boolean) => {
     if (!enabled) return;
 
     let cancelled = false;
+    // ref 는 언마운트/재로그인 후에도 남으므로, 이전 세션의 실패 횟수를 물려받지 않도록 초기화
+    authFailCountRef.current = 0;
 
     const connect = () => {
       if (cancelled) return;
@@ -110,8 +113,9 @@ export const useNotificationSSE = (enabled: boolean) => {
               throw new Error('token-refreshed');
             } catch (err) {
               if (err instanceof Error && err.message === 'token-refreshed') throw err;
-              // refresh 실패 (만료 등) → 연결 중단
+              // refresh 실패 (만료 등) → 연결 중단 + 전역과 동일한 세션 만료 처리
               cancelled = true;
+              handleSessionExpired();
               throw new Error('unauthorized');
             }
           }
@@ -214,6 +218,8 @@ export const useNotificationSSE = (enabled: boolean) => {
           setTimeout(connect, jitteredDelay);
           throw err;
         },
+      }).catch(() => {
+        // onopen/onerror 에서 throw 하면 반환 Promise 가 reject 된다 — 처리는 위에서 끝났으므로 흡수만
       });
     };
 
