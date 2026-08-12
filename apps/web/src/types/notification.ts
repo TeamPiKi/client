@@ -10,7 +10,7 @@ export type NotificationTypeT =
   | 'ITEM_PARSING_FAILED'
   | 'ANNOUNCEMENT';
 
-type NotificationKindT = 'WISH' | 'TOURNAMENT';
+export type NotificationKindT = 'WISH' | 'TOURNAMENT' | 'SYSTEM';
 
 export type NotificationCategoryT = 'ACTIVITY' | 'SYSTEM';
 
@@ -24,7 +24,7 @@ export type NotificationItemT = {
   refId: number;
   isRead: boolean;
   createdAt: string;
-  kind?: NotificationKindT;
+  kind: NotificationKindT;
   tournamentId?: number;
   tournamentItemId?: number;
 };
@@ -57,8 +57,7 @@ export type NotificationSsePayloadT = {
   refId: number;
   isRead: boolean;
   createdAt: string;
-  /** ITEM_PARSING_COMPLETED / ITEM_PARSING_FAILED 일 때만 존재 */
-  kind?: NotificationKindT;
+  kind: NotificationKindT;
   /** kind === 'TOURNAMENT' 일 때만 존재 */
   tournamentId?: number;
   /** kind === 'TOURNAMENT' 일 때만 존재 */

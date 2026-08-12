@@ -1,7 +1,17 @@
+import { environmentManager } from '@tanstack/react-query';
+
 import { clientApi } from '@/apis/client';
+import { serverApi } from '@/apis/server';
 import { ENDPOINTS } from '@/consts/api';
 import type { ApiResponseT } from '@/types/api';
 import type { NotificationListDataT } from '@/types/notification';
+
+type GetNotificationsResponseT = ApiResponseT<NotificationListDataT> & {
+  pageResponse: {
+    nextCursor: string | null;
+    hasNext: boolean;
+  };
+};
 
 type GetNotificationsRequestT = {
   cursor?: string | null;
@@ -13,9 +23,9 @@ export const getNotifications = async ({ cursor, size = 10 }: GetNotificationsRe
   if (cursor) params.set('cursor', cursor);
   params.set('size', String(size));
 
-  const { data } = await clientApi.get<ApiResponseT<NotificationListDataT>>(
-    `${ENDPOINTS.NOTIFICATIONS}?${params.toString()}`
-  );
+  const url = `${ENDPOINTS.NOTIFICATIONS}?${params.toString()}`;
+  const api = environmentManager.isServer() ? serverApi : clientApi;
+  const { data } = await api.get<GetNotificationsResponseT>(url);
 
   return {
     items: data.data.items,

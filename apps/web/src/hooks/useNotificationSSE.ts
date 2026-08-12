@@ -38,6 +38,9 @@ const isWishQueryOfItem = (query: Query, itemId: number) =>
 
 const SCROLL_TO_LAST_QUERY = `${QUERY_ACTION.KEY}=${QUERY_ACTION.VALUE.SCROLL_TO_LAST}`;
 
+const buildToastMessage = (payload: NotificationSsePayloadT) =>
+  payload.body ? `${payload.title} ${payload.body}` : payload.title;
+
 const resolveDeepLink = (payload: NotificationSsePayloadT): string | null => {
   const { type, refId, kind, tournamentId } = payload;
 
@@ -155,6 +158,7 @@ export const useNotificationSSE = (enabled: boolean) => {
               const payload = JSON.parse(event.data) as NotificationSsePayloadT;
               void queryClient.refetchQueries({ queryKey: ['notifications'], type: 'all' });
               syncBadgeWithServer();
+              const message = buildToastMessage(payload);
               const deepLink = resolveDeepLink(payload);
               const action = deepLink
                 ? { label: '바로가기', onClick: () => router.push(deepLink) }
@@ -172,7 +176,7 @@ export const useNotificationSSE = (enabled: boolean) => {
                       predicate: query => isWishQueryOfItem(query, payload.refId),
                     });
                   }
-                  toast.success(payload.title, { description: payload.body || void 0 });
+                  toast.success(message);
                   break;
                 case 'ITEM_PARSING_FAILED':
                   if (payload.kind === 'TOURNAMENT' && payload.tournamentId != null) {
@@ -185,29 +189,17 @@ export const useNotificationSSE = (enabled: boolean) => {
                       predicate: query => isWishQueryOfItem(query, payload.refId),
                     });
                   }
-                  toast.error(payload.title, {
-                    description: payload.body || void 0,
-                    action,
-                    duration: 5000,
-                  });
+                  toast.error(message, { action, duration: 5000 });
                   break;
                 case 'TOURNAMENT_STARTED':
                 case 'TOURNAMENT_JOINED':
                 case 'TOURNAMENT_ITEM_ADDED':
                 case 'TOURNAMENT_ITEM_DELETED':
                   queryClient.invalidateQueries({ queryKey: ['tournament', payload.refId] });
-                  toast.info(payload.title, {
-                    description: payload.body || void 0,
-                    action,
-                    duration: 5000,
-                  });
+                  toast.info(message, { action, duration: 5000 });
                   break;
                 default:
-                  toast.info(payload.title, {
-                    description: payload.body || void 0,
-                    action,
-                    duration: 5000,
-                  });
+                  toast.info(message, { action, duration: 5000 });
               }
             } catch {
               // malformed JSON — 무시
