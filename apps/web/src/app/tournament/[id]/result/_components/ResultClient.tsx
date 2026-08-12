@@ -23,9 +23,11 @@ import ReceiptShareDialog from './receipt-share-dialog/ReceiptShareDialog';
 type ResultClientProps = {
   tournamentId: number;
   isGuest?: boolean;
+  /** 서버가 UA 로 판정한 앱 여부 — hydration 전에도 앱 전용 UI 를 그리기 위해 받는다 */
+  isApp?: boolean;
 };
 
-function ResultClient({ tournamentId, isGuest = false }: ResultClientProps) {
+function ResultClient({ tournamentId, isGuest = false, isApp = false }: ResultClientProps) {
   const router = useRouter();
   const { tournamentData } = useGetTournament(tournamentId);
   const [date] = useState(() => new Date());
@@ -70,7 +72,12 @@ function ResultClient({ tournamentId, isGuest = false }: ResultClientProps) {
   const mainPb = isGuest && !tournamentData.isRoot ? 'pb-[145px]' : 'pb-40';
 
   return (
-    <main className={cn('flex min-h-dvh flex-col overflow-x-hidden bg-bg-layer-basement pt-padding-top', mainPb)}>
+    <main
+      className={cn(
+        'flex min-h-dvh flex-col overflow-x-hidden bg-bg-layer-basement pt-padding-top',
+        mainPb
+      )}
+    >
       <Header center="토너먼트 결과" centerClassName="heading-1-bold" />
 
       <div className="mx-auto mt-4 flex min-h-0 w-full max-w-120 flex-1 flex-col gap-3">
@@ -156,6 +163,7 @@ function ResultClient({ tournamentId, isGuest = false }: ResultClientProps) {
         tournamentName={tournamentName}
         result={result}
         date={date}
+        isApp={isApp}
       />
     </main>
   );
