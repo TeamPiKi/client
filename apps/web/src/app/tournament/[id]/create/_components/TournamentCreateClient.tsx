@@ -187,6 +187,7 @@ function TournamentCreateClient({ tournamentId }: TournamentCreateClientProps) {
             participants={participants}
             inviteCode={pending?.inviteCode ?? ''}
             inviteExpiresAt={pending?.inviteExpiresAt ?? ''}
+            ownerStarted={ownerStarted}
             {...(isCollaborative && !ownerStarted && !isDepositClosed && { depositDeadline })}
           />
         </div>
