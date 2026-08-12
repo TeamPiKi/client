@@ -1,28 +1,21 @@
 'use client';
 
-import ItemEditFormBase from '@/components/common/item-edit-form';
-import type { ItemStatusT } from '@/types/item';
+import ItemInfoScreen from '@/components/common/item-info-screen';
 
 import { useDeleteTournamentItem } from '../../../_common/_hooks/useDeleteTournamentItem';
+import { useGetTournamentItem } from '../_hooks/useGetTournamentItem';
 import { usePatchTournamentItem } from '../_hooks/usePatchTournamentItem';
 
-type ItemEditFormProps = {
+type TournamentItemInfoScreenProps = {
   tournamentId: number;
   tournamentItemId: number;
-  itemStatus: ItemStatusT;
-  initialImageUrl: string | null;
-  initialName: string;
-  initialPrice: number;
 };
 
-function ItemEditForm({
+function TournamentItemInfoScreen({
   tournamentId,
   tournamentItemId,
-  itemStatus,
-  initialImageUrl,
-  initialName,
-  initialPrice,
-}: ItemEditFormProps) {
+}: TournamentItemInfoScreenProps) {
+  const { tournamentItemData } = useGetTournamentItem(tournamentId, tournamentItemId);
   const { patchTournamentItemMutation, isPatchTournamentItemPending } = usePatchTournamentItem(
     tournamentId,
     tournamentItemId
@@ -33,17 +26,22 @@ function ItemEditForm({
   );
 
   return (
-    <ItemEditFormBase
-      itemStatus={itemStatus}
-      initialImageUrl={initialImageUrl}
-      initialName={initialName}
-      initialPrice={initialPrice}
+    <ItemInfoScreen
+      itemType="tournament"
+      item={{
+        status: tournamentItemData.status,
+        imageUrl: tournamentItemData.imageUrl ?? null,
+        name: tournamentItemData.name ?? '',
+        price: tournamentItemData.price ?? 0,
+        sourceUrl: tournamentItemData.sourceUrl ?? null,
+      }}
       onSave={data => patchTournamentItemMutation(data)}
       isSavePending={isPatchTournamentItemPending}
       onDelete={() => deleteTournamentItemMutation()}
       isDeletePending={isDeleteTournamentItemPending}
+      {...(tournamentItemData.memo && { memo: { value: tournamentItemData.memo } })}
     />
   );
 }
 
-export default ItemEditForm;
+export default TournamentItemInfoScreen;

@@ -5,7 +5,7 @@ export const inputStyles = cva(
   {
     variants: {
       status: {
-        default: 'border-gray-100 bg-white focus-within:border-blue-500',
+        default: 'border-gray-100 bg-white focus-within:border-border-accent',
         error: 'border-red-400 bg-white',
         disabled: 'border-gray-100 bg-gray-50',
       },

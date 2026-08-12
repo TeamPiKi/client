@@ -29,10 +29,11 @@ function ByWishContent({ tournamentId }: ByWishContentProps) {
   const { selectedIds, isMaxExceeded, handleSelect } = useWishSelection(MAX_SELECT);
   const { wishlistData, fetchNextPage, hasNextPage, isFetchingNextPage } = useGetWishlist();
   const { tournamentData } = useGetTournament(tournamentId);
-  const { postTournamentItemsByWishMutation, isPostTournamentItemsByWishPending } =
-    usePostTournamentItemsByWish(tournamentId);
 
   const pending = 'pending' in tournamentData ? tournamentData.pending : null;
+  const { postTournamentItemsByWishMutation, isPostTournamentItemsByWishPending } =
+    usePostTournamentItemsByWish(tournamentId, pending?.items.length ?? 0);
+
   const existingItemIds = new Set(pending?.items.map(i => i.itemId) ?? []);
   const items = wishlistData.filter(
     ({ item }) =>
