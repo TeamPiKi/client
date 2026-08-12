@@ -7,6 +7,10 @@ export const ROUTES = {
   SOCIAL_LOGIN_CALLBACK: (provider: string) => `/auth/callback/${provider}`,
   TERMS: '/terms',
   POLICY: '/privacy',
+  /** 인스타 프로필 링크 진입 랜딩 — open.piki.day 루트가 여기로 rewrite 된다 */
+  OPEN: '/open',
+  /** iOS Universal Link 목적지 — 여기가 열렸다는 건 앱 미설치라는 뜻이라 앱스토어로 보낸다 */
+  OPEN_APP: '/open-app',
 
   /** 2. Member & Guest */
   HOME: '/home',
