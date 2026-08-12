@@ -7,7 +7,9 @@ import AddIcon from '@/assets/icons/fill/add.svg';
 import { Dialog, DialogTrigger } from '@/components/dialog';
 import GetItemDialogContent from '@/components/get-item-dialog';
 import { ROUTES } from '@/consts/route';
+import { useGetMe } from '@/hooks/useGetMe';
 
+import { useGetTournament } from '../../../_common/_hooks/useGetTournament';
 import type { TournamentPendingItemT } from '../../../_common/_types/tournamentResponse';
 import basketImg from '../../_assets/basket-gray.png';
 import { ITEMS_PER_BASKET } from '../../_consts/tournamentItemBasket';
@@ -31,6 +33,8 @@ function TournamentItemBasket({
 }: TournamentItemBasketProps) {
   const { id } = useParams<{ id: string }>();
   const tournamentId = Number(id);
+  const { userData } = useGetMe();
+  const { tournamentData } = useGetTournament(tournamentId);
 
   const basketMaxWidth = maxHeight ? (maxHeight * 356) / 464 : null;
 
@@ -76,14 +80,16 @@ function TournamentItemBasket({
           <div className="grid w-[45%] grid-cols-2 gap-x-6 gap-y-5 pt-[20%]">
             {addSlot}
             {items.map((item, index) => {
-              if (item.status === 'READY') {
+              /** 주최자이거나 본인이 담은 아이템만 수정 페이지로 진입 가능 */
+              const canEdit = tournamentData.isOwner || item.userId === userData.id;
+
+              if (item.status === 'READY' && canEdit) {
                 return (
                   <Link
                     key={item.tournamentItemId}
                     href={ROUTES.TOURNAMENT_ITEM_EDIT(tournamentId, item.tournamentItemId)}
                   >
                     <TournamentBasketItem
-                      key={item.tournamentItemId}
                       item={item}
                       index={index}
                       participantImageMap={participantImageMap}
@@ -97,7 +103,7 @@ function TournamentItemBasket({
                   key={item.tournamentItemId}
                   item={item}
                   index={index}
-                  onClick={() => handleItemClick(item)}
+                  {...(canEdit && { onClick: () => handleItemClick(item) })}
                   participantImageMap={participantImageMap}
                 />
               );
