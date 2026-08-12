@@ -9,8 +9,8 @@ import {
   Dialog,
   DialogClose,
   DialogContent,
+  DialogDescription,
   DialogFooter,
-  DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from '@/components/dialog';
@@ -32,35 +32,43 @@ function WithdrawConfirmDialog() {
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <BottomCta>
+      <BottomCta className="flex-row gap-3">
+        <DialogClose asChild>
+          <Button variant="secondary" size="lg" className="flex-1">
+            더 써볼래요
+          </Button>
+        </DialogClose>
         <DialogTrigger asChild>
-          <Button variant="secondary" size="lg" className="w-full">
+          <Button variant="primary" size="lg" className="flex-1">
             탈퇴하기
           </Button>
         </DialogTrigger>
       </BottomCta>
-      <DialogContent showCloseButton={false} className="space-y-5">
-        <DialogHeader className="flex flex-col items-center gap-2 py-2">
-          <WarningIconFill className="size-9 text-icon-neutral-secondary" aria-hidden />
+      <DialogContent showCloseButton={false} className="flex flex-col items-center gap-5 text-center">
+        <WarningIconFill className="size-9 text-icon-neutral-secondary" aria-hidden />
+        <div className="flex flex-col gap-1">
           <DialogTitle className="heading-1-bold text-text-neutral-primary">
             정말 탈퇴하시겠어요?
           </DialogTitle>
-        </DialogHeader>
-        <DialogFooter className="flex-row gap-2.5">
+          <DialogDescription className="body-2-medium text-text-neutral-tertiary">
+            지금까지의 토너먼트 기록, 위시 기록이 전부 사라져요.
+          </DialogDescription>
+        </div>
+        <DialogFooter className="w-full flex-row gap-2.5">
+          <DialogClose asChild>
+            <Button variant="secondary" size="lg" className="flex-1">
+              더 써볼래요
+            </Button>
+          </DialogClose>
           <Button
-            variant="secondary"
+            variant="primary"
             size="lg"
             className="flex-1"
             isLoading={isDeleteMePending}
             onClick={handleWithdraw}
           >
-            탈퇴하기
+            떠날래요
           </Button>
-          <DialogClose asChild>
-            <Button variant="primary" size="lg" className="flex-1">
-              유지하기
-            </Button>
-          </DialogClose>
         </DialogFooter>
       </DialogContent>
     </Dialog>

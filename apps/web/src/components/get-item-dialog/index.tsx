@@ -24,6 +24,7 @@ function GetItemDialogContent({ type }: GetItemDialogContentProps) {
 
   const { id } = useParams<{ id: string }>();
   const tournamentId = parseIdParam(id);
+  const isWishOptionVisible = type === 'tournament' && userData.identityType === 'MEMBER';
 
   if (type === 'tournament' && !tournamentId) return null;
 
@@ -38,7 +39,7 @@ function GetItemDialogContent({ type }: GetItemDialogContentProps) {
         </DialogDescription>
 
         <ul className="flex w-full flex-col gap-2">
-          {type === 'tournament' && userData.identityType === 'MEMBER' && (
+          {isWishOptionVisible && (
             <OptionButton
               href={ROUTES.TOURNAMENT_ADD_ITEM_BY_WISH(tournamentId ?? -1)}
               label="위시에서 가져오기"

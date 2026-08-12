@@ -4,7 +4,10 @@ import { headers } from 'next/headers';
 import React from 'react';
 
 import BottomTabBar from '@/components/bottom-tab-bar';
+import AppUpdateDialog from '@/components/common/app-update-dialog';
+import { APP_UPDATE_PROMPT } from '@/consts/appUpdate';
 import { SCROLL_CONTAINER_ID } from '@/consts/layout';
+import { getAppVersion, isAppVersionSupported } from '@/utils/appVersion';
 import { isWebview as _isWebView } from '@/utils/webBridge';
 
 import Providers from '../components/Providers';
@@ -34,6 +37,9 @@ async function RootLayout({
   const headerStore = await headers();
   const userAgent = headerStore.get('user-agent') ?? '';
   const isWebview = _isWebView(userAgent);
+
+  const shouldUpdateApp =
+    isWebview && !isAppVersionSupported(getAppVersion(userAgent), APP_UPDATE_PROMPT.targetVersion);
 
   return (
     <html
@@ -76,6 +82,8 @@ async function RootLayout({
 
           {/* NOTE: 전환 애니메이션이 끊기지 않게 하기 위해 탭바를 레이아웃에 렌더 */}
           <BottomTabBar />
+
+          {shouldUpdateApp && <AppUpdateDialog />}
         </Providers>
         {/**
          * GA4 web stream — 일반 브라우저 사용자 추적용.

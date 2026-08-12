@@ -1,5 +1,6 @@
 import { fetchEventSource } from '@microsoft/fetch-event-source';
 import { WEBBRIDGE_MESSAGE_TYPE } from '@piki/core';
+import type { Query } from '@tanstack/react-query';
 import { useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef } from 'react';
@@ -19,7 +20,16 @@ const MAX_RETRY_DELAY_MS = 30_000;
 
 const MAX_AUTH_RETRY_COUNT = 2;
 
+/** 아이템 파싱 알림의 refId 는 itemId 라서, 위시 상세 캐시(`['wish', wishId]`)는 item.id 로 찾는다 */
+// TODO: payload 에 wishId 가 추가되면 `['wish', payload.wishId]` 무효화로 대체 (tournamentId 와 동일한 형태로 요청해둠)
+const isWishQueryOfItem = (query: Query, itemId: number) =>
+  query.queryKey[0] === 'wish' &&
+  (query.state.data as { item?: { id: number } } | undefined)?.item?.id === itemId;
+
 const SCROLL_TO_LAST_QUERY = `${QUERY_ACTION.KEY}=${QUERY_ACTION.VALUE.SCROLL_TO_LAST}`;
+
+const buildToastMessage = (payload: NotificationSsePayloadT) =>
+  payload.body ? `${payload.title} ${payload.body}` : payload.title;
 
 const resolveDeepLink = (payload: NotificationSsePayloadT): string | null => {
   const { type, refId, kind, tournamentId } = payload;
@@ -151,6 +161,7 @@ export const useNotificationSSE = (enabled: boolean) => {
               const payload = JSON.parse(event.data) as NotificationSsePayloadT;
               // 배지 갱신은 silent-sync(UNREAD_COUNT_CHANGED) 가 payload 의 count 로 처리한다 — 별도 조회 금지
               void queryClient.refetchQueries({ queryKey: ['notifications'], type: 'all' });
+              const message = buildToastMessage(payload);
               const deepLink = resolveDeepLink(payload);
               const action = deepLink
                 ? { label: '바로가기', onClick: () => router.push(deepLink) }
@@ -164,8 +175,11 @@ export const useNotificationSSE = (enabled: boolean) => {
                     });
                   } else if (payload.kind === 'WISH') {
                     queryClient.invalidateQueries({ queryKey: ['wishlists'] });
+                    queryClient.invalidateQueries({
+                      predicate: query => isWishQueryOfItem(query, payload.refId),
+                    });
                   }
-                  toast.success(payload.title, { description: payload.body || void 0 });
+                  toast.success(message);
                   break;
                 case 'ITEM_PARSING_FAILED':
                   if (payload.kind === 'TOURNAMENT' && payload.tournamentId != null) {
@@ -174,30 +188,21 @@ export const useNotificationSSE = (enabled: boolean) => {
                     });
                   } else if (payload.kind === 'WISH') {
                     queryClient.invalidateQueries({ queryKey: ['wishlists'] });
+                    queryClient.invalidateQueries({
+                      predicate: query => isWishQueryOfItem(query, payload.refId),
+                    });
                   }
-                  toast.error(payload.title, {
-                    description: payload.body || void 0,
-                    action,
-                    duration: 5000,
-                  });
+                  toast.error(message, { action, duration: 5000 });
                   break;
                 case 'TOURNAMENT_STARTED':
                 case 'TOURNAMENT_JOINED':
                 case 'TOURNAMENT_ITEM_ADDED':
                 case 'TOURNAMENT_ITEM_DELETED':
                   queryClient.invalidateQueries({ queryKey: ['tournament', payload.refId] });
-                  toast.info(payload.title, {
-                    description: payload.body || void 0,
-                    action,
-                    duration: 5000,
-                  });
+                  toast.info(message, { action, duration: 5000 });
                   break;
                 default:
-                  toast.info(payload.title, {
-                    description: payload.body || void 0,
-                    action,
-                    duration: 5000,
-                  });
+                  toast.info(message, { action, duration: 5000 });
               }
             } catch {
               // malformed JSON — 무시

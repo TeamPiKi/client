@@ -1,32 +1,49 @@
-import BaseImage from '@/components/base-image';
+import type { ComponentType, SVGProps } from 'react';
+
+import { BasketIconFill, HeartIconFill, LiveIconOutline } from '@/assets/icons';
+import type { NotificationKindT } from '@/types/notification';
 import { cn } from '@/utils/cn';
 
+type NotificationKindDisplayT = {
+  label: string;
+  Icon: ComponentType<SVGProps<SVGSVGElement>>;
+};
+
+const KIND_DISPLAY: Record<NotificationKindT, NotificationKindDisplayT> = {
+  WISH: { label: '위시', Icon: HeartIconFill },
+  TOURNAMENT: { label: '토너먼트', Icon: BasketIconFill },
+  SYSTEM: { label: '공지', Icon: LiveIconOutline },
+};
+
 type NotificationItemProps = {
-  profileImage?: string;
+  kind: NotificationKindT;
   message: string;
+  body?: string;
   time: string;
   isRead?: boolean;
   onClick?: () => void;
 };
 
-function NotificationItem({ profileImage, message, time, isRead, onClick }: NotificationItemProps) {
+function NotificationItem({ kind, message, body, time, isRead, onClick }: NotificationItemProps) {
+  const { label, Icon } = KIND_DISPLAY[kind] ?? KIND_DISPLAY.SYSTEM;
+
   const innerContent = (
-    <>
-      <div className="relative size-8 shrink-0 overflow-hidden rounded-full bg-sky-blue-200">
-        {profileImage && (
-          <BaseImage src={profileImage} alt="" sizes="32px" className="object-cover" />
-        )}
-      </div>
-      <div className="flex flex-col gap-1">
-        <p className="body-1-semibold text-text-neutral-secondary">{message}</p>
-        <span className="caption-1-regular text-text-neutral-tertiary">{time}</span>
-      </div>
-    </>
+    <div className="flex w-full flex-col gap-1">
+      <span className="flex items-center gap-1.5 caption-1-semibold text-text-neutral-secondary">
+        <Icon aria-hidden className="size-4 text-icon-accent" />
+        {label}
+      </span>
+      <p className="mt-1 body-1-semibold text-text-neutral-primary">
+        {message}
+        {body && ` ${body}`}
+      </p>
+      <span className="caption-1-regular text-text-neutral-tertiary">{time}</span>
+    </div>
   );
 
   if (onClick) {
     return (
-      <li className={cn(isRead && 'opacity-50')}>
+      <li className={cn(isRead && 'opacity-40')}>
         <button
           type="button"
           onClick={onClick}
@@ -39,7 +56,7 @@ function NotificationItem({ profileImage, message, time, isRead, onClick }: Noti
   }
 
   return (
-    <li className={cn('flex items-center gap-3 py-5', isRead && 'opacity-50')}>{innerContent}</li>
+    <li className={cn('flex items-center gap-3 py-5', isRead && 'opacity-40')}>{innerContent}</li>
   );
 }
 
