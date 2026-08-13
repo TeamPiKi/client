@@ -8,6 +8,11 @@ const toBase64Url = (value: object) => Buffer.from(JSON.stringify(value)).toStri
 export const createFakeJwt = (expiresInSeconds = 60 * 60) =>
   [
     toBase64Url({ alg: 'HS256', typ: 'JWT' }),
-    toBase64Url({ sub: 'e2e-guest', exp: Math.floor(Date.now() / 1000) + expiresInSeconds }),
+    toBase64Url({
+      sub: 'e2e-user',
+      /** role 클레임 기반 gating(getRoleFromToken) 통과용 — SSR 목의 MOCK_MEMBER_ME(회원 고정)와 정합 */
+      role: 'MEMBER',
+      exp: Math.floor(Date.now() / 1000) + expiresInSeconds,
+    }),
     'e2e-fake-signature',
   ].join('.');

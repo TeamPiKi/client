@@ -5,7 +5,6 @@ import { useState } from 'react';
 
 import { CheckCircledIconOutline } from '@/assets/icons';
 import Button from '@/components/button';
-import { Header, HeaderIcon } from '@/components/header';
 import { cn } from '@/utils/cn';
 import { formatTimeKo } from '@/utils/formatDate';
 import { isWebview } from '@/utils/webBridge';
@@ -57,17 +56,11 @@ function NotificationContent() {
   };
 
   return (
-    <div className="flex h-dvh flex-col bg-gray-50 px-5 pt-padding-top">
-      <Header
-        left={<HeaderIcon name="BACK" />}
-        center="알림 히스토리"
-        centerClassName="heading-1-bold"
-      />
-
-      <div className="mt-4 hide-scrollbar flex-1 overflow-y-auto">{renderContent()}</div>
+    <>
+      {renderContent()}
 
       <MarkAllReadDialog open={isMarkAllReadDialogOpen} onOpenChange={setIsMarkAllReadDialogOpen} />
-    </div>
+    </>
   );
 
   function renderContent() {
