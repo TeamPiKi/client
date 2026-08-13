@@ -1,11 +1,13 @@
+import { ERROR_CODE } from '@piki/core';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
+import { QUERY_ACTION } from '@/consts/queryAction';
 import { ROUTES } from '@/consts/route';
 import { useBackWithFallback } from '@/hooks/useBackWithFallback';
 import type { PatchItemRequestT } from '@/types/item';
-import { getApiErrorStatus, isGlobalNetError } from '@/utils/apiError';
+import { getApiErrorCode, getApiErrorStatus, isGlobalNetError } from '@/utils/apiError';
 import { getApiErrorMessage } from '@/utils/getApiErrorMessage';
 
 import { patchTournamentItem } from '../_apis/patchTournamentItem';
@@ -34,16 +36,33 @@ export const usePatchTournamentItem = (tournamentId: number, tournamentItemId: n
       onError: error => {
         if (isGlobalNetError(error)) return;
 
+        const code = getApiErrorCode(error);
+
+        /** 토너먼트가 시작된 경우 */
+        if (code === ERROR_CODE.TOURNAMENT_NOT_PENDING) {
+          toast.error(getApiErrorMessage(error));
+          queryClient.invalidateQueries({ queryKey: ['tournament', tournamentId] });
+          router.replace(ROUTES.TOURNAMENT_CREATE(tournamentId));
+          return;
+        }
+
+        /** 토너먼트가 삭제된 경우 */
+        if (code === ERROR_CODE.TOURNAMENT_NOT_FOUND) {
+          router.replace(
+            `${ROUTES.HOME}?${QUERY_ACTION.KEY}=${QUERY_ACTION.VALUE.TOURNAMENT_NOT_FOUND}`
+          );
+          return;
+        }
+
         /**
          * 400: 상품 이름·가격 미입력
          * 403: 토너먼트 참여 권한 없음
-         * 404: 토너먼트 or 토너먼트 아이템 존재하지 않음
-         * 409: PENDING 상태 아닌 토너먼트
+         * 404: 토너먼트 아이템 존재하지 않음
          */
         toast.error(getApiErrorMessage(error));
 
         const status = getApiErrorStatus(error);
-        if (status === 403 || status === 404 || status === 409)
+        if (status === 403 || status === 404)
           router.replace(ROUTES.TOURNAMENT_CREATE(tournamentId));
       },
     });

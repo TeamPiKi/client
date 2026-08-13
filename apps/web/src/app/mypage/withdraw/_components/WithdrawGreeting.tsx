@@ -7,7 +7,7 @@ function WithdrawGreeting() {
   const { userData } = useGetMe();
 
   return (
-    <p className="text-center heading-2 text-text-neutral-secondary">
+    <p className="text-center heading-2-semibold text-text-neutral-secondary">
       {userData.nickname}님, PiKi를 떠나시나요?
     </p>
   );

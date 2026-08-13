@@ -1,6 +1,5 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { toast } from 'sonner';
 
@@ -8,6 +7,8 @@ import BottomCta from '@/components/bottom-cta';
 import Button from '@/components/button';
 import { Header, HeaderIcon } from '@/components/header';
 import TournamentErrorDialog from '@/components/tournament-error-dialog';
+import { ROUTES } from '@/consts/route';
+import { useBackWithFallback } from '@/hooks/useBackWithFallback';
 import { useGetWishlist } from '@/hooks/useGetWishlist';
 
 import { useGetTournament } from '../../../_common/_hooks/useGetTournament';
@@ -21,26 +22,28 @@ type ByWishContentProps = {
   tournamentId: number;
 };
 
+const noop = () => {};
+
 function ByWishContent({ tournamentId }: ByWishContentProps) {
-  const router = useRouter();
+  const backWithFallback = useBackWithFallback();
   const { selectedIds, isMaxExceeded, handleSelect } = useWishSelection(MAX_SELECT);
   const { wishlistData, fetchNextPage, hasNextPage, isFetchingNextPage } = useGetWishlist();
   const { tournamentData } = useGetTournament(tournamentId);
-  const { postTournamentItemsByWishMutation, isPostTournamentItemsByWishPending } =
-    usePostTournamentItemsByWish(tournamentId);
 
   const pending = 'pending' in tournamentData ? tournamentData.pending : null;
+  const { postTournamentItemsByWishMutation, isPostTournamentItemsByWishPending } =
+    usePostTournamentItemsByWish(tournamentId, pending?.items.length ?? 0);
+
   const existingItemIds = new Set(pending?.items.map(i => i.itemId) ?? []);
   const items = wishlistData.filter(
     ({ item }) =>
       item.status !== 'FAILED' && item.status !== 'PROCESSING' && !existingItemIds.has(item.id)
   );
 
-  /**
-   * 가져올 위시가 하나도 없는 경우 — 위시가 아예 없거나, 남은 게 전부 이미 담겼거나 추출 실패/진행 중이다.
-   * 전체 페이지를 다 받은 뒤에 판단해야 로딩 중 잘못 뜨지 않는다.
-   */
-  const hasNoSelectableWish = !hasNextPage && !isFetchingNextPage && items.length === 0;
+  const isWishlistLoaded = !hasNextPage && !isFetchingNextPage;
+
+  const hasNoWish = isWishlistLoaded && wishlistData.length === 0;
+  const hasNoSelectableWish = isWishlistLoaded && !hasNoWish && items.length === 0;
 
   useEffect(() => {
     if (!isMaxExceeded) return;
@@ -61,6 +64,22 @@ function ByWishContent({ tournamentId }: ByWishContentProps) {
     postTournamentItemsByWishMutation(itemIds);
   };
 
+  const handleBackToCreate = () => backWithFallback(ROUTES.TOURNAMENT_CREATE(tournamentId));
+
+  if (hasNoWish) {
+    return (
+      <div className="h-full bg-bg-layer-basement">
+        <TournamentErrorDialog
+          type="NO_WISH_EXISTS"
+          open
+          onOpenChange={noop}
+          secondaryButtonText="돌아가기"
+          onSecondaryClick={handleBackToCreate}
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="flex h-full flex-col bg-bg-layer-basement pt-padding-top">
       <div className="px-5">
@@ -79,19 +98,32 @@ function ByWishContent({ tournamentId }: ByWishContentProps) {
       </div>
 
       <main className="mt-6 hide-scrollbar flex flex-1 flex-col overflow-y-auto pb-32">
-        <div className="grid grid-cols-2">
-          {items.map(({ wish, item }) => (
-            <WishSelectCard
-              key={wish.id}
-              name={item.name}
-              price={item.price}
-              imageUrl={item.imageUrl}
-              sourcePlatform={item.sourcePlatform}
-              isSelected={selectedIds.includes(wish.id)}
-              onSelect={() => handleSelect(wish.id)}
-            />
-          ))}
-        </div>
+        {hasNoSelectableWish ? (
+          <div className="flex flex-1 flex-col items-center justify-center gap-4" role="status">
+            <div className="flex flex-col items-center gap-2">
+              <p className="heading-2-semibold text-text-neutral-primary">
+                담을 수 있는 위시가 없어요
+              </p>
+              <p className="text-center body-1-medium text-text-neutral-tertiary">
+                위시가 모두 후보에 담겨 있어요.
+              </p>
+            </div>
+          </div>
+        ) : (
+          <div className="grid grid-cols-2">
+            {items.map(({ wish, item }) => (
+              <WishSelectCard
+                key={wish.id}
+                name={item.name}
+                price={item.price}
+                imageUrl={item.imageUrl}
+                sourcePlatform={item.sourcePlatform}
+                isSelected={selectedIds.includes(wish.id)}
+                onSelect={() => handleSelect(wish.id)}
+              />
+            ))}
+          </div>
+        )}
       </main>
 
       <BottomCta hasGradient>
@@ -105,12 +137,6 @@ function ByWishContent({ tournamentId }: ByWishContentProps) {
           다음
         </Button>
       </BottomCta>
-
-      <TournamentErrorDialog
-        type="NO_WISH_EXISTS"
-        open={hasNoSelectableWish}
-        onOpenChange={() => router.back()}
-      />
     </div>
   );
 }

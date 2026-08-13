@@ -2,7 +2,7 @@
   "expo": {
     "name": "PiKi",
     "slug": "piki",
-    "version": "1.1.1",
+    "version": "1.2.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "piki",
@@ -38,7 +38,8 @@
           "kakaokompassauth",
           "kakaolink",
           "kakaotalk",
-          "kakao326734abdf8de5c7e090a2fc72e1dce6"
+          "kakao326734abdf8de5c7e090a2fc72e1dce6",
+          "instagram-stories"
         ]
       },
       "privacyManifests": {
@@ -180,10 +181,17 @@
         }
       ],
       "./plugins/withShareExtensionKeychain.js",
+      "./plugins/withInstagramQueries.js",
       [
         "./plugins/withKakaoLoginConfig.js",
         {
           "nativeAppKey": "326734abdf8de5c7e090a2fc72e1dce6"
+        }
+      ],
+      [
+        "./plugins/withInstagramStoryShare.js",
+        {
+          "facebookAppId": "2060093567931900"
         }
       ],
       [

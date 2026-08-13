@@ -2,8 +2,9 @@
 
 import { QueryClientProvider } from '@tanstack/react-query';
 import dynamic from 'next/dynamic';
-import { type ReactNode } from 'react';
+import { type ReactNode, Suspense } from 'react';
 
+import QueryActionToast from '@/components/common/query-action-toast';
 import NavigationOverlay from '@/components/navigation-overlay';
 import NotificationSSEProvider from '@/components/notification-sse-provider';
 import { Toaster } from '@/components/toast';
@@ -50,9 +51,16 @@ function Providers({ children }: Readonly<{ children: ReactNode }>) {
       <FcmTokenSyncer />
       <DeepLinkHandler />
       <AppNavigateHandler />
+      {/* NOTE: children 보다 먼저 마운트해 페이지 마운트 시 토스트가 뜨지 않는 오류 방지 */}
+      <Toaster />
       {children}
       <NotificationSSEProvider />
-      <Toaster />
+
+      {/* NOTE: useSearchParams 가 페이지 전체를 클라이언트 렌더로 끌어내리지 않도록 Suspense 경계 사용*/}
+      <Suspense fallback={null}>
+        <QueryActionToast />
+      </Suspense>
+
       {ReactQueryDevtools && <ReactQueryDevtools initialIsOpen={false} />}
     </QueryClientProvider>
   );

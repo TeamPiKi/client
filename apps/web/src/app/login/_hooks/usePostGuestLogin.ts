@@ -2,6 +2,7 @@ import { WEBBRIDGE_MESSAGE_TYPE } from '@piki/core';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 
+import { QUERY_KEYS } from '@/consts/queryKeys';
 import { setCookie } from '@/utils/cookie';
 import { getPostLoginRedirectPath } from '@/utils/loginRedirect';
 import { WebBridge, isWebview } from '@/utils/webBridge';
@@ -15,7 +16,7 @@ export const usePostGuestLogin = () => {
   const { mutate: postGuestLoginMutation, isPending: isPostGuestLoginPending } = useMutation({
     mutationFn: postGuestLogin,
     onSuccess: data => {
-      queryClient.invalidateQueries({ queryKey: ['me'] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.USER.ME });
 
       if (isWebview() && data.accessToken && data.refreshToken) {
         setCookie('access_token', data.accessToken, { minutes: 15 });

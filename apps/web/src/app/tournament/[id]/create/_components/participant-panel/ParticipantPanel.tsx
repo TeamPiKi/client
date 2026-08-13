@@ -6,15 +6,19 @@ import { useState } from 'react';
 import { AddIconOutline, ChevronDownIconOutline, ChevronUpIconOutline } from '@/assets/icons';
 import UserProfileGroup from '@/components/user-profile-group';
 import type { UserT } from '@/components/user-profile-group/userProfile.const';
+import { ROUTES } from '@/consts/route';
 import { cn } from '@/utils/cn';
 
+import { useGetTournament } from '../../../_common/_hooks/useGetTournament';
 import DepositCountdown from '../deposit-countdown/DepositCountdown';
 import InviteFriendsDialog from '../invite-friends/InviteFriendsDialog';
 import ParticipantChip from './ParticipantChip';
 
 const buildInviteUrl = (tournamentId: string, inviteCode: string) => {
-  if (typeof window === 'undefined') return `/invite/${tournamentId}?code=${inviteCode}`;
-  return `${window.location.origin}/invite/${tournamentId}?code=${inviteCode}`;
+  const path = ROUTES.TOURNAMENT_JOIN_BY_LINK(Number(tournamentId)) + `?code=${inviteCode}`;
+
+  if (typeof window === 'undefined') return path;
+  return `${window.location.origin}${path}`;
 };
 
 type ParticipantT = {
@@ -30,6 +34,8 @@ type ParticipantPanelProps = {
   inviteExpiresAt?: string;
   /** 담기 마감 시각 — 있을 때만 타이머 노출 */
   depositDeadline?: string;
+  /** 주최자가 토너먼트를 시작했는지 — 시작 후에는 새 참여자를 받을 수 없다 */
+  ownerStarted?: boolean;
 };
 
 const PLACEHOLDER_AVATAR_COUNT = 2;
@@ -39,8 +45,10 @@ function ParticipantPanel({
   inviteCode,
   inviteExpiresAt,
   depositDeadline,
+  ownerStarted = false,
 }: ParticipantPanelProps) {
   const { id: tournamentId } = useParams<{ id: string }>();
+  const { refetchTournament } = useGetTournament(Number(tournamentId));
   const [isExpanded, setIsExpanded] = useState(false);
   const [isInviteDialogOpen, setIsInviteDialogOpen] = useState(false);
 
@@ -51,7 +59,12 @@ function ParticipantPanel({
   const inviteUrl = inviteCode ? buildInviteUrl(tournamentId, inviteCode) : '';
 
   const handleToggleExpand = () => setIsExpanded(prev => !prev);
-  const handleOpenInvite = () => setIsInviteDialogOpen(true);
+
+  const handleOpenInvite = () => {
+    // 화면을 오래 열어두면 inviteExpiresAt 이 낡아 시트가 만료된 시각을 보여준다.
+    void refetchTournament();
+    setIsInviteDialogOpen(true);
+  };
 
   return (
     <>
@@ -70,7 +83,6 @@ function ParticipantPanel({
             >
               <div className="flex min-w-0 items-center gap-3">
                 {depositDeadline ? (
-                  // 칩 스타일(배경·라운딩·패딩)은 DepositCountdown 이 소유
                   <div className="shrink-0">
                     <DepositCountdown deadline={depositDeadline} showLabel={false} />
                   </div>
@@ -95,14 +107,17 @@ function ParticipantPanel({
                 {participants.map(({ user, itemCount }) => (
                   <ParticipantChip key={user.id} user={user} itemCount={itemCount} />
                 ))}
-                <button
-                  type="button"
-                  onClick={handleOpenInvite}
-                  className="inline-flex size-9 cursor-pointer items-center justify-center rounded-full border border-border-neutral-muted bg-bg-layer-default"
-                  aria-label="친구 초대하기"
-                >
-                  <AddIconOutline className="size-4 text-icon-neutral-primary" />
-                </button>
+                {/* 시작 후에는 새 참여자를 받을 수 없어 초대 진입점을 숨긴다 */}
+                {!ownerStarted && (
+                  <button
+                    type="button"
+                    onClick={handleOpenInvite}
+                    className="inline-flex size-9 cursor-pointer items-center justify-center rounded-full border border-border-neutral-muted bg-bg-layer-default"
+                    aria-label="친구 초대하기"
+                  >
+                    <AddIconOutline className="size-4 text-icon-neutral-primary" />
+                  </button>
+                )}
               </div>
             </div>
           )}
@@ -120,7 +135,7 @@ function ParticipantPanel({
                 <span
                   key={index}
                   aria-hidden
-                  className="-ml-2 inline-flex size-6.75 items-center justify-center rounded-full border-[1.6px] border-white bg-gray-50 body-2-semibold text-text-neutral-tertiary relative"
+                  className="relative -ml-2 inline-flex size-6.75 items-center justify-center rounded-full border-[1.6px] border-white bg-gray-50 body-2-semibold text-text-neutral-tertiary"
                   style={{ zIndex: index + 1 }}
                 >
                   ?
@@ -135,8 +150,9 @@ function ParticipantPanel({
         </button>
       )}
 
+      {/* 시트를 열어둔 사이 주최자가 시작하면 초대가 무의미해지므로 함께 닫는다 */}
       <InviteFriendsDialog
-        open={isInviteDialogOpen}
+        open={isInviteDialogOpen && !ownerStarted}
         onOpenChange={setIsInviteDialogOpen}
         tournamentId={Number(tournamentId)}
         inviteUrl={inviteUrl}

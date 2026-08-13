@@ -11,12 +11,16 @@ import { getQueryClient } from '@/utils/queryClient';
 
 import TournamentListClient from './client';
 
-function TournamentList() {
+type TournamentListProps = {
+  isGuest?: boolean;
+};
+
+function TournamentList({ isGuest = false }: TournamentListProps) {
   const queryClient = getQueryClient();
 
   queryClient.prefetchQuery({
-    queryKey: QUERY_KEYS.TOURNAMENT.LIST.BY_PARAMS({ limit: 3, ownedOnly: true }),
-    queryFn: () => getTournamentList({ limit: 3, ownedOnly: true }),
+    queryKey: QUERY_KEYS.TOURNAMENT.LIST.BY_PARAMS({ limit: 3 }),
+    queryFn: () => getTournamentList({ limit: 3 }),
   });
 
   return (
@@ -38,7 +42,7 @@ function TournamentList() {
             </>
           }
         >
-          <TournamentListClient />
+          <TournamentListClient isGuest={isGuest} />
         </Suspense>
       </section>
     </HydrationBoundary>

@@ -13,6 +13,7 @@ function ProfileSection() {
 
   return (
     <section className="flex w-full flex-col gap-3">
+      <h2 className="body-1-bold text-gray-900">프로필</h2>
       <Link
         href={ROUTES.MYPAGE_EDIT}
         className="flex items-center gap-4 rounded-xl bg-bg-layer-default p-5"
