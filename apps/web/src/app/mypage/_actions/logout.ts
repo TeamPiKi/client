@@ -4,9 +4,8 @@ import { cookies } from 'next/headers';
 
 import { deleteFcmToken } from '@/apis/deleteFcmToken';
 import { serverApi } from '@/apis/server';
+import { clearAuthCookies } from '@/app/mypage/_common/_actions/clearAuthCookies';
 import { ENDPOINTS } from '@/consts/api';
-
-const AUTH_COOKIE_NAMES = ['access_token', 'refresh_token', 'device_id'] as const;
 
 export const logout = async () => {
   const cookieStore = await cookies();
@@ -26,7 +25,5 @@ export const logout = async () => {
     // 백엔드 실패해도 로컬 쿠키는 삭제
   }
 
-  AUTH_COOKIE_NAMES.forEach(cookieName => {
-    if (cookieStore.has(cookieName)) cookieStore.delete(cookieName);
-  });
+  await clearAuthCookies();
 };
