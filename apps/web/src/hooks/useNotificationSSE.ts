@@ -9,6 +9,7 @@ import { toast } from 'sonner';
 import { getNotifications } from '@/app/notification/_apis/getNotifications';
 import { ENDPOINTS } from '@/consts/api';
 import { QUERY_ACTION } from '@/consts/queryAction';
+import { QUERY_KEYS } from '@/consts/queryKeys';
 import { ROUTES } from '@/consts/route';
 import { CLIENT_TYPE } from '@/consts/webBridge';
 import type { NotificationSsePayloadT, SilentSyncSsePayloadT } from '@/types/notification';
@@ -138,7 +139,10 @@ export const useNotificationSSE = (enabled: boolean) => {
                   queryClient.invalidateQueries({ queryKey: ['tournament', payload.tournamentId] });
                   break;
                 case 'UNREAD_COUNT_CHANGED':
-                  void queryClient.refetchQueries({ queryKey: ['notifications'], type: 'all' });
+                  void queryClient.refetchQueries({
+                    queryKey: QUERY_KEYS.NOTIFICATION.LIST,
+                    type: 'all',
+                  });
                   if (isWebview()) {
                     WebBridge.postMessage({
                       type: WEBBRIDGE_MESSAGE_TYPE.WEB_REQ_SET_BADGE,
@@ -156,7 +160,10 @@ export const useNotificationSSE = (enabled: boolean) => {
           if (event.event === 'notification') {
             try {
               const payload = JSON.parse(event.data) as NotificationSsePayloadT;
-              void queryClient.refetchQueries({ queryKey: ['notifications'], type: 'all' });
+              void queryClient.refetchQueries({
+                queryKey: QUERY_KEYS.NOTIFICATION.LIST,
+                type: 'all',
+              });
               syncBadgeWithServer();
               const message = buildToastMessage(payload);
               const deepLink = resolveDeepLink(payload);
