@@ -21,7 +21,7 @@ type TournamentItemBasketCarouselProps = {
   scrollToLast?: boolean;
   /** 위시 담기 등 재진입 시점의 기존 아이템 개수 */
   previousItemCount?: number | null;
-  isDepositClosed?: boolean;
+  isAddItemBlocked?: boolean;
   participantImageMap?: Map<string, string>;
 };
 
@@ -29,7 +29,7 @@ function TournamentItemBasketCarousel({
   items = [],
   scrollToLast = false,
   previousItemCount = null,
-  isDepositClosed = false,
+  isAddItemBlocked = false,
   participantImageMap,
 }: TournamentItemBasketCarouselProps) {
   const [carouselApi, setCarouselApi] = useState<CarouselApi>();
@@ -116,7 +116,7 @@ function TournamentItemBasketCarousel({
         <TournamentItemBasket
           basketIndex={0}
           items={items}
-          isDepositClosed={isDepositClosed}
+          isAddItemBlocked={isAddItemBlocked}
           maxHeight={basketMaxHeight}
           participantImageMap={participantImageMap}
         />
@@ -145,7 +145,7 @@ function TournamentItemBasketCarousel({
               <TournamentItemBasket
                 basketIndex={i}
                 items={items.slice(i * ITEMS_PER_BASKET, (i + 1) * ITEMS_PER_BASKET)}
-                isDepositClosed={isDepositClosed}
+                isAddItemBlocked={isAddItemBlocked}
                 maxHeight={basketMaxHeight}
                 participantImageMap={participantImageMap}
               />

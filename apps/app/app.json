@@ -189,6 +189,12 @@
         }
       ],
       [
+        "./plugins/withInstagramStoryShare.js",
+        {
+          "facebookAppId": "2060093567931900"
+        }
+      ],
+      [
         "@sentry/react-native",
         {
           "organization": "piki-92",

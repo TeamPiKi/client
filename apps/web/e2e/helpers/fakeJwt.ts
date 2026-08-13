@@ -1,7 +1,7 @@
 const toBase64Url = (value: object) => Buffer.from(JSON.stringify(value)).toString('base64url');
 
 /**
- * 미들웨어(src/proxy.ts)의 isTokenValid는 서명 검증 없이 payload.exp만 확인한다.
+ * 미들웨어(src/proxy.ts)의 isTokenUnexpired는 서명 검증 없이 payload.exp만 확인한다.
  * exp가 미래인 JWT 형태 문자열이면 미들웨어를 통과하고,
  * 서버사이드 게스트 로그인(postGuestLoginServer)이 발생하지 않는다 — 네트워크 0회.
  */

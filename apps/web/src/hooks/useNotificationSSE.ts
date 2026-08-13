@@ -6,7 +6,6 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useRef } from 'react';
 import { toast } from 'sonner';
 
-import { getNotifications } from '@/app/notification/_apis/getNotifications';
 import { ENDPOINTS } from '@/consts/api';
 import { QUERY_ACTION } from '@/consts/queryAction';
 import { QUERY_KEYS } from '@/consts/queryKeys';
@@ -14,22 +13,13 @@ import { ROUTES } from '@/consts/route';
 import { CLIENT_TYPE } from '@/consts/webBridge';
 import type { NotificationSsePayloadT, SilentSyncSsePayloadT } from '@/types/notification';
 import { getCookie } from '@/utils/cookie';
+import { handleSessionExpired } from '@/utils/handleSessionExpired';
 import { refreshClientToken } from '@/utils/refreshClientToken';
 import { WebBridge, isWebview } from '@/utils/webBridge';
 
-const syncBadgeWithServer = () => {
-  if (!isWebview()) return;
-  getNotifications({ size: 1 })
-    .then(result => {
-      WebBridge.postMessage({
-        type: WEBBRIDGE_MESSAGE_TYPE.WEB_REQ_SET_BADGE,
-        payload: { count: result.unreadCount },
-      });
-    })
-    .catch(() => {});
-};
-
 const MAX_RETRY_DELAY_MS = 30_000;
+
+const MAX_AUTH_RETRY_COUNT = 2;
 
 /** 아이템 파싱 알림의 refId 는 itemId 라서, 위시 상세 캐시(`['wish', wishId]`)는 item.id 로 찾는다 */
 // TODO: payload 에 wishId 가 추가되면 `['wish', payload.wishId]` 무효화로 대체 (tournamentId 와 동일한 형태로 요청해둠)
@@ -68,11 +58,14 @@ export const useNotificationSSE = (enabled: boolean) => {
   const retryDelayRef = useRef(1_000);
   const abortRef = useRef<AbortController | null>(null);
   const hasConnectedRef = useRef(false);
+  const authFailCountRef = useRef(0);
 
   useEffect(() => {
     if (!enabled) return;
 
     let cancelled = false;
+    // ref 는 언마운트/재로그인 후에도 남으므로, 이전 세션의 실패 횟수를 물려받지 않도록 초기화
+    authFailCountRef.current = 0;
 
     const connect = () => {
       if (cancelled) return;
@@ -105,14 +98,23 @@ export const useNotificationSSE = (enabled: boolean) => {
         onopen: async response => {
           if (response.ok) {
             retryDelayRef.current = 1_000;
+            authFailCountRef.current = 0;
             if (hasConnectedRef.current) {
-              // 재연결 성공 — 끊긴 동안 놓쳤을 수 있는 변경사항을 화면 재조회로 복구
-              void queryClient.invalidateQueries();
+              // 재연결 성공 — 끊긴 동안 SSE 이벤트로 놓쳤을 수 있는 도메인만 재조회
+              void queryClient.invalidateQueries({ queryKey: QUERY_KEYS.NOTIFICATION.LIST });
+              void queryClient.invalidateQueries({ queryKey: ['tournament'] });
+              void queryClient.invalidateQueries({ queryKey: ['wishlists'] });
             }
             hasConnectedRef.current = true;
             return;
           }
           if (response.status === 401) {
+            /** 새 토큰으로도 401 이 이어지면 SSE 연결 중단 */
+            authFailCountRef.current += 1;
+            if (authFailCountRef.current > MAX_AUTH_RETRY_COUNT) {
+              cancelled = true;
+              throw new Error('unauthorized');
+            }
             // 토큰 만료 시 공유 refresh 함수를 통해 갱신 후 재연결.
             // 단일 진입점 — page request / API 호출과 같은 dedupe 큐를 공유한다.
             // (직접 fetch 로 호출하면 동시 다발 race 로 백엔드가 401/500 거부 → 사용자 로그아웃)
@@ -122,8 +124,9 @@ export const useNotificationSSE = (enabled: boolean) => {
               throw new Error('token-refreshed');
             } catch (err) {
               if (err instanceof Error && err.message === 'token-refreshed') throw err;
-              // refresh 실패 (만료 등) → 연결 중단
+              // refresh 실패 (만료 등) → 연결 중단 + 전역과 동일한 세션 만료 처리
               cancelled = true;
+              handleSessionExpired();
               throw new Error('unauthorized');
             }
           }
@@ -160,11 +163,11 @@ export const useNotificationSSE = (enabled: boolean) => {
           if (event.event === 'notification') {
             try {
               const payload = JSON.parse(event.data) as NotificationSsePayloadT;
+              // 배지 갱신은 silent-sync(UNREAD_COUNT_CHANGED) 가 payload 의 count 로 처리한다 — 별도 조회 금지
               void queryClient.refetchQueries({
                 queryKey: QUERY_KEYS.NOTIFICATION.LIST,
                 type: 'all',
               });
-              syncBadgeWithServer();
               const message = buildToastMessage(payload);
               const deepLink = resolveDeepLink(payload);
               const action = deepLink
@@ -227,6 +230,8 @@ export const useNotificationSSE = (enabled: boolean) => {
           setTimeout(connect, jitteredDelay);
           throw err;
         },
+      }).catch(() => {
+        // onopen/onerror 에서 throw 하면 반환 Promise 가 reject 된다 — 처리는 위에서 끝났으므로 흡수만
       });
     };
 

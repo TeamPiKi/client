@@ -1,5 +1,5 @@
 import { GoogleAnalytics } from '@next/third-parties/google';
-import { isTokenValid } from '@piki/core';
+import { isTokenUnexpired } from '@piki/core';
 import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
 import type { Metadata, Viewport } from 'next';
 import { cookies, headers } from 'next/headers';
@@ -44,7 +44,7 @@ async function RootLayout({
 
   const queryClient = getQueryClient();
   const accessToken = (await cookies()).get('access_token')?.value;
-  if (isTokenValid(accessToken ?? null)) {
+  if (isTokenUnexpired(accessToken ?? null)) {
     queryClient.prefetchQuery(getMeQueryOptions);
   }
 
