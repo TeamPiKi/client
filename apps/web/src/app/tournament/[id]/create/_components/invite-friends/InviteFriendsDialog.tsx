@@ -1,5 +1,6 @@
 'use client';
 
+import { ERROR_CODE, ERROR_MESSAGE_MAP } from '@piki/core';
 import { useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 
@@ -103,7 +104,11 @@ function InviteFriendsDialog({
   };
 
   const handleSendInviteLink = async () => {
-    if (!inviteUrl) return;
+    /** 이미 시작된 토너먼트인 경우 */
+    if (!inviteUrl) {
+      toast.error(ERROR_MESSAGE_MAP[ERROR_CODE.TOURNAMENT_NOT_PENDING]);
+      return;
+    }
 
     const result = await share({
       title: 'piki 토너먼트 초대',
