@@ -8,6 +8,7 @@ import { toast } from 'sonner';
 
 import { ENDPOINTS } from '@/consts/api';
 import { QUERY_ACTION } from '@/consts/queryAction';
+import { QUERY_KEYS } from '@/consts/queryKeys';
 import { ROUTES } from '@/consts/route';
 import { CLIENT_TYPE } from '@/consts/webBridge';
 import type { NotificationSsePayloadT, SilentSyncSsePayloadT } from '@/types/notification';
@@ -99,8 +100,8 @@ export const useNotificationSSE = (enabled: boolean) => {
             retryDelayRef.current = 1_000;
             authFailCountRef.current = 0;
             if (hasConnectedRef.current) {
-              // 재연결 성공 — 끊긴 동안 SSE 이벤트로 놓쳤을 수 있는 도메인만 재조회 
-              void queryClient.invalidateQueries({ queryKey: ['notifications'] });
+              // 재연결 성공 — 끊긴 동안 SSE 이벤트로 놓쳤을 수 있는 도메인만 재조회
+              void queryClient.invalidateQueries({ queryKey: QUERY_KEYS.NOTIFICATION.LIST });
               void queryClient.invalidateQueries({ queryKey: ['tournament'] });
               void queryClient.invalidateQueries({ queryKey: ['wishlists'] });
             }
@@ -141,7 +142,10 @@ export const useNotificationSSE = (enabled: boolean) => {
                   queryClient.invalidateQueries({ queryKey: ['tournament', payload.tournamentId] });
                   break;
                 case 'UNREAD_COUNT_CHANGED':
-                  void queryClient.refetchQueries({ queryKey: ['notifications'], type: 'all' });
+                  void queryClient.refetchQueries({
+                    queryKey: QUERY_KEYS.NOTIFICATION.LIST,
+                    type: 'all',
+                  });
                   if (isWebview()) {
                     WebBridge.postMessage({
                       type: WEBBRIDGE_MESSAGE_TYPE.WEB_REQ_SET_BADGE,
@@ -160,7 +164,10 @@ export const useNotificationSSE = (enabled: boolean) => {
             try {
               const payload = JSON.parse(event.data) as NotificationSsePayloadT;
               // 배지 갱신은 silent-sync(UNREAD_COUNT_CHANGED) 가 payload 의 count 로 처리한다 — 별도 조회 금지
-              void queryClient.refetchQueries({ queryKey: ['notifications'], type: 'all' });
+              void queryClient.refetchQueries({
+                queryKey: QUERY_KEYS.NOTIFICATION.LIST,
+                type: 'all',
+              });
               const message = buildToastMessage(payload);
               const deepLink = resolveDeepLink(payload);
               const action = deepLink
