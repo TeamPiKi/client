@@ -1,5 +1,6 @@
 'use client';
 
+import { ERROR_CODE, ERROR_MESSAGE_MAP } from '@piki/core';
 import { useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 
@@ -105,7 +106,7 @@ function InviteFriendsDialog({
   const handleSendInviteLink = async () => {
     /** 이미 시작된 토너먼트인 경우 */
     if (!inviteUrl) {
-      toast.error('이미 시작된 토너먼트에는 친구를 초대할 수 없어요.');
+      toast.error(ERROR_MESSAGE_MAP[ERROR_CODE.TOURNAMENT_NOT_PENDING]);
       return;
     }
 
