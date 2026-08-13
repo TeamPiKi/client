@@ -1,24 +1,12 @@
-import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
-
-import { getQueryClient } from '@/utils/queryClient';
-
-import { getNotifications } from './_apis/getNotifications';
 import NotificationContent from './_components/NotificationContent';
 
+/**
+ * 알림 목록은 서버 prefetch 없이 클라이언트 캐시로 렌더한다 (#491).
+ * 홈 배지(AlarmHeaderIcon)가 같은 키(['notifications'])를 이미 채워두고 SSE 가 신선도를 유지하므로,
+ * RSC prefetch 는 페이지 진입마다 중복 서버 호출만 만든다.
+ */
 function Notification() {
-  const queryClient = getQueryClient();
-
-  queryClient.prefetchInfiniteQuery({
-    queryKey: ['notifications'],
-    queryFn: ({ pageParam }) => getNotifications({ cursor: pageParam as string | null }),
-    initialPageParam: null,
-  });
-
-  return (
-    <HydrationBoundary state={dehydrate(queryClient)}>
-      <NotificationContent />
-    </HydrationBoundary>
-  );
+  return <NotificationContent />;
 }
 
 export default Notification;
