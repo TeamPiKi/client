@@ -99,6 +99,8 @@ function TournamentCreateClient({ tournamentId }: TournamentCreateClientProps) {
   // ownerStarted 면 어차피 시작 흐름으로 넘어가야 하므로 마감 처리하지 않는다.
   // 협업 의도가 없는 토너먼트는 만료 자체를 무시한다.
   const isDepositClosed = !tournamentData.isOwner && !ownerStarted && isExpired && isCollaborative;
+  // 참여자는 주최자가 시작한 뒤로 담을 수 없다(서버 409). 만료 마감과 별개 사유라 따로 둔다.
+  const isAddItemBlocked = isDepositClosed || (!tournamentData.isOwner && ownerStarted);
 
   const participantImageMap = new Map(
     (pending?.participants ?? []).map(p => [p.userId, p.profileImage])
@@ -185,6 +187,7 @@ function TournamentCreateClient({ tournamentId }: TournamentCreateClientProps) {
             participants={participants}
             inviteCode={pending?.inviteCode ?? ''}
             inviteExpiresAt={pending?.inviteExpiresAt ?? ''}
+            ownerStarted={ownerStarted}
             {...(isCollaborative && !ownerStarted && !isDepositClosed && { depositDeadline })}
           />
         </div>
@@ -195,7 +198,7 @@ function TournamentCreateClient({ tournamentId }: TournamentCreateClientProps) {
           items={pending?.items}
           scrollToLast={scrollToLast}
           previousItemCount={previousItemCount}
-          isDepositClosed={isDepositClosed}
+          isAddItemBlocked={isAddItemBlocked}
           participantImageMap={participantImageMap}
         />
         <TournamentItemBasketStatus
@@ -218,7 +221,8 @@ function TournamentCreateClient({ tournamentId }: TournamentCreateClientProps) {
         />
       </div>
 
-      <Dialog open={isGetItemDialogOpen} onOpenChange={setIsGetItemDialogOpen}>
+      {/* 쿼리 파라미터로 직접 열 수 있어 + 버튼과 같은 조건으로 막는다 */}
+      <Dialog open={isGetItemDialogOpen && !isAddItemBlocked} onOpenChange={setIsGetItemDialogOpen}>
         <GetItemDialogContent type="tournament" />
       </Dialog>
 
