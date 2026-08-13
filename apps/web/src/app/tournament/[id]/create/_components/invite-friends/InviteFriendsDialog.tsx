@@ -103,7 +103,11 @@ function InviteFriendsDialog({
   };
 
   const handleSendInviteLink = async () => {
-    if (!inviteUrl) return;
+    /** 이미 시작된 토너먼트인 경우 */
+    if (!inviteUrl) {
+      toast.error('이미 시작된 토너먼트에는 친구를 초대할 수 없어요.');
+      return;
+    }
 
     const result = await share({
       title: 'piki 토너먼트 초대',
