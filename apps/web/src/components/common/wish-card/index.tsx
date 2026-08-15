@@ -4,8 +4,8 @@ import Skeleton from '@/components/skeleton';
 import formatPrice from '@/utils/formatPrice';
 
 type WishCardProps = {
-  name: string;
-  price: number;
+  name: string | null;
+  price: number | null;
   imageUrl: string | null;
   sourcePlatform?: string | null;
   preload?: boolean;
@@ -19,7 +19,7 @@ function WishCard({ name, price, imageUrl, sourcePlatform, preload = false }: Wi
         {imageUrl ? (
           <BaseImage
             src={imageUrl}
-            alt={name}
+            alt={name ?? ''}
             sizes="(max-width: 480px) calc(100vw - 40px - 8px), 216px"
             preload={preload}
             loadingFallback={<Skeleton className="absolute inset-0 rounded-none" />}
@@ -40,7 +40,9 @@ function WishCard({ name, price, imageUrl, sourcePlatform, preload = false }: Wi
       {/* 상품명 + 가격 + 커머스칩 */}
       <div className="flex h-[124px] flex-col items-start gap-2.5 self-stretch p-4">
         <div className="flex flex-col gap-1 self-stretch">
-          <p className="line-clamp-2 self-stretch body-2-medium text-text-neutral-primary">{name}</p>
+          <p className="line-clamp-2 self-stretch body-2-medium text-text-neutral-primary">
+            {name}
+          </p>
           <p className="body-2-semibold text-text-neutral-primary">{formatPrice(String(price))}</p>
         </div>
         {sourcePlatform && (
