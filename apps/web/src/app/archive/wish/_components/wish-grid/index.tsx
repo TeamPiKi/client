@@ -3,6 +3,7 @@ import type { MouseEvent } from 'react';
 
 import { CheckboxEmptyIconFill, CheckboxSelectedIconFill } from '@/assets/icons';
 import WishCard from '@/components/common/wish-card';
+import { ITEM_STATUS } from '@/consts/item';
 import { ROUTES } from '@/consts/route';
 import { Z_INDEX } from '@/consts/zIndex';
 import type { GetWishlistResponseT } from '@/types/wish';
@@ -29,7 +30,7 @@ function WishGrid({ items, isDeleteMode = false, selectedIds, onToggleSelect }: 
   return (
     <div className="grid grid-cols-2">
       {items.map(({ wish, item }, index) => {
-        if (item.status === 'FAILED' || item.status === 'INCOMPLETE')
+        if (item.status === ITEM_STATUS.FAILED || item.status === ITEM_STATUS.INCOMPLETE)
           return (
             <Link
               href={ROUTES.WISH_EDIT(wish.id)}
@@ -39,12 +40,14 @@ function WishGrid({ items, isDeleteMode = false, selectedIds, onToggleSelect }: 
             >
               <WishFailedCard
                 message={
-                  item.status === 'INCOMPLETE' ? '일부만 가져왔어요' : '가져오는데 실패했어요'
+                  item.status === ITEM_STATUS.INCOMPLETE
+                    ? '일부만 가져왔어요'
+                    : '가져오는데 실패했어요'
                 }
               />
             </Link>
           );
-        else if (item.status === 'PENDING' || item.status === 'PROCESSING')
+        else if (item.status === ITEM_STATUS.PENDING || item.status === ITEM_STATUS.PROCESSING)
           return <WishProcessingCard key={wish.id} />;
 
         if (isDeleteMode) {
