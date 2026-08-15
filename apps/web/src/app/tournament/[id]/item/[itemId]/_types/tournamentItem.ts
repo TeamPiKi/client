@@ -19,6 +19,12 @@ export type GetTournamentItemResponseT = {
       price?: undefined;
     }
   | {
+      status: (typeof ITEM_STATUS)['INCOMPLETE'];
+      name?: string;
+      imageUrl?: string;
+      price?: number;
+    }
+  | {
       status: (typeof ITEM_STATUS)['READY'];
       name: string;
       imageUrl: string;

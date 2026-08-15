@@ -7,6 +7,7 @@ import BottomCta from '@/components/bottom-cta';
 import Button from '@/components/button';
 import { Header, HeaderIcon } from '@/components/header';
 import TournamentErrorDialog from '@/components/tournament-error-dialog';
+import { ITEM_STATUS } from '@/consts/item';
 import { ROUTES } from '@/consts/route';
 import { useBackWithFallback } from '@/hooks/useBackWithFallback';
 import { useGetWishlist } from '@/hooks/useGetWishlist';
@@ -37,7 +38,10 @@ function ByWishContent({ tournamentId }: ByWishContentProps) {
   const existingItemIds = new Set(pending?.items.map(i => i.itemId) ?? []);
   const items = wishlistData.filter(
     ({ item }) =>
-      item.status !== 'FAILED' && item.status !== 'PROCESSING' && !existingItemIds.has(item.id)
+      item.status !== ITEM_STATUS.FAILED &&
+      item.status !== ITEM_STATUS.PROCESSING &&
+      item.status !== ITEM_STATUS.INCOMPLETE &&
+      !existingItemIds.has(item.id)
   );
 
   const isWishlistLoaded = !hasNextPage && !isFetchingNextPage;
