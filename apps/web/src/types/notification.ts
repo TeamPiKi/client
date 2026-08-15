@@ -7,7 +7,6 @@ export type NotificationTypeT =
   | 'TOURNAMENT_COMPLETED'
   | 'TOURNAMENT_RESULT_READY'
   | 'ITEM_PARSING_COMPLETED'
-  /** 추출이 일부 필드만 채운 경우 — 사용자가 나머지를 채워야 한다 */
   | 'ITEM_PARSING_INCOMPLETE'
   | 'ITEM_PARSING_FAILED'
   | 'ANNOUNCEMENT';

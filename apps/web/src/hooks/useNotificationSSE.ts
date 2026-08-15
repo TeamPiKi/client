@@ -167,7 +167,7 @@ export const useNotificationSSE = (enabled: boolean) => {
                   }
                   toast.success(message);
                   break;
-                /** 미완성은 실패와 갱신 대상이 같고 문구만 다르다 */
+                /** 미완성·실패 모두 동일한 데이터를 갱신하고, 사용자 안내만 다르다. */
                 case 'ITEM_PARSING_INCOMPLETE':
                 case 'ITEM_PARSING_FAILED':
                   if (payload.kind === 'TOURNAMENT' && payload.tournamentId != null) {
