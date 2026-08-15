@@ -53,7 +53,7 @@ export type DeepLinkPayloadT =
       refId: number;
     }
   | {
-      type: 'ITEM_PARSING_COMPLETED' | 'ITEM_PARSING_FAILED';
+      type: 'ITEM_PARSING_COMPLETED' | 'ITEM_PARSING_INCOMPLETE' | 'ITEM_PARSING_FAILED';
       refId: number;
       kind: 'WISH' | 'TOURNAMENT';
       tournamentId?: number;
