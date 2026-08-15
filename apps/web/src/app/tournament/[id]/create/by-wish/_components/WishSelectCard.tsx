@@ -2,8 +2,8 @@ import { CheckboxEmptyIconFill, CheckboxSelectedIconFill } from '@/assets/icons'
 import WishCard from '@/components/common/wish-card';
 
 type WishSelectCardProps = {
-  name: string;
-  price: number;
+  name: string | null;
+  price: number | null;
   imageUrl: string | null;
   sourcePlatform?: string | null;
   isSelected: boolean;
