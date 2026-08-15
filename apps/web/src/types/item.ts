@@ -5,7 +5,6 @@ export type ItemTypeT = 'wish' | 'tournament';
 export type ItemT = {
   id: number;
   status: ItemStatusT;
-  /** INCOMPLETE 면 비어 있을 수 있다 */
   name: string | null;
   price: number | null;
   currency: string | null;
