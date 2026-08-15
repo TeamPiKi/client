@@ -64,7 +64,7 @@ test('위시에서 상품 4개를 가져오면 장바구니에 담긴다', async
   await expect(nextButton).toBeDisabled();
 
   for (const { item } of MOCK_WISHLIST_ENTRIES) {
-    await page.getByRole('button', { name: item.name }).click();
+    await page.getByRole('button', { name: item.name ?? '' }).click();
   }
 
   /** 담기 성공 후 재조회부터는 4개 담긴 응답 (뒤에 등록한 목이 우선 매칭) */

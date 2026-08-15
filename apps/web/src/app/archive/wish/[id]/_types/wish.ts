@@ -20,6 +20,14 @@ type ItemT = {
       currency: null;
     }
   | {
+      /** 추출이 일부만 채운 상태 — 채운 필드만 값이 있다 */
+      status: (typeof ITEM_STATUS)['INCOMPLETE'];
+      name: string | null;
+      imageUrl: string | null;
+      price: number | null;
+      currency: string | null;
+    }
+  | {
       status: (typeof ITEM_STATUS)['READY'];
       name: string;
       imageUrl: string;

@@ -28,7 +28,8 @@ function TournamentBasketItem({
     <div
       className={cn(
         'relative aspect-square w-full',
-        (item.status === 'READY' || item.status === 'FAILED') && 'cursor-pointer'
+        (item.status === 'READY' || item.status === 'FAILED' || item.status === 'INCOMPLETE') &&
+          'cursor-pointer'
       )}
       onClick={onClick}
     >

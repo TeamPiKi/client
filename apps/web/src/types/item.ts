@@ -5,8 +5,9 @@ export type ItemTypeT = 'wish' | 'tournament';
 export type ItemT = {
   id: number;
   status: ItemStatusT;
-  name: string;
-  price: number;
+  /** INCOMPLETE 면 비어 있을 수 있다 */
+  name: string | null;
+  price: number | null;
   currency: string | null;
   imageUrl: string | null;
   sourceUrl: string | null;

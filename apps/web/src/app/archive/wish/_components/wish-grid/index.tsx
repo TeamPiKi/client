@@ -29,7 +29,7 @@ function WishGrid({ items, isDeleteMode = false, selectedIds, onToggleSelect }: 
   return (
     <div className="grid grid-cols-2">
       {items.map(({ wish, item }, index) => {
-        if (item.status === 'FAILED')
+        if (item.status === 'FAILED' || item.status === 'INCOMPLETE')
           return (
             <Link
               href={ROUTES.WISH_EDIT(wish.id)}
@@ -37,7 +37,11 @@ function WishGrid({ items, isDeleteMode = false, selectedIds, onToggleSelect }: 
               data-scroll-anchor-id={wish.id}
               onClick={event => handleCardClick(event, wish.id)}
             >
-              <WishFailedCard />
+              <WishFailedCard
+                message={
+                  item.status === 'INCOMPLETE' ? '일부만 가져왔어요' : '가져오는데 실패했어요'
+                }
+              />
             </Link>
           );
         else if (item.status === 'PENDING' || item.status === 'PROCESSING')

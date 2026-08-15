@@ -37,7 +37,11 @@ function ByWishContent({ tournamentId }: ByWishContentProps) {
   const existingItemIds = new Set(pending?.items.map(i => i.itemId) ?? []);
   const items = wishlistData.filter(
     ({ item }) =>
-      item.status !== 'FAILED' && item.status !== 'PROCESSING' && !existingItemIds.has(item.id)
+      item.status !== 'FAILED' &&
+      item.status !== 'PROCESSING' &&
+      /** 서버가 미완성 아이템의 토너먼트 출전을 막는다 */
+      item.status !== 'INCOMPLETE' &&
+      !existingItemIds.has(item.id)
   );
 
   const isWishlistLoaded = !hasNextPage && !isFetchingNextPage;
