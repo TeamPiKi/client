@@ -167,6 +167,8 @@ export const useNotificationSSE = (enabled: boolean) => {
                   }
                   toast.success(message);
                   break;
+                /** 미완성·실패 모두 동일한 데이터를 갱신하고, 사용자 안내만 다르다. */
+                case 'ITEM_PARSING_INCOMPLETE':
                 case 'ITEM_PARSING_FAILED':
                   if (payload.kind === 'TOURNAMENT' && payload.tournamentId != null) {
                     queryClient.invalidateQueries({
@@ -178,7 +180,11 @@ export const useNotificationSSE = (enabled: boolean) => {
                       predicate: query => isWishQueryOfItem(query, payload.refId),
                     });
                   }
-                  toast.error(message, { duration: 5000 });
+                  if (payload.type === 'ITEM_PARSING_INCOMPLETE') {
+                    toast.info(message, { duration: 5000 });
+                  } else {
+                    toast.error(message, { duration: 5000 });
+                  }
                   break;
                 case 'TOURNAMENT_STARTED':
                   queryClient.invalidateQueries({ queryKey: ['tournament', payload.refId] });
