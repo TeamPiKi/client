@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 
 import { Dialog } from '@/components/dialog';
 import GetItemDialogContent from '@/components/get-item-dialog';
+import { ITEM_STATUS } from '@/consts/item';
 import { QUERY_ACTION } from '@/consts/queryAction';
 import { useGetMe } from '@/hooks/useGetMe';
 import { useQueryAction } from '@/hooks/useQueryAction';
@@ -74,6 +75,10 @@ function TournamentCreateClient({ tournamentId }: TournamentCreateClientProps) {
   // 아이템 파싱 중이면 SSE 로 실시간 업데이트 (연결 실패 시 polling fallback).
   const hasPendingItem = hasParsingItems(pending?.items ?? []);
   useSSEFallback(['tournament', tournamentId], hasPendingItem);
+
+  const hasUnfinishedItem = (pending?.items ?? []).some(
+    item => item.status === ITEM_STATUS.FAILED || item.status === ITEM_STATUS.INCOMPLETE
+  );
 
   // 주최자가 ROOT 를 시작한 후(ownerStarted=true) 에는 초대 기간이 이미 종료된 상태라
   // inviteExpiresAt 이 null 이고 담기 마감 카운트다운도 의미 없다.
@@ -211,9 +216,7 @@ function TournamentCreateClient({ tournamentId }: TournamentCreateClientProps) {
         <TournamentStartButton
           count={pending?.items.length ?? 0}
           tournamentId={tournamentId}
-          hasUnreadyItem={
-            hasPendingItem || (pending?.items.some(item => item.status === 'FAILED') ?? false)
-          }
+          hasUnreadyItem={hasPendingItem || hasUnfinishedItem}
           hasFriends={hasFriends}
           isWaitingForOwnerStart={isWaitingForOwnerStart}
           isDepositClosed={isDepositClosed}
