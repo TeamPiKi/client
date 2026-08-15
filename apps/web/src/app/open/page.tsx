@@ -4,7 +4,7 @@ import { redirect } from 'next/navigation';
 
 import { DEFAULT_LANDING_TARGET, INSTAGRAM_SOURCE } from '@/consts/appLink';
 import isSafeInternalPath from '@/utils/isSafeInternalPath';
-import { toServiceHost } from '@/utils/landingHost';
+import { toServiceHost } from '@/utils/serviceHost';
 import { isWebview } from '@/utils/webBridge';
 
 import OpenLanding from './_components/OpenLanding';
