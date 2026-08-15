@@ -20,6 +20,13 @@ type ItemT = {
       currency: null;
     }
   | {
+      status: (typeof ITEM_STATUS)['INCOMPLETE'];
+      name: string | null;
+      imageUrl: string | null;
+      price: number | null;
+      currency: string | null;
+    }
+  | {
       status: (typeof ITEM_STATUS)['READY'];
       name: string;
       imageUrl: string;
