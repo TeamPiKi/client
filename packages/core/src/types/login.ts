@@ -34,6 +34,11 @@ export type SocialLoginErrorPayloadT = {
   detail: string;
 };
 
+/** 앱 → 웹 소셜 로그인 사용자 취소 */
+export type SocialLoginCancelMessageT = {
+  type: typeof WEBBRIDGE_MESSAGE_TYPE.APP_RES_SOCIAL_LOGIN_CANCEL;
+};
+
 /** 웹 → 앱 토큰 갱신 알림 */
 export type WebReqTokenRefreshedMessageT = {
   type: typeof WEBBRIDGE_MESSAGE_TYPE.WEB_REQ_TOKEN_REFRESHED;
