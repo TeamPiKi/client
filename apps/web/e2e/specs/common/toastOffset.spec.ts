@@ -3,8 +3,12 @@ import type { Page } from '@playwright/test';
 import { ENDPOINTS } from '@/consts/api';
 
 import { expect, test } from '@e2e/fixtures/mockApiFixture';
-import { MOCK_GUEST_ME } from '@e2e/mocks/me';
-import { MOCK_TOURNAMENT_LIST } from '@e2e/mocks/tournament';
+import { MOCK_GUEST_ME, MOCK_MEMBER_ME } from '@e2e/mocks/me';
+import {
+  MOCK_TOURNAMENT_COMPLETED,
+  MOCK_TOURNAMENT_LIST,
+  MOCK_TOURNAMENT_PENDING,
+} from '@e2e/mocks/tournament';
 
 const OFFSET = {
   NONE: '',
@@ -13,19 +17,8 @@ const OFFSET = {
   CTA_TALL: '150px',
 } as const;
 
-type ProbeT = 'none' | 'default' | 'tall';
-
-const readToastOffset = (page: Page, cta: ProbeT) =>
-  page.evaluate(ctaHeight => {
-    document.getElementById('probe-cta')?.remove();
-
-    if (ctaHeight !== 'none') {
-      const probeCta = document.createElement('div');
-      probeCta.id = 'probe-cta';
-      probeCta.setAttribute('data-bottom-cta', ctaHeight);
-      document.body.appendChild(probeCta);
-    }
-
+const readToastOffset = (page: Page) =>
+  page.evaluate(() => {
     let toaster = document.getElementById('probe-toaster');
     if (!toaster) {
       toaster = document.createElement('div');
@@ -40,7 +33,7 @@ const readToastOffset = (page: Page, cta: ProbeT) =>
       offsetBottom: style.getPropertyValue('--offset-bottom').trim(),
       mobileOffsetBottom: style.getPropertyValue('--mobile-offset-bottom').trim(),
     };
-  }, cta);
+  });
 
 test('탭바 페이지에서는 토스트가 탭바 위로 올라간다', async ({ page, api }) => {
   api.get(ENDPOINTS.TOURNAMENTS, MOCK_TOURNAMENT_LIST);
@@ -49,39 +42,63 @@ test('탭바 페이지에서는 토스트가 탭바 위로 올라간다', async 
   await page.goto('/home');
   await expect(page.locator('[data-bottom-tab-bar]')).toBeVisible();
 
-  expect(await readToastOffset(page, 'none')).toEqual({
+  expect(await readToastOffset(page)).toEqual({
     offsetBottom: OFFSET.TAB_BAR,
     mobileOffsetBottom: OFFSET.TAB_BAR,
   });
 });
 
-test('하단 CTA 가 있으면 CTA 높이 기준으로 올라가고, 탭바 규칙보다 우선한다', async ({
-  page,
-  api,
-}) => {
-  api.get(ENDPOINTS.TOURNAMENTS, MOCK_TOURNAMENT_LIST);
-  api.get(ENDPOINTS.USER, MOCK_GUEST_ME);
+test('기본형 CTA 페이지(담기 화면)에서는 토스트가 CTA 위로 올라간다', async ({ page, api }) => {
+  api.get(ENDPOINTS.USER, MOCK_MEMBER_ME);
+  api.get(ENDPOINTS.TOURNAMENT(1), MOCK_TOURNAMENT_PENDING);
 
-  // 탭바가 있는 페이지에서 확인 — 위시 삭제 모드처럼 CTA 가 탭바를 덮는 케이스와 같은 조건
-  await page.goto('/home');
-  await expect(page.locator('[data-bottom-tab-bar]')).toBeVisible();
+  await page.goto('/tournament/1/create');
+  await expect(page.locator('[data-bottom-cta="default"]')).toBeVisible();
 
-  expect(await readToastOffset(page, 'default')).toEqual({
+  expect(await readToastOffset(page)).toEqual({
     offsetBottom: OFFSET.CTA,
     mobileOffsetBottom: OFFSET.CTA,
   });
+});
 
-  expect(await readToastOffset(page, 'tall')).toEqual({
+test('tall CTA 페이지(결과 화면)에서는 토스트가 그만큼 더 올라간다', async ({ page, api }) => {
+  api.get(ENDPOINTS.USER, MOCK_MEMBER_ME);
+  api.get(ENDPOINTS.TOURNAMENT(3), MOCK_TOURNAMENT_COMPLETED);
+
+  await page.goto('/tournament/3/result');
+  await expect(page.locator('[data-bottom-cta="tall"]')).toBeVisible();
+
+  expect(await readToastOffset(page)).toEqual({
     offsetBottom: OFFSET.CTA_TALL,
     mobileOffsetBottom: OFFSET.CTA_TALL,
+  });
+});
+
+test('CTA 와 탭바 마커가 함께 있으면 CTA 규칙이 이긴다', async ({ page, api }) => {
+  api.get(ENDPOINTS.TOURNAMENTS, MOCK_TOURNAMENT_LIST);
+  api.get(ENDPOINTS.USER, MOCK_GUEST_ME);
+
+  await page.goto('/home');
+  await expect(page.locator('[data-bottom-tab-bar]')).toBeVisible();
+
+  await page.evaluate(() => {
+    const cta = document.createElement('div');
+    cta.setAttribute('data-bottom-cta', 'default');
+    document.body.appendChild(cta);
+  });
+
+  expect(await readToastOffset(page)).toEqual({
+    offsetBottom: OFFSET.CTA,
+    mobileOffsetBottom: OFFSET.CTA,
   });
 });
 
 test('하단 바가 없는 페이지에는 덮어쓰기 규칙이 걸리지 않는다', async ({ page }) => {
   await page.goto('/not-found-page-for-toast-offset');
   await expect(page.locator('[data-bottom-tab-bar]')).toHaveCount(0);
+  await expect(page.locator('[data-bottom-cta]')).toHaveCount(0);
 
-  expect(await readToastOffset(page, 'none')).toEqual({
+  expect(await readToastOffset(page)).toEqual({
     offsetBottom: OFFSET.NONE,
     mobileOffsetBottom: OFFSET.NONE,
   });
