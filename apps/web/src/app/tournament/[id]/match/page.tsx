@@ -3,6 +3,7 @@ import { isAxiosError } from 'axios';
 import { redirect } from 'next/navigation';
 
 import { ROUTES } from '@/consts/route';
+import { TOURNAMENT_STATUS } from '@/consts/tournament';
 import { getQueryClient } from '@/utils/queryClient';
 
 import { getTournament } from '../_common/_apis/getTournament';
@@ -20,20 +21,20 @@ async function TournamentPage({ params }: TournamentPageProps) {
 
   const tournamentData = await getTournament(tournamentId);
 
-  if (tournamentData.status === 'COMPLETED') {
+  if (tournamentData.status === TOURNAMENT_STATUS.COMPLETED) {
     redirect(ROUTES.TOURNAMENT_RESULT(tournamentId));
   }
 
   // 참여자가 본인 매치를 시작하기 전 (IN_PROGRESS + pending 페이로드)
   // — 아직 진행할 게 없으므로 create(대기) 화면으로 돌려보낸다.
-  if (tournamentData.status === 'IN_PROGRESS' && tournamentData.pending) {
+  if (tournamentData.status === TOURNAMENT_STATUS.IN_PROGRESS && tournamentData.pending) {
     redirect(ROUTES.TOURNAMENT_CREATE(tournamentId));
   }
 
   let hydratedTournament: GetTournamentInProgressResponseT;
   let playTournamentId = tournamentId;
 
-  if (tournamentData.status === 'PENDING') {
+  if (tournamentData.status === TOURNAMENT_STATUS.PENDING) {
     try {
       // 응답 tournamentId 활용:
       // - 주최자(ROOT): 요청 tournamentId 와 동일
@@ -50,10 +51,10 @@ async function TournamentPage({ params }: TournamentPageProps) {
       playTournamentId = nextTournamentId;
       const started = await getTournament(nextTournamentId);
 
-      if (started.status === 'COMPLETED') {
+      if (started.status === TOURNAMENT_STATUS.COMPLETED) {
         redirect(ROUTES.TOURNAMENT_RESULT(nextTournamentId));
       }
-      if (started.status !== 'IN_PROGRESS' || started.pending) {
+      if (started.status !== TOURNAMENT_STATUS.IN_PROGRESS || started.pending) {
         // start 직후인데 진행 상태가 아님 — 예상 밖이라 대기 화면으로 돌려보낸다
         redirect(ROUTES.TOURNAMENT_CREATE(nextTournamentId));
       }
@@ -64,17 +65,17 @@ async function TournamentPage({ params }: TournamentPageProps) {
       if (!isAxiosError(error) || error.response?.status !== 409) throw error;
 
       const latest = await getTournament(tournamentId);
-      if (latest.status === 'COMPLETED') {
+      if (latest.status === TOURNAMENT_STATUS.COMPLETED) {
         redirect(ROUTES.TOURNAMENT_RESULT(tournamentId));
       }
-      if (latest.status === 'PENDING' || latest.pending) {
+      if (latest.status === TOURNAMENT_STATUS.PENDING || latest.pending) {
         // 409이면서 여전히 PENDING 또는 멤버 대기 상태 — 예상 밖, 그대로 던짐
         throw error;
       }
       hydratedTournament = latest;
     }
   } else {
-    // tournamentData.status === 'IN_PROGRESS' && !tournamentData.pending — 매치 진행 중
+    // tournamentData.status === TOURNAMENT_STATUS.IN_PROGRESS && !tournamentData.pending — 매치 진행 중
     hydratedTournament = tournamentData;
   }
 
