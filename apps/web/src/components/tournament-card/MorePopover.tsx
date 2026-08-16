@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { type ComponentType, type SVGProps, useState } from 'react';
+import { type ComponentType, type MouseEvent, type SVGProps, useState } from 'react';
 
 import {
   GroupIconFill,
@@ -57,76 +57,81 @@ function MorePopover({ status, tournamentId, participantCount = 0 }: MorePopover
     router.push(ROUTES.TOURNAMENT_RESULT(tournamentId));
   };
 
+  /** 카드 전체가 Link 라 더보기 조작이 페이지 이동으로 이어지지 않게 막는다 */
+  const handleStopCardNavigation = (event: MouseEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    event.stopPropagation();
+  };
+
   return (
-    <div
-      className="contents"
-      onClick={event => {
-        event.preventDefault();
-        event.stopPropagation();
-      }}
-    >
-      <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
-        <PopoverTrigger asChild>
-          <button type="button" aria-label="더보기" className="cursor-pointer">
-            <ThreeDotVerticalIconFill className="size-6 text-icon-neutral-secondary" />
-          </button>
-        </PopoverTrigger>
-        <PopoverContent className="p-2" align="end" alignOffset={-24}>
-          <PopoverTitle className="sr-only">더보기</PopoverTitle>
+    <>
+      {/*
+        Dialog 는 이 래퍼 밖에 둔다 — 안에 두면 딤 클릭이 stopPropagation 에 막혀 닫히지 않는다.
+      */}
+      <div className="contents" onClick={handleStopCardNavigation}>
+        <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
+          <PopoverTrigger asChild>
+            <button type="button" aria-label="더보기" className="cursor-pointer">
+              <ThreeDotVerticalIconFill className="size-6 text-icon-neutral-secondary" />
+            </button>
+          </PopoverTrigger>
+          <PopoverContent className="p-2" align="end" alignOffset={-24}>
+            <PopoverTitle className="sr-only">더보기</PopoverTitle>
 
-          {status === TOURNAMENT_STATUS.PENDING && (
-            <>
-              <OptionButton
-                Icon={HeartIconFill}
-                label="위시 추가하기"
-                onClick={handleAddTournamentItem}
-              />
-              <OptionButton
-                Icon={TrashIconFill}
-                label="삭제하기"
-                onClick={handleDeleteTournament}
-              />
-            </>
-          )}
+            {status === TOURNAMENT_STATUS.PENDING && (
+              <>
+                <OptionButton
+                  Icon={HeartIconFill}
+                  label="위시 추가하기"
+                  onClick={handleAddTournamentItem}
+                />
+                <OptionButton
+                  Icon={TrashIconFill}
+                  label="삭제하기"
+                  onClick={handleDeleteTournament}
+                />
+              </>
+            )}
 
-          {status === TOURNAMENT_STATUS.IN_PROGRESS && (
-            <>
-              {/*
+            {status === TOURNAMENT_STATUS.IN_PROGRESS && (
+              <>
+                {/*
                 TODO: IN_PROGRESS 참여자 API 가 추가되면 친구 목록 보기 노출.
                 현재는 group-result(COMPLETED 전용) 만 사용 가능해 데이터를 못 받으므로 미노출.
               */}
-              <OptionButton
-                disabled
-                Icon={TrashIconFill}
-                label="삭제하기"
-                onClick={handleDeleteTournament}
-              />
-            </>
-          )}
-
-          {status === TOURNAMENT_STATUS.COMPLETED && (
-            <>
-              {hasInvitedFriends && (
                 <OptionButton
-                  Icon={GroupIconFill}
-                  label="친구 목록 보기"
-                  onClick={handleViewFriendList}
+                  disabled
+                  Icon={TrashIconFill}
+                  label="삭제하기"
+                  onClick={handleDeleteTournament}
                 />
-              )}
-              <OptionButton
-                Icon={ReceiptIconFill}
-                label="결과 확인하기"
-                onClick={handleViewTournamentResult}
-              />
-              <OptionButton
-                Icon={TrashIconFill}
-                label="삭제하기"
-                onClick={handleDeleteTournament}
-              />
-            </>
-          )}
-        </PopoverContent>
-      </Popover>
+              </>
+            )}
+
+            {status === TOURNAMENT_STATUS.COMPLETED && (
+              <>
+                {hasInvitedFriends && (
+                  <OptionButton
+                    Icon={GroupIconFill}
+                    label="친구 목록 보기"
+                    onClick={handleViewFriendList}
+                  />
+                )}
+                <OptionButton
+                  Icon={ReceiptIconFill}
+                  label="결과 확인하기"
+                  onClick={handleViewTournamentResult}
+                />
+                <OptionButton
+                  Icon={TrashIconFill}
+                  label="삭제하기"
+                  onClick={handleDeleteTournament}
+                />
+              </>
+            )}
+          </PopoverContent>
+        </Popover>
+      </div>
 
       <TournamentDeleteDialog
         open={isDeleteDialogOpen}
@@ -139,7 +144,7 @@ function MorePopover({ status, tournamentId, participantCount = 0 }: MorePopover
         onOpenChange={setIsFriendListOpen}
         tournamentId={tournamentId}
       />
-    </div>
+    </>
   );
 }
 

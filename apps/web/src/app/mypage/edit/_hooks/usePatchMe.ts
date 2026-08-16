@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
+import { QUERY_KEYS } from '@/consts/queryKeys';
 import { isGlobalNetError } from '@/utils/apiError';
 import { getApiErrorMessage } from '@/utils/getApiErrorMessage';
 
@@ -18,7 +19,7 @@ export const usePatchMe = () => {
       return patchMe(formData);
     },
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['me'] });
+      await queryClient.invalidateQueries({ queryKey: QUERY_KEYS.USER.ME });
     },
     onError: error => {
       if (isGlobalNetError(error)) return;

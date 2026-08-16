@@ -1,10 +1,10 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 
 import { CheckCircledIconOutline } from '@/assets/icons';
 import Button from '@/components/button';
-import { Header, HeaderIcon } from '@/components/header';
 import { cn } from '@/utils/cn';
 import { formatTimeKo } from '@/utils/formatDate';
 import { isWebview } from '@/utils/webBridge';
@@ -14,6 +14,7 @@ import useIntersectionObserver from '../_hooks/useIntersectionObserver';
 import { usePostNotificationsRead } from '../_hooks/usePostNotificationsRead';
 import { usePushPermission } from '../_hooks/usePushPermission';
 import { getNotificationRoute } from '../_utils/getNotificationRoute';
+import MarkAllReadDialog from './MarkAllReadDialog';
 import NotificationItem from './NotificationItem';
 import NotificationStateCard from './NotificationStateCard';
 import PushDisabledBanner from './PushDisabledBanner';
@@ -34,12 +35,10 @@ function NotificationContent() {
   } = useGetNotifications();
   const { postNotificationsReadMutation, isPostNotificationsReadPending } =
     usePostNotificationsRead();
+  const [isMarkAllReadDialogOpen, setIsMarkAllReadDialogOpen] = useState(false);
   const isEmpty = !isPending && notificationsData.length === 0;
 
-  const handleMarkAllRead = () => {
-    if (isPostNotificationsReadPending) return;
-    postNotificationsReadMutation({ all: true });
-  };
+  const handleMarkAllRead = () => setIsMarkAllReadDialogOpen(true);
 
   const bottomRef = useIntersectionObserver(
     fetchNextPage,
@@ -57,15 +56,11 @@ function NotificationContent() {
   };
 
   return (
-    <div className="flex h-dvh flex-col bg-gray-50 px-5 pt-padding-top">
-      <Header
-        left={<HeaderIcon name="BACK" />}
-        center="알림 히스토리"
-        centerClassName="heading-1-bold"
-      />
+    <>
+      {renderContent()}
 
-      <div className="hide-scrollbar flex-1 overflow-y-auto">{renderContent()}</div>
-    </div>
+      <MarkAllReadDialog open={isMarkAllReadDialogOpen} onOpenChange={setIsMarkAllReadDialogOpen} />
+    </>
   );
 
   function renderContent() {
@@ -74,9 +69,11 @@ function NotificationContent() {
     if (isEmpty)
       return <NotificationStateCard variant="empty" onAction={openNotificationSettings} />;
 
+    const isPushBannerVisible = isWebview() && isPushEnabled === false;
+
     return (
-      <div className={cn('flex flex-col gap-4 pb-9', unreadCount <= 0 && 'pt-9')}>
-        {isWebview() && isPushEnabled === false && (
+      <div className={cn('flex flex-col gap-4 pb-9')}>
+        {isPushBannerVisible && (
           <div className="pt-5">
             <PushDisabledBanner onOpenNotificationSettings={openNotificationSettings} />
           </div>
@@ -99,9 +96,10 @@ function NotificationContent() {
             {notificationsData.map(notification => (
               <NotificationItem
                 key={notification.id}
+                kind={notification.kind}
                 message={notification.title}
+                body={notification.body}
                 time={formatTimeKo(notification.createdAt)}
-                profileImage={notification.imageUrl}
                 isRead={notification.isRead}
                 onClick={() => handleNotificationClick(notification)}
               />
@@ -117,6 +115,12 @@ function NotificationContent() {
           </div>
         ) : (
           <div ref={bottomRef} />
+        )}
+
+        {!isPending && !isFetchingNextPage && !isFetchNextPageError && !hasNextPage && (
+          <p className="mt-3 text-center caption-1-regular text-text-neutral-tertiary">
+            알림은 14일간 보관되며, 14일 후 자동 삭제돼요.
+          </p>
         )}
       </div>
     );

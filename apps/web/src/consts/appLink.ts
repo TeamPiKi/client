@@ -1,0 +1,11 @@
+/** Android 패키지명 — `intent://` 의 package 지정에 쓴다 (스토어 URL 은 @piki/core 의 APP_STORE_URL) */
+export const ANDROID_PACKAGE_NAME = 'day.no30s.piki';
+
+/** `?to=` 가 없거나 안전하지 않을 때의 목적지 */
+export const DEFAULT_LANDING_TARGET = '/';
+
+/** 로고가 한 프레임 그려진 뒤 발사해 흰 화면이 스치지 않게 한다 (ms) */
+export const AUTO_LAUNCH_DELAY_MS = 200;
+
+/** 인앱 브라우저 UA 토큰 — 동작 분기가 아니라 유입 분석용 */
+export const IN_APP_BROWSER_UA_TOKENS = ['Instagram', 'Threads'] as const;

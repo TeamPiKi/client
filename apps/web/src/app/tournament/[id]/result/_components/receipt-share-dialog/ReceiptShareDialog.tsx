@@ -29,6 +29,8 @@ type ReceiptShareDialogProps = {
   tournamentName: string;
   result: RankedProductT[];
   date: Date;
+  /** 서버가 UA 로 판정한 앱 여부 — 스토리 공유 버튼 노출에 쓴다 */
+  isApp?: boolean;
 };
 
 type ShareActionProps = {
@@ -74,18 +76,28 @@ function ReceiptShareDialog({
   tournamentName,
   result,
   date,
+  isApp = false,
 }: ReceiptShareDialogProps) {
   const captureLayerRef = useRef<HTMLDivElement | null>(null);
   const [imageBlob, setImageBlob] = useState<Blob | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  /** state 는 버튼 비활성화용, ref 는 즉시 차단용 */
+  const [isSharingLink, setIsSharingLink] = useState(false);
+  const isSharingLinkRef = useRef(false);
   const { shareToStory, isSharing } = useInstagramStoryShare();
 
-  /** 스토리 공유는 네이티브 전용 — SSR 은 false 로 두어 hydration mismatch 를 피한다 */
-  const isAppEnvironment = useSyncExternalStore(
+  /**
+   * 스토리 공유는 네이티브 전용.
+   * 서버가 UA 로 판정한 값을 우선 쓴다 — 클라에서만 판정하면 hydration 후에야 정해져
+   * 시트가 열린 뒤 버튼이 하나 늘며 뒤늦게 나타난다.
+   * UA 가 없는 구버전 앱을 위해 클라 판정(window 객체)을 fallback 으로 둔다.
+   */
+  const isWebviewByClient = useSyncExternalStore(
     () => () => {},
     () => isWebview(),
     () => false
   );
+  const isAppEnvironment = isApp || isWebviewByClient;
 
   /** 시트가 열릴 때 한 번만 캡처하고, 그 blob 을 모든 액션이 재사용한다 */
   useEffect(() => {
@@ -159,6 +171,9 @@ function ReceiptShareDialog({
     /** WebBridge 가 이미 업데이트 안내를 띄웠다 */
     if (status === 'blocked') return;
 
+    /** 연타로 인한 중복 호출 — 안내 없이 무시 */
+    if (status === 'busy') return;
+
     if (status === 'notInstalled') {
       toast.warning('인스타그램 앱을 설치하면 스토리에 공유할 수 있어요.');
       return;
@@ -178,8 +193,19 @@ function ReceiptShareDialog({
 
   const handleShareLink = async () => {
     if (!imageBlob) return;
+    /** 연타 방지 — state 는 리렌더 후에야 반영돼 그 사이 클릭을 막지 못한다 */
+    if (isSharingLinkRef.current) return;
 
-    const shareResult = await shareReceiptImageFile(imageBlob);
+    isSharingLinkRef.current = true;
+    setIsSharingLink(true);
+
+    const shareResult = await shareReceiptImageFile(imageBlob).finally(() => {
+      isSharingLinkRef.current = false;
+      setIsSharingLink(false);
+    });
+
+    /** 이미 열린 공유 시트에서 발생한 중복 호출 — 사용자 입장에선 정상이므로 조용히 무시한다 */
+    if (shareResult === 'busy') return;
     if (shareResult === 'unsupported') {
       toast.warning('이 환경에서는 공유를 지원하지 않아요. 저장을 이용해주세요.');
       return;
@@ -246,7 +272,7 @@ function ReceiptShareDialog({
               <ShareAction
                 icon={<LinkIconOutline className="size-6 text-text-neutral-secondary" />}
                 label="링크 공유"
-                disabled={!imageBlob}
+                disabled={!imageBlob || isSharingLink}
                 onClick={handleShareLink}
               />
               {isAppEnvironment && (

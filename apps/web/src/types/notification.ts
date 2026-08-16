@@ -7,10 +7,11 @@ export type NotificationTypeT =
   | 'TOURNAMENT_COMPLETED'
   | 'TOURNAMENT_RESULT_READY'
   | 'ITEM_PARSING_COMPLETED'
+  | 'ITEM_PARSING_INCOMPLETE'
   | 'ITEM_PARSING_FAILED'
   | 'ANNOUNCEMENT';
 
-type NotificationKindT = 'WISH' | 'TOURNAMENT';
+export type NotificationKindT = 'WISH' | 'TOURNAMENT' | 'SYSTEM';
 
 export type NotificationCategoryT = 'ACTIVITY' | 'SYSTEM';
 
@@ -24,7 +25,7 @@ export type NotificationItemT = {
   refId: number;
   isRead: boolean;
   createdAt: string;
-  kind?: NotificationKindT;
+  kind: NotificationKindT;
   tournamentId?: number;
   tournamentItemId?: number;
 };
@@ -40,7 +41,7 @@ export type SilentSyncSsePayloadT =
       type: 'TOURNAMENT_ITEM_PARSED';
       tournamentId: number;
       tournamentItemId: number;
-      status: 'READY' | 'FAILED';
+      status: 'READY' | 'INCOMPLETE' | 'FAILED';
     }
   | {
       type: 'UNREAD_COUNT_CHANGED';
@@ -57,8 +58,7 @@ export type NotificationSsePayloadT = {
   refId: number;
   isRead: boolean;
   createdAt: string;
-  /** ITEM_PARSING_COMPLETED / ITEM_PARSING_FAILED 일 때만 존재 */
-  kind?: NotificationKindT;
+  kind: NotificationKindT;
   /** kind === 'TOURNAMENT' 일 때만 존재 */
   tournamentId?: number;
   /** kind === 'TOURNAMENT' 일 때만 존재 */

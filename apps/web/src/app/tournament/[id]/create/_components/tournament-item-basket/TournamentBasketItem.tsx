@@ -1,6 +1,7 @@
 import Image from 'next/image';
 
 import ProductImage from '@/app/tournament/[id]/create/_components/product-image';
+import { ITEM_STATUS } from '@/consts/item';
 import { Z_INDEX } from '@/consts/zIndex';
 import { useGetMe } from '@/hooks/useGetMe';
 import { cn } from '@/utils/cn';
@@ -28,7 +29,10 @@ function TournamentBasketItem({
     <div
       className={cn(
         'relative aspect-square w-full',
-        (item.status === 'READY' || item.status === 'FAILED') && 'cursor-pointer'
+        (item.status === ITEM_STATUS.READY ||
+          item.status === ITEM_STATUS.FAILED ||
+          item.status === ITEM_STATUS.INCOMPLETE) &&
+          'cursor-pointer'
       )}
       onClick={onClick}
     >

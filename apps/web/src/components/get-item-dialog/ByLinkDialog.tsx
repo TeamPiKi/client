@@ -3,11 +3,11 @@
 import { useParams } from 'next/navigation';
 import { useState } from 'react';
 
-import { usePostTournamentItemLink } from '@/app/tournament/[id]/create/_hooks/usePostTournamentItemLink';
 import { LinkIconFill } from '@/assets/icons';
 import Button from '@/components/button';
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/dialog';
 import Input from '@/components/input';
+import { usePostTournamentItemLink } from '@/hooks/usePostTournamentItemLink';
 import { usePostWishLink } from '@/hooks/usePostWishLink';
 import type { ItemTypeT } from '@/types/item';
 import { isGlobalNetError } from '@/utils/apiError';

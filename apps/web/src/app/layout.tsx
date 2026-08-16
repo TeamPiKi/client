@@ -1,13 +1,17 @@
 import { GoogleAnalytics } from '@next/third-parties/google';
+import { isTokenUnexpired } from '@piki/core';
+import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
 import type { Metadata, Viewport } from 'next';
-import { headers } from 'next/headers';
+import { cookies, headers } from 'next/headers';
 import React from 'react';
 
+import { getMeQueryOptions } from '@/apis/getMe';
 import BottomTabBar from '@/components/bottom-tab-bar';
 import AppUpdateDialog from '@/components/common/app-update-dialog';
 import { APP_UPDATE_PROMPT } from '@/consts/appUpdate';
 import { SCROLL_CONTAINER_ID } from '@/consts/layout';
 import { getAppVersion, isAppVersionSupported } from '@/utils/appVersion';
+import { getQueryClient } from '@/utils/queryClient';
 import { isWebview as _isWebView } from '@/utils/webBridge';
 
 import Providers from '../components/Providers';
@@ -37,6 +41,12 @@ async function RootLayout({
   const headerStore = await headers();
   const userAgent = headerStore.get('user-agent') ?? '';
   const isWebview = _isWebView(userAgent);
+
+  const queryClient = getQueryClient();
+  const accessToken = (await cookies()).get('access_token')?.value;
+  if (isTokenUnexpired(accessToken ?? null)) {
+    queryClient.prefetchQuery(getMeQueryOptions);
+  }
 
   const shouldUpdateApp =
     isWebview && !isAppVersionSupported(getAppVersion(userAgent), APP_UPDATE_PROMPT.targetVersion);
@@ -77,7 +87,7 @@ async function RootLayout({
             id={SCROLL_CONTAINER_ID}
             className="mx-auto hide-scrollbar h-full max-w-120 overflow-y-auto [scrollbar-gutter:stable]"
           >
-            {children}
+            <HydrationBoundary state={dehydrate(queryClient)}>{children}</HydrationBoundary>
           </div>
 
           {/* NOTE: 전환 애니메이션이 끊기지 않게 하기 위해 탭바를 레이아웃에 렌더 */}

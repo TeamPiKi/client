@@ -6,6 +6,7 @@ import { useState } from 'react';
 import AddIcon from '@/assets/icons/fill/add.svg';
 import { Dialog, DialogTrigger } from '@/components/dialog';
 import GetItemDialogContent from '@/components/get-item-dialog';
+import { ITEM_STATUS } from '@/consts/item';
 import { ROUTES } from '@/consts/route';
 
 import type { TournamentPendingItemT } from '../../../_common/_types/tournamentResponse';
@@ -18,7 +19,7 @@ type TournamentItemBasketProps = {
   basketIndex: number;
   items: TournamentPendingItemT[];
   maxHeight?: number;
-  isDepositClosed?: boolean;
+  isAddItemBlocked?: boolean;
   participantImageMap?: Map<string, string>;
 };
 
@@ -26,7 +27,7 @@ function TournamentItemBasket({
   basketIndex,
   items,
   maxHeight,
-  isDepositClosed = false,
+  isAddItemBlocked = false,
   participantImageMap,
 }: TournamentItemBasketProps) {
   const { id } = useParams<{ id: string }>();
@@ -41,7 +42,7 @@ function TournamentItemBasket({
   };
 
   const isFull = items.length >= ITEMS_PER_BASKET;
-  const showAddButton = !isDepositClosed && !isFull;
+  const showAddButton = !isAddItemBlocked && !isFull;
 
   const addSlot = showAddButton ? (
     <Dialog>
@@ -76,7 +77,7 @@ function TournamentItemBasket({
           <div className="grid w-[45%] grid-cols-2 gap-x-6 gap-y-5 pt-[20%]">
             {addSlot}
             {items.map((item, index) => {
-              if (item.status === 'READY') {
+              if (item.status === ITEM_STATUS.READY || item.status === ITEM_STATUS.INCOMPLETE) {
                 return (
                   <Link
                     key={item.tournamentItemId}

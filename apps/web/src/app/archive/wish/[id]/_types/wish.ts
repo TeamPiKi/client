@@ -1,5 +1,5 @@
 import type { ITEM_STATUS } from '@/consts/item';
-import type { PriceHistorySourceT, PriceHistoryT } from '@/types/item';
+import type { PatchItemRequestT, PriceHistorySourceT, PriceHistoryT } from '@/types/item';
 import type { WishT } from '@/types/wish';
 
 type ItemT = {
@@ -20,6 +20,13 @@ type ItemT = {
       currency: null;
     }
   | {
+      status: (typeof ITEM_STATUS)['INCOMPLETE'];
+      name: string | null;
+      imageUrl: string | null;
+      price: number | null;
+      currency: string | null;
+    }
+  | {
       status: (typeof ITEM_STATUS)['READY'];
       name: string;
       imageUrl: string;
@@ -28,8 +35,14 @@ type ItemT = {
     }
 );
 
+export type PatchWishRequestT = PatchItemRequestT & {
+  memo?: string;
+};
+
 export type GetWishResponseT = {
   wish: WishT;
+  /** 개인 메모 — 본인만 볼 수 있음 */
+  memo: string | null;
   item: ItemT;
   /**
    * 가격 갱신 기록

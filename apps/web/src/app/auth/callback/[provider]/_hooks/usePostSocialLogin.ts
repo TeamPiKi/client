@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 
 import { ANALYTICS_EVENT } from '@/consts/analytics';
 import { QUERY_ACTION } from '@/consts/queryAction';
+import { QUERY_KEYS } from '@/consts/queryKeys';
 import type { ApiErrorResponseT } from '@/types/api';
 import { logAnalyticsEvent } from '@/utils/analytics';
 import { isServerOrNetworkError, isWithdrawnAccountError } from '@/utils/apiError';
@@ -30,7 +31,7 @@ export const usePostSocialLogin = (provider: SocialProviderT) => {
     }) => postSocialLogin(provider, { code, redirectUri, state }),
     onSuccess: (_, variables) => {
       logAnalyticsEvent(ANALYTICS_EVENT.SIGN_UP_COMPLETE, { provider });
-      queryClient.invalidateQueries({ queryKey: ['me'] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.USER.ME });
       window.location.replace(getLoginRedirectPath(variables.redirect));
     },
     onError: (error, variables) => {

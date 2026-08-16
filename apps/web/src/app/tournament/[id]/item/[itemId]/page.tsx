@@ -1,15 +1,17 @@
-import EditContent from './_components/EditContent';
+import TournamentItemInfoScreen from './_components/TournamentItemInfoScreen';
 
-type TournamentItemEditPageProps = {
+type TournamentItemInfoPageProps = {
   params: Promise<{ id: string; itemId: string }>;
 };
 
-async function TournamentItemEditPage({ params }: TournamentItemEditPageProps) {
+async function TournamentItemInfoPage({ params }: TournamentItemInfoPageProps) {
   const { id, itemId } = await params;
   const tournamentId = Number(id);
   const tournamentItemId = Number(itemId);
 
-  return <EditContent tournamentId={tournamentId} tournamentItemId={tournamentItemId} />;
+  return (
+    <TournamentItemInfoScreen tournamentId={tournamentId} tournamentItemId={tournamentItemId} />
+  );
 }
 
-export default TournamentItemEditPage;
+export default TournamentItemInfoPage;

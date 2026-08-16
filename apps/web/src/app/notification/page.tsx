@@ -1,23 +1,20 @@
-import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
+import { Header, HeaderIcon } from '@/components/header';
 
-import { getQueryClient } from '@/utils/queryClient';
-
-import { getNotifications } from './_apis/getNotifications';
 import NotificationContent from './_components/NotificationContent';
 
 function Notification() {
-  const queryClient = getQueryClient();
-
-  queryClient.prefetchInfiniteQuery({
-    queryKey: ['notifications'],
-    queryFn: ({ pageParam }) => getNotifications({ cursor: pageParam as string | null }),
-    initialPageParam: null,
-  });
-
   return (
-    <HydrationBoundary state={dehydrate(queryClient)}>
-      <NotificationContent />
-    </HydrationBoundary>
+    <main className="flex h-dvh flex-col bg-gray-50 px-5 pt-padding-top">
+      <Header
+        left={<HeaderIcon name="BACK" />}
+        center="알림 히스토리"
+        centerClassName="heading-1-bold"
+      />
+
+      <div className="mt-4 hide-scrollbar flex-1 overflow-y-auto">
+        <NotificationContent />
+      </div>
+    </main>
   );
 }
 

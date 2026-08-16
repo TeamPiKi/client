@@ -1,8 +1,8 @@
-import { clientApi } from '@/apis/client';
 import { ENDPOINTS } from '@/consts/api';
 import type { ApiResponseT } from '@/types/api';
+import type { PostTournamentItemLinkResponseT } from '@/types/tournament';
 
-import type { PostTournamentItemLinkResponseT } from '../_types/tournament';
+import { clientApi } from './client';
 
 export const postTournamentItemLink = async (tournamentId: number, url: string) => {
   const { data } = await clientApi.post<ApiResponseT<PostTournamentItemLinkResponseT>>(

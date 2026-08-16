@@ -1,10 +1,6 @@
-import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
-
-import { getMe } from '@/apis/getMe';
 import { Header, HeaderIcon } from '@/components/header';
 import Spacing from '@/components/spacing';
 import { getIsGuest } from '@/utils/getIsGuest';
-import { getQueryClient } from '@/utils/queryClient';
 
 import AccountInfoSection from './_components/AccountInfoSection';
 import AppVersionFooter from './_components/AppVersionFooter';
@@ -12,12 +8,6 @@ import MypageGuestBanner from './_components/MypageGuestBanner';
 import ProfileSection from './_components/ProfileSection';
 
 async function MypagePage() {
-  const queryClient = getQueryClient();
-  queryClient.prefetchQuery({
-    queryKey: ['me'],
-    queryFn: getMe,
-  });
-
   const isGuest = await getIsGuest();
 
   return (
@@ -33,9 +23,7 @@ async function MypagePage() {
           </>
         )}
 
-        <HydrationBoundary state={dehydrate(queryClient)}>
-          <ProfileSection />
-        </HydrationBoundary>
+        <ProfileSection />
 
         <Spacing size={32} />
 

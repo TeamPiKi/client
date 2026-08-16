@@ -56,6 +56,10 @@ export type PostCreateTournamentResponseT = {
   tournamentId: number;
 };
 
+export type PostTournamentItemLinkResponseT = {
+  tournamentItemId: number;
+};
+
 /** 초대 코드 / 토너먼트 미리보기 응답 */
 export type GetInvitePreviewResponseT = {
   tournamentId: number;

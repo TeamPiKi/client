@@ -6,6 +6,8 @@ export type GetTournamentItemResponseT = {
   /** 이미지로 등록한 경우 undefined */
   sourceUrl?: string;
   currency?: string;
+  /** 개인 메모 - 위시에서 가져오기가 아니거나 비회원인 경우 undefined */
+  memo?: string;
 } & (
   | {
       status:
@@ -15,6 +17,12 @@ export type GetTournamentItemResponseT = {
       name?: undefined;
       imageUrl?: undefined;
       price?: undefined;
+    }
+  | {
+      status: (typeof ITEM_STATUS)['INCOMPLETE'];
+      name?: string;
+      imageUrl?: string;
+      price?: number;
     }
   | {
       status: (typeof ITEM_STATUS)['READY'];

@@ -40,6 +40,12 @@ export const ANALYTICS_EVENT = {
   APP_UPDATE_PROMPT_VIEW: 'app_update_prompt_view',
   APP_UPDATE_PROMPT_CLICK: 'app_update_prompt_click',
   APP_UPDATE_PROMPT_DISMISS: 'app_update_prompt_dismiss',
+
+  /** 외부 유입 랜딩 (인스타 프로필 링크) — 인스타는 리퍼러를 안 넘겨 utm_source 로만 잡힌다 */
+  LANDING_VIEW: 'landing_view',
+  LANDING_APP_OPEN: 'landing_app_open',
+  LANDING_STORE_OPEN: 'landing_store_open',
+  LANDING_WEB_CONTINUE: 'landing_web_continue',
 } as const;
 
 export type AnalyticsEventNameT = (typeof ANALYTICS_EVENT)[keyof typeof ANALYTICS_EVENT];

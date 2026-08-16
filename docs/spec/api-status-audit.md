@@ -8,7 +8,7 @@
 
 ## 전역 동작 (공통 전제)
 
-- **401**: `apis/client.ts` 인터셉터가 토큰 refresh 후 자동 재시도, 실패 시 로그인 리다이렉트 → clientApi 호출은 사실상 401 전역 커버. **단 로그인 요청(`/auth/login/*`·`/auth/guest`)은 세션이 없어 refresh 대상에서 제외** — 이 401 은 로그인 실패이므로 개별 `onError` 가 안내한다. **`serverApi`(SSR) 응답 인터셉터는 409 `USER-003` 리다이렉트와 5xx 수집만 하므로** 서버 렌더 경로의 나머지 4xx/5xx는 그대로 throw.
+- **401**: `apis/client.ts` 인터셉터가 토큰 refresh 후 자동 재시도, 실패 시 로그인 리다이렉트 → clientApi 호출은 사실상 401 전역 커버. **단 로그인 요청(`/auth/login/*`·`/auth/guest`)은 세션이 없어 refresh 대상에서 제외** — 이 401 은 로그인 실패이므로 개별 `onError` 가 안내한다. **`serverApi`(SSR) 응답 인터셉터는 401 세션 만료 리다이렉트(`?action=session-expired`)·409 `USER-003` 리다이렉트·5xx 수집을 하므로** 서버 렌더 경로의 나머지 4xx는 그대로 throw.
 - **409 `USER-003`(탈퇴한 계정)**: `clientApi` 인터셉터가 토큰 정리 + 로그인 리다이렉트(`?action=withdrawn-account`), `serverApi` 인터셉터가 SSR 경로에서 동일하게 `redirect`.
 - **Mutation 전역 안전망** (`utils/queryClient.ts` `MutationCache.onError`):
   - **5xx·네트워크**: 항상 `getApiErrorMessage` 토스트 + Sentry (개별 `onError` 유무와 무관)
