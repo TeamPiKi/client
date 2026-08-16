@@ -243,30 +243,24 @@ body {
     sans-serif;
 }
 
-/**
- * 페이지 상하단 표준 여백.
- *
- * - status: status bar 와 헤더 사이 여백. 웹(노치 없음)에서는 0,
- *   앱(WebView, `<html data-app>`) 에서만 14px 추가. layout wrapper 가 이미
- *   `pt-[env(safe-area-inset-top)]` 으로 노치만큼 패딩을 잡으므로 여기서는
- *   디자인이 의도한 추가 여백만 더한다.
- * - bottom: 12px (콘텐츠와 홈 인디케이터/내비게이션 사이 마진)
- */
+/** 앱 WebView의 상단 여백: safe area에 14px을 더하고 최소 47px을 보장한다. */
 html[data-app] {
   --spacing-padding-top: max(env(safe-area-inset-top) + 14px, 47px);
 }
 
-/**
- * Bottom Tab Bar 위로 토스트 띄우기.
- *
- * 탭바 pill(`data-bottom-tab-bar` 마커, bottom 40px + 높이 ~68px)이 렌더된 페이지에서만
- * sonner 토스트의 하단 offset 을 올린다. 기본값은 Toaster(components/toast)의 `offset` prop.
- *
- * sonner 는 offset prop 을 토스터 엘리먼트의 인라인 CSS 변수로 심고,
- * 뷰포트 600px 초과에서는 `--offset-bottom`, 이하에서는 `--mobile-offset-bottom` 을
- * 사용하므로 두 변수 모두 `!important` 로 덮어야 한다.
- */
 body:has([data-bottom-tab-bar]) [data-sonner-toaster][data-y-position='bottom'] {
   --offset-bottom: 102px !important;
   --mobile-offset-bottom: 102px !important;
+}
+
+/** CTA가 탭바보다 우선하도록 탭바 규칙 뒤에 둔다. */
+body:has([data-bottom-cta]) [data-sonner-toaster][data-y-position='bottom'] {
+  --offset-bottom: 110px !important;
+  --mobile-offset-bottom: 110px !important;
+}
+
+/** 버튼 위에 한 줄이 더 붙는 CTA (결과 페이지 홈으로 가기 링크, 온보딩 인디케이터) */
+body:has([data-bottom-cta='tall']) [data-sonner-toaster][data-y-position='bottom'] {
+  --offset-bottom: 150px !important;
+  --mobile-offset-bottom: 150px !important;
 }
