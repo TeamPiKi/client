@@ -38,7 +38,7 @@ export const BRIDGE_GATE: Record<WebBridgeMessageT['type'], BridgeGateT> = {
   WEB_REQ_LOG_ANALYTICS_EVENT: { minAppVersion: '1.0.4', notifyOnBlock: false },
   WEB_REQ_TOKEN_REFRESHED: { minAppVersion: '1.0.4', notifyOnBlock: false },
   WEB_REQ_SET_BADGE: { minAppVersion: '1.0.4', notifyOnBlock: false },
-  WEB_REQ_SHARE_INSTAGRAM_STORY: { minAppVersion: '1.1.2', notifyOnBlock: true },
+  WEB_REQ_SHARE_INSTAGRAM_STORY: { minAppVersion: '1.2.1', notifyOnBlock: true },
   WEB_REQ_OPEN_STORE: { minAppVersion: '1.2.0', notifyOnBlock: false },
 
   /** 앱 → 웹 — 웹이 보내는 메시지가 아니므로 게이트 대상이 아님 */

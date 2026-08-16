@@ -1,12 +1,14 @@
-import { getTokenMaxAge, isTokenValid } from '@piki/core';
+import { getTokenMaxAge, isTokenUnexpired } from '@piki/core';
 import * as Sentry from '@sentry/nextjs';
 import { type NextRequest, NextResponse } from 'next/server';
 
 import { postTokenRefreshServer } from './apis/postTokenRefresh';
 import { postGuestLoginServer } from './app/login/_apis/postGuestLogin';
+import { QUERY_ACTION } from './consts/queryAction';
 import { ROUTES } from './consts/route';
 import { getApiErrorStatus } from './utils/apiError';
 import { getRouteType } from './utils/getRouteType';
+import { isLandingHost } from './utils/landingHost';
 import { getLoginPath } from './utils/loginRedirect';
 import { isWebview } from './utils/webBridge';
 
@@ -215,8 +217,34 @@ const handleTokenRefresh = async (request: NextRequest) => {
   }
 };
 
+/** 세션 만료 신호로 진입한 로그인 - 토큰 폐기 후 페이지 진입 */
+const handleSessionExpired = (request: NextRequest) => {
+  /** 페이지 렌더링 시 죽은 토큰을 보지 않도록 남은 쿠키에서 삭제 */
+  const remainingCookies = request.cookies
+    .getAll()
+    .filter(({ name }) => name !== 'access_token' && name !== 'refresh_token')
+    .map(({ name, value }) => `${name}=${value}`);
+
+  const requestHeaders = new Headers(request.headers);
+  if (remainingCookies.length) requestHeaders.set('cookie', remainingCookies.join('; '));
+  else requestHeaders.delete('cookie');
+
+  const response = NextResponse.next({ request: { headers: requestHeaders } });
+  response.cookies.delete('access_token');
+  response.cookies.delete('refresh_token');
+
+  return response;
+};
+
 export const proxy = async (request: NextRequest) => {
   const { pathname, search } = request.nextUrl;
+
+  /** 랜딩 서브도메인(open.*)의 루트 진입만 랜딩으로 rewrite — 인스타에는 open.piki.day 하나만 건다 */
+  if (pathname === '/' && isLandingHost(request.headers.get('host') ?? '')) {
+    const landingUrl = request.nextUrl.clone();
+    landingUrl.pathname = ROUTES.OPEN;
+    return NextResponse.rewrite(landingUrl);
+  }
 
   const routeType = getRouteType(pathname);
 
@@ -227,10 +255,15 @@ export const proxy = async (request: NextRequest) => {
 
   /** 퍼블릭 영역 */
   if (routeType === 'PUBLIC') {
+    const isSessionExpired =
+      pathname === ROUTES.LOGIN &&
+      request.nextUrl.searchParams.get(QUERY_ACTION.KEY) === QUERY_ACTION.VALUE.SESSION_EXPIRED;
+    if (isSessionExpired) return handleSessionExpired(request);
+
     const needsRestore =
       pathname === ROUTES.LOGIN &&
-      !(accessToken && isTokenValid(accessToken.value)) &&
-      isTokenValid(refreshToken?.value ?? null);
+      !(accessToken && isTokenUnexpired(accessToken.value)) &&
+      isTokenUnexpired(refreshToken?.value ?? null);
     if (needsRestore) return await handleTokenRefresh(request);
 
     return NextResponse.next();
@@ -238,7 +271,7 @@ export const proxy = async (request: NextRequest) => {
 
   if (routeType === 'MEMBER_AND_GUEST') {
     /** access(O): 통과 */
-    if (accessToken && isTokenValid(accessToken.value)) return NextResponse.next();
+    if (accessToken && isTokenUnexpired(accessToken.value)) return NextResponse.next();
 
     /** access(X), refresh(O): 토큰 갱신, 실패 시 로그인 페이지로 리다이렉트 */
     if (refreshToken) return await handleTokenRefresh(request);
@@ -249,7 +282,7 @@ export const proxy = async (request: NextRequest) => {
 
   if (routeType === 'MEMBER_ONLY' || routeType === 'AUTHORIZED') {
     /** access(O): 통과, 헤더에 쿼리파라미터까지 포함된 이동 경로 주입 */
-    if (accessToken && isTokenValid(accessToken.value)) {
+    if (accessToken && isTokenUnexpired(accessToken.value)) {
       const headers = new Headers(request.headers);
       headers.set('x-redirect-path', `${pathname}${search}`);
       return NextResponse.next({ request: { headers } });

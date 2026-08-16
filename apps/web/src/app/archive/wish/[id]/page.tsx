@@ -1,14 +1,14 @@
-import EditContent from './_components/EditContent';
+import WishInfoScreen from './_components/WishInfoScreen';
 
-type WishEditPageProps = {
+type WishInfoPageProps = {
   params: Promise<{ id: string }>;
 };
 
-async function WishEditPage({ params }: WishEditPageProps) {
+async function WishInfoPage({ params }: WishInfoPageProps) {
   const { id } = await params;
   const wishId = Number(id);
 
-  return <EditContent wishId={wishId} />;
+  return <WishInfoScreen wishId={wishId} />;
 }
 
-export default WishEditPage;
+export default WishInfoPage;

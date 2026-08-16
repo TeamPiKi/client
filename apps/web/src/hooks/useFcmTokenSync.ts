@@ -1,6 +1,6 @@
 'use client';
 
-import { WEBBRIDGE_MESSAGE_TYPE, isTokenValid } from '@piki/core';
+import { WEBBRIDGE_MESSAGE_TYPE, isTokenUnexpired } from '@piki/core';
 import { useCallback, useEffect } from 'react';
 
 import { postFcmToken } from '@/apis/postFcmToken';
@@ -13,12 +13,12 @@ import { WebBridge, isWebview as isWebviewFn } from '@/utils/webBridge';
 export const useFcmTokenSync = () => {
   const isWebview = isWebviewFn();
   const accessToken = getCookie('access_token');
-  const canSyncFcm = !!accessToken && isTokenValid(accessToken);
+  const canSyncFcm = !!accessToken && isTokenUnexpired(accessToken);
 
   useWebBridgeMessage(
     useCallback(message => {
       const token = getCookie('access_token');
-      if (!token || !isTokenValid(token)) return;
+      if (!token || !isTokenUnexpired(token)) return;
 
       if (
         message.type === WEBBRIDGE_MESSAGE_TYPE.APP_RES_PUSH_PERMISSION_STATUS &&

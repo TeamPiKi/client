@@ -78,6 +78,6 @@ export {
   getTokenExpiresIso,
   getTokenMaxAge,
   isFresherToken,
-  isTokenValid,
+  isTokenUnexpired,
 } from './utils/jwt';
 export { isWebBridgeMessageT } from './utils/webBridge';

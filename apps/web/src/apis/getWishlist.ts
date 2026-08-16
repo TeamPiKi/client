@@ -1,4 +1,4 @@
-import { environmentManager } from '@tanstack/react-query';
+import { environmentManager, infiniteQueryOptions } from '@tanstack/react-query';
 
 import { clientApi } from '@/apis/client';
 import { serverApi } from '@/apis/server';
@@ -24,3 +24,11 @@ export const getWishlist = async (cursor: string | null = null) => {
   });
   return data;
 };
+
+/** 서버 prefetch·suspense 훅·일반 구독이 모두 같은 캐시를 바라봐야 하므로 설정을 한곳에서 관리 */
+export const wishlistInfiniteQueryOptions = infiniteQueryOptions({
+  queryKey: ['wishlists'],
+  queryFn: ({ pageParam }) => getWishlist(pageParam),
+  initialPageParam: null as string | null,
+  getNextPageParam: page => (page.pageResponse.hasNext ? page.pageResponse.nextCursor : null),
+});

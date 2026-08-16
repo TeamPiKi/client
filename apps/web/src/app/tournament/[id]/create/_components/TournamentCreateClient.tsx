@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 
 import { Dialog } from '@/components/dialog';
 import GetItemDialogContent from '@/components/get-item-dialog';
+import { ITEM_STATUS } from '@/consts/item';
 import { QUERY_ACTION } from '@/consts/queryAction';
 import { useGetMe } from '@/hooks/useGetMe';
 import { useQueryAction } from '@/hooks/useQueryAction';
@@ -12,6 +13,7 @@ import { hasParsingItems } from '@/utils/item';
 
 import { type JoinConfirmPayloadT, consumeJoinConfirmFor } from '../../../join/_utils/joinSession';
 import { useGetTournament } from '../../_common/_hooks/useGetTournament';
+import { PREV_ITEM_COUNT_KEY } from '../_consts/tournamentItemBasket';
 import { useCountdown } from '../_hooks/useCountdown';
 import { usePostTournamentStart } from '../_hooks/usePostTournamentStart';
 import { hasSentInvite } from '../_utils/inviteSentSession';
@@ -32,6 +34,7 @@ type TournamentCreateClientProps = {
 function TournamentCreateClient({ tournamentId }: TournamentCreateClientProps) {
   // back() 복귀는 URL에 쿼리를 추가할 수 없어 sessionStorage로 전달한다.
   const scrollToLastKey = `piki:scrollToLast:${tournamentId}`;
+  const prevItemCountKey = `piki:${PREV_ITEM_COUNT_KEY}:${tournamentId}`;
 
   const { isActive: isScrollToLastQuery } = useQueryAction({
     action: QUERY_ACTION.VALUE.SCROLL_TO_LAST,
@@ -39,12 +42,23 @@ function TournamentCreateClient({ tournamentId }: TournamentCreateClientProps) {
   const [isScrollToLastSession] = useState(
     () => typeof window !== 'undefined' && sessionStorage.getItem(scrollToLastKey) === '1'
   );
+  /** 재진입 시점의 값만 필요하므로 useState 초기화 함수에서 한 번만 읽는다 */
+  const [previousItemCount] = useState<number | null>(() => {
+    if (typeof window === 'undefined') return null;
+
+    const raw = sessionStorage.getItem(prevItemCountKey);
+    if (raw === null) return null;
+
+    const parsed = Number(raw);
+    return Number.isInteger(parsed) && parsed >= 0 ? parsed : null;
+  });
 
   const scrollToLast = isScrollToLastQuery || isScrollToLastSession;
 
   useEffect(() => {
     sessionStorage.removeItem(scrollToLastKey);
-  }, [scrollToLastKey]);
+    sessionStorage.removeItem(prevItemCountKey);
+  }, [scrollToLastKey, prevItemCountKey]);
 
   const { tournamentData } = useGetTournament(tournamentId);
   const { userData } = useGetMe();
@@ -61,6 +75,10 @@ function TournamentCreateClient({ tournamentId }: TournamentCreateClientProps) {
   // 아이템 파싱 중이면 SSE 로 실시간 업데이트 (연결 실패 시 polling fallback).
   const hasPendingItem = hasParsingItems(pending?.items ?? []);
   useSSEFallback(['tournament', tournamentId], hasPendingItem);
+
+  const hasUnfinishedItem = (pending?.items ?? []).some(
+    item => item.status === ITEM_STATUS.FAILED || item.status === ITEM_STATUS.INCOMPLETE
+  );
 
   // 주최자가 ROOT 를 시작한 후(ownerStarted=true) 에는 초대 기간이 이미 종료된 상태라
   // inviteExpiresAt 이 null 이고 담기 마감 카운트다운도 의미 없다.
@@ -86,6 +104,8 @@ function TournamentCreateClient({ tournamentId }: TournamentCreateClientProps) {
   // ownerStarted 면 어차피 시작 흐름으로 넘어가야 하므로 마감 처리하지 않는다.
   // 협업 의도가 없는 토너먼트는 만료 자체를 무시한다.
   const isDepositClosed = !tournamentData.isOwner && !ownerStarted && isExpired && isCollaborative;
+  // 참여자는 주최자가 시작한 뒤로 담을 수 없다(서버 409). 만료 마감과 별개 사유라 따로 둔다.
+  const isAddItemBlocked = isDepositClosed || (!tournamentData.isOwner && ownerStarted);
 
   const participantImageMap = new Map(
     (pending?.participants ?? []).map(p => [p.userId, p.profileImage])
@@ -172,6 +192,7 @@ function TournamentCreateClient({ tournamentId }: TournamentCreateClientProps) {
             participants={participants}
             inviteCode={pending?.inviteCode ?? ''}
             inviteExpiresAt={pending?.inviteExpiresAt ?? ''}
+            ownerStarted={ownerStarted}
             {...(isCollaborative && !ownerStarted && !isDepositClosed && { depositDeadline })}
           />
         </div>
@@ -181,7 +202,8 @@ function TournamentCreateClient({ tournamentId }: TournamentCreateClientProps) {
         <TournamentItemBasketCarousel
           items={pending?.items}
           scrollToLast={scrollToLast}
-          isDepositClosed={isDepositClosed}
+          previousItemCount={previousItemCount}
+          isAddItemBlocked={isAddItemBlocked}
           participantImageMap={participantImageMap}
         />
         <TournamentItemBasketStatus
@@ -194,9 +216,7 @@ function TournamentCreateClient({ tournamentId }: TournamentCreateClientProps) {
         <TournamentStartButton
           count={pending?.items.length ?? 0}
           tournamentId={tournamentId}
-          hasUnreadyItem={
-            hasPendingItem || (pending?.items.some(item => item.status === 'FAILED') ?? false)
-          }
+          hasUnreadyItem={hasPendingItem || hasUnfinishedItem}
           hasFriends={hasFriends}
           isWaitingForOwnerStart={isWaitingForOwnerStart}
           isDepositClosed={isDepositClosed}
@@ -204,7 +224,8 @@ function TournamentCreateClient({ tournamentId }: TournamentCreateClientProps) {
         />
       </div>
 
-      <Dialog open={isGetItemDialogOpen} onOpenChange={setIsGetItemDialogOpen}>
+      {/* 쿼리 파라미터로 직접 열 수 있어 + 버튼과 같은 조건으로 막는다 */}
+      <Dialog open={isGetItemDialogOpen && !isAddItemBlocked} onOpenChange={setIsGetItemDialogOpen}>
         <GetItemDialogContent type="tournament" />
       </Dialog>
 

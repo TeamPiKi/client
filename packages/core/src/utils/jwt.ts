@@ -26,11 +26,14 @@ export const decodeJwtPayload = (token: string): JwtPayloadT | null => {
 };
 
 /**
- * 토큰 유효 여부 반환
+ * 토큰 미만료 여부 반환 — payload 의 exp 만 본다.
  *
- * @param leewayMs - 여유시간. 설정 시 현재 시간 + 여유시간 < exp 이면 유효한 토큰으로 판단.
+ * 서명은 검증하지 않는다(프론트에 시크릿이 없다). 서버가 거부하는 토큰이라도 exp 가 남아 있으면 true 이므로,
+ * "서버가 받아준다"는 보장으로 쓰면 안 된다. 진짜 판정은 백엔드의 401 이다.
+ *
+ * @param leewayMs - 여유시간. 설정 시 현재 시간 + 여유시간 < exp 이면 미만료로 판단.
  */
-export const isTokenValid = (token: string | null, leewayMs = 0): boolean => {
+export const isTokenUnexpired = (token: string | null, leewayMs = 0): boolean => {
   if (!token) return false;
 
   const exp = decodeJwtPayload(token)?.exp;

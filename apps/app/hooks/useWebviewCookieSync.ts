@@ -1,4 +1,4 @@
-import { getTokenExpiresIso, isFresherToken, isTokenValid } from '@piki/core';
+import { getTokenExpiresIso, isFresherToken, isTokenUnexpired } from '@piki/core';
 import CookieManager from '@react-native-cookies/cookies';
 import { useEffect, useState } from 'react';
 import { AppState, Platform } from 'react-native';
@@ -49,7 +49,7 @@ export const useWebviewCookieSync = (isWebviewReady: boolean) => {
       }
 
       /** access 가 아직 유효하면 refresh 생략 */
-      if (refreshToken && !isTokenValid(accessToken, 60_000)) {
+      if (refreshToken && !isTokenUnexpired(accessToken, 60_000)) {
         try {
           const refreshResponse = await postTokenRefresh(refreshToken);
 
