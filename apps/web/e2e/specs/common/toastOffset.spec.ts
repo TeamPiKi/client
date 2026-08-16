@@ -1,3 +1,5 @@
+import type { Page } from '@playwright/test';
+
 import { ENDPOINTS } from '@/consts/api';
 
 import { expect, test } from '@e2e/fixtures/mockApiFixture';
@@ -13,7 +15,7 @@ const OFFSET = {
 
 type ProbeT = 'none' | 'default' | 'tall';
 
-const readToastOffset = (page: import('@playwright/test').Page, cta: ProbeT) =>
+const readToastOffset = (page: Page, cta: ProbeT) =>
   page.evaluate(ctaHeight => {
     document.getElementById('probe-cta')?.remove();
 
