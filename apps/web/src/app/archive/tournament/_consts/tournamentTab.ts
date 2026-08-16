@@ -1,3 +1,4 @@
+import { TOURNAMENT_STATUS } from '@/consts/tournament';
 import type { TournamentStatusT } from '@/types/tournament';
 
 export type TournamentStatusTabT = 'ongoing' | 'completed';
@@ -8,6 +9,6 @@ export type TournamentStatusTabT = 'ongoing' | 'completed';
  * - 완료(completed) 탭: 완료된 토너먼트
  */
 export const STATUS_BY_TAB: Record<TournamentStatusTabT, TournamentStatusT[]> = {
-  ongoing: ['PENDING', 'IN_PROGRESS'],
-  completed: ['COMPLETED'],
+  ongoing: [TOURNAMENT_STATUS.PENDING, TOURNAMENT_STATUS.IN_PROGRESS],
+  completed: [TOURNAMENT_STATUS.COMPLETED],
 };
