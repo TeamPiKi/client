@@ -206,10 +206,12 @@ function TournamentCreateClient({ tournamentId }: TournamentCreateClientProps) {
           previousItemCount={previousItemCount}
           isAddItemBlocked={isAddItemBlocked}
           participantImageMap={participantImageMap}
-        />
-        <TournamentItemBasketStatus
-          isProcessing={hasPendingItem}
-          count={pending?.items.length ?? 0}
+          bottomSlot={
+            <TournamentItemBasketStatus
+              isProcessing={hasPendingItem}
+              count={pending?.items.length ?? 0}
+            />
+          }
         />
       </div>
 
