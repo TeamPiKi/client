@@ -7,6 +7,7 @@ import { useRef, useState } from 'react';
 import { toast } from 'sonner';
 
 import { ROUTES } from '@/consts/route';
+import { TOURNAMENT_STATUS } from '@/consts/tournament';
 import type { ApiErrorResponseT } from '@/types/api';
 import type { TournamentItemT } from '@/types/tournament';
 
@@ -60,7 +61,7 @@ const useTournament = ({ tournamentId, inProgress }: UseTournamentArgs) => {
         isOwner: previous.isOwner,
         isRoot: previous.isRoot,
         ...(sourceTournamentId ? { sourceTournamentId } : {}),
-        status: 'COMPLETED',
+        status: TOURNAMENT_STATUS.COMPLETED,
         completed: {
           result: completed.result,
           hasGroupResult: completed.hasGroupResult,
@@ -102,12 +103,12 @@ const useTournament = ({ tournamentId, inProgress }: UseTournamentArgs) => {
     const next = await getTournament(tournamentId);
     queryClient.setQueryData(['tournament', tournamentId], next);
 
-    if (next.status === 'COMPLETED') {
+    if (next.status === TOURNAMENT_STATUS.COMPLETED) {
       setIsNavigatingToResult(true);
       router.replace(ROUTES.TOURNAMENT_RESULT(tournamentId));
       return;
     }
-    if (next.status !== 'IN_PROGRESS' || !next.inProgress) return;
+    if (next.status !== TOURNAMENT_STATUS.IN_PROGRESS || !next.inProgress) return;
 
     const nextInProgress = next.inProgress;
 

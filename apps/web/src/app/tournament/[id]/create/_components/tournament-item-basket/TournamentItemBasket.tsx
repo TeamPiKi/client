@@ -38,7 +38,7 @@ function TournamentItemBasket({
   const [failedItem, setFailedItem] = useState<TournamentPendingItemT | null>(null);
 
   const handleItemClick = (item: TournamentItemBasketProps['items'][number]) => {
-    if (item.status === 'FAILED') setFailedItem(item);
+    if (item.status === ITEM_STATUS.FAILED) setFailedItem(item);
   };
 
   const isFull = items.length >= ITEMS_PER_BASKET;
