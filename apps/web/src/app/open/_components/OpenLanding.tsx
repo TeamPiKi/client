@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 
 import PikiLogo from '@/assets/images/piki-logo-cart.svg';
+import BottomCta from '@/components/bottom-cta';
 import { ANALYTICS_EVENT } from '@/consts/analytics';
 import { AUTO_LAUNCH_DELAY_MS } from '@/consts/appLink';
 import { logAnalyticsEvent } from '@/utils/analytics';
@@ -84,7 +85,7 @@ function OpenLanding({ landingEnv, target, serviceOrigin, source }: OpenLandingP
       </div>
 
       {/** 자동 전환이 막힌 환경(구버전 인스타 등)에서 웹으로 빠져나갈 길 */}
-      <div className="fixed inset-x-0 bottom-0 z-20 flex justify-center pb-10">
+      <BottomCta className="justify-center bg-transparent pb-10">
         <button
           type="button"
           onClick={handleWebContinueClick}
@@ -92,7 +93,7 @@ function OpenLanding({ landingEnv, target, serviceOrigin, source }: OpenLandingP
         >
           웹으로 계속 보기
         </button>
-      </div>
+      </BottomCta>
     </main>
   );
 }

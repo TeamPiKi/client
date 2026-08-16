@@ -158,6 +158,8 @@
   --color-icon-neutral-inverse: var(--color-base-50);
 
   --spacing-padding-top: max(env(safe-area-inset-top), 47px);
+
+  --spacing-bottom-cta: 98px;
 }
 
 @utility hide-scrollbar {

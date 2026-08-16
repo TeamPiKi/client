@@ -80,7 +80,7 @@ function ItemInfoScreen({
       <main
         className={cn(
           'mt-2 hide-scrollbar min-h-0 flex-1 overflow-y-auto',
-          isDetailMode ? 'pb-[98px]' : 'pb-40'
+          isDetailMode ? 'pb-bottom-cta' : 'pb-40'
         )}
       >
         {isDetailMode ? (

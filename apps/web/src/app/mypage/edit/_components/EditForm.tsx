@@ -57,7 +57,7 @@ function EditForm() {
 
   return (
     <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col">
-      <div className="hide-scrollbar flex flex-1 flex-col overflow-y-auto pb-[98px]">
+      <div className="hide-scrollbar flex flex-1 flex-col overflow-y-auto pb-bottom-cta">
         <ProfileImageField
           userIdentityType={userData.identityType}
           profileImage={userData.profileImage}
