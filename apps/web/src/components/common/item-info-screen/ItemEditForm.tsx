@@ -64,7 +64,7 @@ function ItemEditForm({ item, onSave, isSavePending = false }: ItemEditFormProps
       <ItemImagePicker
         imageUrl={item.imageUrl}
         onImageSelect={setSelectedImage}
-        className={item.status === ITEM_STATUS.FAILED ? 'mt-2' : 'mt-5'}
+        className={item.status === ITEM_STATUS.FAILED ? 'mt-4' : 'mt-5'}
       />
 
       <Spacing size={16} />
