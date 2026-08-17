@@ -32,7 +32,7 @@ type InProgressT = NonNullable<GetTournamentInProgressResponseT['inProgress']>;
 const useTournament = ({ tournamentId, inProgress }: UseTournamentArgs) => {
   const router = useRouter();
   const queryClient = useQueryClient();
-  const { postRecordMatchMutation, isPostRecordMatchPending } = usePostRecordMatch({
+  const { postRecordMatchMutation } = usePostRecordMatch({
     tournamentId,
     onSuccess: data => {
       const completed = data.completed;
@@ -85,9 +85,6 @@ const useTournament = ({ tournamentId, inProgress }: UseTournamentArgs) => {
   // 카드 선택 락 해제용 — 매치가 바뀌지 않는 기록 실패에서 VsSection 을 remount 시켜
   // 재선택을 가능하게 한다 (락은 useCardSelectionAnimation 내부 상태)
   const [selectionEpoch, setSelectionEpoch] = useState(0);
-  // 결승 기록 후 결과 페이지로 이동하는 동안 true — 라우팅이 끝나기 전에
-  // 방금 고른 결승 매치가 다시 그려지는 깜빡임을 막는다
-  const [isNavigatingToResult, setIsNavigatingToResult] = useState(false);
 
   // 준결승/결승 바텀시트 표시 중 재조회 없이 적용할 다음 라운드 데이터
   const pendingNextRoundRef = useRef<InProgressT | null>(null);
@@ -106,7 +103,6 @@ const useTournament = ({ tournamentId, inProgress }: UseTournamentArgs) => {
     queryClient.setQueryData(['tournament', tournamentId], next);
 
     if (next.status === TOURNAMENT_STATUS.COMPLETED) {
-      setIsNavigatingToResult(true);
       router.replace(ROUTES.TOURNAMENT_RESULT(tournamentId));
       return;
     }
@@ -172,7 +168,6 @@ const useTournament = ({ tournamentId, inProgress }: UseTournamentArgs) => {
         onSuccess: async data => {
           // 토너먼트 종료 — 캐시 정리(훅 onSuccess)까지 끝난 뒤 결과 페이지로
           if (data.completed) {
-            setIsNavigatingToResult(true);
             router.replace(ROUTES.TOURNAMENT_RESULT(tournamentId));
             return;
           }
@@ -238,11 +233,6 @@ const useTournament = ({ tournamentId, inProgress }: UseTournamentArgs) => {
     isFinalRound,
     transitionStage,
     selectionEpoch,
-    /**
-     * 기록 요청 대기 중 — 다음 매치를 서버가 주므로 이 동안 스켈레톤을 노출한다.
-     * 결과 페이지로 이동하는 중에도 유지해 방금 고른 매치가 다시 보이지 않게 한다.
-     */
-    isRecordingMatch: isPostRecordMatchPending || isNavigatingToResult,
     handleSelect,
     handleTransitionComplete,
   };

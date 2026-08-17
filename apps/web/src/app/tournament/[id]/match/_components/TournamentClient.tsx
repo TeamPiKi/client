@@ -23,7 +23,6 @@ function TournamentClient({ tournamentId, tournamentName, inProgress }: Tourname
     isFinalRound,
     transitionStage,
     selectionEpoch,
-    isRecordingMatch,
     handleSelect,
     handleTransitionComplete,
   } = useTournament({ tournamentId, tournamentName, inProgress });
@@ -49,8 +48,8 @@ function TournamentClient({ tournamentId, tournamentName, inProgress }: Tourname
         )}
       </div>
       <div className={`w-full ${isFinalRound ? 'mt-29' : 'mt-8'}`}>
-        {/* 다음 매치는 서버 응답으로 오므로 기록 대기 동안 스켈레톤을 보여준다 */}
-        {isRecordingMatch || !currentMatch ? (
+        {/* 기록 대기 중에는 이전 화면을 유지해 스켈레톤 깜빡임을 방지한다. */}
+        {!currentMatch ? (
           <MatchSkeleton isFinal={isFinalRound} />
         ) : (
           <VsSection
