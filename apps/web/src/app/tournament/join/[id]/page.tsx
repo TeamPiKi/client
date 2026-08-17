@@ -1,15 +1,12 @@
 import { ERROR_CODE } from '@piki/core';
-import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
 import type { Metadata } from 'next';
 import { headers } from 'next/headers';
 import { notFound, redirect } from 'next/navigation';
 
 import { getInvitePreviewByCode } from '@/apis/getInvitePreviewByCode';
-import { getMe } from '@/apis/getMe';
 import { ROUTES } from '@/consts/route';
 import { getApiErrorCode, getApiErrorStatus, isServerOrNetworkError } from '@/utils/apiError';
 import { parseIdParam } from '@/utils/parseIdParam';
-import { getQueryClient } from '@/utils/queryClient';
 
 import JoinErrorScreen from './_components/JoinErrorScreen';
 import JoinPreviewClient from './_components/JoinPreviewClient';
@@ -80,17 +77,7 @@ async function TournamentJoinPage({ params, searchParams }: TournamentJoinPagePr
   /** 이미 참여한 유저인 경우 - 바로 토너먼트 준비 화면으로 진입 */
   if (preview.joined) redirect(ROUTES.TOURNAMENT_CREATE(tournamentId));
 
-  const queryClient = getQueryClient();
-  queryClient.prefetchQuery({
-    queryKey: ['me'],
-    queryFn: getMe,
-  });
-
-  return (
-    <HydrationBoundary state={dehydrate(queryClient)}>
-      <JoinPreviewClient tournamentId={tournamentId} inviteCode={code} preview={preview} />
-    </HydrationBoundary>
-  );
+  return <JoinPreviewClient tournamentId={tournamentId} inviteCode={code} preview={preview} />;
 }
 
 export default TournamentJoinPage;

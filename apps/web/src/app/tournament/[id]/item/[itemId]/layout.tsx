@@ -2,6 +2,7 @@ import { ERROR_CODE } from '@piki/core';
 import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
 import { notFound, redirect } from 'next/navigation';
 
+import { ITEM_STATUS } from '@/consts/item';
 import { QUERY_ACTION } from '@/consts/queryAction';
 import { ROUTES } from '@/consts/route';
 import { getApiErrorCode, getApiErrorStatus, isGlobalNetError } from '@/utils/apiError';
@@ -34,7 +35,10 @@ async function TournamentItemLayout({ children, params }: TournamentItemLayoutPr
     );
 
     /** 아직 PROCESSING 상태인 경우에는 접근 불가 */
-    if (tournamentItemData.status === 'PROCESSING' || tournamentItemData.status === 'PENDING')
+    if (
+      tournamentItemData.status === ITEM_STATUS.PROCESSING ||
+      tournamentItemData.status === ITEM_STATUS.PENDING
+    )
       redirect(ROUTES.TOURNAMENT_CREATE(tournamentId));
   } catch (error) {
     if (isGlobalNetError(error)) throw error;

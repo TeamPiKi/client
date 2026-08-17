@@ -3,7 +3,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { usePathname } from 'next/navigation';
 
-import { getMe } from '@/apis/getMe';
+import { getMeQueryOptions } from '@/apis/getMe';
 import { useNotificationSSE } from '@/hooks/useNotificationSSE';
 import { getRouteType } from '@/utils/getRouteType';
 
@@ -13,8 +13,7 @@ function NotificationSSEProvider() {
   const enabled = !!routeType && routeType !== 'PUBLIC';
 
   const { data: meData } = useQuery({
-    queryKey: ['me'],
-    queryFn: getMe,
+    ...getMeQueryOptions,
     enabled,
     retry: false,
   });

@@ -36,6 +36,7 @@ export const useDeleteTournamentItem = (tournamentId: number, tournamentItemId: 
 
         /** 토너먼트가 시작된 경우 */
         if (code === ERROR_CODE.TOURNAMENT_NOT_PENDING) {
+          toast.error(getApiErrorMessage(error));
           queryClient.invalidateQueries({ queryKey: ['tournament', tournamentId] });
           if (pathname !== ROUTES.TOURNAMENT_CREATE(tournamentId))
             router.replace(ROUTES.TOURNAMENT_CREATE(tournamentId));

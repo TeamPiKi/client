@@ -2,12 +2,12 @@ import { fetchEventSource } from '@microsoft/fetch-event-source';
 import { WEBBRIDGE_MESSAGE_TYPE } from '@piki/core';
 import type { Query } from '@tanstack/react-query';
 import { useQueryClient } from '@tanstack/react-query';
-import { useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { useEffect, useRef } from 'react';
 import { toast } from 'sonner';
 
 import { ENDPOINTS } from '@/consts/api';
-import { QUERY_ACTION } from '@/consts/queryAction';
+import { QUERY_KEYS } from '@/consts/queryKeys';
 import { ROUTES } from '@/consts/route';
 import { CLIENT_TYPE } from '@/consts/webBridge';
 import type { NotificationSsePayloadT, SilentSyncSsePayloadT } from '@/types/notification';
@@ -26,38 +26,22 @@ const isWishQueryOfItem = (query: Query, itemId: number) =>
   query.queryKey[0] === 'wish' &&
   (query.state.data as { item?: { id: number } } | undefined)?.item?.id === itemId;
 
-const SCROLL_TO_LAST_QUERY = `${QUERY_ACTION.KEY}=${QUERY_ACTION.VALUE.SCROLL_TO_LAST}`;
-
 const buildToastMessage = (payload: NotificationSsePayloadT) =>
   payload.body ? `${payload.title} ${payload.body}` : payload.title;
 
-const resolveDeepLink = (payload: NotificationSsePayloadT): string | null => {
-  const { type, refId, kind, tournamentId } = payload;
-
-  switch (type) {
-    case 'TOURNAMENT_STARTED':
-      return ROUTES.TOURNAMENT_CREATE(refId);
-    case 'TOURNAMENT_JOINED':
-    case 'TOURNAMENT_ITEM_ADDED':
-      return `${ROUTES.TOURNAMENT_CREATE(refId)}?${SCROLL_TO_LAST_QUERY}`;
-    case 'ITEM_PARSING_COMPLETED':
-    case 'ITEM_PARSING_FAILED':
-      if (kind === 'TOURNAMENT' && tournamentId != null) {
-        return `${ROUTES.TOURNAMENT_CREATE(tournamentId)}?${SCROLL_TO_LAST_QUERY}`;
-      }
-      return ROUTES.WISHLIST;
-    default:
-      return null;
-  }
-};
-
 export const useNotificationSSE = (enabled: boolean) => {
-  const router = useRouter();
+  const pathname = usePathname();
   const queryClient = useQueryClient();
   const retryDelayRef = useRef(1_000);
   const abortRef = useRef<AbortController | null>(null);
   const hasConnectedRef = useRef(false);
   const authFailCountRef = useRef(0);
+
+  // 주최자 알림 토스트를 담기 화면에서만 노출하기 위해 최신 경로를 ref로 관리
+  const pathnameRef = useRef(pathname);
+  useEffect(() => {
+    pathnameRef.current = pathname;
+  }, [pathname]);
 
   useEffect(() => {
     if (!enabled) return;
@@ -99,8 +83,8 @@ export const useNotificationSSE = (enabled: boolean) => {
             retryDelayRef.current = 1_000;
             authFailCountRef.current = 0;
             if (hasConnectedRef.current) {
-              // 재연결 성공 — 끊긴 동안 SSE 이벤트로 놓쳤을 수 있는 도메인만 재조회 
-              void queryClient.invalidateQueries({ queryKey: ['notifications'] });
+              // 재연결 성공 — 끊긴 동안 SSE 이벤트로 놓쳤을 수 있는 도메인만 재조회
+              void queryClient.invalidateQueries({ queryKey: QUERY_KEYS.NOTIFICATION.LIST });
               void queryClient.invalidateQueries({ queryKey: ['tournament'] });
               void queryClient.invalidateQueries({ queryKey: ['wishlists'] });
             }
@@ -141,7 +125,10 @@ export const useNotificationSSE = (enabled: boolean) => {
                   queryClient.invalidateQueries({ queryKey: ['tournament', payload.tournamentId] });
                   break;
                 case 'UNREAD_COUNT_CHANGED':
-                  void queryClient.refetchQueries({ queryKey: ['notifications'], type: 'all' });
+                  void queryClient.refetchQueries({
+                    queryKey: QUERY_KEYS.NOTIFICATION.LIST,
+                    type: 'all',
+                  });
                   if (isWebview()) {
                     WebBridge.postMessage({
                       type: WEBBRIDGE_MESSAGE_TYPE.WEB_REQ_SET_BADGE,
@@ -160,12 +147,11 @@ export const useNotificationSSE = (enabled: boolean) => {
             try {
               const payload = JSON.parse(event.data) as NotificationSsePayloadT;
               // 배지 갱신은 silent-sync(UNREAD_COUNT_CHANGED) 가 payload 의 count 로 처리한다 — 별도 조회 금지
-              void queryClient.refetchQueries({ queryKey: ['notifications'], type: 'all' });
+              void queryClient.refetchQueries({
+                queryKey: QUERY_KEYS.NOTIFICATION.LIST,
+                type: 'all',
+              });
               const message = buildToastMessage(payload);
-              const deepLink = resolveDeepLink(payload);
-              const action = deepLink
-                ? { label: '바로가기', onClick: () => router.push(deepLink) }
-                : void 0;
 
               switch (payload.type) {
                 case 'ITEM_PARSING_COMPLETED':
@@ -181,6 +167,8 @@ export const useNotificationSSE = (enabled: boolean) => {
                   }
                   toast.success(message);
                   break;
+                /** 미완성·실패 모두 동일한 데이터를 갱신하고, 사용자 안내만 다르다. */
+                case 'ITEM_PARSING_INCOMPLETE':
                 case 'ITEM_PARSING_FAILED':
                   if (payload.kind === 'TOURNAMENT' && payload.tournamentId != null) {
                     queryClient.invalidateQueries({
@@ -192,17 +180,27 @@ export const useNotificationSSE = (enabled: boolean) => {
                       predicate: query => isWishQueryOfItem(query, payload.refId),
                     });
                   }
-                  toast.error(message, { action, duration: 5000 });
+                  if (payload.type === 'ITEM_PARSING_INCOMPLETE') {
+                    toast.info(message, { duration: 5000 });
+                  } else {
+                    toast.error(message, { duration: 5000 });
+                  }
                   break;
                 case 'TOURNAMENT_STARTED':
+                  queryClient.invalidateQueries({ queryKey: ['tournament', payload.refId] });
+                  toast.info(message, { duration: 5000 });
+                  break;
                 case 'TOURNAMENT_JOINED':
                 case 'TOURNAMENT_ITEM_ADDED':
                 case 'TOURNAMENT_ITEM_DELETED':
                   queryClient.invalidateQueries({ queryKey: ['tournament', payload.refId] });
-                  toast.info(message, { action, duration: 5000 });
+
+                  if (pathnameRef.current === ROUTES.TOURNAMENT_CREATE(payload.refId)) {
+                    toast.info(message, { duration: 5000 });
+                  }
                   break;
                 default:
-                  toast.info(message, { action, duration: 5000 });
+                  toast.info(message, { duration: 5000 });
               }
             } catch {
               // malformed JSON — 무시
@@ -234,5 +232,5 @@ export const useNotificationSSE = (enabled: boolean) => {
       cancelled = true;
       abortRef.current?.abort();
     };
-  }, [enabled, router, queryClient]);
+  }, [enabled, queryClient]);
 };

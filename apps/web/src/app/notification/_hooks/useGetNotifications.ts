@@ -2,6 +2,7 @@ import { WEBBRIDGE_MESSAGE_TYPE } from '@piki/core';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { useEffect } from 'react';
 
+import { QUERY_KEYS } from '@/consts/queryKeys';
 import { WebBridge, isWebview } from '@/utils/webBridge';
 
 import { getNotifications } from '../_apis/getNotifications';
@@ -17,7 +18,7 @@ export const useGetNotifications = () => {
     isFetchNextPageError,
     refetch,
   } = useInfiniteQuery({
-    queryKey: ['notifications'],
+    queryKey: QUERY_KEYS.NOTIFICATION.LIST,
     queryFn: ({ pageParam }) => getNotifications({ cursor: pageParam }),
     initialPageParam: null as string | null,
     getNextPageParam: lastPage => (lastPage.hasNext ? (lastPage.nextCursor ?? null) : null),
