@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { TrashIconOutline } from '@/assets/icons';
 import ConfirmDialog from '@/components/common/confirm-dialog';
 import { Header, HeaderIcon } from '@/components/header';
+import { ITEM_STATUS } from '@/consts/item';
 import type { ItemTypeT, PatchItemRequestT } from '@/types/item';
 import { cn } from '@/utils/cn';
 
@@ -62,9 +63,9 @@ function ItemInfoScreen({
         left={<HeaderIcon name="BACK" {...(isEditing && { onClick: () => setIsEditing(false) })} />}
         center={isDetailMode ? viewTitle : '위시 정보 수정'}
         centerClassName="heading-1-bold"
-        /** 삭제는 조회 화면에서만 */
+        /** 삭제는 조회 화면과 FAILED 수집 실패 화면에서 노출 */
         right={
-          isDetailMode && (
+          (isDetailMode || item.status === ITEM_STATUS.FAILED) && (
             <button
               type="button"
               aria-label="삭제하기"
