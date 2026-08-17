@@ -2,8 +2,8 @@ import BaseImage from '@/components/base-image';
 import { Z_INDEX } from '@/consts/zIndex';
 import formatPrice from '@/utils/formatPrice';
 
+import { PRODUCT_CARD_IMAGE_SIZES } from '../../_common/_consts/image';
 import type { ProductT } from '../../_common/_types/tournament';
-import { PRODUCT_CARD_IMAGE_SIZES } from '../_consts/image';
 
 type ProductCardProps = ProductT & {
   isPicked?: boolean;

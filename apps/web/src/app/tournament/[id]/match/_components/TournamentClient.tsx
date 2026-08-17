@@ -1,7 +1,7 @@
 'use client';
 
+import usePreloadMatchImages from '../../_common/_hooks/usePreloadMatchImages';
 import type { GetTournamentInProgressResponseT } from '../../_common/_types/tournamentResponse';
-import usePreloadMatchImages from '../_hooks/usePreloadMatchImages';
 import useTournament from '../_hooks/useTournament';
 import MatchSkeleton from './MatchSkeleton';
 import RoundBadge from './RoundBadge';
