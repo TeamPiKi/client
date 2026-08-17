@@ -1,6 +1,7 @@
 'use client';
 
 import type { GetTournamentInProgressResponseT } from '../../_common/_types/tournamentResponse';
+import usePreloadMatchImages from '../_hooks/usePreloadMatchImages';
 import useTournament from '../_hooks/useTournament';
 import MatchSkeleton from './MatchSkeleton';
 import RoundBadge from './RoundBadge';
@@ -17,6 +18,7 @@ type TournamentClientProps = {
 function TournamentClient({ tournamentId, tournamentName, inProgress }: TournamentClientProps) {
   const {
     currentMatch,
+    remainingItems,
     roundLabel,
     isFinalRound,
     transitionStage,
@@ -25,6 +27,9 @@ function TournamentClient({ tournamentId, tournamentName, inProgress }: Tourname
     handleSelect,
     handleTransitionComplete,
   } = useTournament({ tournamentId, tournamentName, inProgress });
+
+  // 다음 대진은 미리 알 수 없어도 후보는 알고 있다 — 라운드의 남은 아이템 이미지를 미리 받아둔다
+  usePreloadMatchImages(remainingItems.map(item => item.imageUrl));
 
   const backgroundClassName = isFinalRound
     ? 'bg-gradient-to-b from-sky-blue-50 via-[#F5FCFF] to-white'

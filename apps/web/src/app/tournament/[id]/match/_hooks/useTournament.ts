@@ -77,6 +77,8 @@ const useTournament = ({ tournamentId, inProgress }: UseTournamentArgs) => {
   const [currentMatch, setCurrentMatch] = useState<TournamentMatchT | undefined>(
     inProgress.currentMatch
   );
+  // 해당 라운드에 남은 후보 아이템 — 다음 대진 이미지 프리로드용 (usePreloadMatchImages)
+  const [remainingItems, setRemainingItems] = useState(inProgress.remainingItems);
   // 라운드 내 진행한 매치 수 (라벨 표기용) — 라운드가 바뀌면 0 으로 초기화
   const [matchIndex, setMatchIndex] = useState(0);
   const [transitionStage, setTransitionStage] = useState<TransitionStageT | null>(null);
@@ -111,6 +113,9 @@ const useTournament = ({ tournamentId, inProgress }: UseTournamentArgs) => {
     if (next.status !== TOURNAMENT_STATUS.IN_PROGRESS || !next.inProgress) return;
 
     const nextInProgress = next.inProgress;
+
+    // 바텀시트 분기보다 먼저 갱신 — 시트가 떠 있는 동안이 프리로드에 쓸 수 있는 시간이다
+    setRemainingItems(nextInProgress.remainingItems);
 
     // 라운드 전환 — 서버의 실제 다음 라운드 수 기준으로 바텀시트 판단
     if (nextInProgress.currentRound !== currentRound) {
@@ -228,6 +233,7 @@ const useTournament = ({ tournamentId, inProgress }: UseTournamentArgs) => {
 
   return {
     currentMatch,
+    remainingItems,
     roundLabel,
     isFinalRound,
     transitionStage,
