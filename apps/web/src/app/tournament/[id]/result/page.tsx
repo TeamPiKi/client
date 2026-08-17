@@ -2,6 +2,7 @@ import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
 import { redirect } from 'next/navigation';
 
 import { ROUTES } from '@/consts/route';
+import { TOURNAMENT_STATUS } from '@/consts/tournament';
 import { getIsApp } from '@/utils/getIsApp';
 import { getIsGuest } from '@/utils/getIsGuest';
 import { getQueryClient } from '@/utils/queryClient';
@@ -28,7 +29,7 @@ async function ResultContent({ tournamentId }: { tournamentId: number }) {
     queryFn: () => getTournament(tournamentId),
   });
 
-  if (tournamentData.status !== 'COMPLETED') {
+  if (tournamentData.status !== TOURNAMENT_STATUS.COMPLETED) {
     redirect(ROUTES.TOURNAMENT_MATCH(tournamentId));
   }
 

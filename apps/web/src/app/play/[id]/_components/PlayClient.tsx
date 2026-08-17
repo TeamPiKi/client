@@ -12,6 +12,7 @@ import ButtonLink from '@/components/button/ButtonLink';
 import Spinner from '@/components/spinner';
 import { ANALYTICS_EVENT } from '@/consts/analytics';
 import { ROUTES } from '@/consts/route';
+import { TOURNAMENT_STATUS } from '@/consts/tournament';
 import { logAnalyticsEvent } from '@/utils/analytics';
 import { isServerOrNetworkError } from '@/utils/apiError';
 
@@ -42,11 +43,11 @@ function PlayClient({ sourceTournamentId }: PlayClientProps) {
     // - COMPLETED: 이미 끝낸 토너먼트 (재진입) → result 로 결과 다시 보기
     const goToTournament = async (id: number) => {
       const data = await getTournament(id);
-      if (data.status === 'COMPLETED') {
+      if (data.status === TOURNAMENT_STATUS.COMPLETED) {
         router.replace(ROUTES.TOURNAMENT_RESULT(id));
         return;
       }
-      if (data.status === 'IN_PROGRESS' && !data.pending) {
+      if (data.status === TOURNAMENT_STATUS.IN_PROGRESS && !data.pending) {
         router.replace(ROUTES.TOURNAMENT_MATCH(id));
         return;
       }
