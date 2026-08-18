@@ -23,6 +23,7 @@ type TournamentItemBasketCarouselProps = {
   previousItemCount?: number | null;
   isAddItemBlocked?: boolean;
   participantImageMap?: Map<string, string>;
+  bottomSlot?: React.ReactNode;
 };
 
 function TournamentItemBasketCarousel({
@@ -31,6 +32,7 @@ function TournamentItemBasketCarousel({
   previousItemCount = null,
   isAddItemBlocked = false,
   participantImageMap,
+  bottomSlot,
 }: TournamentItemBasketCarouselProps) {
   const [carouselApi, setCarouselApi] = useState<CarouselApi>();
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -99,12 +101,16 @@ function TournamentItemBasketCarousel({
 
   const { ref: containerRef, height: containerHeight } = useContainerHeight();
   const { ref: indicatorRef, height: indicatorHeight } = useContainerHeight();
+  const { ref: bottomSlotRef, height: bottomSlotHeight } = useContainerHeight();
   const gap = isCarouselEnabled ? 16 : 0;
+
+  const bottomSlotBlockHeight = bottomSlot ? (bottomSlotHeight ?? 0) + gap : 0;
+
   let basketMaxHeight: number | undefined;
   if (containerHeight) {
     basketMaxHeight = isCarouselEnabled
-      ? containerHeight - (indicatorHeight ?? 0) - gap
-      : containerHeight;
+      ? containerHeight - (indicatorHeight ?? 0) - gap - bottomSlotBlockHeight
+      : containerHeight - bottomSlotBlockHeight;
   }
 
   if (!isCarouselEnabled) {
@@ -120,6 +126,12 @@ function TournamentItemBasketCarousel({
           maxHeight={basketMaxHeight}
           participantImageMap={participantImageMap}
         />
+
+        {bottomSlot && (
+          <div ref={bottomSlotRef} className="my-auto">
+            {bottomSlot}
+          </div>
+        )}
       </div>
     );
   }
@@ -161,6 +173,12 @@ function TournamentItemBasketCarousel({
           onSelect={handleIndicatorSelect}
         />
       </div>
+
+      {bottomSlot && (
+        <div ref={bottomSlotRef} className="my-auto">
+          {bottomSlot}
+        </div>
+      )}
     </div>
   );
 }
