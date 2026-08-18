@@ -2,6 +2,7 @@ import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
 import { isAxiosError } from 'axios';
 import { notFound, redirect } from 'next/navigation';
 
+import { ITEM_STATUS } from '@/consts/item';
 import { ROUTES } from '@/consts/route';
 import type { ApiErrorResponseT } from '@/types/api';
 import { parseIdParam } from '@/utils/parseIdParam';
@@ -27,7 +28,10 @@ async function WishEditLayout({ children, params }: WishEditLayoutProps) {
     queryClient.setQueryData(['wish', wishId], wishData);
 
     /** 아직 PROCESSING 상태인 경우에는 접근 불가 */
-    if (wishData.item.status === 'PROCESSING' || wishData.item.status === 'PENDING')
+    if (
+      wishData.item.status === ITEM_STATUS.PROCESSING ||
+      wishData.item.status === ITEM_STATUS.PENDING
+    )
       redirect(ROUTES.WISHLIST);
   } catch (error) {
     if (!isAxiosError<ApiErrorResponseT>(error)) throw error;

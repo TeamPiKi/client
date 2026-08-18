@@ -5,6 +5,7 @@ import { useState } from 'react';
 import CheckboxSelectedIconFill from '@/assets/icons/fill/checkbox-selected.svg';
 import TrashIconFill from '@/assets/icons/fill/trash.svg';
 import ConfirmDialog from '@/components/common/confirm-dialog';
+import { ITEM_STATUS } from '@/consts/item';
 import { useGetWishlist } from '@/hooks/useGetWishlist';
 
 import { useDeleteWishes } from '../_hooks/useDeleteWishes';
@@ -39,7 +40,9 @@ function WishContent() {
   const selectableIds = wishlistData
     .filter(
       ({ item }) =>
-        item.status !== 'FAILED' && item.status !== 'PENDING' && item.status !== 'PROCESSING'
+        item.status !== ITEM_STATUS.FAILED &&
+        item.status !== ITEM_STATUS.PENDING &&
+        item.status !== ITEM_STATUS.PROCESSING
     )
     .map(({ wish }) => wish.id);
   const isAllSelected = selectableIds.length > 0 && selectableIds.every(id => selectedIds.has(id));
