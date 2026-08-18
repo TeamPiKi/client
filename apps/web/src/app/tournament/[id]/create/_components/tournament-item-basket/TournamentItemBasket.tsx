@@ -80,10 +80,8 @@ function TournamentItemBasket({
           <div className="grid w-[45%] grid-cols-2 gap-x-6 gap-y-5 pt-[20%]">
             {addSlot}
             {items.map((item, index) => {
-              /** 주최자이거나 본인이 담은 아이템만 수정 페이지로 진입 가능 */
-              const canEdit = tournamentData.isOwner || item.userId === userData.id;
-
-              if (item.status === 'READY' && canEdit) {
+              /** READY 아이템은 누구나 진입 가능 — 주최자·본인이 아니면 조회 전용으로 열림 */
+              if (item.status === 'READY') {
                 return (
                   <Link
                     key={item.tournamentItemId}
@@ -97,6 +95,9 @@ function TournamentItemBasket({
                   </Link>
                 );
               }
+
+              /** FAILED 아이템 직접 입력은 주최자·본인만 가능 */
+              const canEdit = tournamentData.isOwner || item.userId === userData.id;
 
               return (
                 <TournamentBasketItem

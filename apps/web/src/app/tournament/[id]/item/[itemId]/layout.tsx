@@ -2,13 +2,16 @@ import { ERROR_CODE } from '@piki/core';
 import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
 import { notFound, redirect } from 'next/navigation';
 
+import { getMe } from '@/apis/getMe';
 import { QUERY_ACTION } from '@/consts/queryAction';
 import { ROUTES } from '@/consts/route';
 import { getApiErrorCode, getApiErrorStatus, isGlobalNetError } from '@/utils/apiError';
 import { parseIdParam } from '@/utils/parseIdParam';
 import { getQueryClient } from '@/utils/queryClient';
 
+import { getTournament } from '../../_common/_apis/getTournament';
 import { getTournamentItem } from './_apis/getTournamentItem';
+import { canEditTournamentItem } from './_utils/canEditTournamentItem';
 
 type TournamentItemLayoutProps = {
   children: React.ReactNode;
@@ -27,14 +30,27 @@ async function TournamentItemLayout({ children, params }: TournamentItemLayoutPr
 
   /** 토너먼트 아이템 접근 권한 조회 */
   try {
-    const tournamentItemData = await getTournamentItem(tournamentId, tournamentItemId);
-    queryClient.setQueryData(
-      ['tournamentItem', tournamentId, tournamentItemId],
-      tournamentItemData
-    );
+    const [tournamentItemData, tournamentData, userData] = await Promise.all([
+      queryClient.ensureQueryData({
+        queryKey: ['tournamentItem', tournamentId, tournamentItemId],
+        queryFn: () => getTournamentItem(tournamentId, tournamentItemId),
+      }),
+      queryClient.ensureQueryData({
+        queryKey: ['tournament', tournamentId],
+        queryFn: () => getTournament(tournamentId),
+      }),
+      queryClient.ensureQueryData({ queryKey: ['me'], queryFn: getMe }),
+    ]);
 
     /** 아직 PROCESSING 상태인 경우에는 접근 불가 */
     if (tournamentItemData.status === 'PROCESSING' || tournamentItemData.status === 'PENDING')
+      redirect(ROUTES.TOURNAMENT_CREATE(tournamentId));
+
+    /** FAILED 상태인 경우 주최자나 등록한 본인만 접근 가능 */
+    if (
+      tournamentItemData.status === 'FAILED' &&
+      !canEditTournamentItem(tournamentData, userData, tournamentItemId)
+    )
       redirect(ROUTES.TOURNAMENT_CREATE(tournamentId));
   } catch (error) {
     if (isGlobalNetError(error)) throw error;
