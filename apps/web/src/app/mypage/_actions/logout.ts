@@ -4,7 +4,7 @@ import { cookies } from 'next/headers';
 
 import { deleteFcmToken } from '@/apis/deleteFcmToken';
 import { serverApi } from '@/apis/server';
-import { clearAuthCookies } from '@/app/mypage/_common/_actions/clearAuthCookies';
+import { clearAuthCookies } from '@/actions/clearAuthCookies';
 import { ENDPOINTS } from '@/consts/api';
 
 export const logout = async () => {
