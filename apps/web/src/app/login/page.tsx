@@ -41,11 +41,11 @@ async function LoginPage({ searchParams }: LoginPageProps) {
   const userAgent = (await headers()).get('user-agent') ?? '';
   const isAndroidWebview = userAgent.includes(WEBVIEW_UA_TOKEN) && /android/i.test(userAgent);
 
-  const showOnboardiing = !redirectParam && !action && !code;
+  const showOnboarding = !redirectParam && !action && !code;
 
   return (
     <div className="flex min-h-dvh flex-col items-center bg-gray-50 px-4 pt-padding-top pb-10">
-      {showOnboardiing && <OnboardingGate />}
+      {showOnboarding && <OnboardingGate />}
 
       <div className="mt-15 flex flex-col items-center gap-6">
         <PikiLogo aria-label="PiKi" className="h-[106px] w-[146px] shrink-0 text-sky-blue-400" />
