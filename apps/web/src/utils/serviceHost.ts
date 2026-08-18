@@ -11,7 +11,9 @@ const isLocalHost = (hostname: string) =>
  * 로컬·서비스 호스트는 그대로 두고, 그 외에는 프로덕션으로 떨어뜨린다.
  */
 export const toServiceHost = (host: string) => {
-  const hostname = host.split(':')[0] ?? '';
+  /** userinfo(`@`)·비숫자 포트 등 변형된 Host 헤더는 오리진 조작이 가능하므로 형태부터 거른다 */
+  const match = /^([a-z0-9.-]+)(:\d+)?$/i.exec(host);
+  const hostname = match?.[1] ?? '';
 
   if (SERVICE_HOSTS.includes(hostname) || isLocalHost(hostname)) return host;
 
