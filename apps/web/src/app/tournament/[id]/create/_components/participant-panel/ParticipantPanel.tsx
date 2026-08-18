@@ -7,6 +7,7 @@ import { AddIconOutline, ChevronDownIconOutline, ChevronUpIconOutline } from '@/
 import UserProfileGroup from '@/components/user-profile-group';
 import type { UserT } from '@/components/user-profile-group/userProfile.const';
 import { ROUTES } from '@/consts/route';
+import { Z_INDEX } from '@/consts/zIndex';
 import { cn } from '@/utils/cn';
 
 import { useGetTournament } from '../../../_common/_hooks/useGetTournament';
@@ -102,7 +103,10 @@ function ParticipantPanel({
           </div>
 
           {isExpanded && (
-            <div className="absolute top-full z-10 w-full rounded-b-xl bg-base-50 px-3 pb-3">
+            <div
+              className="absolute top-full w-full rounded-b-xl bg-base-50 px-3 pb-3"
+              style={{ zIndex: Z_INDEX.POPOVER }}
+            >
               <div className="flex flex-wrap gap-2">
                 {participants.map(({ user, itemCount }) => (
                   <ParticipantChip key={user.id} user={user} itemCount={itemCount} />

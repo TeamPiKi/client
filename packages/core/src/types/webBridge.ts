@@ -13,6 +13,7 @@ import type {
 } from './instagramStory';
 import type {
   RequestSocialLoginMessageT,
+  SocialLoginCancelMessageT,
   SocialLoginErrorMessageT,
   SocialLoginSuccessMessageT,
   WebReqLogoutMessageT,
@@ -38,6 +39,7 @@ export type WebBridgeMessageT =
   | RequestSocialLoginMessageT
   | SocialLoginSuccessMessageT
   | SocialLoginErrorMessageT
+  | SocialLoginCancelMessageT
   | AppResShareIntentMessageT
   | WebReqReadyMessageT
   | WebReqPushPermissionStatusMessageT
