@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 
 import PikiLogo from '@/assets/images/piki-logo-cart.svg';
+import BottomCta from '@/components/bottom-cta';
 import Button from '@/components/button';
 import { ANALYTICS_EVENT } from '@/consts/analytics';
 import { AUTO_LAUNCH_DELAY_MS } from '@/consts/appLink';
@@ -57,14 +58,14 @@ function AppStoreRedirect({ storeUrl, target }: AppStoreRedirectProps) {
       </div>
 
       {hasAttemptedStore && (
-        <div className="fixed inset-x-0 bottom-0 z-20 mx-auto flex max-w-120 flex-col gap-2 px-5 pb-10">
+        <BottomCta className="flex-col items-stretch gap-2 bg-transparent pb-10">
           <Button size="lg" onClick={handleWebContinueClick}>
             웹으로 계속 보기
           </Button>
           <Button variant="secondary" size="lg" onClick={handleStoreRetryClick}>
             앱 설치하러 가기
           </Button>
-        </div>
+        </BottomCta>
       )}
     </main>
   );

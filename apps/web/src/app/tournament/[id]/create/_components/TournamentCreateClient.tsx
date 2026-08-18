@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 
+import BottomCta from '@/components/bottom-cta';
 import { Dialog } from '@/components/dialog';
 import GetItemDialogContent from '@/components/get-item-dialog';
 import { ITEM_STATUS } from '@/consts/item';
@@ -184,7 +185,7 @@ function TournamentCreateClient({ tournamentId }: TournamentCreateClientProps) {
   const handleCloseConfirm = () => setConfirmPayload(null);
 
   return (
-    <div className="flex h-full min-h-0 flex-col bg-bg-layer-basement pt-padding-top pb-8">
+    <div className="flex h-full min-h-0 flex-col bg-bg-layer-basement pt-padding-top pb-bottom-cta">
       <div className="px-5">
         <TournamentHeader name={tournamentData.name} hasFriends={hasFriends} />
         <div className="mt-[3.9dvh]">
@@ -205,14 +206,16 @@ function TournamentCreateClient({ tournamentId }: TournamentCreateClientProps) {
           previousItemCount={previousItemCount}
           isAddItemBlocked={isAddItemBlocked}
           participantImageMap={participantImageMap}
-        />
-        <TournamentItemBasketStatus
-          isProcessing={hasPendingItem}
-          count={pending?.items.length ?? 0}
+          bottomSlot={
+            <TournamentItemBasketStatus
+              isProcessing={hasPendingItem}
+              count={pending?.items.length ?? 0}
+            />
+          }
         />
       </div>
 
-      <div className="flex shrink-0 flex-col gap-3 px-5 pt-[max(3dvh)]">
+      <BottomCta className="flex-col items-stretch gap-3">
         <TournamentStartButton
           count={pending?.items.length ?? 0}
           tournamentId={tournamentId}
@@ -222,7 +225,7 @@ function TournamentCreateClient({ tournamentId }: TournamentCreateClientProps) {
           isDepositClosed={isDepositClosed}
           isParticipant={isParticipant}
         />
-      </div>
+      </BottomCta>
 
       {/* 쿼리 파라미터로 직접 열 수 있어 + 버튼과 같은 조건으로 막는다 */}
       <Dialog open={isGetItemDialogOpen && !isAddItemBlocked} onOpenChange={setIsGetItemDialogOpen}>
