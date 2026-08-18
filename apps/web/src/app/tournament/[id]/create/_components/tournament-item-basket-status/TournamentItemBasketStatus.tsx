@@ -16,7 +16,7 @@ function TournamentItemBasketStatus({ isProcessing, count }: TournamentItemBaske
   const isBlue = count < 2;
 
   return (
-    <div className="flex items-center justify-center pt-3">
+    <div className="flex items-center justify-center">
       <span
         className={cn(
           'inline-flex h-10 items-center rounded-3xl border px-3 body-2-regular',

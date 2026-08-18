@@ -1,5 +1,5 @@
 import { DEFAULT_ERROR_MESSAGE, type SocialProviderT, WEBBRIDGE_MESSAGE_TYPE } from '@piki/core';
-import { GoogleSignin } from '@react-native-google-signin/google-signin';
+import { GoogleSignin, isCancelledResponse } from '@react-native-google-signin/google-signin';
 import { login as kakaoLogin } from '@react-native-kakao/user';
 import * as AppleAuthentication from 'expo-apple-authentication';
 import { useCallback } from 'react';
@@ -28,7 +28,11 @@ export const useSocialLogin = () => {
         accessToken = result.accessToken;
       } else if (provider === 'google') {
         await GoogleSignin.hasPlayServices();
-        await GoogleSignin.signIn();
+        const signInResult = await GoogleSignin.signIn();
+        if (isCancelledResponse(signInResult)) {
+          WebBridge.postMessage({ type: WEBBRIDGE_MESSAGE_TYPE.APP_RES_SOCIAL_LOGIN_CANCEL });
+          return;
+        }
         const { accessToken: googleAccessToken } = await GoogleSignin.getTokens();
         if (!googleAccessToken) throw new Error('Google Access Token을 받지 못했습니다.');
         accessToken = googleAccessToken;
@@ -56,6 +60,14 @@ export const useSocialLogin = () => {
         payload: { accessToken: jwtAccessToken, refreshToken },
       });
     } catch (error) {
+      const isAppleCancel =
+        typeof error === 'object' && error !== null && (error as { code?: string }).code === 'ERR_REQUEST_CANCELED';
+
+      if (isAppleCancel) {
+        WebBridge.postMessage({ type: WEBBRIDGE_MESSAGE_TYPE.APP_RES_SOCIAL_LOGIN_CANCEL });
+        return;
+      }
+
       WebBridge.postMessage({
         type: WEBBRIDGE_MESSAGE_TYPE.APP_RES_SOCIAL_LOGIN_ERROR,
         payload: { detail: error instanceof Error ? error.message : DEFAULT_ERROR_MESSAGE },

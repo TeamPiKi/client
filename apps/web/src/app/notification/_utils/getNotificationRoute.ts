@@ -18,6 +18,7 @@ export const getNotificationRoute = (
     case 'TOURNAMENT_RESULT_READY':
       return ROUTES.TOURNAMENT_RESULT(refId);
     case 'ITEM_PARSING_COMPLETED':
+    case 'ITEM_PARSING_INCOMPLETE':
     case 'ITEM_PARSING_FAILED':
       if (extra?.kind === 'TOURNAMENT' && extra.tournamentId) {
         return ROUTES.TOURNAMENT_CREATE(extra.tournamentId);

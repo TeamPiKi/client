@@ -42,6 +42,8 @@ export const useNativeLoginResult = ({
               : DEFAULT_ERROR_MESSAGE
           );
           router.replace(getLoginPath(redirect));
+        } else if (message.type === WEBBRIDGE_MESSAGE_TYPE.APP_RES_SOCIAL_LOGIN_CANCEL) {
+          onSettled?.();
         }
       },
       [onSettled, redirect, router]

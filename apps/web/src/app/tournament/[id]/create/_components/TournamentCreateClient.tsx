@@ -2,8 +2,10 @@
 
 import { useEffect, useState } from 'react';
 
+import BottomCta from '@/components/bottom-cta';
 import { Dialog } from '@/components/dialog';
 import GetItemDialogContent from '@/components/get-item-dialog';
+import { ITEM_STATUS } from '@/consts/item';
 import { QUERY_ACTION } from '@/consts/queryAction';
 import { useGetMe } from '@/hooks/useGetMe';
 import { useQueryAction } from '@/hooks/useQueryAction';
@@ -74,6 +76,10 @@ function TournamentCreateClient({ tournamentId }: TournamentCreateClientProps) {
   // 아이템 파싱 중이면 SSE 로 실시간 업데이트 (연결 실패 시 polling fallback).
   const hasPendingItem = hasParsingItems(pending?.items ?? []);
   useSSEFallback(['tournament', tournamentId], hasPendingItem);
+
+  const hasUnfinishedItem = (pending?.items ?? []).some(
+    item => item.status === ITEM_STATUS.FAILED || item.status === ITEM_STATUS.INCOMPLETE
+  );
 
   // 주최자가 ROOT 를 시작한 후(ownerStarted=true) 에는 초대 기간이 이미 종료된 상태라
   // inviteExpiresAt 이 null 이고 담기 마감 카운트다운도 의미 없다.
@@ -179,7 +185,7 @@ function TournamentCreateClient({ tournamentId }: TournamentCreateClientProps) {
   const handleCloseConfirm = () => setConfirmPayload(null);
 
   return (
-    <div className="flex h-full min-h-0 flex-col bg-bg-layer-basement pt-padding-top pb-8">
+    <div className="flex h-full min-h-0 flex-col bg-bg-layer-basement pt-padding-top pb-bottom-cta">
       <div className="px-5">
         <TournamentHeader name={tournamentData.name} hasFriends={hasFriends} />
         <div className="mt-[3.9dvh]">
@@ -200,26 +206,26 @@ function TournamentCreateClient({ tournamentId }: TournamentCreateClientProps) {
           previousItemCount={previousItemCount}
           isAddItemBlocked={isAddItemBlocked}
           participantImageMap={participantImageMap}
-        />
-        <TournamentItemBasketStatus
-          isProcessing={hasPendingItem}
-          count={pending?.items.length ?? 0}
+          bottomSlot={
+            <TournamentItemBasketStatus
+              isProcessing={hasPendingItem}
+              count={pending?.items.length ?? 0}
+            />
+          }
         />
       </div>
 
-      <div className="flex shrink-0 flex-col gap-3 px-5 pt-[max(3dvh)]">
+      <BottomCta className="flex-col items-stretch gap-3">
         <TournamentStartButton
           count={pending?.items.length ?? 0}
           tournamentId={tournamentId}
-          hasUnreadyItem={
-            hasPendingItem || (pending?.items.some(item => item.status === 'FAILED') ?? false)
-          }
+          hasUnreadyItem={hasPendingItem || hasUnfinishedItem}
           hasFriends={hasFriends}
           isWaitingForOwnerStart={isWaitingForOwnerStart}
           isDepositClosed={isDepositClosed}
           isParticipant={isParticipant}
         />
-      </div>
+      </BottomCta>
 
       {/* 쿼리 파라미터로 직접 열 수 있어 + 버튼과 같은 조건으로 막는다 */}
       <Dialog open={isGetItemDialogOpen && !isAddItemBlocked} onOpenChange={setIsGetItemDialogOpen}>

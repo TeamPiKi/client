@@ -26,10 +26,7 @@ function TournamentBasketItem({
 
   return (
     <div
-      className={cn(
-        'relative aspect-square w-full',
-        (item.status === 'READY' || item.status === 'FAILED') && 'cursor-pointer'
-      )}
+      className={cn('relative aspect-square w-full', onClick && 'cursor-pointer')}
       onClick={onClick}
     >
       <div className="absolute inset-0 overflow-hidden rounded-2xl">
