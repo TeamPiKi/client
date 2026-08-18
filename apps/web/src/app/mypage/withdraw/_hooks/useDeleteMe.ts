@@ -33,7 +33,7 @@ export const useDeleteMe = () => {
       Sentry.setUser(null);
 
       queryClient.clear();
-      router.replace(ROUTES.ROOT);
+      router.replace(ROUTES.LOGIN);
     },
     onError: error => {
       if (isGlobalNetError(error)) return;
