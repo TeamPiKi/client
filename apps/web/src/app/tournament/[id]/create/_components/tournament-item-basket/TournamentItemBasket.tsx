@@ -8,7 +8,9 @@ import { Dialog, DialogTrigger } from '@/components/dialog';
 import GetItemDialogContent from '@/components/get-item-dialog';
 import { ITEM_STATUS } from '@/consts/item';
 import { ROUTES } from '@/consts/route';
+import { useGetMe } from '@/hooks/useGetMe';
 
+import { useGetTournament } from '../../../_common/_hooks/useGetTournament';
 import type { TournamentPendingItemT } from '../../../_common/_types/tournamentResponse';
 import basketImg from '../../_assets/basket-gray.png';
 import { ITEMS_PER_BASKET } from '../../_consts/tournamentItemBasket';
@@ -32,6 +34,8 @@ function TournamentItemBasket({
 }: TournamentItemBasketProps) {
   const { id } = useParams<{ id: string }>();
   const tournamentId = Number(id);
+  const { userData } = useGetMe();
+  const { tournamentData } = useGetTournament(tournamentId);
 
   const basketMaxWidth = maxHeight ? (maxHeight * 356) / 464 : null;
 
@@ -77,14 +81,33 @@ function TournamentItemBasket({
           <div className="grid w-[45%] grid-cols-2 gap-x-6 gap-y-5 pt-[20%]">
             {addSlot}
             {items.map((item, index) => {
-              if (item.status === ITEM_STATUS.READY || item.status === ITEM_STATUS.INCOMPLETE) {
+              /** READY 아이템은 누구나 진입 가능 — 주최자·본인이 아니면 조회 전용으로 열림 */
+              if (item.status === ITEM_STATUS.READY) {
                 return (
                   <Link
                     key={item.tournamentItemId}
                     href={ROUTES.TOURNAMENT_ITEM_EDIT(tournamentId, item.tournamentItemId)}
                   >
                     <TournamentBasketItem
-                      key={item.tournamentItemId}
+                      item={item}
+                      index={index}
+                      participantImageMap={participantImageMap}
+                    />
+                  </Link>
+                );
+              }
+
+              /** INCOMPLETE, FAILED 아이템 직접 입력은 주최자·본인만 가능 */
+              const canEdit = tournamentData.isOwner || item.userId === userData.id;
+
+              /** INCOMPLETE 아이템도 수정 페이지로 이동 */
+              if (item.status === ITEM_STATUS.INCOMPLETE && canEdit) {
+                return (
+                  <Link
+                    key={item.tournamentItemId}
+                    href={ROUTES.TOURNAMENT_ITEM_EDIT(tournamentId, item.tournamentItemId)}
+                  >
+                    <TournamentBasketItem
                       item={item}
                       index={index}
                       participantImageMap={participantImageMap}
@@ -98,7 +121,7 @@ function TournamentItemBasket({
                   key={item.tournamentItemId}
                   item={item}
                   index={index}
-                  onClick={() => handleItemClick(item)}
+                  {...(canEdit && { onClick: () => handleItemClick(item) })}
                   participantImageMap={participantImageMap}
                 />
               );
