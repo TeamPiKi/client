@@ -96,8 +96,24 @@ function TournamentItemBasket({
                 );
               }
 
-              /** FAILED 아이템 직접 입력은 주최자·본인만 가능 */
+              /** INCOMPLETE, FAILED 아이템 직접 입력은 주최자·본인만 가능 */
               const canEdit = tournamentData.isOwner || item.userId === userData.id;
+
+              /** INCOMPLETE 아이템도 수정 페이지로 이동 */
+              if (item.status === 'INCOMPLETE' && canEdit) {
+                return (
+                  <Link
+                    key={item.tournamentItemId}
+                    href={ROUTES.TOURNAMENT_ITEM_EDIT(tournamentId, item.tournamentItemId)}
+                  >
+                    <TournamentBasketItem
+                      item={item}
+                      index={index}
+                      participantImageMap={participantImageMap}
+                    />
+                  </Link>
+                );
+              }
 
               return (
                 <TournamentBasketItem

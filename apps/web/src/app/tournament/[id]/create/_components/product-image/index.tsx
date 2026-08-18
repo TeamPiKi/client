@@ -52,7 +52,7 @@ function ProductImage({
         {...(!fill ? { style: { width: dimension, height: dimension } } : {})}
       >
         {(parsingStatus === 'PENDING' || parsingStatus === 'PROCESSING') && <LoadingFallback />}
-        {parsingStatus === 'FAILED' &&
+        {(parsingStatus === 'FAILED' || parsingStatus === 'INCOMPLETE') &&
           (size === 'lg' ? <LgErrorFallback radius={radius} /> : <SmErrorFallback />)}
       </div>
     );

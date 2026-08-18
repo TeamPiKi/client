@@ -46,9 +46,9 @@ async function TournamentItemLayout({ children, params }: TournamentItemLayoutPr
     if (tournamentItemData.status === 'PROCESSING' || tournamentItemData.status === 'PENDING')
       redirect(ROUTES.TOURNAMENT_CREATE(tournamentId));
 
-    /** FAILED 상태인 경우 주최자나 등록한 본인만 접근 가능 */
+    /** FAILED·INCOMPLETE 상태인 경우 주최자나 등록한 본인만 접근 가능 */
     if (
-      tournamentItemData.status === 'FAILED' &&
+      (tournamentItemData.status === 'FAILED' || tournamentItemData.status === 'INCOMPLETE') &&
       !canEditTournamentItem(tournamentData, userData, tournamentItemId)
     )
       redirect(ROUTES.TOURNAMENT_CREATE(tournamentId));
