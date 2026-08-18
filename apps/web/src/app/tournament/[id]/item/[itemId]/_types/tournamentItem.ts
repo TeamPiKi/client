@@ -19,6 +19,7 @@ export type GetTournamentItemResponseT = {
       price?: undefined;
     }
   | {
+      /** 추출이 일부 필드만 채운 상태 — 없는 필드는 응답에서 생략된다 */
       status: (typeof ITEM_STATUS)['INCOMPLETE'];
       name?: string;
       imageUrl?: string;
