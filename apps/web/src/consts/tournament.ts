@@ -1,3 +1,6 @@
+/** 시작에 필요한 최소 후보 수 — 서버도 2~32개를 요구한다 (TOURNAMENT-007) */
+export const MIN_TOURNAMENT_ITEM_COUNT = 2;
+
 export const TOURNAMENT_STATUS = {
   PENDING: 'PENDING',
   IN_PROGRESS: 'IN_PROGRESS',
