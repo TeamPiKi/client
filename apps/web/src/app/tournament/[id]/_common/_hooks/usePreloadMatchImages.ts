@@ -31,26 +31,23 @@ const usePreloadMatchImages = (imageUrls: (string | null | undefined)[]) => {
       const image = new Image();
       /** 현재 매치 이미지와 대역폭을 다투지 않도록 낮은 우선순위로 */
       image.fetchPriority = 'low';
-      /** srcset·sizes 를 src 보다 먼저 — 순서가 바뀌면 src 로 먼저 요청이 나간다 */
+
       if (props.sizes) image.sizes = props.sizes;
       if (props.srcSet) image.srcset = props.srcSet;
 
-      const release = () => pendingImages.delete(image);
-      image.onload = release;
-      image.onerror = release;
+      image.onload = () => {
+        pendingImages.delete(image);
+      };
+      /** 실패한 URL은 제거해 다음 진입 시 재시도한다. */
+      image.onerror = () => {
+        pendingImages.delete(image);
+
+        preloadedUrlsRef.current.delete(imageUrl);
+      };
 
       pendingImages.add(image);
       image.src = props.src;
     });
-
-    return () => {
-      /** 언마운트 시 보관 중인 이미지 참조와 이벤트 핸들러 정리 */
-      pendingImages.forEach(image => {
-        image.onload = null;
-        image.onerror = null;
-      });
-      pendingImages.clear();
-    };
   }, [urlsKey]);
 };
 
