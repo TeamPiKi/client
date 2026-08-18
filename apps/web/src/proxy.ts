@@ -216,8 +216,8 @@ const handleTokenRefresh = async (request: NextRequest) => {
   }
 };
 
-/** 세션 만료 신호로 진입한 로그인 - 토큰 폐기 후 페이지 진입 */
-const handleSessionExpired = (request: NextRequest) => {
+/** 세션 만료·탈퇴 신호로 진입한 로그인 - 토큰 폐기 후 페이지 진입 */
+const handleAuthReset = (request: NextRequest) => {
   /** 페이지 렌더링 시 죽은 토큰을 보지 않도록 남은 쿠키에서 삭제 */
   const remainingCookies = request.cookies
     .getAll()
@@ -247,10 +247,12 @@ export const proxy = async (request: NextRequest) => {
 
   /** 퍼블릭 영역 */
   if (routeType === 'PUBLIC') {
-    const isSessionExpired =
-      pathname === ROUTES.LOGIN &&
-      request.nextUrl.searchParams.get(QUERY_ACTION.KEY) === QUERY_ACTION.VALUE.SESSION_EXPIRED;
-    if (isSessionExpired) return handleSessionExpired(request);
+    const loginAction =
+      pathname === ROUTES.LOGIN ? request.nextUrl.searchParams.get(QUERY_ACTION.KEY) : null;
+    const isAuthReset =
+      loginAction === QUERY_ACTION.VALUE.SESSION_EXPIRED ||
+      loginAction === QUERY_ACTION.VALUE.WITHDRAWN_ACCOUNT;
+    if (isAuthReset) return handleAuthReset(request);
 
     const needsRestore =
       pathname === ROUTES.LOGIN &&
