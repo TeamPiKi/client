@@ -18,7 +18,9 @@ import KakaoIcon from '@/assets/icons/social/kakao.svg';
 import Spinner from '@/components/spinner';
 import { QUERY_ACTION } from '@/consts/queryAction';
 import { useNativeLoginResult } from '@/hooks/useNativeLoginResult';
+import { cn } from '@/utils/cn';
 import { getApiErrorMessage } from '@/utils/getApiErrorMessage';
+import { getRouteType } from '@/utils/getRouteType';
 import {
   getLoginPath,
   getPostLoginRedirectPath,
@@ -45,6 +47,10 @@ function LoginButtons({ redirect, action, errorCode, showAppleLogin }: LoginButt
   const router = useRouter();
   const validRedirect = isValidLoginRedirectPath(redirect) ? redirect : null;
 
+  /** 회원 전용 경로(위시 등)로 진입 시 게스트 로그인은 의미가 없어 미노출 */
+  const isMemberOnlyRedirect =
+    !!validRedirect && getRouteType(validRedirect.split('?')[0] ?? validRedirect) === 'MEMBER_ONLY';
+
   const [isGuestRefreshing, setIsGuestRefreshing] = useState(false);
   const [nativePendingProvider, setNativePendingProvider] = useState<SocialProviderT | null>(null);
   const [webPendingProvider, setWebPendingProvider] = useState<SocialProviderT | null>(null);
@@ -56,11 +62,13 @@ function LoginButtons({ redirect, action, errorCode, showAppleLogin }: LoginButt
   useEffect(() => {
     const handleLoginError = () => {
       if (action === QUERY_ACTION.VALUE.SESSION_EXPIRED) {
+        if (isWebview()) WebBridge.postMessage({ type: WEBBRIDGE_MESSAGE_TYPE.WEB_REQ_LOGOUT });
         toast.error(ERROR_MESSAGE_MAP[ERROR_CODE.AUTH_INVALID_TOKEN]);
         router.replace(getLoginPath(validRedirect), { scroll: false });
         return;
       }
       if (action === QUERY_ACTION.VALUE.WITHDRAWN_ACCOUNT) {
+        if (isWebview()) WebBridge.postMessage({ type: WEBBRIDGE_MESSAGE_TYPE.WEB_REQ_LOGOUT });
         toast.error(ERROR_MESSAGE_MAP[ERROR_CODE.USER_DELETED]);
         router.replace(getLoginPath(validRedirect), { scroll: false });
         return;
@@ -170,7 +178,10 @@ function LoginButtons({ redirect, action, errorCode, showAppleLogin }: LoginButt
         type="button"
         disabled={isAnyPending}
         onClick={handleGuestLogin}
-        className="mt-7 flex cursor-pointer items-center gap-1.5 body-2-medium text-text-neutral-secondary underline underline-offset-2 disabled:opacity-50"
+        className={cn(
+          'mt-7 flex cursor-pointer items-center gap-1.5 body-2-medium text-text-neutral-secondary underline underline-offset-2 disabled:opacity-50',
+          isMemberOnlyRedirect && 'invisible'
+        )}
       >
         {isGuestPending ? <Spinner size={16} /> : null}
         비회원으로 시작하기

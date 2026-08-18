@@ -4,6 +4,7 @@ import type { ImageProps } from 'next/image';
 import type { ReactNode } from 'react';
 
 import BaseImage from '@/components/base-image';
+import { ITEM_STATUS } from '@/consts/item';
 import type { ItemStatusT } from '@/types/item';
 import { cn } from '@/utils/cn';
 
@@ -51,8 +52,11 @@ function ProductImage({
         className={containerClass}
         {...(!fill ? { style: { width: dimension, height: dimension } } : {})}
       >
-        {(parsingStatus === 'PENDING' || parsingStatus === 'PROCESSING') && <LoadingFallback />}
-        {(parsingStatus === 'FAILED' || parsingStatus === 'INCOMPLETE') &&
+        {(parsingStatus === ITEM_STATUS.PENDING || parsingStatus === ITEM_STATUS.PROCESSING) && (
+          <LoadingFallback />
+        )}
+        {/* INCOMPLETE 는 이미지를 못 건진 경우라 FAILED 와 같은 빈 이미지 자리를 쓴다 (디자인 확인 전 임시) */}
+        {(parsingStatus === ITEM_STATUS.FAILED || parsingStatus === ITEM_STATUS.INCOMPLETE) &&
           (size === 'lg' ? <LgErrorFallback radius={radius} /> : <SmErrorFallback />)}
       </div>
     );

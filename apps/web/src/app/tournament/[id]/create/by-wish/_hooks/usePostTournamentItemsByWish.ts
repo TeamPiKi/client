@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
 import { PREV_ITEM_COUNT_KEY } from '@/app/tournament/[id]/create/_consts/tournamentItemBasket';
+import { QUERY_ACTION } from '@/consts/queryAction';
 import { ROUTES } from '@/consts/route';
 import { useBackWithFallback } from '@/hooks/useBackWithFallback';
 import { getApiErrorCode, isGlobalNetError } from '@/utils/apiError';
@@ -33,10 +34,19 @@ export const usePostTournamentItemsByWish = (tournamentId: number, previousItemC
 
       const code = getApiErrorCode(error);
 
-      /** 토너먼트가 시작됐거나 삭제, 존재하지 않는 경우 */
-      if (code === ERROR_CODE.TOURNAMENT_NOT_PENDING || code === ERROR_CODE.TOURNAMENT_NOT_FOUND) {
+      /** 토너먼트가 시작된 경우 */
+      if (code === ERROR_CODE.TOURNAMENT_NOT_PENDING) {
+        toast.error(getApiErrorMessage(error));
         queryClient.invalidateQueries({ queryKey: ['tournament', tournamentId] });
         router.replace(ROUTES.TOURNAMENT_CREATE(tournamentId));
+        return;
+      }
+
+      /** 토너먼트가 삭제된 경우 */
+      if (code === ERROR_CODE.TOURNAMENT_NOT_FOUND) {
+        router.replace(
+          `${ROUTES.HOME}?${QUERY_ACTION.KEY}=${QUERY_ACTION.VALUE.TOURNAMENT_NOT_FOUND}`
+        );
         return;
       }
 

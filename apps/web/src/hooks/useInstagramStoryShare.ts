@@ -11,7 +11,8 @@ import { WebBridge } from '@/utils/webBridge';
 const RESPONSE_TIMEOUT_MS = 15_000;
 
 /** `blocked` 는 앱 버전 게이트에 막혀 전송조차 안 된 경우 */
-export type InstagramStoryShareResultT = ShareInstagramStoryStatusT | 'blocked';
+/** 'blocked' 앱 버전 게이트에 막힘 · 'busy' 이미 공유 진행 중 */
+export type InstagramStoryShareResultT = ShareInstagramStoryStatusT | 'blocked' | 'busy';
 
 type PendingRequestT = {
   resolve: (status: ShareInstagramStoryStatusT) => void;
@@ -26,6 +27,7 @@ type PendingRequestT = {
 export const useInstagramStoryShare = () => {
   const pendingRequestsRef = useRef<Map<string, PendingRequestT>>(new Map());
   const [isSharing, setIsSharing] = useState(false);
+  const isSharingRef = useRef(false);
 
   const settleRequest = useCallback((requestId: string, status: ShareInstagramStoryStatusT) => {
     const pending = pendingRequestsRef.current.get(requestId);
@@ -63,8 +65,12 @@ export const useInstagramStoryShare = () => {
   );
 
   const shareToStory = useCallback(async (imageBlob: Blob): Promise<InstagramStoryShareResultT> => {
+    /** 연타 방지 — state 는 리렌더 후에야 반영돼 그 사이 클릭을 막지 못한다 */
+    if (isSharingRef.current) return 'busy';
+
     try {
       const requestId = crypto.randomUUID();
+      isSharingRef.current = true;
       setIsSharing(true);
 
       const base64 = await blobToBase64(imageBlob);
@@ -95,6 +101,7 @@ export const useInstagramStoryShare = () => {
     } catch {
       return 'error';
     } finally {
+      isSharingRef.current = false;
       setIsSharing(false);
     }
   }, []);

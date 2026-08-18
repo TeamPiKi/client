@@ -6,6 +6,7 @@ import { useState } from 'react';
 import AddIcon from '@/assets/icons/fill/add.svg';
 import { Dialog, DialogTrigger } from '@/components/dialog';
 import GetItemDialogContent from '@/components/get-item-dialog';
+import { ITEM_STATUS } from '@/consts/item';
 import { ROUTES } from '@/consts/route';
 import { useGetMe } from '@/hooks/useGetMe';
 
@@ -20,7 +21,7 @@ type TournamentItemBasketProps = {
   basketIndex: number;
   items: TournamentPendingItemT[];
   maxHeight?: number;
-  isDepositClosed?: boolean;
+  isAddItemBlocked?: boolean;
   participantImageMap?: Map<string, string>;
 };
 
@@ -28,7 +29,7 @@ function TournamentItemBasket({
   basketIndex,
   items,
   maxHeight,
-  isDepositClosed = false,
+  isAddItemBlocked = false,
   participantImageMap,
 }: TournamentItemBasketProps) {
   const { id } = useParams<{ id: string }>();
@@ -41,11 +42,11 @@ function TournamentItemBasket({
   const [failedItem, setFailedItem] = useState<TournamentPendingItemT | null>(null);
 
   const handleItemClick = (item: TournamentItemBasketProps['items'][number]) => {
-    if (item.status === 'FAILED') setFailedItem(item);
+    if (item.status === ITEM_STATUS.FAILED) setFailedItem(item);
   };
 
   const isFull = items.length >= ITEMS_PER_BASKET;
-  const showAddButton = !isDepositClosed && !isFull;
+  const showAddButton = !isAddItemBlocked && !isFull;
 
   const addSlot = showAddButton ? (
     <Dialog>
@@ -81,7 +82,7 @@ function TournamentItemBasket({
             {addSlot}
             {items.map((item, index) => {
               /** READY 아이템은 누구나 진입 가능 — 주최자·본인이 아니면 조회 전용으로 열림 */
-              if (item.status === 'READY') {
+              if (item.status === ITEM_STATUS.READY) {
                 return (
                   <Link
                     key={item.tournamentItemId}
@@ -100,7 +101,7 @@ function TournamentItemBasket({
               const canEdit = tournamentData.isOwner || item.userId === userData.id;
 
               /** INCOMPLETE 아이템도 수정 페이지로 이동 */
-              if (item.status === 'INCOMPLETE' && canEdit) {
+              if (item.status === ITEM_STATUS.INCOMPLETE && canEdit) {
                 return (
                   <Link
                     key={item.tournamentItemId}

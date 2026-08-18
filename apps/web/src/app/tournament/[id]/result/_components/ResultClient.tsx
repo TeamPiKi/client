@@ -10,6 +10,7 @@ import Button from '@/components/button';
 import { Header } from '@/components/header';
 import { ANALYTICS_EVENT } from '@/consts/analytics';
 import { ROUTES } from '@/consts/route';
+import { TOURNAMENT_STATUS } from '@/consts/tournament';
 import { logAnalyticsEvent } from '@/utils/analytics';
 import { cn } from '@/utils/cn';
 
@@ -23,9 +24,11 @@ import ReceiptShareDialog from './receipt-share-dialog/ReceiptShareDialog';
 type ResultClientProps = {
   tournamentId: number;
   isGuest?: boolean;
+  /** 서버가 UA 로 판정한 앱 여부 — hydration 전에도 앱 전용 UI 를 그리기 위해 받는다 */
+  isApp?: boolean;
 };
 
-function ResultClient({ tournamentId, isGuest = false }: ResultClientProps) {
+function ResultClient({ tournamentId, isGuest = false, isApp = false }: ResultClientProps) {
   const router = useRouter();
   const { tournamentData } = useGetTournament(tournamentId);
   const [date] = useState(() => new Date());
@@ -34,7 +37,7 @@ function ResultClient({ tournamentId, isGuest = false }: ResultClientProps) {
 
   // RSC에서 status 검사를 하지만, 클라에서 status가 바뀐 경우 방어
   useEffect(() => {
-    if (tournamentData.status === 'COMPLETED') return;
+    if (tournamentData.status === TOURNAMENT_STATUS.COMPLETED) return;
     router.replace(ROUTES.TOURNAMENT_MATCH(tournamentId));
   }, [tournamentData.status, router, tournamentId]);
 
@@ -42,13 +45,13 @@ function ResultClient({ tournamentId, isGuest = false }: ResultClientProps) {
   // 같은 인스턴스가 다른 tournamentId 로 재사용되더라도 ID 별로 정확히 1회만 로깅한다.
   const loggedCompleteForRef = useRef<number | null>(null);
   useEffect(() => {
-    if (tournamentData.status !== 'COMPLETED') return;
+    if (tournamentData.status !== TOURNAMENT_STATUS.COMPLETED) return;
     if (loggedCompleteForRef.current === tournamentId) return;
     loggedCompleteForRef.current = tournamentId;
     logAnalyticsEvent(ANALYTICS_EVENT.RESULT_VIEW, { tournament_id: tournamentId });
   }, [tournamentData.status, tournamentId]);
 
-  if (tournamentData.status !== 'COMPLETED') {
+  if (tournamentData.status !== TOURNAMENT_STATUS.COMPLETED) {
     return (
       <main className="flex min-h-dvh items-center justify-center bg-bg-layer-basement pt-padding-top">
         <p className="body-1-medium text-text-neutral-tertiary">결과를 불러오는 중...</p>
@@ -60,17 +63,23 @@ function ResultClient({ tournamentId, isGuest = false }: ResultClientProps) {
   const result = tournamentData.completed.result;
   // 플레이 링크 공유는 ROOT 의 소유자만 가능 — CLONE 소유자(친구 초대 → CLONE 생성한 사람) 제외
   const canSharePlayLink = tournamentData.isRoot && tournamentData.isOwner;
+  // 그룹 결과는 원본(ROOT) 단위로 집계된다. CLONE 에서 보고 있으면 원본 id 로 조회해야 한다.
+  const groupResultTournamentId = tournamentData.sourceTournamentId ?? tournamentId;
 
   const handleSharePlayLink = () => {
     setIsShareDialogOpen(true);
   };
 
-  // 비회원 솔로(isRoot=false): 배너가 스크롤 마지막 — 버튼과 13px 간격
-  // 나머지: pb-40 (160px) → GroupResultEntryCard 또는 ReceiptDrawMachine과 BottomCta 버튼 사이 ~28px
+  /** 비회원 솔로는 배너가 스크롤 마지막이라 하단 여백을 줄인다 */
   const mainPb = isGuest && !tournamentData.isRoot ? 'pb-[145px]' : 'pb-40';
 
   return (
-    <main className={cn('flex min-h-dvh flex-col overflow-x-hidden bg-bg-layer-basement pt-padding-top', mainPb)}>
+    <main
+      className={cn(
+        'flex min-h-dvh flex-col overflow-x-hidden bg-bg-layer-basement pt-padding-top',
+        mainPb
+      )}
+    >
       <Header center="토너먼트 결과" centerClassName="heading-1-bold" />
 
       <div className="mx-auto mt-4 flex min-h-0 w-full max-w-120 flex-1 flex-col gap-3">
@@ -81,10 +90,6 @@ function ResultClient({ tournamentId, isGuest = false }: ResultClientProps) {
           date={date}
         />
 
-        {/*
-          비회원 유도 배너 — 게스트일 때만 노출.
-          영수증과 61px 간격: gap-3(12px) + mt-[49px](49px) = 61px.
-        */}
         {isGuest && (
           <div className="mx-5 mt-[49px]">
             <ResultGuestBanner />
@@ -92,22 +97,17 @@ function ResultClient({ tournamentId, isGuest = false }: ResultClientProps) {
         )}
 
         {/*
-          친구 토너먼트 결과보기 카드 노출 + 라우팅.
-          - ROOT 사용자(주최자 / 친구 초대 멤버) 에게만 노출.
-          - CLONE 사용자(플레이 링크 게스트)는 숨긴다.
-          - 친구 유무는 클릭 시 group-result API 응답으로 판단한다 (캐시 의존 X).
-          - 앱 화면이 낮게 크롭될 때도 CTA 는 항상 고정돼야 해서 스크롤 영역에 둔다.
+          전체 결과 보기 — 주최자·참여자·게스트 모두에게 노출한다.
+          hasGroupResult 가 false 면(완료한 CLONE 없음) 눌러도 서버가 409 를 주므로 숨긴다.
         */}
-        {tournamentData.isRoot && (!isGuest || tournamentData.completed.hasGroupResult) && (
+        {tournamentData.completed.hasGroupResult && (
           <div className="mx-5">
-            <GroupResultEntryCard tournamentId={tournamentId} />
+            <GroupResultEntryCard tournamentId={groupResultTournamentId} />
           </div>
         )}
       </div>
 
-      {/* 하단 CTA — 저장/공유 버튼 → 홈으로 가기 순 위계, 항상 화면 하단 고정 */}
       <BottomCta hasGradient className="flex-col items-stretch gap-6.5 pb-[30px]">
-        {/* 영수증 공유 (모든 사용자) + 토너먼트 공유 (ROOT 소유자만, 플레이 링크 공유) */}
         <div className="flex gap-3">
           <Button
             variant="secondary"
@@ -156,6 +156,7 @@ function ResultClient({ tournamentId, isGuest = false }: ResultClientProps) {
         tournamentName={tournamentName}
         result={result}
         date={date}
+        isApp={isApp}
       />
     </main>
   );

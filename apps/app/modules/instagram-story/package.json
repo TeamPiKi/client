@@ -1,0 +1,7 @@
+{
+  "name": "instagram-story",
+  "version": "1.0.0",
+  "description": "iOS 인스타그램 스토리 공유 (전용 pasteboard 키)",
+  "main": "src/index.ts",
+  "private": true
+}
