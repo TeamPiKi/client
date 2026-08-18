@@ -24,6 +24,7 @@ type ItemInfoScreenProps = {
   /** 가격 정보 새로고침 가능 여부 */
   priceRefresh?: PriceRefreshT;
   memo?: MemoT;
+  readOnly?: boolean;
 };
 
 /**
@@ -41,6 +42,7 @@ function ItemInfoScreen({
   isDeletePending,
   priceRefresh,
   memo,
+  readOnly = false,
 }: ItemInfoScreenProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -64,7 +66,8 @@ function ItemInfoScreen({
         centerClassName="heading-1-bold"
         /** 삭제는 조회 화면에서만 */
         right={
-          isDetailMode && (
+          isDetailMode &&
+          !readOnly && (
             <button
               type="button"
               aria-label="삭제하기"
@@ -87,8 +90,10 @@ function ItemInfoScreen({
           <ItemDetailView
             item={item}
             memo={memo}
-            priceRefresh={priceRefresh}
-            onEdit={() => setIsEditing(true)}
+            {...(!readOnly && {
+              priceRefresh,
+              onEdit: () => setIsEditing(true),
+            })}
           />
         ) : (
           <ItemEditForm
