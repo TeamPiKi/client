@@ -41,7 +41,7 @@ function TournamentHistorySection() {
 
   return (
     <>
-      <div className="sticky top-0 z-20 flex w-full flex-col bg-bg-layer-basement pt-padding-top">
+      <div className="sticky top-0 z-20 flex w-full flex-col bg-bg-layer-basement pt-padding-top pb-2">
         <h1 className="heading-1-bold text-text-neutral-primary">내 토너먼트</h1>
         <Spacing size={16} />
         <TournamentStatusTab activeTab={activeTab} onTabChange={handleTabChange} />
@@ -51,7 +51,7 @@ function TournamentHistorySection() {
           onFilterChange={handlePlayTypeFilterChange}
         />
       </div>
-      <div className="hide-scrollbar flex flex-1 flex-col gap-4 overflow-y-auto pt-6 pb-46">
+      <div className="hide-scrollbar flex flex-1 flex-col gap-4 overflow-y-auto pt-4 pb-46">
         <Suspense
           key={`${activeTab}-${activePlayTypeFilter}`}
           fallback={<TournamentHistorySkeleton />}
