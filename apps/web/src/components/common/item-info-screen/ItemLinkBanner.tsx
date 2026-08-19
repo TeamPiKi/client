@@ -3,19 +3,20 @@
 import { useState } from 'react';
 
 import { ChevronForwardIconFill, LinkIconFill } from '@/assets/icons';
+import { cn } from '@/utils/cn';
 
 type ItemLinkBannerProps = {
   href: string;
 };
 
-/** 사이트 파비콘 직접 로드 → 실패 시 구글 faviconV2 → 그래도 실패 시 기존 링크 아이콘 */
+/** 파비콘 후보 — 고해상도 순. 전부 실패하면 링크 아이콘으로 폴백 */
 const getSourceUrlParts = (sourceUrl: string) => {
   try {
     const { hostname, origin } = new URL(sourceUrl);
     return {
       label: hostname,
       faviconSrcs: [
-        `${origin}/apple-touch-icon.png`, // 보통 180×180 — favicon.ico(16~32px)보다 고해상도
+        `${origin}/apple-touch-icon.png`,
         `${origin}/favicon.ico`,
         `https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://${hostname}&size=128`,
       ],
@@ -28,11 +29,13 @@ const getSourceUrlParts = (sourceUrl: string) => {
 /** 상품 이미지 위에 겹쳐 두는 원본 링크 칩 */
 function ItemLinkBanner({ href }: ItemLinkBannerProps) {
   const [faviconIndex, setFaviconIndex] = useState(0);
+  const [isFaviconLoaded, setIsFaviconLoaded] = useState(false);
 
   const { label, faviconSrcs } = getSourceUrlParts(href);
   const faviconSrc = faviconSrcs[faviconIndex];
 
   const handleFaviconError = () => setFaviconIndex(prev => prev + 1);
+  const handleFaviconLoad = () => setIsFaviconLoaded(true);
 
   return (
     <a
@@ -41,22 +44,23 @@ function ItemLinkBanner({ href }: ItemLinkBannerProps) {
       rel="noopener noreferrer"
       className="liquid-glass absolute bottom-4 left-4 flex max-w-[calc(100%-32px)] items-center gap-2 rounded-full p-1 pr-2"
     >
-      <span className="flex size-8 shrink-0 items-center justify-center overflow-hidden rounded-full border border-border-neutral-muted bg-bg-layer-default">
-        {faviconSrc ? (
-          // 임의 외부 도메인이라 next/image remotePatterns 등록이 불가능해 일반 img 사용
-          // eslint-disable-next-line @next/next/no-img-element
+      <span className="relative flex size-8 shrink-0 items-center justify-center overflow-hidden rounded-full border border-border-neutral-muted bg-bg-layer-default">
+        {!isFaviconLoaded && <LinkIconFill className="size-5 text-icon-neutral-primary" />}
+        {faviconSrc && (
+          // eslint-disable-next-line @next/next/no-img-element -- next/image는 .ico 미지원
           <img
-            // 하이드레이션 전에 로드가 이미 실패한 이미지는 onError가 다시 발생하지 않으므로 여기서 감지
+            /** 하이드레이션 전에 로드가 끝나면 onLoad/onError가 오지 않아 ref에서 보정 */
             ref={img => {
-              if (img?.complete && img.naturalWidth === 0) handleFaviconError();
+              if (!img?.complete) return;
+              if (img.naturalWidth === 0) handleFaviconError();
+              else handleFaviconLoad();
             }}
             src={faviconSrc}
             alt=""
-            className="size-full object-cover"
+            className={cn('absolute inset-0 size-full object-cover', !isFaviconLoaded && 'invisible')}
+            onLoad={handleFaviconLoad}
             onError={handleFaviconError}
           />
-        ) : (
-          <LinkIconFill className="size-5 text-icon-neutral-primary" />
         )}
       </span>
       <span className="truncate body-2-medium text-text-neutral-secondary">{label}</span>
