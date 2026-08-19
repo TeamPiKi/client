@@ -59,11 +59,11 @@ function AppStoreRedirect({ storeUrl, target }: AppStoreRedirectProps) {
 
       {hasAttemptedStore && (
         <BottomCta className="flex-col items-stretch gap-2 bg-transparent pb-10">
-          <Button size="lg" onClick={handleWebContinueClick}>
-            웹으로 계속 보기
-          </Button>
-          <Button variant="secondary" size="lg" onClick={handleStoreRetryClick}>
+          <Button size="lg" onClick={handleStoreRetryClick}>
             앱 설치하러 가기
+          </Button>
+          <Button variant="secondary" size="lg" onClick={handleWebContinueClick}>
+            웹으로 계속 보기
           </Button>
         </BottomCta>
       )}
