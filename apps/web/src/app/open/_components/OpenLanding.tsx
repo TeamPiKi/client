@@ -20,8 +20,8 @@ type OpenLandingProps = {
   source: string | null;
 };
 
-/** 루트 스플래시와 같은 로고 크기 — 원본 146px 을 200px 로 키운 비율 */
-const SPLASH_LOGO_SCALE = 200 / 146;
+/** 루트 스플래시와 같은 로고 크기 — 원본 146px 을 116px 로 줄인 비율 */
+const SPLASH_LOGO_SCALE = 116 / 146;
 
 /** 앱을 여는 URL — 설치 여부 판정은 전부 OS 에 맡긴다 (웹에는 감지 수단이 없다) */
 const getAppOpenUrl = ({ landingEnv, target, serviceOrigin, source }: OpenLandingProps) => {

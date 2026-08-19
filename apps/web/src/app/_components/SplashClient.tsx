@@ -17,10 +17,10 @@ type LogoTransformT = {
 /** 로그인 페이지 PikiLogo 원본 너비(px) */
 const LOGIN_LOGO_WIDTH = 146;
 /** 스플래시에서 보여줄 로고 너비(px) */
-const SPLASH_LOGO_WIDTH = 200;
+const SPLASH_LOGO_WIDTH = 116;
 /**
- * SVG width attribute로 키우면 viewBox만 커지고 path는 그대로라 왼쪽 위로 치우쳐 보임.
- * 원본 크기(146px)로 렌더한 뒤 transform scale로 통째로 확대한다.
+ * SVG width attribute로 바꾸면 viewBox만 변하고 path는 그대로라 왼쪽 위로 치우쳐 보임.
+ * 원본 크기(146px)로 렌더한 뒤 transform scale로 통째로 조정한다.
  */
 const SPLASH_SCALE = SPLASH_LOGO_WIDTH / LOGIN_LOGO_WIDTH;
 

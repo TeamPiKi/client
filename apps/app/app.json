@@ -2,7 +2,7 @@
   "expo": {
     "name": "PiKi",
     "slug": "piki",
-    "version": "1.2.0",
+    "version": "1.2.1",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "piki",
@@ -101,7 +101,7 @@
         "expo-splash-screen",
         {
           "image": "./assets/images/splash-icon.png",
-          "imageWidth": 200,
+          "imageWidth": 116,
           "resizeMode": "contain",
           "backgroundColor": "#FAFAFA",
           "dark": {
@@ -109,7 +109,7 @@
           },
           "android": {
             "image": "./assets/images/splash-android-blank.png",
-            "imageWidth": 200,
+            "imageWidth": 116,
             "resizeMode": "contain",
             "backgroundColor": "#FAFAFA",
             "dark": {

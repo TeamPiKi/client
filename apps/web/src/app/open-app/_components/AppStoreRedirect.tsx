@@ -15,8 +15,8 @@ type AppStoreRedirectProps = {
   target: string;
 };
 
-/** 루트 스플래시와 같은 로고 크기 — 원본 146px 을 200px 로 키운 비율 */
-const SPLASH_LOGO_SCALE = 200 / 146;
+/** 루트 스플래시와 같은 로고 크기 — 원본 146px 을 116px 로 줄인 비율 */
+const SPLASH_LOGO_SCALE = 116 / 146;
 
 function AppStoreRedirect({ storeUrl, target }: AppStoreRedirectProps) {
   /** 스토어 전환을 취소하고 남은 유저에게만 CTA 를 보여준다 — 전환 전에는 로고만 */
@@ -59,11 +59,11 @@ function AppStoreRedirect({ storeUrl, target }: AppStoreRedirectProps) {
 
       {hasAttemptedStore && (
         <BottomCta className="flex-col items-stretch gap-2 bg-transparent pb-10">
-          <Button size="lg" onClick={handleWebContinueClick}>
-            웹으로 계속 보기
-          </Button>
-          <Button variant="secondary" size="lg" onClick={handleStoreRetryClick}>
+          <Button size="lg" onClick={handleStoreRetryClick}>
             앱 설치하러 가기
+          </Button>
+          <Button variant="secondary" size="lg" onClick={handleWebContinueClick}>
+            웹으로 계속 보기
           </Button>
         </BottomCta>
       )}
