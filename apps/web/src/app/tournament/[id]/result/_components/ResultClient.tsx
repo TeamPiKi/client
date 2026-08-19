@@ -107,7 +107,7 @@ function ResultClient({ tournamentId, isGuest = false, isApp = false }: ResultCl
         )}
       </div>
 
-      <BottomCta hasGradient className="flex-col items-stretch gap-6.5 pb-[30px]">
+      <BottomCta hasGradient height="tall" className="flex-col items-stretch gap-6.5 pb-[30px]">
         <div className="flex gap-3">
           <Button
             variant="secondary"

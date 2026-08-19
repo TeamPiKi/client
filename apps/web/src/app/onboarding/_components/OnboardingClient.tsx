@@ -75,7 +75,7 @@ function OnboardingClient() {
         </Carousel>
       </main>
 
-      <BottomCta hasGradient className="flex-col gap-6">
+      <BottomCta hasGradient height="tall" className="flex-col gap-6">
         <OnboardingIndicator
           totalCount={ONBOARDING_SLIDES.length}
           currentIndex={currentIndex}

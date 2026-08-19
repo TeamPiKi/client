@@ -13,7 +13,7 @@ function MypageWithdrawPage() {
         center={<h1 className="heading-1-bold text-text-neutral-primary">회원탈퇴</h1>}
       />
 
-      <div className="hide-scrollbar flex w-full flex-1 flex-col items-center overflow-y-auto pb-[98px] pt-[124.5px]">
+      <div className="hide-scrollbar flex w-full flex-1 flex-col items-center overflow-y-auto pb-bottom-cta pt-[124.5px]">
         <BasketWithdrawIcon aria-hidden className="size-[60px] shrink-0" />
         <div className="mt-[15px] flex flex-col items-center gap-3">
           <WithdrawGreeting />

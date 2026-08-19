@@ -1,10 +1,13 @@
 'use client';
 
 import ItemInfoScreen from '@/components/common/item-info-screen';
+import { useGetMe } from '@/hooks/useGetMe';
 
 import { useDeleteTournamentItem } from '../../../_common/_hooks/useDeleteTournamentItem';
+import { useGetTournament } from '../../../_common/_hooks/useGetTournament';
 import { useGetTournamentItem } from '../_hooks/useGetTournamentItem';
 import { usePatchTournamentItem } from '../_hooks/usePatchTournamentItem';
+import { canEditTournamentItem } from '../_utils/canEditTournamentItem';
 
 type TournamentItemInfoScreenProps = {
   tournamentId: number;
@@ -16,6 +19,8 @@ function TournamentItemInfoScreen({
   tournamentItemId,
 }: TournamentItemInfoScreenProps) {
   const { tournamentItemData } = useGetTournamentItem(tournamentId, tournamentItemId);
+  const { userData } = useGetMe();
+  const { tournamentData } = useGetTournament(tournamentId);
   const { patchTournamentItemMutation, isPatchTournamentItemPending } = usePatchTournamentItem(
     tournamentId,
     tournamentItemId
@@ -24,6 +29,8 @@ function TournamentItemInfoScreen({
     tournamentId,
     tournamentItemId
   );
+
+  const canEdit = canEditTournamentItem(tournamentData, userData, tournamentItemId);
 
   return (
     <ItemInfoScreen
@@ -36,6 +43,7 @@ function TournamentItemInfoScreen({
         sourceUrl: tournamentItemData.sourceUrl ?? null,
         sourcePlatform: null,
       }}
+      readOnly={!canEdit}
       onSave={data => patchTournamentItemMutation(data)}
       isSavePending={isPatchTournamentItemPending}
       onDelete={() => deleteTournamentItemMutation()}

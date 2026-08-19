@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 
 import PikiLogo from '@/assets/images/piki-logo-cart.svg';
+import BottomCta from '@/components/bottom-cta';
 import { ANALYTICS_EVENT } from '@/consts/analytics';
 import { AUTO_LAUNCH_DELAY_MS } from '@/consts/appLink';
 import { logAnalyticsEvent } from '@/utils/analytics';
@@ -14,7 +15,7 @@ type OpenLandingProps = {
   landingEnv: LandingEnvT;
   /** 검증된 내부 경로 */
   target: string;
-  /** 실제 서비스 오리진 (piki.day) — 랜딩 오리진과 크로스 도메인이어야 UL 이 산다 */
+  /** 앱 링크가 발동하는 서비스 오리진 (piki.day) — 프리뷰 등 미등록 호스트는 여기서 정규화된다 */
   serviceOrigin: string;
   source: string | null;
 };
@@ -61,7 +62,7 @@ function OpenLanding({ landingEnv, target, serviceOrigin, source }: OpenLandingP
     return () => clearTimeout(timer);
   }, [appOpenUrl, webUrl, platform]);
 
-  /** 함정 1 — JS 이동이라야 크로스 도메인 UL 이 발동하지 않고 웹으로 간다 */
+  /** `<Link>` 가 아닌 JS 이동 — UL 을 건드리지 않고 확실히 웹으로만 보낸다 */
   const handleWebContinueClick = () => {
     logAnalyticsEvent(ANALYTICS_EVENT.LANDING_WEB_CONTINUE, { platform });
     window.location.href = webUrl;
@@ -84,7 +85,7 @@ function OpenLanding({ landingEnv, target, serviceOrigin, source }: OpenLandingP
       </div>
 
       {/** 자동 전환이 막힌 환경(구버전 인스타 등)에서 웹으로 빠져나갈 길 */}
-      <div className="fixed inset-x-0 bottom-0 z-20 flex justify-center pb-10">
+      <BottomCta className="justify-center bg-transparent pb-10">
         <button
           type="button"
           onClick={handleWebContinueClick}
@@ -92,7 +93,7 @@ function OpenLanding({ landingEnv, target, serviceOrigin, source }: OpenLandingP
         >
           웹으로 계속 보기
         </button>
-      </div>
+      </BottomCta>
     </main>
   );
 }
