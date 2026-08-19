@@ -38,11 +38,8 @@ function ByImageDialog({ type, open, onOpenChange }: Props) {
   } = useImagePicker({
     maxCount: MAX_IMAGE_COUNT,
     onSuccess: async (files, skippedCount) => {
-      const formData = new FormData();
-      files.forEach(file => formData.append('images', file));
-
       if (type === 'wish') {
-        postWishOCRMutation(formData, {
+        postWishOCRMutation(files, {
           onSettled: () => onOpenChange(false),
           onSuccess: () => {
             if (skippedCount > 0)
@@ -50,7 +47,7 @@ function ByImageDialog({ type, open, onOpenChange }: Props) {
           },
         });
       } else if (type === 'tournament') {
-        postTournamentOCRMutation(formData, {
+        postTournamentOCRMutation(files, {
           onSettled: () => onOpenChange(false),
           onSuccess: () => {
             if (skippedCount > 0)

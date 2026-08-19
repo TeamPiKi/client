@@ -1,3 +1,4 @@
+import type { PresignedImageUploadT } from './image';
 import type { ItemT } from './item';
 
 export type WishT = {
@@ -29,9 +30,21 @@ export type PostWishLinkResponseT = {
   reused: boolean;
 };
 
-export type PostWishOCRResponseT = {
+export type PostWishPresignedUrlRequestT = {
+  contentTypes: string[];
+};
+
+export type PostWishPresignedUrlResponseT = {
+  uploads: PresignedImageUploadT[];
+};
+
+export type PostWishImagesRequestT = {
+  imageKeys: string[];
+};
+
+export type PostWishImagesResponseT = {
   wish: WishT;
   item: ItemT;
   refreshNeeded: null;
   reused: null;
-};
+}[];
