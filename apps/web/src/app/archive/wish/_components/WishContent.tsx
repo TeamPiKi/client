@@ -106,7 +106,7 @@ function WishContent() {
         )}
       </div>
 
-      <div className="flex flex-1 flex-col pb-24">
+      <div className="flex flex-1 flex-col pb-46">
         <WishlistList
           isDeleteMode={isDeleteMode}
           selectedIds={selectedIds}
