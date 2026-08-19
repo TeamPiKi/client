@@ -34,6 +34,7 @@ function TournamentItemInfoScreen({
         name: tournamentItemData.name ?? '',
         price: tournamentItemData.price ?? 0,
         sourceUrl: tournamentItemData.sourceUrl ?? null,
+        sourcePlatform: null,
       }}
       onSave={data => patchTournamentItemMutation(data)}
       isSavePending={isPatchTournamentItemPending}

@@ -6,7 +6,8 @@ import { ChevronForwardIconFill, LinkIconFill } from '@/assets/icons';
 import { cn } from '@/utils/cn';
 
 type ItemLinkBannerProps = {
-  href: string;
+  sourceUrl: string;
+  sourcePlatform: string | null;
 };
 
 /** 파비콘 후보 — 고해상도 순. 전부 실패하면 링크 아이콘으로 폴백 */
@@ -27,11 +28,12 @@ const getSourceUrlParts = (sourceUrl: string) => {
 };
 
 /** 상품 이미지 위에 겹쳐 두는 원본 링크 칩 */
-function ItemLinkBanner({ href }: ItemLinkBannerProps) {
+function ItemLinkBanner({ sourceUrl, sourcePlatform }: ItemLinkBannerProps) {
   const [faviconIndex, setFaviconIndex] = useState(0);
   const [isFaviconLoaded, setIsFaviconLoaded] = useState(false);
 
-  const { label, faviconSrcs } = getSourceUrlParts(href);
+  const { label: hostLabel, faviconSrcs } = getSourceUrlParts(sourceUrl);
+  const label = sourcePlatform ?? hostLabel;
   const faviconSrc = faviconSrcs[faviconIndex];
 
   const handleFaviconError = () => setFaviconIndex(prev => prev + 1);
@@ -39,7 +41,7 @@ function ItemLinkBanner({ href }: ItemLinkBannerProps) {
 
   return (
     <a
-      href={href}
+      href={sourceUrl}
       target="_blank"
       rel="noopener noreferrer"
       className="liquid-glass absolute bottom-4 left-4 flex max-w-[calc(100%-32px)] items-center gap-2 rounded-full p-1 pr-2"
