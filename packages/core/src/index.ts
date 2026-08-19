@@ -6,6 +6,7 @@ export {
   DEFAULT_ERROR_MESSAGE,
   ERROR_CODE,
   ERROR_MESSAGE_MAP,
+  S3_UPLOAD_ERROR_MESSAGE,
   SERVER_ERROR_MESSAGE,
 } from './consts/errorCode';
 export { SUPPORTED_IMAGE_MIME_TYPES } from './consts/image';

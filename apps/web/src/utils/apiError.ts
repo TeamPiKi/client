@@ -1,4 +1,4 @@
-import { ERROR_CODE } from '@piki/core';
+import { ERROR_CODE, S3_UPLOAD_ERROR_MESSAGE } from '@piki/core';
 import type { ApiErrorCodeT } from '@piki/core';
 import { isAxiosError } from 'axios';
 
@@ -23,6 +23,17 @@ export const isGlobalNetError = (error: unknown): boolean =>
   isServerOrNetworkError(error) ||
   (isAxiosError(error) && error.response?.status === 401) ||
   isWithdrawnAccountError(error);
+
+const S3_UPLOAD_ERROR_NAME = 'S3UploadError';
+export const createS3UploadError = (cause: unknown) => {
+  const error = new Error(S3_UPLOAD_ERROR_MESSAGE, { cause });
+  error.name = S3_UPLOAD_ERROR_NAME;
+
+  return error;
+};
+
+export const isS3UploadError = (error: unknown): error is Error =>
+  error instanceof Error && error.name === S3_UPLOAD_ERROR_NAME;
 
 export const getApiErrorStatus = (error: unknown): number | null =>
   isAxiosError(error) ? (error.response?.status ?? null) : null;
