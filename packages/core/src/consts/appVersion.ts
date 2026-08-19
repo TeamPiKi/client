@@ -47,6 +47,7 @@ export const BRIDGE_GATE: Record<WebBridgeMessageT['type'], BridgeGateT> = {
   APP_RES_IMAGE_PICKER_ERROR: { minAppVersion: null, notifyOnBlock: false },
   SOCIAL_LOGIN_SUCCESS: { minAppVersion: null, notifyOnBlock: false },
   SOCIAL_LOGIN_ERROR: { minAppVersion: null, notifyOnBlock: false },
+  SOCIAL_LOGIN_CANCEL: { minAppVersion: null, notifyOnBlock: false },
   APP_RES_SHARE_INTENT: { minAppVersion: null, notifyOnBlock: false },
   APP_RES_PUSH_PERMISSION_STATUS: { minAppVersion: null, notifyOnBlock: false },
   APP_RES_FCM_TOKEN: { minAppVersion: null, notifyOnBlock: false },

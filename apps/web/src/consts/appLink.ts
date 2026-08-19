@@ -9,3 +9,6 @@ export const AUTO_LAUNCH_DELAY_MS = 200;
 
 /** 인앱 브라우저 UA 토큰 — 동작 분기가 아니라 유입 분석용 */
 export const IN_APP_BROWSER_UA_TOKENS = ['Instagram', 'Threads'] as const;
+
+/** 인스타 유입 소스 값 — GA4 이벤트 파라미터와 Play 스토어 referrer 에 같은 값이 나가야 한다 */
+export const INSTAGRAM_SOURCE = 'instagram';

@@ -10,6 +10,7 @@ import Button from '@/components/button';
 import { Header } from '@/components/header';
 import { ANALYTICS_EVENT } from '@/consts/analytics';
 import { ROUTES } from '@/consts/route';
+import { TOURNAMENT_STATUS } from '@/consts/tournament';
 import { logAnalyticsEvent } from '@/utils/analytics';
 import { cn } from '@/utils/cn';
 
@@ -36,7 +37,7 @@ function ResultClient({ tournamentId, isGuest = false, isApp = false }: ResultCl
 
   // RSC에서 status 검사를 하지만, 클라에서 status가 바뀐 경우 방어
   useEffect(() => {
-    if (tournamentData.status === 'COMPLETED') return;
+    if (tournamentData.status === TOURNAMENT_STATUS.COMPLETED) return;
     router.replace(ROUTES.TOURNAMENT_MATCH(tournamentId));
   }, [tournamentData.status, router, tournamentId]);
 
@@ -44,13 +45,13 @@ function ResultClient({ tournamentId, isGuest = false, isApp = false }: ResultCl
   // 같은 인스턴스가 다른 tournamentId 로 재사용되더라도 ID 별로 정확히 1회만 로깅한다.
   const loggedCompleteForRef = useRef<number | null>(null);
   useEffect(() => {
-    if (tournamentData.status !== 'COMPLETED') return;
+    if (tournamentData.status !== TOURNAMENT_STATUS.COMPLETED) return;
     if (loggedCompleteForRef.current === tournamentId) return;
     loggedCompleteForRef.current = tournamentId;
     logAnalyticsEvent(ANALYTICS_EVENT.RESULT_VIEW, { tournament_id: tournamentId });
   }, [tournamentData.status, tournamentId]);
 
-  if (tournamentData.status !== 'COMPLETED') {
+  if (tournamentData.status !== TOURNAMENT_STATUS.COMPLETED) {
     return (
       <main className="flex min-h-dvh items-center justify-center bg-bg-layer-basement pt-padding-top">
         <p className="body-1-medium text-text-neutral-tertiary">결과를 불러오는 중...</p>
@@ -106,7 +107,7 @@ function ResultClient({ tournamentId, isGuest = false, isApp = false }: ResultCl
         )}
       </div>
 
-      <BottomCta hasGradient className="flex-col items-stretch gap-6.5 pb-[30px]">
+      <BottomCta hasGradient height="tall" className="flex-col items-stretch gap-6.5 pb-[30px]">
         <div className="flex gap-3">
           <Button
             variant="secondary"
