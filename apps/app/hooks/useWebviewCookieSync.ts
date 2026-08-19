@@ -7,6 +7,7 @@ import { postTokenRefresh } from '@/apis/postTokenRefresh';
 import { TokenStorage } from '@/utils/tokenStorage';
 
 const WEB_URL = process.env.EXPO_PUBLIC_WEB_URL ?? 'http://localhost:3000';
+const SYNC_TIMEOUT_MS = 8000;
 
 /**
  * SecureStore ↔ WebView 쿠키 저장소 양방향 동기화
@@ -87,7 +88,7 @@ export const useWebviewCookieSync = (isWebviewReady: boolean) => {
       if (refreshToken) await setAuthCookie('refresh_token', refreshToken);
     };
 
-    sync()
+    Promise.race([sync(), new Promise<void>(resolve => setTimeout(resolve, SYNC_TIMEOUT_MS))])
       .catch(error => {
         if (__DEV__) console.warn('[COOKIE_SYNC] 동기화 실패:', String(error));
       })
