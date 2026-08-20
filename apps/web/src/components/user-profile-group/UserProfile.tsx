@@ -22,7 +22,7 @@ function UserProfile({ user, className }: UserProfileProps) {
       >
         <Image
           src={user.imageUrl}
-          alt={user.name ?? '사용자 프로필'}
+          alt={`${user.name} 프로필 이미지`}
           fill
           sizes="27px"
           className="object-cover"

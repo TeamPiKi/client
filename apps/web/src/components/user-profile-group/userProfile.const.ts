@@ -5,7 +5,7 @@ export type ProfileTypeT = 'blue' | 'yellow';
 
 export type UserT = {
   id: string | number;
-  name?: string;
+  name: string;
   /** imageUrl 없을 때 기본 SVG 프로필 색상 */
   profileType?: ProfileTypeT;
   imageUrl?: string;
