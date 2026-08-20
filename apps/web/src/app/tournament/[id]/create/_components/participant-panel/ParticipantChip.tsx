@@ -1,5 +1,5 @@
 import UserProfile from '@/components/user-profile-group/UserProfile';
-import type { UserT } from '@/components/user-profile-group/userProfile.const';
+import type { UserT } from '@/components/user-profile-group/userProfile.types';
 import { useGetMe } from '@/hooks/useGetMe';
 
 type ParticipantChipProps = {

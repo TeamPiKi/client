@@ -7,6 +7,7 @@ import Button from '@/components/button';
 import { Drawer, DrawerContent, DrawerDescription, DrawerTitle } from '@/components/drawer';
 import Spinner from '@/components/spinner';
 import { ANALYTICS_EVENT } from '@/consts/analytics';
+import { ROUTES } from '@/consts/route';
 import { logAnalyticsEvent } from '@/utils/analytics';
 import { share } from '@/utils/share';
 
@@ -21,8 +22,9 @@ type PlateShareDialogProps = {
 };
 
 const buildPlayLinkUrl = (tournamentId: number) => {
-  if (typeof window === 'undefined') return `/play/${tournamentId}`;
-  return `${window.location.origin}/play/${tournamentId}`;
+  const path = ROUTES.PLAY_FROM_LINK(tournamentId);
+  if (typeof window === 'undefined') return path;
+  return `${window.location.origin}${path}`;
 };
 
 function PlateShareDialog({
