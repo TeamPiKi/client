@@ -28,6 +28,9 @@ export const usePostWishOCR = () => {
       });
 
       /** 일부 실패 시 전체 실패 처리 */
+      if (uploads.length !== files.length)
+        throw createS3UploadError(new Error('presigned 발급 개수 불일치'));
+
       await Promise.all(
         files.map((file, index) => {
           const upload = uploads[index];
