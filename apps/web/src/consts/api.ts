@@ -15,7 +15,8 @@ export const ENDPOINTS = {
   /** 위시리스트 */
   WISHLISTS: '/api/v1/wishlists',
   WISHLIST: (id: number) => `/api/v1/wishlists/${id}`,
-  WISH_OCR: '/api/v1/wishlists/images',
+  WISH_IMAGE_PRESIGNED: '/api/v1/wishlists/images/presigned',
+  WISH_IMAGE_CONFIRM: '/api/v1/wishlists/images/confirm',
   WISHLIST_REFRESH: (id: number) => `/api/v1/wishlists/${id}/refresh`,
 
   /** 토너먼트 */
@@ -24,7 +25,9 @@ export const ENDPOINTS = {
   TOURNAMENT_START: (id: number) => `/api/v1/tournaments/${id}/start`,
   TOURNAMENT_MATCHES: (id: number) => `/api/v1/tournaments/${id}/matches`,
   TOURNAMENT_ITEM_LINK: (id: number) => `/api/v1/tournaments/${id}/items/link`,
-  TOURNAMENT_OCR: (id: number) => `/api/v1/tournaments/${id}/items/images`,
+  TOURNAMENT_ITEM_IMAGE_PRESIGNED: (id: number) =>
+    `/api/v1/tournaments/${id}/items/images/presigned`,
+  TOURNAMENT_ITEM_IMAGE_CONFIRM: (id: number) => `/api/v1/tournaments/${id}/items/images/confirm`,
   TOURNAMENT_ITEM: (id: number, ItemId: number) => `/api/v1/tournaments/${id}/items/${ItemId}`,
   TOURNAMENT_ITEMS_FROM_WISH: (id: number) => `/api/v1/tournaments/${id}/items/wish`,
   TOURNAMENT_PLAY_LINK: (id: number) => `/api/v1/tournaments/${id}/play-link`,
