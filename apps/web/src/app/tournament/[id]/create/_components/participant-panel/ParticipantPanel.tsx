@@ -5,7 +5,7 @@ import { useState } from 'react';
 
 import { AddIconOutline, ChevronDownIconOutline, ChevronUpIconOutline } from '@/assets/icons';
 import UserProfileGroup from '@/components/user-profile-group';
-import type { UserT } from '@/components/user-profile-group/userProfile.const';
+import type { UserT } from '@/components/user-profile-group/userProfile.types';
 import { ROUTES } from '@/consts/route';
 import { Z_INDEX } from '@/consts/zIndex';
 import { cn } from '@/utils/cn';
