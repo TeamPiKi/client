@@ -54,9 +54,7 @@ function ParticipantPanel({
   const [isInviteDialogOpen, setIsInviteDialogOpen] = useState(false);
 
   const hasFriends = participants.length > 1;
-  const profileImageUrls = participants.flatMap(({ user }) =>
-    user.imageUrl ? [user.imageUrl] : []
-  );
+  const profileImageUrls = participants.map(({ user }) => user.imageUrl);
   const inviteUrl = inviteCode ? buildInviteUrl(tournamentId, inviteCode) : '';
 
   const handleToggleExpand = () => setIsExpanded(prev => !prev);
