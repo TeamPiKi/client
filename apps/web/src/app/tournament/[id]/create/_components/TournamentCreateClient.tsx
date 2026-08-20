@@ -16,7 +16,7 @@ import { useGetTournament } from '../../_common/_hooks/useGetTournament';
 import { PREV_ITEM_COUNT_KEY } from '../_consts/tournamentItemBasket';
 import { useCountdown } from '../_hooks/useCountdown';
 import { usePostTournamentStart } from '../_hooks/usePostTournamentStart';
-import { hasSentInvite } from '../_utils/inviteSentSession';
+import { hasSentInvite } from '@/utils/inviteSentSession';
 import DepositClosedDialog from './deposit-closed-dialog/DepositClosedDialog';
 import OwnerStartedDialog from './owner-started-dialog/OwnerStartedDialog';
 import ParticipantPanel from './participant-panel/ParticipantPanel';

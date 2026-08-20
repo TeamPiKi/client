@@ -28,3 +28,12 @@ export const markInviteSent = (tournamentId: number): void => {
     /* private mode 등 — 무시 */
   }
 };
+
+export const clearInviteSent = (tournamentId: number): void => {
+  if (typeof window === 'undefined') return;
+  try {
+    window.localStorage.removeItem(getStorageKey(tournamentId));
+  } catch {
+    /* private mode 등 — 무시 */
+  }
+};
