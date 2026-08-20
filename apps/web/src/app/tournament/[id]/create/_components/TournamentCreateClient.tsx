@@ -12,14 +12,12 @@ import { useQueryAction } from '@/hooks/useQueryAction';
 import { useSSEFallback } from '@/hooks/useSSEFallback';
 import { hasParsingItems } from '@/utils/item';
 
-import { type JoinConfirmPayloadT, consumeJoinConfirmFor } from '../../../join/_utils/joinSession';
 import { useGetTournament } from '../../_common/_hooks/useGetTournament';
 import { PREV_ITEM_COUNT_KEY } from '../_consts/tournamentItemBasket';
 import { useCountdown } from '../_hooks/useCountdown';
 import { usePostTournamentStart } from '../_hooks/usePostTournamentStart';
 import { hasSentInvite } from '../_utils/inviteSentSession';
 import DepositClosedDialog from './deposit-closed-dialog/DepositClosedDialog';
-import MemberJoinConfirmDialog from './member-join-confirm-dialog/MemberJoinConfirmDialog';
 import OwnerStartedDialog from './owner-started-dialog/OwnerStartedDialog';
 import ParticipantPanel from './participant-panel/ParticipantPanel';
 import TournamentHeader from './tournament-header/TournamentHeader';
@@ -112,9 +110,6 @@ function TournamentCreateClient({ tournamentId }: TournamentCreateClientProps) {
     (pending?.participants ?? []).map(p => [p.userId, p.profileImage])
   );
 
-  const [confirmPayload, setConfirmPayload] = useState<JoinConfirmPayloadT | null>(() =>
-    consumeJoinConfirmFor(tournamentId)
-  );
   const isParticipant = !tournamentData.isOwner;
   // 참여자는 주최자가 ROOT 를 시작한 후(ownerStarted=true) 부터 본인 CLONE 시작 가능.
   const isWaitingForOwnerStart = isParticipant && pending?.ownerStarted === false;
@@ -181,8 +176,6 @@ function TournamentCreateClient({ tournamentId }: TournamentCreateClientProps) {
     setIsOwnerStartedDialogOpen(open);
     if (!open) setHasDismissedOwnerStarted(true);
   };
-
-  const handleCloseConfirm = () => setConfirmPayload(null);
 
   return (
     <div className="flex h-full min-h-0 flex-col bg-bg-layer-basement pt-padding-top pb-bottom-cta">
@@ -260,21 +253,6 @@ function TournamentCreateClient({ tournamentId }: TournamentCreateClientProps) {
           itemCount={pending?.items.length ?? 0}
           participantCount={pending?.participants.length ?? 0}
           onConfirm={() => setIsWelcomeOpen(false)}
-        />
-      )}
-
-      {confirmPayload && (
-        <MemberJoinConfirmDialog
-          open
-          onOpenChange={open => {
-            if (!open) handleCloseConfirm();
-          }}
-          nickname={confirmPayload.nickname}
-          profileType={confirmPayload.profileType}
-          tournamentName={confirmPayload.tournamentName}
-          itemCount={confirmPayload.itemCount}
-          participantCount={confirmPayload.participantCount}
-          onConfirm={handleCloseConfirm}
         />
       )}
     </div>
