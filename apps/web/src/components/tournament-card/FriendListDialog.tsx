@@ -7,13 +7,13 @@ import { ProfileCircledFilledIconOutline } from '@/assets/icons';
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/dialog';
 import Spinner from '@/components/spinner';
 import UserProfile from '@/components/user-profile-group/UserProfile';
-import type { ProfileTypeT, UserT } from '@/components/user-profile-group/userProfile.const';
+import type { UserT } from '@/components/user-profile-group/userProfile.types';
 import { useGetMe } from '@/hooks/useGetMe';
 
 type FriendListItemT = {
   userId: string;
   nickname: string;
-  profileImage?: string;
+  profileImage: string;
   /** 본인 여부 — true 면 우측에 "나" 배지 표시 */
   isMe?: boolean;
 };
@@ -25,18 +25,10 @@ type FriendListDialogProps = {
   tournamentId: number;
 };
 
-/** 닉네임 → 안정적인 profileType(blue/yellow) 매핑. 이미지가 없을 때만 사용. */
-const pickProfileType = (seed: string): ProfileTypeT => {
-  let hash = 0;
-  for (let i = 0; i < seed.length; i++) hash = (hash * 31 + seed.charCodeAt(i)) | 0;
-  return Math.abs(hash) % 2 === 0 ? 'blue' : 'yellow';
-};
-
 const toUser = (friend: FriendListItemT): UserT => ({
   id: friend.userId,
   name: friend.nickname,
-  profileType: pickProfileType(friend.userId || friend.nickname),
-  ...(friend.profileImage ? { imageUrl: friend.profileImage } : {}),
+  imageUrl: friend.profileImage,
 });
 
 function FriendListDialog({ open, onOpenChange, tournamentId }: FriendListDialogProps) {

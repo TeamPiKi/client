@@ -12,7 +12,7 @@ export const SCROLL_NAMESPACE = {
   ARCHIVE_TOURNAMENT: 'archiveTournament',
 } as const;
 
-export type ScrollAnchorT = {
+type ScrollAnchorT = {
   anchorId: number;
   offset: number;
 };

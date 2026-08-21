@@ -1,5 +1,6 @@
 import AddIconFill from '@/assets/icons/fill/add.svg';
 import Button from '@/components/button';
+import { Z_INDEX } from '@/consts/zIndex';
 
 type WishlistFabAreaProps = {
   isDeleteMode: boolean;
@@ -10,7 +11,10 @@ function WishlistFabArea({ isDeleteMode, onAddItem }: WishlistFabAreaProps) {
   if (isDeleteMode) return null;
 
   return (
-    <div className="pointer-events-none fixed right-0 bottom-[103px] left-0 z-30 mx-auto flex w-full max-w-120 justify-end pr-5">
+    <div
+      style={{ zIndex: Z_INDEX.FAB }}
+      className="pointer-events-none fixed right-0 bottom-[103px] left-0 mx-auto flex w-full max-w-120 justify-end pr-5"
+    >
       <Button
         variant="primary"
         size="xl"

@@ -117,7 +117,8 @@ apps/web/src/
 │       └── {component-name}/             # 폴더명: kebab-case
 │           ├── index.tsx                 # 컴포넌트 본체 (default export)
 │           ├── {componentName}.style.ts  # cva variants (스타일 분리 시)
-│           └── {componentName}.const.ts  # 상수/타입 (필요 시)
+│           ├── {componentName}.const.ts  # 상수 (필요 시)
+│           └── {componentName}.types.ts  # 타입 (필요 시)
 ├── apis/         # API 호출 함수 (HTTP 메서드 prefix 컨벤션)
 ├── hooks/        # 커스텀 훅
 ├── utils/        # 공통 유틸리티 함수
@@ -170,7 +171,8 @@ apps/web/src/
 | **대표 컴포넌트** | `index.tsx` (default export) | `button/index.tsx`                      |
 | **보조 컴포넌트** | PascalCase                   | `UserProfile.tsx`, `ButtonLink.tsx`     |
 | **스타일 (cva)**  | camelCase + `.style.ts`      | `button.style.ts`, `stateChip.style.ts` |
-| **상수/타입**     | camelCase + `.const.ts`      | `userProfile.const.ts`                  |
+| **상수**          | camelCase + `.const.ts`      | `joinErrorDialog.const.ts`              |
+| **타입**          | camelCase + `.types.ts`      | `userProfile.types.ts`                  |
 
 - **폴더명**: kebab-case (`button/`, `wish-card/`, `state-chip/`)
 
@@ -198,7 +200,7 @@ import Button from '@/components/common/Button/Button';
 | **폴더**                 | kebab-case                      | `wish-card/`, `state-chip/`                             |
 | **공통 컴포넌트 본체**   | `index.tsx`                     | `components/common/button/index.tsx`                    |
 | **보조 컴포넌트 파일**   | PascalCase                      | `UserProfile.tsx`, `ButtonLink.tsx`                     |
-| **스타일/상수 파일**     | camelCase                       | `button.style.ts`, `userProfile.const.ts`               |
+| **스타일/상수/타입 파일** | camelCase                       | `button.style.ts`, `userProfile.types.ts`               |
 | **일반 파일** (훅, 유틸) | camelCase                       | `useAuth.ts`, `formatDate.ts`                           |
 | **타입**                 | T suffix                        | `UserT`, `ProductT`                                     |
 | **API 함수**             | HTTP 메서드 prefix              | `getUser`, `postWishlist`, `patchProfile`, `deleteItem` |

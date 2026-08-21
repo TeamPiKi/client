@@ -2,6 +2,7 @@ import BaseImage from '@/components/base-image';
 import { Z_INDEX } from '@/consts/zIndex';
 import formatPrice from '@/utils/formatPrice';
 
+import { PRODUCT_CARD_IMAGE_SIZES } from '../../_common/_consts/image';
 import type { ProductT } from '../../_common/_types/tournament';
 
 type ProductCardProps = ProductT & {
@@ -33,7 +34,7 @@ function ProductCard({ imageUrl, name, price, isPicked, isFinal = false, onClick
             <BaseImage
               src={imageUrl}
               alt={name}
-              sizes="(max-width: 480px) 45vw, 200px"
+              sizes={PRODUCT_CARD_IMAGE_SIZES}
               preload
               className="object-cover"
             />

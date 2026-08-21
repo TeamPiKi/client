@@ -1,19 +1,42 @@
 'use client';
 
+import { useQueryClient } from '@tanstack/react-query';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 
 import { ROUTES } from '@/consts/route';
+import { TOURNAMENT_STATUS } from '@/consts/tournament';
 
+import usePreloadMatchImages from '../_common/_hooks/usePreloadMatchImages';
+import type { GetTournamentResponseT } from '../_common/_types/tournamentResponse';
 import LoadingBar from './_components/LoadingBar';
 import TournamentBracketAnimation from './_components/TournamentBracketAnimation';
 
 const LOADING_DURATION_MS = 4000;
 
+const getCandidateImageUrls = (tournament: GetTournamentResponseT | undefined) => {
+  if (!tournament) return [];
+  if (tournament.status === TOURNAMENT_STATUS.PENDING)
+    return tournament.pending.items.map(item => item.imageUrl);
+  if (tournament.status !== TOURNAMENT_STATUS.IN_PROGRESS) return [];
+
+  return tournament.inProgress
+    ? tournament.inProgress.remainingItems.map(item => item.imageUrl)
+    : tournament.pending.items.map(item => item.imageUrl);
+};
+
 function TournamentLoadingPage() {
   const router = useRouter();
   const params = useParams();
+  const queryClient = useQueryClient();
   const tournamentId = Number(params.id);
+
+  const tournamentData = queryClient.getQueryData<GetTournamentResponseT>([
+    'tournament',
+    tournamentId,
+  ]);
+
+  usePreloadMatchImages(getCandidateImageUrls(tournamentData));
 
   useEffect(() => {
     const timer = setTimeout(() => {
