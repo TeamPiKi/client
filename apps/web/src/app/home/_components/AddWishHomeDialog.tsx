@@ -66,9 +66,10 @@ function WishButtonContent() {
         src={AddWishBg}
         alt=""
         aria-hidden
-        width={197}
-        height={242}
-        className="pointer-events-none mx-auto"
+        width={525}
+        height={660}
+        sizes="(max-width: 640px) 40vw, 175px"
+        className="pointer-events-none absolute top-0 left-1/2 h-full w-auto -translate-x-1/2"
         priority
       />
       <span className="absolute top-[18px] left-[15px] heading-1-bold text-base-50">위시 담기</span>
