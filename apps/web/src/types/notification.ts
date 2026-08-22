@@ -1,3 +1,5 @@
+import type { ITEM_STATUS } from '@/consts/item';
+
 export type NotificationTypeT =
   | 'TOURNAMENT_JOINED'
   | 'TOURNAMENT_ITEM_ADDED'
@@ -41,7 +43,10 @@ export type SilentSyncSsePayloadT =
       type: 'TOURNAMENT_ITEM_PARSED';
       tournamentId: number;
       tournamentItemId: number;
-      status: 'READY' | 'INCOMPLETE' | 'FAILED';
+      status:
+        | (typeof ITEM_STATUS)['READY']
+        | (typeof ITEM_STATUS)['INCOMPLETE']
+        | (typeof ITEM_STATUS)['FAILED'];
     }
   | {
       type: 'UNREAD_COUNT_CHANGED';

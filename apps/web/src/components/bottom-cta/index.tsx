@@ -4,12 +4,19 @@ import { cn } from '@/utils/cn';
 type BottomCtaProps = {
   className?: string;
   hasGradient?: boolean;
+  height?: 'default' | 'tall';
   children: React.ReactNode;
 };
 
-function BottomCta({ className, hasGradient = false, children }: BottomCtaProps) {
+function BottomCta({
+  className,
+  hasGradient = false,
+  height = 'default',
+  children,
+}: BottomCtaProps) {
   return (
     <div
+      data-bottom-cta={height}
       className={cn(
         'fixed right-0 bottom-0 left-0 mx-auto flex w-full max-w-120 items-center gap-2.5 bg-bg-layer-basement px-5 pt-3 pb-8',
         className

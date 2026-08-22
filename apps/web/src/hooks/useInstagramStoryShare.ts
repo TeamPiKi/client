@@ -12,7 +12,7 @@ const RESPONSE_TIMEOUT_MS = 15_000;
 
 /** `blocked` 는 앱 버전 게이트에 막혀 전송조차 안 된 경우 */
 /** 'blocked' 앱 버전 게이트에 막힘 · 'busy' 이미 공유 진행 중 */
-export type InstagramStoryShareResultT = ShareInstagramStoryStatusT | 'blocked' | 'busy';
+type InstagramStoryShareResultT = ShareInstagramStoryStatusT | 'blocked' | 'busy';
 
 type PendingRequestT = {
   resolve: (status: ShareInstagramStoryStatusT) => void;

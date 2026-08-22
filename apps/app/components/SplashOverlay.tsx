@@ -2,7 +2,7 @@ import { Image, StyleSheet, View } from 'react-native';
 
 /** app.json expo-splash-screen 설정과 동일하게 유지 (backgroundColor / imageWidth) */
 const SPLASH_BACKGROUND_COLOR = '#FAFAFA';
-const SPLASH_LOGO_WIDTH = 200;
+const SPLASH_LOGO_WIDTH = 116;
 
 /**
  * 네이티브 스플래시를 이어받는 RN 스플래시 오버레이.

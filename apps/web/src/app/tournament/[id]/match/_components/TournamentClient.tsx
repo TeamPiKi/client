@@ -1,5 +1,6 @@
 'use client';
 
+import usePreloadMatchImages from '../../_common/_hooks/usePreloadMatchImages';
 import type { GetTournamentInProgressResponseT } from '../../_common/_types/tournamentResponse';
 import useTournament from '../_hooks/useTournament';
 import MatchSkeleton from './MatchSkeleton';
@@ -17,14 +18,17 @@ type TournamentClientProps = {
 function TournamentClient({ tournamentId, tournamentName, inProgress }: TournamentClientProps) {
   const {
     currentMatch,
+    remainingItems,
     roundLabel,
     isFinalRound,
     transitionStage,
     selectionEpoch,
-    isRecordingMatch,
     handleSelect,
     handleTransitionComplete,
   } = useTournament({ tournamentId, tournamentName, inProgress });
+
+  // 다음 대진은 미리 알 수 없어도 후보는 알고 있다 — 라운드의 남은 아이템 이미지를 미리 받아둔다
+  usePreloadMatchImages(remainingItems.map(item => item.imageUrl));
 
   const backgroundClassName = isFinalRound
     ? 'bg-gradient-to-b from-sky-blue-50 via-[#F5FCFF] to-white'
@@ -44,8 +48,8 @@ function TournamentClient({ tournamentId, tournamentName, inProgress }: Tourname
         )}
       </div>
       <div className={`w-full ${isFinalRound ? 'mt-29' : 'mt-8'}`}>
-        {/* 다음 매치는 서버 응답으로 오므로 기록 대기 동안 스켈레톤을 보여준다 */}
-        {isRecordingMatch || !currentMatch ? (
+        {/* 기록 대기 중에는 이전 화면을 유지해 스켈레톤 깜빡임을 방지한다. */}
+        {!currentMatch ? (
           <MatchSkeleton isFinal={isFinalRound} />
         ) : (
           <VsSection

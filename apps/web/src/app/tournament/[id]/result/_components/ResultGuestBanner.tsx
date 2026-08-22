@@ -3,9 +3,7 @@
 import Link from 'next/link';
 import { useEffect } from 'react';
 
-import ResultGuestBannerGroupIllustration from '@/assets/images/result-guest-banner-group.svg';
-import UserProfileGreenIcon from '@/assets/images/user-profile-green.svg';
-import UserProfileYellowIcon from '@/assets/images/user-profile-yellow.svg';
+import ResultGuestBannerIllustration from '@/assets/images/result-guest-banner-illustration.svg';
 import { ANALYTICS_EVENT } from '@/consts/analytics';
 import { ROUTES } from '@/consts/route';
 import { logAnalyticsEvent } from '@/utils/analytics';
@@ -31,39 +29,9 @@ function ResultGuestBanner() {
         <p className="body-1-semibold text-text-neutral-secondary">가입하고 토너먼트 주최하기</p>
       </div>
 
-      {/* 노란 이모지 — 그룹 일러스트 뒤에 위치 */}
-      <UserProfileYellowIcon
+      <ResultGuestBannerIllustration
         aria-hidden
-        style={{
-          position: 'absolute',
-          right: '21.59px',
-          top: '15px',
-          width: '21.396px',
-          height: '21.396px',
-          transform: 'rotate(12.047deg)',
-        }}
-      />
-      {/* 그룹 일러스트 (블루 카드 + 하트 + 스파클) */}
-      <ResultGuestBannerGroupIllustration
-        aria-hidden
-        style={{
-          position: 'absolute',
-          right: '19.27px',
-          top: '14.25px',
-          height: '52.087px',
-          width: '77.711px',
-        }}
-      />
-      {/* 초록 이모지 — 그룹 일러스트 앞에 위치 */}
-      <UserProfileGreenIcon
-        aria-hidden
-        style={{
-          position: 'absolute',
-          right: '84.5px',
-          top: '39.63px',
-          width: '22px',
-          height: '23px',
-        }}
+        className="absolute top-[14.25px] right-[18px] h-[53px] w-[87px]"
       />
     </Link>
   );

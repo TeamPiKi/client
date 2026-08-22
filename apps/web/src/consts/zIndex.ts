@@ -4,6 +4,7 @@ export const Z_INDEX = {
   BOTTOM_TAB_BAR: 20,
 
   BOTTOM_CTA: 30,
+  FAB: 30,
 
   POPOVER: 40,
 

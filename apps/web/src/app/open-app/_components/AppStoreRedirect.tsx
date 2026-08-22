@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 
 import PikiLogo from '@/assets/images/piki-logo-cart.svg';
+import BottomCta from '@/components/bottom-cta';
 import Button from '@/components/button';
 import { ANALYTICS_EVENT } from '@/consts/analytics';
 import { AUTO_LAUNCH_DELAY_MS } from '@/consts/appLink';
@@ -14,8 +15,8 @@ type AppStoreRedirectProps = {
   target: string;
 };
 
-/** 루트 스플래시와 같은 로고 크기 — 원본 146px 을 200px 로 키운 비율 */
-const SPLASH_LOGO_SCALE = 200 / 146;
+/** 루트 스플래시와 같은 로고 크기 — 원본 146px 을 116px 로 줄인 비율 */
+const SPLASH_LOGO_SCALE = 116 / 146;
 
 function AppStoreRedirect({ storeUrl, target }: AppStoreRedirectProps) {
   /** 스토어 전환을 취소하고 남은 유저에게만 CTA 를 보여준다 — 전환 전에는 로고만 */
@@ -57,14 +58,14 @@ function AppStoreRedirect({ storeUrl, target }: AppStoreRedirectProps) {
       </div>
 
       {hasAttemptedStore && (
-        <div className="fixed inset-x-0 bottom-0 z-20 mx-auto flex max-w-120 flex-col gap-2 px-5 pb-10">
-          <Button size="lg" onClick={handleWebContinueClick}>
-            웹으로 계속 보기
-          </Button>
-          <Button variant="secondary" size="lg" onClick={handleStoreRetryClick}>
+        <BottomCta className="flex-col items-stretch gap-2 bg-transparent pb-10">
+          <Button size="lg" onClick={handleStoreRetryClick}>
             앱 설치하러 가기
           </Button>
-        </div>
+          <Button variant="secondary" size="lg" onClick={handleWebContinueClick}>
+            웹으로 계속 보기
+          </Button>
+        </BottomCta>
       )}
     </main>
   );

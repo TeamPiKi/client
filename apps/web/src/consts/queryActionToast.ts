@@ -33,4 +33,9 @@ export const QUERY_ACTION_TOAST: Partial<Record<QueryActionValueT, QueryActionTo
     message: ERROR_MESSAGE_MAP[ERROR_CODE.TOURNAMENT_NOT_FOUND],
     variant: 'error',
   },
+  /** 후보 부족·추출 미완 등 사유가 여러 갈래라 카탈로그 문구 대신 포괄 안내를 쓴다 */
+  [QUERY_ACTION.VALUE.TOURNAMENT_NOT_STARTABLE]: {
+    message: '아직 토너먼트를 시작할 수 없어요. 후보를 확인해 주세요.',
+    variant: 'error',
+  },
 };

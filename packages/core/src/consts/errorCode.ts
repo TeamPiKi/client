@@ -279,3 +279,6 @@ export const DEFAULT_ERROR_MESSAGE = '요청을 처리하지 못했어요.';
 
 /** code 를 알 수 없는 5xx·네트워크 오류 fallback 문구 */
 export const SERVER_ERROR_MESSAGE = '일시적인 오류가 발생했어요. 잠시 후 다시 시도해 주세요.';
+
+/** S3 실패 문구 */
+export const S3_UPLOAD_ERROR_MESSAGE = '이미지 업로드에 실패했어요. 잠시 후 다시 시도해 주세요.';

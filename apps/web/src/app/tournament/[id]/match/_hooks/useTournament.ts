@@ -7,6 +7,7 @@ import { useRef, useState } from 'react';
 import { toast } from 'sonner';
 
 import { ROUTES } from '@/consts/route';
+import { TOURNAMENT_STATUS } from '@/consts/tournament';
 import type { ApiErrorResponseT } from '@/types/api';
 import type { TournamentItemT } from '@/types/tournament';
 
@@ -31,7 +32,7 @@ type InProgressT = NonNullable<GetTournamentInProgressResponseT['inProgress']>;
 const useTournament = ({ tournamentId, inProgress }: UseTournamentArgs) => {
   const router = useRouter();
   const queryClient = useQueryClient();
-  const { postRecordMatchMutation, isPostRecordMatchPending } = usePostRecordMatch({
+  const { postRecordMatchMutation } = usePostRecordMatch({
     tournamentId,
     onSuccess: data => {
       const completed = data.completed;
@@ -60,7 +61,7 @@ const useTournament = ({ tournamentId, inProgress }: UseTournamentArgs) => {
         isOwner: previous.isOwner,
         isRoot: previous.isRoot,
         ...(sourceTournamentId ? { sourceTournamentId } : {}),
-        status: 'COMPLETED',
+        status: TOURNAMENT_STATUS.COMPLETED,
         completed: {
           result: completed.result,
           hasGroupResult: completed.hasGroupResult,
@@ -76,15 +77,14 @@ const useTournament = ({ tournamentId, inProgress }: UseTournamentArgs) => {
   const [currentMatch, setCurrentMatch] = useState<TournamentMatchT | undefined>(
     inProgress.currentMatch
   );
+  // 해당 라운드에 남은 후보 아이템 — 다음 대진 이미지 프리로드용 (usePreloadMatchImages)
+  const [remainingItems, setRemainingItems] = useState(inProgress.remainingItems);
   // 라운드 내 진행한 매치 수 (라벨 표기용) — 라운드가 바뀌면 0 으로 초기화
   const [matchIndex, setMatchIndex] = useState(0);
   const [transitionStage, setTransitionStage] = useState<TransitionStageT | null>(null);
   // 카드 선택 락 해제용 — 매치가 바뀌지 않는 기록 실패에서 VsSection 을 remount 시켜
   // 재선택을 가능하게 한다 (락은 useCardSelectionAnimation 내부 상태)
   const [selectionEpoch, setSelectionEpoch] = useState(0);
-  // 결승 기록 후 결과 페이지로 이동하는 동안 true — 라우팅이 끝나기 전에
-  // 방금 고른 결승 매치가 다시 그려지는 깜빡임을 막는다
-  const [isNavigatingToResult, setIsNavigatingToResult] = useState(false);
 
   // 준결승/결승 바텀시트 표시 중 재조회 없이 적용할 다음 라운드 데이터
   const pendingNextRoundRef = useRef<InProgressT | null>(null);
@@ -102,14 +102,16 @@ const useTournament = ({ tournamentId, inProgress }: UseTournamentArgs) => {
     const next = await getTournament(tournamentId);
     queryClient.setQueryData(['tournament', tournamentId], next);
 
-    if (next.status === 'COMPLETED') {
-      setIsNavigatingToResult(true);
+    if (next.status === TOURNAMENT_STATUS.COMPLETED) {
       router.replace(ROUTES.TOURNAMENT_RESULT(tournamentId));
       return;
     }
-    if (next.status !== 'IN_PROGRESS' || !next.inProgress) return;
+    if (next.status !== TOURNAMENT_STATUS.IN_PROGRESS || !next.inProgress) return;
 
     const nextInProgress = next.inProgress;
+
+    // 바텀시트 분기보다 먼저 갱신 — 시트가 떠 있는 동안이 프리로드에 쓸 수 있는 시간이다
+    setRemainingItems(nextInProgress.remainingItems);
 
     // 라운드 전환 — 서버의 실제 다음 라운드 수 기준으로 바텀시트 판단
     if (nextInProgress.currentRound !== currentRound) {
@@ -166,7 +168,6 @@ const useTournament = ({ tournamentId, inProgress }: UseTournamentArgs) => {
         onSuccess: async data => {
           // 토너먼트 종료 — 캐시 정리(훅 onSuccess)까지 끝난 뒤 결과 페이지로
           if (data.completed) {
-            setIsNavigatingToResult(true);
             router.replace(ROUTES.TOURNAMENT_RESULT(tournamentId));
             return;
           }
@@ -227,15 +228,11 @@ const useTournament = ({ tournamentId, inProgress }: UseTournamentArgs) => {
 
   return {
     currentMatch,
+    remainingItems,
     roundLabel,
     isFinalRound,
     transitionStage,
     selectionEpoch,
-    /**
-     * 기록 요청 대기 중 — 다음 매치를 서버가 주므로 이 동안 스켈레톤을 노출한다.
-     * 결과 페이지로 이동하는 중에도 유지해 방금 고른 매치가 다시 보이지 않게 한다.
-     */
-    isRecordingMatch: isPostRecordMatchPending || isNavigatingToResult,
     handleSelect,
     handleTransitionComplete,
   };

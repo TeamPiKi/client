@@ -13,7 +13,7 @@ import { parseServerLocalDateTime } from '@/utils/formatDate';
 import { share } from '@/utils/share';
 
 import { usePatchInviteExpiry } from '../../_hooks/usePatchInviteExpiry';
-import { markInviteSent } from '../../_utils/inviteSentSession';
+import { markInviteSent } from '@/utils/inviteSentSession';
 import InviteExpiresPicker from './InviteExpiresPicker';
 
 type InviteFriendsDialogProps = {

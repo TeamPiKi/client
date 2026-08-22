@@ -8,6 +8,7 @@ import { ROUTES } from '@/consts/route';
 import { logAnalyticsEvent } from '@/utils/analytics';
 import { getApiErrorCode, getApiErrorStatus, isGlobalNetError } from '@/utils/apiError';
 import { getApiErrorMessage } from '@/utils/getApiErrorMessage';
+import { clearInviteSent } from '@/utils/inviteSentSession';
 
 import { postTournamentStart } from '../_apis/postTournamentStart';
 
@@ -21,6 +22,7 @@ export const usePostTournamentStart = (tournamentId: number) => {
       // - 주최자: ROOT ID (요청 tournamentId 와 동일)
       // - 참여자: 새로 생성된 CLONE ID (이후 본인 인스턴스로 진행)
       onSuccess: ({ tournamentId: nextTournamentId }) => {
+        clearInviteSent(tournamentId);
         logAnalyticsEvent(ANALYTICS_EVENT.TOURNAMENT_START, {
           tournament_id: nextTournamentId,
           source_tournament_id: tournamentId,

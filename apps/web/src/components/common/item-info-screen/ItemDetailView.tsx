@@ -11,7 +11,8 @@ type ItemDetailViewProps = {
   item: ReadyItemInfoT;
   memo?: MemoT;
   priceRefresh?: PriceRefreshT;
-  onEdit: () => void;
+  /** 없으면 조회 전용 — 수정 버튼을 노출하지 않는다 */
+  onEdit?: () => void;
 };
 
 /** 정보를 정상적으로 가져온 상품의 조회 화면 */
@@ -20,7 +21,9 @@ function ItemDetailView({ item, memo, priceRefresh, onEdit }: ItemDetailViewProp
     <>
       <div className="relative mt-5 aspect-square w-full overflow-hidden rounded-xl bg-gray-50">
         <Image src={item.imageUrl} alt="상품 이미지" fill sizes="440px" className="object-cover" />
-        {item.sourceUrl && <ItemLinkBanner href={item.sourceUrl} />}
+        {item.sourceUrl && (
+          <ItemLinkBanner sourceUrl={item.sourceUrl} sourcePlatform={item.sourcePlatform} />
+        )}
       </div>
 
       <Spacing size={12} />
