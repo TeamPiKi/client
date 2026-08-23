@@ -18,11 +18,6 @@ function LoadingFallback() {
 
         <div className="flex flex-col items-center gap-4">
           <Skeleton className="aspect-356/464 w-full rounded-xl" />
-          <div className="flex gap-1.5">
-            {Array.from({ length: 3 }).map((_, i) => (
-              <Skeleton key={i} shape="circle" className="h-2 w-2" />
-            ))}
-          </div>
         </div>
       </div>
 
