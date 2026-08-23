@@ -10,6 +10,7 @@ import { cn } from '@/utils/cn';
 import type { TournamentPendingItemT } from '../../../_common/_types/tournamentResponse';
 import {
   BASKET_CAROUSEL_SLIDE_SIZE_PERCENT,
+  BASKET_STACK_GAP,
   ITEMS_PER_BASKET,
 } from '../../_consts/tournamentItemBasket';
 import { getActiveBasketCount, getBasketIndexForLastItem } from '../../_utils/tournamentItemBasket';
@@ -92,9 +93,7 @@ function TournamentItemBasketCarousel({
 
   const { ref: containerRef, height: containerHeight } = useContainerHeight();
   const { ref: bottomSlotRef, height: bottomSlotHeight } = useContainerHeight();
-  const gap = isCarouselEnabled ? 16 : 0;
-
-  const bottomSlotBlockHeight = bottomSlot ? (bottomSlotHeight ?? 0) + gap : 0;
+  const bottomSlotBlockHeight = bottomSlot ? (bottomSlotHeight ?? 0) + BASKET_STACK_GAP : 0;
 
   let basketMaxHeight: number | undefined;
   if (containerHeight) {
@@ -105,21 +104,19 @@ function TournamentItemBasketCarousel({
     return (
       <div
         ref={containerRef}
-        className="flex min-h-0 w-full flex-1 flex-col items-center justify-start px-5"
+        className="flex min-h-0 w-full flex-1 flex-col items-center justify-start gap-4"
       >
-        <TournamentItemBasket
-          basketIndex={0}
-          items={items}
-          isAddItemBlocked={isAddItemBlocked}
-          maxHeight={basketMaxHeight}
-          participantImageMap={participantImageMap}
-        />
+        <div style={{ width: `${BASKET_CAROUSEL_SLIDE_SIZE_PERCENT}%` }}>
+          <TournamentItemBasket
+            basketIndex={0}
+            items={items}
+            isAddItemBlocked={isAddItemBlocked}
+            maxHeight={basketMaxHeight}
+            participantImageMap={participantImageMap}
+          />
+        </div>
 
-        {bottomSlot && (
-          <div ref={bottomSlotRef} className="my-auto">
-            {bottomSlot}
-          </div>
-        )}
+        {bottomSlot && <div ref={bottomSlotRef}>{bottomSlot}</div>}
       </div>
     );
   }
@@ -154,11 +151,7 @@ function TournamentItemBasketCarousel({
         </CarouselContent>
       </Carousel>
 
-      {bottomSlot && (
-        <div ref={bottomSlotRef} className="my-auto">
-          {bottomSlot}
-        </div>
-      )}
+      {bottomSlot && <div ref={bottomSlotRef}>{bottomSlot}</div>}
     </div>
   );
 }

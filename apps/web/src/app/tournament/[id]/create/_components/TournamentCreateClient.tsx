@@ -178,10 +178,10 @@ function TournamentCreateClient({ tournamentId }: TournamentCreateClientProps) {
   };
 
   return (
-    <div className="flex h-full min-h-0 flex-col bg-bg-layer-basement pt-padding-top pb-bottom-cta">
+    <main className="flex h-full min-h-0 flex-col bg-bg-layer-basement pt-padding-top pb-bottom-cta">
       <div className="px-5">
         <TournamentHeader name={tournamentData.name} hasFriends={hasFriends} />
-        <div className="mt-[3.9dvh]">
+        <div className="mt-7">
           <ParticipantPanel
             participants={participants}
             inviteCode={pending?.inviteCode ?? ''}
@@ -192,7 +192,7 @@ function TournamentCreateClient({ tournamentId }: TournamentCreateClientProps) {
         </div>
       </div>
 
-      <div className="mt-[3dvh] flex min-h-0 flex-1 flex-col">
+      <div className="mt-9 flex min-h-0 flex-1 flex-col">
         <TournamentItemBasketCarousel
           items={pending?.items}
           scrollToLast={scrollToLast}
@@ -255,7 +255,7 @@ function TournamentCreateClient({ tournamentId }: TournamentCreateClientProps) {
           onConfirm={() => setIsWelcomeOpen(false)}
         />
       )}
-    </div>
+    </main>
   );
 }
 
