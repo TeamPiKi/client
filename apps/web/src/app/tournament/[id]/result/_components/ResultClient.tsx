@@ -16,6 +16,7 @@ import { cn } from '@/utils/cn';
 
 import { useGetTournament } from '../../_common/_hooks/useGetTournament';
 import ReceiptDrawMachine from './ReceiptDrawMachine';
+import ReceiptPaper from './ReceiptPaper';
 import ResultGuestBanner from './ResultGuestBanner';
 import GroupResultEntryCard from './group-result-entry-card/GroupResultEntryCard';
 import PlateShareDialog from './plate-share-dialog/PlateShareDialog';
@@ -83,12 +84,14 @@ function ResultClient({ tournamentId, isGuest = false, isApp = false }: ResultCl
       <Header center="토너먼트 결과" centerClassName="heading-1-bold" />
 
       <div className="mx-auto mt-4 flex min-h-0 w-full max-w-120 flex-1 flex-col gap-3">
-        <ReceiptDrawMachine
-          tournamentId={tournamentId}
-          tournamentName={tournamentName}
-          result={result}
-          date={date}
-        />
+        <ReceiptDrawMachine>
+          <ReceiptPaper
+            tournamentId={tournamentId}
+            tournamentName={tournamentName}
+            result={result}
+            date={date}
+          />
+        </ReceiptDrawMachine>
 
         {isGuest && (
           <div className="mx-5 mt-[49px]">

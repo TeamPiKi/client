@@ -17,6 +17,7 @@ import { useBackWithFallback } from '@/hooks/useBackWithFallback';
 import { cn } from '@/utils/cn';
 
 import { useGetTournament } from '../../../_common/_hooks/useGetTournament';
+import ReceiptDrawMachine from '../../_components/ReceiptDrawMachine';
 import { useGetGroupResult } from '../../_hooks/useGetGroupResult';
 import type { GroupResultItemT } from '../../_types/groupResult';
 import { formatDate, formatTime } from '../../_utils/formatReceipt';
@@ -109,78 +110,80 @@ function GroupResultClient({ tournamentId }: GroupResultClientProps) {
       </header>
 
       <div className="mx-auto mt-5 flex w-full max-w-105 flex-1 flex-col px-5">
-        <div className="relative flex w-full flex-col gap-2 bg-bg-layer-default pt-6 pb-6.25 filter-[drop-shadow(0px_2px_4px_rgba(0,0,0,0.12))]">
-          {/* PiKi 로고 + 헤드라인 */}
-          <div className="relative flex flex-col items-center gap-2">
-            <PikiLogo aria-label="PiKi" className="h-14 w-19.25 shrink-0 text-gray-800" />
-            <p
-              className={cn(
-                kodeMono.className,
-                'text-center text-[12px] leading-4 font-semibold tracking-[-0.4px] text-text-neutral-secondary'
-              )}
-            >
-              FROM WISH TO PICK
-            </p>
-          </div>
-
-          <div className="flex flex-col">
-            {/* 날짜 / 시간 */}
-            <div className={cn(kodeMono.className, 'flex items-center justify-between px-5')}>
-              <span className="caption-1-semibold text-text-neutral-secondary">
-                {formatDate(date)}
-              </span>
-              <span className="caption-1-semibold text-text-neutral-secondary">
-                {formatTime(date)}
-              </span>
+        <ReceiptDrawMachine>
+          <div className="relative flex w-full flex-col gap-2 bg-bg-layer-default pt-6 pb-6.25 filter-[drop-shadow(0px_2px_4px_rgba(0,0,0,0.12))]">
+            {/* PiKi 로고 + 헤드라인 */}
+            <div className="relative flex flex-col items-center gap-2">
+              <PikiLogo aria-label="PiKi" className="h-14 w-19.25 shrink-0 text-gray-800" />
+              <p
+                className={cn(
+                  kodeMono.className,
+                  'text-center text-[12px] leading-4 font-semibold tracking-[-0.4px] text-text-neutral-secondary'
+                )}
+              >
+                FROM WISH TO PICK
+              </p>
             </div>
 
-            <SectionDivider />
+            <div className="flex flex-col">
+              {/* 날짜 / 시간 */}
+              <div className={cn(kodeMono.className, 'flex items-center justify-between px-5')}>
+                <span className="caption-1-semibold text-text-neutral-secondary">
+                  {formatDate(date)}
+                </span>
+                <span className="caption-1-semibold text-text-neutral-secondary">
+                  {formatTime(date)}
+                </span>
+              </div>
 
-            {/* 토너먼트 이름 */}
-            <div className="flex flex-col px-5 py-2">
-              <p className="body-2-semibold text-text-neutral-primary">{tournamentName}</p>
+              <SectionDivider />
+
+              {/* 토너먼트 이름 */}
+              <div className="flex flex-col px-5 py-2">
+                <p className="body-2-semibold text-text-neutral-primary">{tournamentName}</p>
+              </div>
+
+              {/* 1st Place — 트로피 */}
+              {firstItem && (
+                <div className="flex flex-col gap-3 py-3">
+                  <PlaceLabel label="1st Place" />
+                  <GroupProductCard item={firstItem} highlight />
+                </div>
+              )}
+
+              {/* Others — 상품 카드 리스트 */}
+              {otherItems.length > 0 && (
+                <div className="flex flex-col gap-3 py-3">
+                  <PlaceLabel label="Others" />
+                  <ul className="flex flex-col gap-3">
+                    {otherItems.map(item => (
+                      <li key={`${item.rank}-${item.itemId}`}>
+                        <GroupProductCard item={item} />
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              <SectionDivider />
+
+              <p
+                className={cn(
+                  kodeMono.className,
+                  'px-5 py-2 text-center caption-1-semibold text-text-neutral-secondary'
+                )}
+              >
+                @piki.day
+              </p>
             </div>
 
-            {/* 1st Place — 트로피 */}
-            {firstItem && (
-              <div className="flex flex-col gap-3 py-3">
-                <PlaceLabel label="1st Place" />
-                <GroupProductCard item={firstItem} highlight />
-              </div>
-            )}
-
-            {/* Others — 상품 카드 리스트 */}
-            {otherItems.length > 0 && (
-              <div className="flex flex-col gap-3 py-3">
-                <PlaceLabel label="Others" />
-                <ul className="flex flex-col gap-3">
-                  {otherItems.map(item => (
-                    <li key={`${item.rank}-${item.itemId}`}>
-                      <GroupProductCard item={item} />
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-
-            <SectionDivider />
-
-            <p
-              className={cn(
-                kodeMono.className,
-                'px-5 py-2 text-center caption-1-semibold text-text-neutral-secondary'
-              )}
-            >
-              @piki.day
-            </p>
+            <ReceiptZigzag
+              aria-hidden
+              preserveAspectRatio="none"
+              className="pointer-events-none absolute top-full left-0 block h-4.5 w-full"
+            />
           </div>
-
-          <ReceiptZigzag
-            aria-hidden
-            preserveAspectRatio="none"
-            className="pointer-events-none absolute top-full left-0 block h-4.5 w-full"
-          />
-        </div>
+        </ReceiptDrawMachine>
       </div>
     </main>
   );
