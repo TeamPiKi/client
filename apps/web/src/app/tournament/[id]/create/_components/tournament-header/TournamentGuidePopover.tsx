@@ -23,7 +23,7 @@ function TournamentGuidePopover() {
         <ul className="flex flex-col gap-2">
           {GUIDE_ITEMS.map(({ icon: Icon, text }) => (
             <li key={text} className="flex items-center gap-3">
-              <Icon className="size-6 shrink-0 text-icon-accent" aria-hidden />
+              <Icon className="size-4.5 shrink-0 text-icon-accent/88" aria-hidden />
               <p className="body-2-medium text-text-neutral-secondary">{text}</p>
             </li>
           ))}
