@@ -52,7 +52,7 @@ function TournamentItemBasket({
     <Dialog>
       <DialogTrigger asChild>
         <button
-          className="relative flex aspect-square w-full cursor-pointer items-center justify-center overflow-hidden rounded-2xl border-[1.85px] border-white bg-white/1 shadow-[0_0_8px_rgba(0,0,0,0.16)] backdrop-blur-sm"
+          className="relative flex aspect-square w-full cursor-pointer items-center justify-center overflow-hidden rounded-2xl border-[2.5px] border-white bg-white/1 shadow-[0_0_8px_rgba(0,0,0,0.16)] backdrop-blur-sm"
           aria-label="위시 아이템 추가"
         >
           <AddIcon width={28} height={28} className="text-base-50" aria-hidden />
@@ -78,7 +78,7 @@ function TournamentItemBasket({
         {items.length === 0 && showAddButton ? (
           <div className="flex h-full w-[20%] items-center justify-start">{addSlot}</div>
         ) : (
-          <div className="grid w-[45%] grid-cols-2 gap-x-6 gap-y-5 pt-[20%]">
+          <div className="grid w-[46.5%] grid-cols-2 gap-3.5 pt-[17%]">
             {addSlot}
             {items.map((item, index) => {
               /** READY 아이템은 누구나 진입 가능 — 주최자·본인이 아니면 조회 전용으로 열림 */

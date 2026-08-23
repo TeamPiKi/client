@@ -12,6 +12,6 @@ export const SIZE_STYLE: Record<
   sm: {
     dimension: 68,
     radius: 'rounded-[16px]',
-    decoration: 'border-[1.85px] border-white shadow-[0_0_8px_rgba(0,0,0,0.16)]',
+    decoration: 'border-[2px] border-white shadow-[0_0_8px_rgba(0,0,0,0.16)]',
   },
 };
