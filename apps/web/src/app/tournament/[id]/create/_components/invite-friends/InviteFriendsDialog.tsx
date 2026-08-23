@@ -151,7 +151,7 @@ function InviteFriendsDialog({
               친구 초대하기
             </DrawerTitle>
             <DrawerDescription className="body-2-regular text-text-neutral-secondary">
-              초대 링크를 보내 친구와 함께 담을 수 있어요.
+              링크를 보내 친구와 함께 담을 수 있어요.
             </DrawerDescription>
           </div>
 
