@@ -131,6 +131,7 @@ function TournamentStartButton({
         onOpenChange={setIsByeWarningOpen}
         onAddMore={() => setIsByeWarningOpen(false)}
         onConfirm={handleByeWarningConfirm}
+        isParticipant={isParticipant}
       />
     </>
   );
