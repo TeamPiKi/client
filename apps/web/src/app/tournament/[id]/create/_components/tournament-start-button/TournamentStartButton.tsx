@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import Button from '@/components/button';
 
@@ -8,8 +8,6 @@ import { usePostTournamentStart } from '../../_hooks/usePostTournamentStart';
 import { needsByeWarning } from '../../_utils/bye';
 import ByeWarningDialog from './ByeWarningDialog';
 import ConfirmStartDialog from './ConfirmStartDialog';
-
-const PARTICIPANT_TOOLTIP_DURATION_MS = 3_000;
 
 /**
  * count 가 2의 거듭제곱(2, 4, 8, 16, 32) 인지 검사.
@@ -38,17 +36,6 @@ function TournamentStartButton({
   const [isByeWarningOpen, setIsByeWarningOpen] = useState(false);
   const { postTournamentStartMutation, isPostTournamentStartPending } =
     usePostTournamentStart(tournamentId);
-
-  const [isTooltipVisible, setIsTooltipVisible] = useState(isWaitingForOwnerStart);
-
-  useEffect(() => {
-    if (!isWaitingForOwnerStart) return;
-    const timeoutId = window.setTimeout(
-      () => setIsTooltipVisible(false),
-      PARTICIPANT_TOOLTIP_DURATION_MS
-    );
-    return () => window.clearTimeout(timeoutId);
-  }, [isWaitingForOwnerStart]);
 
   const startTournament = () => postTournamentStartMutation();
 
@@ -97,18 +84,6 @@ function TournamentStartButton({
 
   return (
     <>
-      {isTooltipVisible && (
-        <div className="flex justify-center">
-          <span className="relative inline-flex items-center rounded-md bg-gray-700 px-3 py-2 caption-1-regular text-text-neutral-inverse">
-            주최자가 시작해야 플레이 할 수 있어요
-            <span
-              aria-hidden
-              className="absolute -bottom-1 left-1/2 size-2 -translate-x-1/2 rotate-45 bg-gray-700"
-            />
-          </span>
-        </div>
-      )}
-
       <Button
         variant="primary"
         size="lg"
