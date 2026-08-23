@@ -202,13 +202,13 @@ function InviteFriendsDialog({
 
             <div className="flex w-full flex-col gap-1 rounded-xl bg-gray-50 px-4 py-3">
               <div className="flex items-center gap-1">
-                <CheckIconFill className="size-4.5 text-text-neutral-secondary" />
+                <CheckIconFill className="size-4.5 text-icon-neutral-secondary" />
                 <p className="caption-1-regular text-text-neutral-secondary">
                   최대 7명까지 초대할 수 있어요.
                 </p>
               </div>
               <div className="flex items-center gap-1">
-                <CheckIconFill className="size-4.5 text-text-neutral-secondary" />
+                <CheckIconFill className="size-4.5 text-icon-neutral-secondary" />
                 <p className="caption-1-regular text-text-neutral-secondary">
                   설정한 기한이 지나면 후보를 담을 수 없어요.
                 </p>
