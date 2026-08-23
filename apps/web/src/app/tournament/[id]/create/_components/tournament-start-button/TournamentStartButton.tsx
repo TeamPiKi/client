@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import Button from '@/components/button';
 
 import { usePostTournamentStart } from '../../_hooks/usePostTournamentStart';
+import { needsByeWarning } from '../../_utils/bye';
 import ByeWarningDialog from './ByeWarningDialog';
 import ConfirmStartDialog from './ConfirmStartDialog';
 
@@ -14,8 +15,6 @@ const PARTICIPANT_TOOLTIP_DURATION_MS = 3_000;
  * count 가 2의 거듭제곱(2, 4, 8, 16, 32) 인지 검사.
  * 아니면 부전승이 발생하므로 사용자에게 안내 모달을 띄운다.
  */
-const isPowerOfTwo = (n: number) => n >= 2 && (n & (n - 1)) === 0;
-
 type TournamentStartButtonProps = {
   count: number;
   tournamentId: number;
@@ -73,7 +72,7 @@ function TournamentStartButton({
   const handleClick = () => {
     if (isWaitingForOwnerStart) return;
     // 후보 수가 2의 거듭제곱이 아니면 부전승 발생 — 먼저 안내 모달 노출.
-    if (!isPowerOfTwo(count)) {
+    if (needsByeWarning(count)) {
       setIsByeWarningOpen(true);
       return;
     }
@@ -131,6 +130,7 @@ function TournamentStartButton({
         onOpenChange={setIsByeWarningOpen}
         onAddMore={() => setIsByeWarningOpen(false)}
         onConfirm={handleByeWarningConfirm}
+        isParticipant={isParticipant}
       />
     </>
   );
