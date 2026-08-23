@@ -10,10 +10,10 @@ import { Drawer, DrawerContent, DrawerDescription, DrawerTitle } from '@/compone
 import { ANALYTICS_EVENT } from '@/consts/analytics';
 import { logAnalyticsEvent } from '@/utils/analytics';
 import { parseServerLocalDateTime } from '@/utils/formatDate';
-import { share } from '@/utils/share';
+import { markInviteSent } from '@/utils/inviteSentSession';
+import { copyToClipboard, share } from '@/utils/share';
 
 import { usePatchInviteExpiry } from '../../_hooks/usePatchInviteExpiry';
-import { markInviteSent } from '@/utils/inviteSentSession';
 import InviteExpiresPicker from './InviteExpiresPicker';
 
 type InviteFriendsDialogProps = {
@@ -22,6 +22,8 @@ type InviteFriendsDialogProps = {
   /** 마감 시각 변경 API 호출용 */
   tournamentId: number;
   inviteUrl?: string;
+  /** 초대 코드 — 링크 대신 코드로 참여할 때 쓴다 */
+  inviteCode?: string;
   /** ISO 8601 — 초대 코드 만료 시각 */
   inviteExpiresAt?: string;
 };
@@ -68,6 +70,7 @@ function InviteFriendsDialog({
   onOpenChange,
   tournamentId,
   inviteUrl,
+  inviteCode,
   inviteExpiresAt,
 }: InviteFriendsDialogProps) {
   const [isPickerOpen, setIsPickerOpen] = useState(false);
@@ -90,6 +93,17 @@ function InviteFriendsDialog({
     usePatchInviteExpiry(tournamentId);
 
   const handleOpenPicker = () => setIsPickerOpen(true);
+
+  const handleCopyInviteCode = async () => {
+    if (!inviteCode) return;
+
+    try {
+      await copyToClipboard(inviteCode);
+      toast.success('초대 코드를 복사했어요.');
+    } catch {
+      toast.warning('이 환경에서는 복사를 지원하지 않아요.');
+    }
+  };
 
   const handleConfirmExpires = (newExpiresAt: string) => {
     patchInviteExpiryMutation(
@@ -141,41 +155,64 @@ function InviteFriendsDialog({
             </DrawerDescription>
           </div>
 
-          {expiresInfo && (
-            <div className="flex w-full items-center justify-between rounded-xl border border-border-neutral-muted bg-bg-layer-default px-4 py-5">
-              <div className="flex items-center gap-4">
-                <div className="flex size-11 items-center justify-center rounded-3xl bg-sky-blue-50">
-                  <StopwatchIconFill className="size-6 text-text-accent" />
-                </div>
-                <div className="flex flex-col gap-0.5">
-                  <p className="body-2-semibold text-text-accent">{expiresInfo.remainingLabel}</p>
-                  <p className="heading-1-bold text-text-neutral-primary">
-                    {expiresInfo.absoluteLabel}
-                  </p>
+          <div className="flex w-full flex-col gap-5">
+            {expiresInfo && (
+              <div className="flex flex-col gap-1">
+                <p className="body-2-medium text-text-neutral-primary">담기 기한</p>
+                <div className="flex w-full items-center justify-between rounded-xl border border-gray-75 p-4">
+                  <div className="flex items-center gap-3">
+                    <div className="flex size-11 items-center justify-center rounded-full bg-sky-blue-50">
+                      <StopwatchIconFill className="size-6 text-text-accent" />
+                    </div>
+                    <div className="flex flex-col gap-0.5">
+                      <p className="caption-1-semibold text-sky-blue-500">
+                        {expiresInfo.remainingLabel}
+                      </p>
+                      <p className="heading-2-semibold text-text-neutral-primary">
+                        {expiresInfo.absoluteLabel}
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    className="cursor-pointer body-2-medium text-text-neutral-tertiary"
+                    onClick={handleOpenPicker}
+                  >
+                    변경
+                  </button>
                 </div>
               </div>
-              <button
-                type="button"
-                className="cursor-pointer body-2-medium text-text-neutral-tertiary underline"
-                onClick={handleOpenPicker}
-              >
-                변경
-              </button>
-            </div>
-          )}
+            )}
 
-          <div className="flex w-full flex-col gap-2 rounded-xl bg-gray-50 p-4">
-            <div className="flex items-center gap-2">
-              <CheckIconFill className="size-4.5 text-text-neutral-secondary" />
-              <p className="body-2-medium text-text-neutral-secondary">
-                최대 7명까지 초대할 수 있어요.
-              </p>
-            </div>
-            <div className="flex items-center gap-2">
-              <CheckIconFill className="size-4.5 text-text-neutral-secondary" />
-              <p className="body-2-medium text-text-neutral-secondary">
-                설정한 기한이 지나면 후보를 담을 수 없어요.
-              </p>
+            {inviteCode && (
+              <div className="flex flex-col gap-2">
+                <p className="body-2-medium text-text-neutral-primary">초대 코드</p>
+                <div className="flex w-full items-center justify-between rounded-xl border border-gray-75 p-4">
+                  <p className="heading-2-semibold text-text-neutral-primary">{inviteCode}</p>
+                  <button
+                    type="button"
+                    className="cursor-pointer body-2-medium text-text-neutral-tertiary"
+                    onClick={handleCopyInviteCode}
+                  >
+                    복사
+                  </button>
+                </div>
+              </div>
+            )}
+
+            <div className="flex w-full flex-col gap-1 rounded-xl bg-gray-50 px-4 py-3">
+              <div className="flex items-center gap-1">
+                <CheckIconFill className="size-4.5 text-text-neutral-secondary" />
+                <p className="caption-1-regular text-text-neutral-secondary">
+                  최대 7명까지 초대할 수 있어요.
+                </p>
+              </div>
+              <div className="flex items-center gap-1">
+                <CheckIconFill className="size-4.5 text-text-neutral-secondary" />
+                <p className="caption-1-regular text-text-neutral-secondary">
+                  설정한 기한이 지나면 후보를 담을 수 없어요.
+                </p>
+              </div>
             </div>
           </div>
 

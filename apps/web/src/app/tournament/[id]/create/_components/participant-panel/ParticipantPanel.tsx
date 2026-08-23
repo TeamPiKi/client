@@ -158,6 +158,7 @@ function ParticipantPanel({
         onOpenChange={setIsInviteDialogOpen}
         tournamentId={Number(tournamentId)}
         inviteUrl={inviteUrl}
+        inviteCode={inviteCode}
         inviteExpiresAt={inviteExpiresAt}
       />
     </>
