@@ -7,18 +7,12 @@ import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/compone
 type ByeWarningDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  /** "상품 더 담기" — 모달 닫기만 (사용자가 후보를 더 추가하러 돌아감) */
   onAddMore: () => void;
-  /** 확인 — 부전승 포함된 채로 토너먼트 시작 진행 */
   onConfirm: () => void;
   /** 참여자는 후보를 더 담을 수 없어 확인 버튼 하나만 노출한다 */
   isParticipant?: boolean;
 };
 
-/**
- * 후보 개수가 2의 거듭제곱(2, 4, 8, 16, 32) 이 아닐 때 시작 직전에 노출되는 안내 모달.
- * 일부 후보가 자동으로 다음 라운드에 올라가는 부전승이 발생함을 사용자에게 알린다.
- */
 function ByeWarningDialog({
   open,
   onOpenChange,

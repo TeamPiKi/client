@@ -141,10 +141,7 @@ function TournamentCreateClient({ tournamentId }: TournamentCreateClientProps) {
     usePostTournamentStart(tournamentId);
   const itemCount = pending?.items.length ?? 0;
 
-  /**
-   * 시작 경로가 하단 버튼 외에 두 모달에도 있어 부전승 안내를 건너뛰고 있었다.
-   * 세 경로 모두 같은 기준으로 안내한 뒤 시작한다.
-   */
+  /** 하단 버튼 외에 두 모달에서도 시작할 수 있어 같은 기준으로 안내한다 */
   const [isByeWarningOpen, setIsByeWarningOpen] = useState(false);
 
   const startWithByeCheck = () => {
