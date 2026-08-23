@@ -215,7 +215,6 @@ function GroupProductCard({ item, highlight = false }: GroupProductCardProps) {
                 width={60}
                 height={60}
                 className="size-full object-cover"
-                unoptimized
               />
             ) : null}
           </div>
