@@ -11,7 +11,7 @@ const canUseWebShare = (data: ShareDataT) => {
   return true;
 };
 
-const copyToClipboard = async (text: string) => {
+export const copyToClipboard = async (text: string) => {
   if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
     await navigator.clipboard.writeText(text);
     return;
