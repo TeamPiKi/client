@@ -4,7 +4,7 @@ import { ERROR_CODE, ERROR_MESSAGE_MAP } from '@piki/core';
 import { useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 
-import { CheckIconFill, StopwatchIconFill } from '@/assets/icons/fill';
+import { CheckIconFill, TimerIconFill } from '@/assets/icons/fill';
 import Button from '@/components/button';
 import { Drawer, DrawerContent, DrawerDescription, DrawerTitle } from '@/components/drawer';
 import { ANALYTICS_EVENT } from '@/consts/analytics';
@@ -162,7 +162,7 @@ function InviteFriendsDialog({
                 <div className="flex w-full items-center justify-between rounded-xl border border-gray-75 p-4">
                   <div className="flex items-center gap-3">
                     <div className="flex size-11 items-center justify-center rounded-full bg-sky-blue-50">
-                      <StopwatchIconFill className="size-6 text-text-accent" />
+                      <TimerIconFill className="size-6 text-sky-blue-300" />
                     </div>
                     <div className="flex flex-col gap-0.5">
                       <p className="caption-1-semibold text-sky-blue-500">
