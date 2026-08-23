@@ -10,19 +10,21 @@ import { QUERY_ACTION } from '@/consts/queryAction';
 import { useGetMe } from '@/hooks/useGetMe';
 import { useQueryAction } from '@/hooks/useQueryAction';
 import { useSSEFallback } from '@/hooks/useSSEFallback';
+import { hasSentInvite } from '@/utils/inviteSentSession';
 import { hasParsingItems } from '@/utils/item';
 
 import { useGetTournament } from '../../_common/_hooks/useGetTournament';
 import { PREV_ITEM_COUNT_KEY } from '../_consts/tournamentItemBasket';
 import { useCountdown } from '../_hooks/useCountdown';
 import { usePostTournamentStart } from '../_hooks/usePostTournamentStart';
-import { hasSentInvite } from '@/utils/inviteSentSession';
+import { needsByeWarning } from '../_utils/bye';
 import DepositClosedDialog from './deposit-closed-dialog/DepositClosedDialog';
 import OwnerStartedDialog from './owner-started-dialog/OwnerStartedDialog';
 import ParticipantPanel from './participant-panel/ParticipantPanel';
 import TournamentHeader from './tournament-header/TournamentHeader';
 import TournamentItemBasketStatus from './tournament-item-basket-status/TournamentItemBasketStatus';
 import TournamentItemBasketCarousel from './tournament-item-basket/TournamentItemBasketCarousel';
+import ByeWarningDialog from './tournament-start-button/ByeWarningDialog';
 import TournamentStartButton from './tournament-start-button/TournamentStartButton';
 import WelcomeJoinDialog from './welcome-join-dialog/WelcomeJoinDialog';
 
@@ -139,11 +141,25 @@ function TournamentCreateClient({ tournamentId }: TournamentCreateClientProps) {
     usePostTournamentStart(tournamentId);
   const itemCount = pending?.items.length ?? 0;
 
+  /**
+   * 시작 경로가 하단 버튼 외에 두 모달에도 있어 부전승 안내를 건너뛰고 있었다.
+   * 세 경로 모두 같은 기준으로 안내한 뒤 시작한다.
+   */
+  const [isByeWarningOpen, setIsByeWarningOpen] = useState(false);
+
+  const startWithByeCheck = () => {
+    if (needsByeWarning(itemCount)) {
+      setIsByeWarningOpen(true);
+      return;
+    }
+    postTournamentStartMutation();
+  };
+
   const handleStartFromDepositClosed = () => {
     if (isPostTournamentStartPending) return;
     setIsDepositClosedDialogOpen(false);
     setHasDismissedDepositClosed(true);
-    postTournamentStartMutation();
+    startWithByeCheck();
   };
 
   const handleDepositClosedOpenChange = (open: boolean) => {
@@ -169,7 +185,7 @@ function TournamentCreateClient({ tournamentId }: TournamentCreateClientProps) {
     if (isPostTournamentStartPending) return;
     setIsOwnerStartedDialogOpen(false);
     setHasDismissedOwnerStarted(true);
-    postTournamentStartMutation();
+    startWithByeCheck();
   };
 
   const handleOwnerStartedOpenChange = (open: boolean) => {
@@ -240,6 +256,17 @@ function TournamentCreateClient({ tournamentId }: TournamentCreateClientProps) {
         onStart={handleStartFromOwnerStarted}
         itemCount={itemCount}
         isPending={isPostTournamentStartPending}
+      />
+
+      <ByeWarningDialog
+        open={isByeWarningOpen}
+        onOpenChange={setIsByeWarningOpen}
+        onAddMore={() => setIsByeWarningOpen(false)}
+        onConfirm={() => {
+          setIsByeWarningOpen(false);
+          postTournamentStartMutation();
+        }}
+        isParticipant={isParticipant}
       />
 
       {isWelcomeOpen && (
