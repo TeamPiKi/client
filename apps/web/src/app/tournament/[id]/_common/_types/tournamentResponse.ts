@@ -34,7 +34,7 @@ export type TournamentPendingItemT = Partial<TournamentItemT> & {
 type TournamentPendingPayloadT = {
   /**
    * 주최자가 ROOT 토너먼트를 시작했는지 여부.
-   * - false (status=PENDING): "주최자가 시작해야..." 안내
+   * - false (status=PENDING): 참여자는 아직 시작할 수 없음
    * - true (status=IN_PROGRESS): 참여자도 본인 CLONE 시작 가능
    */
   ownerStarted: boolean;
