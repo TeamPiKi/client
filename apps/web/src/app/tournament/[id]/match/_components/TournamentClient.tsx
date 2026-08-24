@@ -38,7 +38,7 @@ function TournamentClient({ tournamentId, tournamentName, inProgress }: Tourname
     <main
       className={`hide-scrollbar flex min-h-dvh flex-col items-center overflow-y-auto px-5 pt-padding-top pb-6 ${backgroundClassName}`}
     >
-      <div className="flex flex-col items-center gap-6">
+      <div className="mt-6 flex flex-col items-center gap-6">
         <div className="flex flex-col items-center gap-4">
           <RoundBadge label={roundLabel} isFinal={isFinalRound} />
           <TournamentQuestion isFinal={isFinalRound} />
