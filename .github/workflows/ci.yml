@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   ci:
-    name: Lint, Type Check
+    name: Lint, Type Check, Unit Test
     runs-on: ubuntu-latest
 
     steps:
@@ -44,6 +44,9 @@ jobs:
 
       - name: Type Check
         run: pnpm check-types
+
+      - name: Unit Test
+        run: pnpm test
 
   e2e:
     name: E2E (Playwright)
