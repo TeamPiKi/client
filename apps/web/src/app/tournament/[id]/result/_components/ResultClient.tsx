@@ -99,11 +99,8 @@ function ResultClient({ tournamentId, isGuest = false, isApp = false }: ResultCl
           </div>
         )}
 
-        {/*
-          전체 결과 보기 — 주최자·참여자·게스트 모두에게 노출한다.
-          hasGroupResult 가 false 면(완료한 CLONE 없음) 눌러도 서버가 409 를 주므로 숨긴다.
-        */}
-        {tournamentData.completed.hasGroupResult && (
+        {/* 전체 결과 보기 — 소셜 토너먼트면 주최자·참여자·게스트 모두에게 항상 노출 */}
+        {tournamentData.completed.isGroupTournament && (
           <div className="mx-5">
             <GroupResultEntryCard tournamentId={groupResultTournamentId} />
           </div>
