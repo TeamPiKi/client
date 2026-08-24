@@ -12,7 +12,6 @@ import { ANALYTICS_EVENT } from '@/consts/analytics';
 import { ROUTES } from '@/consts/route';
 import { TOURNAMENT_STATUS } from '@/consts/tournament';
 import { logAnalyticsEvent } from '@/utils/analytics';
-import { cn } from '@/utils/cn';
 
 import { useGetTournament } from '../../_common/_hooks/useGetTournament';
 import ReceiptDrawMachine from './ReceiptDrawMachine';
@@ -71,16 +70,9 @@ function ResultClient({ tournamentId, isGuest = false, isApp = false }: ResultCl
     setIsShareDialogOpen(true);
   };
 
-  /** 비회원 솔로는 배너가 스크롤 마지막이라 하단 여백을 줄인다 */
-  const mainPb = isGuest && !tournamentData.isRoot ? 'pb-[145px]' : 'pb-40';
-
   return (
-    <main
-      className={cn(
-        'flex min-h-dvh flex-col overflow-x-hidden bg-bg-layer-basement pt-padding-top',
-        mainPb
-      )}
-    >
+    // pb-46(184px): 마지막 요소가 CTA(144px) + 상단 그라디언트(36px)에 가려지지 않는 하단 여백
+    <main className="flex min-h-dvh flex-col overflow-x-hidden bg-bg-layer-basement pt-padding-top pb-46">
       <Header center="토너먼트 결과" centerClassName="heading-1-bold" />
 
       <div className="mx-auto mt-4 flex min-h-0 w-full max-w-120 flex-1 flex-col gap-3">
@@ -99,11 +91,8 @@ function ResultClient({ tournamentId, isGuest = false, isApp = false }: ResultCl
           </div>
         )}
 
-        {/*
-          전체 결과 보기 — 주최자·참여자·게스트 모두에게 노출한다.
-          hasGroupResult 가 false 면(완료한 CLONE 없음) 눌러도 서버가 409 를 주므로 숨긴다.
-        */}
-        {tournamentData.completed.hasGroupResult && (
+        {/* 전체 결과 보기 — 소셜 토너먼트면 주최자·참여자·게스트 모두에게 항상 노출 */}
+        {tournamentData.completed.isGroupTournament && (
           <div className="mx-5">
             <GroupResultEntryCard tournamentId={groupResultTournamentId} />
           </div>
