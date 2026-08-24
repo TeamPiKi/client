@@ -8,5 +8,5 @@ export default defineConfig([
   ...baseConfig,
   ...nextVitals,
   ...nextTs,
-  globalIgnores(['.next/**', 'out/**', 'build/**', 'next-env.d.ts']),
+  globalIgnores(['.next/**', '.next-diag/**', 'out/**', 'build/**', 'next-env.d.ts']),
 ]);
