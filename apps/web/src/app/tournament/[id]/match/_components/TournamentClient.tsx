@@ -47,7 +47,7 @@ function TournamentClient({ tournamentId, tournamentName, inProgress }: Tourname
           <p className="heading-2-medium text-text-neutral-secondary">최종 선택을 해주세요</p>
         )}
       </div>
-      <div className={`w-full ${isFinalRound ? 'mt-29' : 'mt-8'}`}>
+      <div className={`-mx-5 ${isFinalRound ? 'mt-29' : 'mt-8'}`}>
         {/* 기록 대기 중에는 이전 화면을 유지해 스켈레톤 깜빡임을 방지한다. */}
         {!currentMatch ? (
           <MatchSkeleton isFinal={isFinalRound} />
