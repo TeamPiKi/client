@@ -6,6 +6,7 @@ import { expect, test } from '@e2e/fixtures/mockApiFixture';
 import { MOCK_MEMBER_ME } from '@e2e/mocks/me';
 import {
   MOCK_TOURNAMENT_COMPLETED,
+  MOCK_TOURNAMENT_GROUP_COMPLETED,
   MOCK_TOURNAMENT_LIST,
   MOCK_TOURNAMENT_RESULT,
 } from '@e2e/mocks/tournament';
@@ -35,6 +36,25 @@ test('결과 페이지에 영수증과 순위, 공유 버튼이 렌더링된다'
   await expect(page.getByRole('button', { name: '영수증 저장' })).toBeVisible();
   /** isRoot && isOwner — 플레이 링크 공유 버튼 노출 */
   await expect(page.getByRole('button', { name: '토너먼트 공유' })).toBeVisible();
+
+  /** 솔로 토너먼트(isGroupTournament: false)는 전체 결과 보기 배너가 없다 */
+  await expect(page.getByRole('link', { name: '전체 결과 보기' })).toBeHidden();
+});
+
+/**
+ * 소셜 토너먼트에서 내가 먼저 완주한 상태(id 4 — isGroupTournament: true, hasGroupResult: false).
+ * 예전엔 hasGroupResult 기준이라 이 지점에서 배너가 사라졌다 — 노출은 소셜 여부로만 판단한다.
+ */
+test('소셜 토너먼트는 친구가 완주하기 전에도 전체 결과 보기 배너가 노출된다', async ({
+  page,
+  api,
+}) => {
+  api.get(ENDPOINTS.USER, MOCK_MEMBER_ME);
+  api.get(ENDPOINTS.TOURNAMENT(4), MOCK_TOURNAMENT_GROUP_COMPLETED);
+
+  await page.goto('/tournament/4/result');
+
+  await expect(page.getByRole('link', { name: '전체 결과 보기' })).toBeVisible();
 });
 
 test('결과 페이지에서 홈으로 가기를 누르면 홈으로 이동한다', async ({ page, api }) => {

@@ -51,6 +51,7 @@ test('4강 두 매치를 진행하면 결승으로 전환되고, 결승 선택�
     nextMatch: null,
     completed: {
       result: MOCK_TOURNAMENT_RESULT,
+      isGroupTournament: false,
       hasGroupResult: false,
       canAddItem: false,
     },
