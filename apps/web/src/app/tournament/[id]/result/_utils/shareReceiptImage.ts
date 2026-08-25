@@ -6,20 +6,6 @@ const MIME = 'image/png';
 /** 공유 이미지 가로 폭 (디자인 스펙) — 캡처 대상 실제 폭에 맞춰 pixelRatio 를 역산한다 */
 export const SHARE_IMAGE_WIDTH = 1080;
 
-const downloadBlob = (blob: Blob, fileName: string) => {
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = fileName;
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-  URL.revokeObjectURL(url);
-};
-
-/** `download` 속성 미지원(iOS 웹뷰 등) 이면 클릭해도 저장되지 않는다 */
-const isDownloadSupported = () => 'download' in document.createElement('a');
-
 const withTimeout = <T>(promise: Promise<T>, ms: number): Promise<T> =>
   new Promise<T>((resolve, reject) => {
     const timeoutId = window.setTimeout(() => reject(new Error('TIMEOUT')), ms);
@@ -84,33 +70,6 @@ export const captureReceiptImage = async (element: HTMLElement): Promise<Blob> =
   if (!blob) throw new Error('영수증 이미지 변환 실패');
 
   return blob;
-};
-
-/** 캡처된 blob 을 파일로 저장 — 다운로드 시작에 실패하면 false */
-export const saveReceiptImage = (blob: Blob): boolean => {
-  if (!isDownloadSupported()) return false;
-
-  try {
-    downloadBlob(blob, FILE_NAME);
-    return true;
-  } catch {
-    return false;
-  }
-};
-
-/**
- * 캡처된 blob 을 클립보드에 복사.
- * ClipboardItem 미지원(안드로이드 웹뷰 등) 이면 false 를 반환해 호출부가 대체 동작을 고른다.
- */
-export const copyReceiptImage = async (blob: Blob): Promise<boolean> => {
-  if (typeof ClipboardItem === 'undefined' || !navigator.clipboard?.write) return false;
-
-  try {
-    await navigator.clipboard.write([new ClipboardItem({ [MIME]: blob })]);
-    return true;
-  } catch {
-    return false;
-  }
 };
 
 /**
