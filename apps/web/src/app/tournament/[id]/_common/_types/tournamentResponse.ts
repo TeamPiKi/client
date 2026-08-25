@@ -34,7 +34,7 @@ export type TournamentPendingItemT = Partial<TournamentItemT> & {
 type TournamentPendingPayloadT = {
   /**
    * 주최자가 ROOT 토너먼트를 시작했는지 여부.
-   * - false (status=PENDING): "주최자가 시작해야..." 안내
+   * - false (status=PENDING): 참여자는 아직 시작할 수 없음
    * - true (status=IN_PROGRESS): 참여자도 본인 CLONE 시작 가능
    */
   ownerStarted: boolean;
@@ -107,7 +107,9 @@ export type GetTournamentCompletedResponseT = {
   status: Extract<TournamentStatusT, 'COMPLETED'>;
   completed: {
     result: TournamentRankingT[];
-    /** 참여자 2명 이상이면 true — 친구 토너먼트 결과 보기 버튼 노출용 */
+    /** 소셜 토너먼트 여부 — 전체 결과 보기 배너 노출용 */
+    isGroupTournament: boolean;
+    /** 소셜 토너먼트에서 완료한 플레이어 2명 이상이면 true */
     hasGroupResult: boolean;
     /** 플레이 링크 만료 시각 (ISO 8601). 아직 링크 생성 전이면 응답에 없음 */
     playLinkExpiresAt?: string;
@@ -145,6 +147,7 @@ export type PostRecordMatchResponseT = {
   nextMatch?: TournamentMatchT;
   completed?: {
     result: TournamentRankingT[];
+    isGroupTournament: boolean;
     hasGroupResult: boolean;
     canAddItem: boolean;
     playLinkExpiresAt?: string;

@@ -10,19 +10,21 @@ import { QUERY_ACTION } from '@/consts/queryAction';
 import { useGetMe } from '@/hooks/useGetMe';
 import { useQueryAction } from '@/hooks/useQueryAction';
 import { useSSEFallback } from '@/hooks/useSSEFallback';
+import { hasSentInvite } from '@/utils/inviteSentSession';
 import { hasParsingItems } from '@/utils/item';
 
 import { useGetTournament } from '../../_common/_hooks/useGetTournament';
 import { PREV_ITEM_COUNT_KEY } from '../_consts/tournamentItemBasket';
 import { useCountdown } from '../_hooks/useCountdown';
 import { usePostTournamentStart } from '../_hooks/usePostTournamentStart';
-import { hasSentInvite } from '@/utils/inviteSentSession';
+import { needsByeWarning } from '../_utils/bye';
 import DepositClosedDialog from './deposit-closed-dialog/DepositClosedDialog';
 import OwnerStartedDialog from './owner-started-dialog/OwnerStartedDialog';
 import ParticipantPanel from './participant-panel/ParticipantPanel';
 import TournamentHeader from './tournament-header/TournamentHeader';
 import TournamentItemBasketStatus from './tournament-item-basket-status/TournamentItemBasketStatus';
 import TournamentItemBasketCarousel from './tournament-item-basket/TournamentItemBasketCarousel';
+import ByeWarningDialog from './tournament-start-button/ByeWarningDialog';
 import TournamentStartButton from './tournament-start-button/TournamentStartButton';
 import WelcomeJoinDialog from './welcome-join-dialog/WelcomeJoinDialog';
 
@@ -139,11 +141,22 @@ function TournamentCreateClient({ tournamentId }: TournamentCreateClientProps) {
     usePostTournamentStart(tournamentId);
   const itemCount = pending?.items.length ?? 0;
 
+  /** 하단 버튼 외에 두 모달에서도 시작할 수 있어 같은 기준으로 안내한다 */
+  const [isByeWarningOpen, setIsByeWarningOpen] = useState(false);
+
+  const startWithByeCheck = () => {
+    if (needsByeWarning(itemCount)) {
+      setIsByeWarningOpen(true);
+      return;
+    }
+    postTournamentStartMutation();
+  };
+
   const handleStartFromDepositClosed = () => {
     if (isPostTournamentStartPending) return;
     setIsDepositClosedDialogOpen(false);
     setHasDismissedDepositClosed(true);
-    postTournamentStartMutation();
+    startWithByeCheck();
   };
 
   const handleDepositClosedOpenChange = (open: boolean) => {
@@ -169,7 +182,7 @@ function TournamentCreateClient({ tournamentId }: TournamentCreateClientProps) {
     if (isPostTournamentStartPending) return;
     setIsOwnerStartedDialogOpen(false);
     setHasDismissedOwnerStarted(true);
-    postTournamentStartMutation();
+    startWithByeCheck();
   };
 
   const handleOwnerStartedOpenChange = (open: boolean) => {
@@ -178,10 +191,10 @@ function TournamentCreateClient({ tournamentId }: TournamentCreateClientProps) {
   };
 
   return (
-    <div className="flex h-full min-h-0 flex-col bg-bg-layer-basement pt-padding-top pb-bottom-cta">
+    <main className="flex h-full min-h-0 flex-col bg-bg-layer-basement pt-padding-top pb-bottom-cta">
       <div className="px-5">
         <TournamentHeader name={tournamentData.name} hasFriends={hasFriends} />
-        <div className="mt-[3.9dvh]">
+        <div className="mt-7">
           <ParticipantPanel
             participants={participants}
             inviteCode={pending?.inviteCode ?? ''}
@@ -192,7 +205,7 @@ function TournamentCreateClient({ tournamentId }: TournamentCreateClientProps) {
         </div>
       </div>
 
-      <div className="mt-[3dvh] flex min-h-0 flex-1 flex-col">
+      <div className="mt-9 flex min-h-0 flex-1 flex-col">
         <TournamentItemBasketCarousel
           items={pending?.items}
           scrollToLast={scrollToLast}
@@ -242,6 +255,17 @@ function TournamentCreateClient({ tournamentId }: TournamentCreateClientProps) {
         isPending={isPostTournamentStartPending}
       />
 
+      <ByeWarningDialog
+        open={isByeWarningOpen}
+        onOpenChange={setIsByeWarningOpen}
+        onAddMore={() => setIsByeWarningOpen(false)}
+        onConfirm={() => {
+          setIsByeWarningOpen(false);
+          postTournamentStartMutation();
+        }}
+        isParticipant={isParticipant}
+      />
+
       {isWelcomeOpen && (
         <WelcomeJoinDialog
           userIdentityType={userData.identityType}
@@ -255,7 +279,7 @@ function TournamentCreateClient({ tournamentId }: TournamentCreateClientProps) {
           onConfirm={() => setIsWelcomeOpen(false)}
         />
       )}
-    </div>
+    </main>
   );
 }
 

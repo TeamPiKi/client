@@ -2,12 +2,9 @@
 
 import { gsap } from 'gsap';
 import Image from 'next/image';
-import { useLayoutEffect, useRef, useState } from 'react';
+import { type ReactNode, useLayoutEffect, useRef, useState } from 'react';
 
 import ReceiptPrinterImg from '@/assets/images/tournament/result/receipt-printer.png';
-
-import type { RankedProductT } from '../../_common/_types/tournament';
-import ReceiptPaper from './ReceiptPaper';
 
 /** 프린터 래퍼 aspect ratio (디자인 박스) */
 const PRINTER_ASPECT_NUMERATOR = 267;
@@ -25,18 +22,11 @@ const RECEIPT_TOP_PER_PRINTER_HEIGHT =
   RECEIPT_TOP_AT_MAX_PRINTER_WIDTH_PX / REFERENCE_PRINTER_FRAME_HEIGHT_PX;
 
 type ReceiptDrawMachineProps = {
-  tournamentId: number;
-  tournamentName: string;
-  result: RankedProductT[];
-  date: Date;
+  /** 슬롯에서 빠져나오는 영수증 본문 */
+  children: ReactNode;
 };
 
-function ReceiptDrawMachine({
-  tournamentId,
-  tournamentName,
-  result,
-  date,
-}: ReceiptDrawMachineProps) {
+function ReceiptDrawMachine({ children }: ReceiptDrawMachineProps) {
   const animationScopeRef = useRef<HTMLDivElement | null>(null);
   const printerFrameRef = useRef<HTMLDivElement | null>(null);
   const receiptPaperRef = useRef<HTMLDivElement | null>(null);
@@ -149,12 +139,7 @@ function ReceiptDrawMachine({
 
       {/* 영수증 종이 영역 공간 확보 (layout reserved) */}
       <div className="invisible mx-auto w-[74%]" aria-hidden>
-        <ReceiptPaper
-          tournamentId={tournamentId}
-          tournamentName={tournamentName}
-          result={result}
-          date={date}
-        />
+        {children}
       </div>
 
       {/* 영수증 마스크 — 슬롯 위치(top)부터 컨테이너 끝(bottom-0)까지, 프린터 위로(z-40) 덮음.
@@ -167,12 +152,7 @@ function ReceiptDrawMachine({
           ref={receiptPaperRef}
           className="pointer-events-auto mx-auto h-fit w-[74%] will-change-transform"
         >
-          <ReceiptPaper
-            tournamentId={tournamentId}
-            tournamentName={tournamentName}
-            result={result}
-            date={date}
-          />
+          {children}
         </div>
       </div>
     </div>

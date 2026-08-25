@@ -39,8 +39,6 @@ const useTournament = ({ tournamentId, inProgress }: UseTournamentArgs) => {
       if (!completed) return;
 
       // 결승 기록 응답에 결과가 이미 들어 있으므로 캐시를 비우지 않고 COMPLETED 로 시드한다.
-      // hasGroupResult 도 이 응답에 포함돼 stale 우려가 없다.
-      // 정체성 필드(name/isOwner/isRoot 등)는 응답에 없어 기존 캐시에서 가져온다.
       const previous = queryClient.getQueryData<GetTournamentInProgressResponseT>([
         'tournament',
         tournamentId,
@@ -64,6 +62,7 @@ const useTournament = ({ tournamentId, inProgress }: UseTournamentArgs) => {
         status: TOURNAMENT_STATUS.COMPLETED,
         completed: {
           result: completed.result,
+          isGroupTournament: completed.isGroupTournament,
           hasGroupResult: completed.hasGroupResult,
           ...(playLinkExpiresAt ? { playLinkExpiresAt } : {}),
         },

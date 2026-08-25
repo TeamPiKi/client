@@ -2,6 +2,7 @@
 
 import { Kode_Mono } from 'next/font/google';
 import Image from 'next/image';
+import type { ReactNode } from 'react';
 import { useState } from 'react';
 
 import {
@@ -12,11 +13,13 @@ import {
 import PikiLogo from '@/assets/images/piki-logo-cart.svg';
 import ReceiptZigzag from '@/assets/images/tournament/result/receipt-zigzag.svg';
 import TrophyBadge from '@/assets/images/tournament/result/trophy-badge.svg';
+import Spinner from '@/components/spinner';
 import { ROUTES } from '@/consts/route';
 import { useBackWithFallback } from '@/hooks/useBackWithFallback';
 import { cn } from '@/utils/cn';
 
 import { useGetTournament } from '../../../_common/_hooks/useGetTournament';
+import ReceiptDrawMachine from '../../_components/ReceiptDrawMachine';
 import { useGetGroupResult } from '../../_hooks/useGetGroupResult';
 import type { GroupResultItemT } from '../../_types/groupResult';
 import { formatDate, formatTime } from '../../_utils/formatReceipt';
@@ -28,6 +31,25 @@ type GroupResultClientProps = {
 };
 
 const SectionDivider = () => <div className="h-px w-full border-t border-dashed border-gray-100" />;
+
+const GroupResultShell = ({ onBack, children }: { onBack: () => void; children: ReactNode }) => (
+  <main className="flex min-h-dvh flex-col bg-bg-layer-basement pt-padding-top pb-8">
+    <header className="relative flex h-7.5 w-full shrink-0 items-center px-5">
+      <button
+        type="button"
+        aria-label="뒤로가기"
+        onClick={onBack}
+        className="cursor-pointer p-0.75"
+      >
+        <ChevronBackwardIconFill className="size-6 text-icon-neutral-secondary" />
+      </button>
+      <h1 className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 heading-1-bold text-text-neutral-primary">
+        친구 토너먼트 결과
+      </h1>
+    </header>
+    {children}
+  </main>
+);
 
 /**
  * 영수증 구분선 라벨. 라벨 길이에 상관없이 항상 영수증 전체 폭을 채우도록
@@ -53,29 +75,31 @@ const PlaceLabel = ({ label }: { label: string }) => (
 function GroupResultClient({ tournamentId }: GroupResultClientProps) {
   const backWithFallback = useBackWithFallback();
   const { tournamentData } = useGetTournament(tournamentId);
+  // 그룹 결과는 원본(ROOT) 단위로 집계된다. CLONE 에서 진입하면 원본 id 로 조회한다.
+  const groupResultTournamentId =
+    'sourceTournamentId' in tournamentData && tournamentData.sourceTournamentId
+      ? tournamentData.sourceTournamentId
+      : tournamentId;
   const { groupResultData, isGroupResultPending, isGroupResultError } =
-    useGetGroupResult(tournamentId);
+    useGetGroupResult(groupResultTournamentId);
 
   const date = new Date();
   const tournamentName = tournamentData.name;
+  const handleBack = () => backWithFallback(ROUTES.TOURNAMENT_RESULT(tournamentId));
 
-  // 친구가 아직 본인 매치를 시작 안 했거나, 권한 없음 등으로 데이터를 받지 못한 경우.
-  if (isGroupResultPending || isGroupResultError || !groupResultData) {
+  if (isGroupResultPending) {
     return (
-      <main className="flex min-h-dvh flex-col bg-bg-layer-basement pt-padding-top pb-8">
-        <header className="relative flex h-7.5 w-full shrink-0 items-center px-5">
-          <button
-            type="button"
-            aria-label="뒤로가기"
-            onClick={() => backWithFallback(ROUTES.TOURNAMENT_RESULT(tournamentId))}
-            className="cursor-pointer p-0.75"
-          >
-            <ChevronBackwardIconFill className="size-6 text-icon-neutral-secondary" />
-          </button>
-          <h1 className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 heading-1-bold text-text-neutral-primary">
-            친구 토너먼트 결과
-          </h1>
-        </header>
+      <GroupResultShell onBack={handleBack}>
+        <div className="flex flex-1 items-center justify-center px-5">
+          <Spinner size={32} />
+        </div>
+      </GroupResultShell>
+    );
+  }
+
+  if (isGroupResultError || !groupResultData) {
+    return (
+      <GroupResultShell onBack={handleBack}>
         <div className="flex flex-1 flex-col items-center justify-center gap-2 px-5">
           <p className="heading-1-bold text-text-neutral-primary">아직 친구 결과가 없어요</p>
           <p className="text-center body-1-medium text-text-neutral-tertiary">
@@ -84,7 +108,7 @@ function GroupResultClient({ tournamentId }: GroupResultClientProps) {
             결과를 비교해볼 수 있어요.
           </p>
         </div>
-      </main>
+      </GroupResultShell>
     );
   }
 
@@ -93,96 +117,84 @@ function GroupResultClient({ tournamentId }: GroupResultClientProps) {
   const otherItems = sortedItems.filter(item => item.rank !== 1);
 
   return (
-    <main className="flex min-h-dvh flex-col bg-bg-layer-basement pt-padding-top pb-8">
-      <header className="relative flex h-7.5 w-full shrink-0 items-center px-5">
-        <button
-          type="button"
-          aria-label="뒤로가기"
-          onClick={() => backWithFallback(ROUTES.TOURNAMENT_RESULT(tournamentId))}
-          className="cursor-pointer p-0.75"
-        >
-          <ChevronBackwardIconFill className="size-6 text-icon-neutral-secondary" />
-        </button>
-        <h1 className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 heading-1-bold text-text-neutral-primary">
-          친구 토너먼트 결과
-        </h1>
-      </header>
-
+    <GroupResultShell onBack={handleBack}>
       <div className="mx-auto mt-5 flex w-full max-w-105 flex-1 flex-col px-5">
-        <div className="relative flex w-full flex-col gap-2 bg-bg-layer-default pt-6 pb-6.25 filter-[drop-shadow(0px_2px_4px_rgba(0,0,0,0.12))]">
-          {/* PiKi 로고 + 헤드라인 */}
-          <div className="relative flex flex-col items-center gap-2">
-            <PikiLogo aria-label="PiKi" className="h-14 w-19.25 shrink-0 text-gray-800" />
-            <p
-              className={cn(
-                kodeMono.className,
-                'text-center text-[12px] leading-4 font-semibold tracking-[-0.4px] text-text-neutral-secondary'
-              )}
-            >
-              FROM WISH TO PICK
-            </p>
-          </div>
-
-          <div className="flex flex-col">
-            {/* 날짜 / 시간 */}
-            <div className={cn(kodeMono.className, 'flex items-center justify-between px-5')}>
-              <span className="caption-1-semibold text-text-neutral-secondary">
-                {formatDate(date)}
-              </span>
-              <span className="caption-1-semibold text-text-neutral-secondary">
-                {formatTime(date)}
-              </span>
+        <ReceiptDrawMachine>
+          <div className="relative flex w-full flex-col gap-2 bg-bg-layer-default pt-6 pb-6.25 filter-[drop-shadow(0px_2px_4px_rgba(0,0,0,0.12))]">
+            {/* PiKi 로고 + 헤드라인 */}
+            <div className="relative flex flex-col items-center gap-2">
+              <PikiLogo aria-label="PiKi" className="h-14 w-19.25 shrink-0 text-gray-800" />
+              <p
+                className={cn(
+                  kodeMono.className,
+                  'text-center text-[12px] leading-4 font-semibold tracking-[-0.4px] text-text-neutral-secondary'
+                )}
+              >
+                FROM WISH TO PICK
+              </p>
             </div>
 
-            <SectionDivider />
+            <div className="flex flex-col">
+              {/* 날짜 / 시간 */}
+              <div className={cn(kodeMono.className, 'flex items-center justify-between px-5')}>
+                <span className="caption-1-semibold text-text-neutral-secondary">
+                  {formatDate(date)}
+                </span>
+                <span className="caption-1-semibold text-text-neutral-secondary">
+                  {formatTime(date)}
+                </span>
+              </div>
 
-            {/* 토너먼트 이름 */}
-            <div className="flex flex-col px-5 py-2">
-              <p className="body-2-semibold text-text-neutral-primary">{tournamentName}</p>
+              <SectionDivider />
+
+              {/* 토너먼트 이름 */}
+              <div className="flex flex-col px-5 py-2">
+                <p className="body-2-semibold text-text-neutral-primary">{tournamentName}</p>
+              </div>
+
+              {/* 1st Place — 트로피 */}
+              {firstItem && (
+                <div className="flex flex-col gap-3 py-3">
+                  <PlaceLabel label="1st Place" />
+                  <GroupProductCard item={firstItem} highlight />
+                </div>
+              )}
+
+              {/* Others — 상품 카드 리스트 */}
+              {otherItems.length > 0 && (
+                <div className="flex flex-col gap-3 py-3">
+                  <PlaceLabel label="Others" />
+                  <ul className="flex flex-col gap-3">
+                    {otherItems.map(item => (
+                      <li key={`${item.rank}-${item.itemId}`}>
+                        <GroupProductCard item={item} />
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              <SectionDivider />
+
+              <p
+                className={cn(
+                  kodeMono.className,
+                  'px-5 py-2 text-center caption-1-semibold text-text-neutral-secondary'
+                )}
+              >
+                @piki.day
+              </p>
             </div>
 
-            {/* 1st Place — 트로피 */}
-            {firstItem && (
-              <div className="flex flex-col gap-3 py-3">
-                <PlaceLabel label="1st Place" />
-                <GroupProductCard item={firstItem} highlight />
-              </div>
-            )}
-
-            {/* Others — 상품 카드 리스트 */}
-            {otherItems.length > 0 && (
-              <div className="flex flex-col gap-3 py-3">
-                <PlaceLabel label="Others" />
-                <ul className="flex flex-col gap-3">
-                  {otherItems.map(item => (
-                    <li key={`${item.rank}-${item.itemId}`}>
-                      <GroupProductCard item={item} />
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-
-            <SectionDivider />
-
-            <p
-              className={cn(
-                kodeMono.className,
-                'px-5 py-2 text-center caption-1-semibold text-text-neutral-secondary'
-              )}
-            >
-              @piki.day
-            </p>
+            <ReceiptZigzag
+              aria-hidden
+              preserveAspectRatio="none"
+              className="pointer-events-none absolute top-full left-0 block h-4.5 w-full"
+            />
           </div>
-
-          <ReceiptZigzag
-            aria-hidden
-            preserveAspectRatio="none"
-            className="pointer-events-none absolute top-full left-0 block h-4.5 w-full"
-          />
-        </div>
+        </ReceiptDrawMachine>
       </div>
-    </main>
+    </GroupResultShell>
   );
 }
 
@@ -212,7 +224,6 @@ function GroupProductCard({ item, highlight = false }: GroupProductCardProps) {
                 width={60}
                 height={60}
                 className="size-full object-cover"
-                unoptimized
               />
             ) : null}
           </div>

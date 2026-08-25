@@ -16,26 +16,31 @@ function ConfirmStartDialog({ open, onOpenChange, onConfirm }: ConfirmStartDialo
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent showCloseButton={false} className="flex flex-col items-center gap-5 p-6">
-        <ConfirmStartFace className="size-7.75" aria-hidden />
+      <DialogContent
+        showCloseButton={false}
+        className="flex max-w-83 flex-col items-center gap-5 p-4"
+      >
+        <div className="flex flex-col items-center gap-3">
+          <ConfirmStartFace className="size-7.5 text-icon-neutral-secondary" aria-hidden />
 
-        <div className="flex flex-col items-center gap-1">
-          <DialogTitle className="text-center heading-1-bold text-text-neutral-primary">
-            토너먼트를 정말 바로 시작할까요?
-          </DialogTitle>
-          <DialogDescription className="text-center body-2-medium text-text-neutral-tertiary">
-            바로 시작하면 담지 못한 친구가
-            <br />
-            있을 수 있어요.
-          </DialogDescription>
+          <div className="flex flex-col items-center gap-1">
+            <DialogTitle className="text-center heading-2-semibold text-text-neutral-primary">
+              토너먼트를 바로 시작할까요?
+            </DialogTitle>
+            <DialogDescription className="text-center body-2-medium text-text-neutral-tertiary">
+              바로 시작하면 담지 못한 친구가
+              <br />
+              있을 수 있어요.
+            </DialogDescription>
+          </div>
         </div>
 
-        <div className="flex w-full gap-2">
+        <div className="flex w-full gap-2.5">
           <Button variant="secondary" size="lg" onClick={handleCancel}>
             돌아가기
           </Button>
           <Button variant="primary" size="lg" onClick={onConfirm}>
-            바로 시작할래요
+            바로 시작하기
           </Button>
         </div>
       </DialogContent>

@@ -10,10 +10,10 @@ import { cn } from '@/utils/cn';
 import type { TournamentPendingItemT } from '../../../_common/_types/tournamentResponse';
 import {
   BASKET_CAROUSEL_SLIDE_SIZE_PERCENT,
+  BASKET_STACK_GAP,
   ITEMS_PER_BASKET,
 } from '../../_consts/tournamentItemBasket';
 import { getActiveBasketCount, getBasketIndexForLastItem } from '../../_utils/tournamentItemBasket';
-import CarouselIndicator from './CarouselIndicator';
 import TournamentItemBasket from './TournamentItemBasket';
 
 type TournamentItemBasketCarouselProps = {
@@ -35,7 +35,6 @@ function TournamentItemBasketCarousel({
   bottomSlot,
 }: TournamentItemBasketCarouselProps) {
   const [carouselApi, setCarouselApi] = useState<CarouselApi>();
-  const [currentIndex, setCurrentIndex] = useState(0);
 
   const activeBasketCount = useMemo(() => getActiveBasketCount(items.length), [items.length]);
 
@@ -81,57 +80,43 @@ function TournamentItemBasketCarousel({
   useEffect(() => {
     if (!carouselApi) return;
 
-    const handleSelect = () => setCurrentIndex(carouselApi.selectedScrollSnap());
-
     const handleReInit = () => {
       carouselApi.scrollTo(carouselApi.selectedScrollSnap(), true);
     };
 
-    handleSelect();
-    carouselApi.on('select', handleSelect);
     carouselApi.on('reInit', handleReInit);
 
     return () => {
-      carouselApi.off('select', handleSelect);
       carouselApi.off('reInit', handleReInit);
     };
   }, [carouselApi]);
 
-  const handleIndicatorSelect = (index: number) => carouselApi?.scrollTo(index);
-
   const { ref: containerRef, height: containerHeight } = useContainerHeight();
-  const { ref: indicatorRef, height: indicatorHeight } = useContainerHeight();
   const { ref: bottomSlotRef, height: bottomSlotHeight } = useContainerHeight();
-  const gap = isCarouselEnabled ? 16 : 0;
-
-  const bottomSlotBlockHeight = bottomSlot ? (bottomSlotHeight ?? 0) + gap : 0;
+  const bottomSlotBlockHeight = bottomSlot ? (bottomSlotHeight ?? 0) + BASKET_STACK_GAP : 0;
 
   let basketMaxHeight: number | undefined;
   if (containerHeight) {
-    basketMaxHeight = isCarouselEnabled
-      ? containerHeight - (indicatorHeight ?? 0) - gap - bottomSlotBlockHeight
-      : containerHeight - bottomSlotBlockHeight;
+    basketMaxHeight = containerHeight - bottomSlotBlockHeight;
   }
 
   if (!isCarouselEnabled) {
     return (
       <div
         ref={containerRef}
-        className="flex min-h-0 w-full flex-1 flex-col items-center justify-start px-5"
+        className="flex min-h-0 w-full flex-1 flex-col items-center justify-start gap-4"
       >
-        <TournamentItemBasket
-          basketIndex={0}
-          items={items}
-          isAddItemBlocked={isAddItemBlocked}
-          maxHeight={basketMaxHeight}
-          participantImageMap={participantImageMap}
-        />
+        <div style={{ width: `${BASKET_CAROUSEL_SLIDE_SIZE_PERCENT}%` }}>
+          <TournamentItemBasket
+            basketIndex={0}
+            items={items}
+            isAddItemBlocked={isAddItemBlocked}
+            maxHeight={basketMaxHeight}
+            participantImageMap={participantImageMap}
+          />
+        </div>
 
-        {bottomSlot && (
-          <div ref={bottomSlotRef} className="my-auto">
-            {bottomSlot}
-          </div>
-        )}
+        {bottomSlot && <div ref={bottomSlotRef}>{bottomSlot}</div>}
       </div>
     );
   }
@@ -166,19 +151,7 @@ function TournamentItemBasketCarousel({
         </CarouselContent>
       </Carousel>
 
-      <div ref={indicatorRef}>
-        <CarouselIndicator
-          totalCount={activeBasketCount}
-          currentIndex={currentIndex}
-          onSelect={handleIndicatorSelect}
-        />
-      </div>
-
-      {bottomSlot && (
-        <div ref={bottomSlotRef} className="my-auto">
-          {bottomSlot}
-        </div>
-      )}
+      {bottomSlot && <div ref={bottomSlotRef}>{bottomSlot}</div>}
     </div>
   );
 }

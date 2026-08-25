@@ -196,6 +196,18 @@ export const MOCK_TOURNAMENT_COMPLETED: GetTournamentCompletedResponseT = {
   status: 'COMPLETED',
   completed: {
     result: MOCK_TOURNAMENT_RESULT,
+    isGroupTournament: false,
     hasGroupResult: false,
+  },
+};
+
+/** 소셜 토너먼트 첫 완주자 상태 (id 4) — 친구는 아직 미완주라 hasGroupResult: false */
+export const MOCK_TOURNAMENT_GROUP_COMPLETED: GetTournamentCompletedResponseT = {
+  ...MOCK_TOURNAMENT_COMPLETED,
+  tournamentId: 4,
+  name: 'E2E 소셜 결과 토너먼트',
+  completed: {
+    ...MOCK_TOURNAMENT_COMPLETED.completed,
+    isGroupTournament: true,
   },
 };

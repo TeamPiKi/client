@@ -38,7 +38,7 @@ function TournamentClient({ tournamentId, tournamentName, inProgress }: Tourname
     <main
       className={`hide-scrollbar flex min-h-dvh flex-col items-center overflow-y-auto px-5 pt-padding-top pb-6 ${backgroundClassName}`}
     >
-      <div className="flex flex-col items-center gap-6">
+      <div className="mt-6 flex flex-col items-center gap-6">
         <div className="flex flex-col items-center gap-4">
           <RoundBadge label={roundLabel} isFinal={isFinalRound} />
           <TournamentQuestion isFinal={isFinalRound} />
@@ -47,7 +47,7 @@ function TournamentClient({ tournamentId, tournamentName, inProgress }: Tourname
           <p className="heading-2-medium text-text-neutral-secondary">최종 선택을 해주세요</p>
         )}
       </div>
-      <div className={`w-full ${isFinalRound ? 'mt-29' : 'mt-8'}`}>
+      <div className={`-mx-5 ${isFinalRound ? 'mt-29' : 'mt-8'}`}>
         {/* 기록 대기 중에는 이전 화면을 유지해 스켈레톤 깜빡임을 방지한다. */}
         {!currentMatch ? (
           <MatchSkeleton isFinal={isFinalRound} />

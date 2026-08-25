@@ -49,7 +49,7 @@ function Thumbnail({
   return (
     <div
       className={cn(
-        'relative size-[63px] overflow-hidden rounded-[16px] border-[3px] border-white bg-gray-50 shadow-[0_0_8px_rgba(0,0,0,0.16)]',
+        'relative size-[63px] overflow-hidden rounded-[16px] border-[1.85px] border-white bg-gray-50 shadow-[0_0_8px_rgba(0,0,0,0.16)]',
         className
       )}
       style={style}
