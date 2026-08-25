@@ -79,8 +79,8 @@ test('웹 브라우저에서는 공유 시트에 스토리 공유 버튼이 없�
   await page.goto('/tournament/3/result');
   await page.getByRole('button', { name: '영수증 저장' }).click();
 
-  await expect(page.getByRole('button', { name: '이미지 저장' })).toBeVisible();
-  await expect(page.getByRole('button', { name: '스토리 공유' })).toBeHidden();
+  await expect(page.getByRole('button', { name: '공유하기', exact: true })).toBeVisible();
+  await expect(page.getByRole('button', { name: '스토리로 바로 공유하기' })).toBeHidden();
 });
 
 test.describe('앱(웹뷰) 환경', () => {
@@ -126,7 +126,7 @@ test.describe('앱(웹뷰) 환경', () => {
     await page.goto('/tournament/3/result');
     await page.getByRole('button', { name: '영수증 저장' }).click();
 
-    const storyButton = page.getByRole('button', { name: '스토리 공유' });
+    const storyButton = page.getByRole('button', { name: '스토리로 바로 공유하기' });
     await expect(storyButton).toBeEnabled();
     await storyButton.click();
 

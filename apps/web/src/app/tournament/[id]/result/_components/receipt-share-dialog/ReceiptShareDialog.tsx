@@ -3,23 +3,16 @@
 import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { toast } from 'sonner';
 
-import { CopyIconFill, DownloadIconFill, LinkIconOutline } from '@/assets/icons';
-import InstagramIcon from '@/assets/icons/social/instagram.svg';
+import Button from '@/components/button';
 import { Drawer, DrawerContent, DrawerDescription, DrawerTitle } from '@/components/drawer';
 import Skeleton from '@/components/skeleton';
 import { ANALYTICS_EVENT } from '@/consts/analytics';
 import { useInstagramStoryShare } from '@/hooks/useInstagramStoryShare';
 import { logAnalyticsEvent } from '@/utils/analytics';
-import { cn } from '@/utils/cn';
 import { isWebview } from '@/utils/webBridge';
 
 import type { RankedProductT } from '../../../_common/_types/tournament';
-import {
-  captureReceiptImage,
-  copyReceiptImage,
-  saveReceiptImage,
-  shareReceiptImageFile,
-} from '../../_utils/shareReceiptImage';
+import { captureReceiptImage, shareReceiptImageFile } from '../../_utils/shareReceiptImage';
 import ReceiptShareCaptureLayer from './ReceiptShareCaptureLayer';
 
 type ReceiptShareDialogProps = {
@@ -32,42 +25,6 @@ type ReceiptShareDialogProps = {
   /** 서버가 UA 로 판정한 앱 여부 — 스토리 공유 버튼 노출에 쓴다 */
   isApp?: boolean;
 };
-
-type ShareActionProps = {
-  icon: React.ReactNode;
-  label: string;
-  /** 원형 배경색 클래스 — 브랜드 아이콘은 고유 배경을 쓴다 */
-  iconBackgroundClassName?: string;
-  disabled?: boolean;
-  onClick: () => void;
-};
-
-function ShareAction({
-  icon,
-  label,
-  iconBackgroundClassName = 'bg-gray-50',
-  disabled,
-  onClick,
-}: ShareActionProps) {
-  return (
-    <button
-      type="button"
-      disabled={disabled}
-      onClick={onClick}
-      className="flex cursor-pointer flex-col items-center gap-2 disabled:cursor-not-allowed disabled:opacity-40"
-    >
-      <span
-        className={cn(
-          'flex size-14 items-center justify-center rounded-full',
-          iconBackgroundClassName
-        )}
-      >
-        {icon}
-      </span>
-      <span className="body-2-medium text-text-neutral-secondary">{label}</span>
-    </button>
-  );
-}
 
 function ReceiptShareDialog({
   open,
@@ -131,37 +88,6 @@ function ReceiptShareDialog({
       setPreviewUrl(null);
     };
   }, [open]);
-
-  const handleSave = () => {
-    if (!imageBlob) return;
-    const isSaved = saveReceiptImage(imageBlob);
-    if (!isSaved) {
-      toast.error('저장에 실패했습니다.');
-      return;
-    }
-
-    logAnalyticsEvent(ANALYTICS_EVENT.RECEIPT_SHARE, {
-      tournament_id: tournamentId,
-      method: 'save',
-    });
-    toast.success('이미지를 저장했어요.');
-  };
-
-  const handleCopy = async () => {
-    if (!imageBlob) return;
-
-    const isCopied = await copyReceiptImage(imageBlob);
-    if (!isCopied) {
-      toast.warning('이 브라우저에서는 복사를 지원하지 않아요. 저장을 이용해주세요.');
-      return;
-    }
-
-    logAnalyticsEvent(ANALYTICS_EVENT.RECEIPT_SHARE, {
-      tournament_id: tournamentId,
-      method: 'copy',
-    });
-    toast.success('이미지를 복사했어요.');
-  };
 
   const handleShareToStory = async () => {
     if (!imageBlob) return;
@@ -239,7 +165,7 @@ function ReceiptShareDialog({
               영수증 공유
             </DrawerTitle>
             <DrawerDescription className="sr-only">
-              영수증 이미지를 저장하거나 공유할 수 있어요.
+              영수증 이미지를 공유할 수 있어요.
             </DrawerDescription>
 
             <div className="aspect-1080/1920 w-full max-w-52.5">
@@ -255,34 +181,26 @@ function ReceiptShareDialog({
               )}
             </div>
 
-            {/* 앱에서는 스토리 공유가 더해져 4개 — 좁은 화면에서 넘치지 않게 간격 상한을 둔다 */}
-            <div className="flex w-full items-start justify-center gap-[clamp(1rem,7vw,2.5rem)] border-t border-gray-75 pt-5">
-              <ShareAction
-                icon={<DownloadIconFill className="size-6 text-text-neutral-secondary" />}
-                label="이미지 저장"
-                disabled={!imageBlob}
-                onClick={handleSave}
-              />
-              <ShareAction
-                icon={<CopyIconFill className="size-6 text-text-neutral-secondary" />}
-                label="이미지 복사"
-                disabled={!imageBlob}
-                onClick={handleCopy}
-              />
-              <ShareAction
-                icon={<LinkIconOutline className="size-6 text-text-neutral-secondary" />}
-                label="링크 공유"
+            <div className="flex w-full flex-col items-center gap-4">
+              <Button
+                variant="primary"
+                size="lg"
+                className="w-full"
                 disabled={!imageBlob || isSharingLink}
                 onClick={handleShareLink}
-              />
+              >
+                공유하기
+              </Button>
+
               {isAppEnvironment && (
-                <ShareAction
-                  icon={<InstagramIcon className="size-7" />}
-                  iconBackgroundClassName="border border-gray-75 bg-white"
-                  label="스토리 공유"
+                <button
+                  type="button"
                   disabled={!imageBlob || isSharing}
                   onClick={handleShareToStory}
-                />
+                  className="cursor-pointer body-2-medium text-text-neutral-secondary disabled:cursor-not-allowed disabled:opacity-40"
+                >
+                  스토리로 바로 공유하기
+                </button>
               )}
             </div>
           </div>
