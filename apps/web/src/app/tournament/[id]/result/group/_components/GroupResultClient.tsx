@@ -97,7 +97,8 @@ function GroupResultClient({ tournamentId }: GroupResultClientProps) {
     );
   }
 
-  if (isGroupResultError || !groupResultData) {
+  const chosenItems = groupResultData?.items.filter(item => item.chosenBy.length > 0) ?? [];
+  if (isGroupResultError || !groupResultData || chosenItems.length === 0) {
     return (
       <GroupResultShell onBack={handleBack}>
         <div className="flex flex-1 flex-col items-center justify-center gap-2 px-5">
@@ -112,7 +113,7 @@ function GroupResultClient({ tournamentId }: GroupResultClientProps) {
     );
   }
 
-  const sortedItems = [...groupResultData.items].sort((a, b) => a.rank - b.rank);
+  const sortedItems = [...chosenItems].sort((a, b) => a.rank - b.rank);
   const firstItem = sortedItems.find(item => item.rank === 1);
   const otherItems = sortedItems.filter(item => item.rank !== 1);
 
