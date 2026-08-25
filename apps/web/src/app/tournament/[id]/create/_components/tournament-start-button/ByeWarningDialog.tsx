@@ -22,9 +22,12 @@ function ByeWarningDialog({
 }: ByeWarningDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent showCloseButton={false} className="max-w-83 flex-col items-center gap-5 p-4">
+      <DialogContent
+        showCloseButton={false}
+        className="flex max-w-83 flex-col items-center gap-5 p-4"
+      >
         <div className="flex flex-col items-center gap-3">
-          <AlertIconFill className="size-10 text-icon-accent" aria-hidden />
+          <AlertIconFill className="size-10 text-icon-neutral-secondary" aria-hidden />
 
           <div className="flex flex-col items-center gap-1">
             <DialogTitle className="text-center heading-2-semibold text-text-neutral-primary">

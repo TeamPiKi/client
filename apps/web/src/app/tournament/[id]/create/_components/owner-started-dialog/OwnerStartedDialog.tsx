@@ -28,14 +28,17 @@ function OwnerStartedDialog({
 }: OwnerStartedDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent showCloseButton={false} className="flex flex-col items-center gap-5 p-5">
-        <FireIconFill className="size-10 text-icon-accent" aria-hidden />
+      <DialogContent
+        showCloseButton={false}
+        className="flex max-w-83 flex-col items-center gap-5 p-4"
+      >
+        <FireIconFill className="size-10 text-icon-neutral-secondary" aria-hidden />
 
-        <div className="flex flex-col items-center gap-2">
-          <DialogTitle className="text-center heading-1-bold text-text-neutral-primary">
+        <div className="flex flex-col items-center gap-1">
+          <DialogTitle className="text-center heading-2-semibold text-text-neutral-primary">
             주최자가 토너먼트를 시작했어요!
           </DialogTitle>
-          <DialogDescription className="text-center body-1-medium text-text-neutral-tertiary">
+          <DialogDescription className="text-center body-2-medium text-text-neutral-tertiary">
             지금 바로 {itemCount}강 토너먼트를 시작해 보세요.
           </DialogDescription>
         </div>
