@@ -53,6 +53,9 @@ function ItemInfoScreen({
   /** 조회 모드 여부 — READY 이면서 수정 버튼을 누르지 않은 상태 */
   const isDetailMode = isReadyItemInfo(item) && !isEditing;
 
+  const isUnresolvedItem =
+    item.status === ITEM_STATUS.FAILED || item.status === ITEM_STATUS.INCOMPLETE;
+
   const handleRefreshFailedEdit = () => {
     priceRefresh?.closeFailedDialog();
     setIsEditing(true);
@@ -65,9 +68,9 @@ function ItemInfoScreen({
         left={<HeaderIcon name="BACK" {...(isEditing && { onClick: () => setIsEditing(false) })} />}
         center={isDetailMode ? viewTitle : '위시 정보 수정'}
         centerClassName="heading-1-bold"
-        /** 삭제는 조회 화면과 FAILED 수집 실패 화면에서 노출 */
+        /** 삭제는 조회 화면과 FAILED·INCOMPLETE 입력 화면에서 노출 */
         right={
-          (isDetailMode || item.status === ITEM_STATUS.FAILED) &&
+          (isDetailMode || isUnresolvedItem) &&
           !readOnly && (
             <button
               type="button"
