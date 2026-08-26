@@ -60,6 +60,13 @@ const nextConfig = async () => {
           destination: '/tournament/join/:id',
           permanent: false,
         },
+        /** 구 인스타 바이오 링크 호환 
+         * TODO: 바이오 교체 후 제거 */
+        {
+          source: '/open',
+          destination: '/?utm_source=instagram',
+          permanent: false,
+        },
         /** 구버전 앱 공유 시트·기존 딥링크의 /archive(?tab=) 경로 호환 */
         {
           source: '/archive',
