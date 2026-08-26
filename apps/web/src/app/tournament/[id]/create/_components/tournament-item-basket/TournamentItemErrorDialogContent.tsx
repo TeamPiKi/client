@@ -8,18 +8,17 @@ import { DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/compon
 import { ITEM_STATUS } from '@/consts/item';
 import { ROUTES } from '@/consts/route';
 import type { ItemStatusT } from '@/types/item';
+import { cn } from '@/utils/cn';
 
 import { useDeleteTournamentItem } from '../../../_common/_hooks/useDeleteTournamentItem';
 
 const MODAL_CONTENT = {
   [ITEM_STATUS.FAILED]: {
-    iconSize: 48,
     iconClassName: 'text-red-300',
     title: '상품 정보를 가져오지 못했어요',
     description: '서버에서 문제가 발생했어요',
   },
   [ITEM_STATUS.INCOMPLETE]: {
-    iconSize: 30,
     iconClassName: 'text-icon-warning',
     title: '일부 정보만 찾았어요',
     description: '조금만 더 채우면 등록이 끝나요',
@@ -38,7 +37,7 @@ function TournamentItemErrorDialogContent({
   tournamentId,
   tournamentItemId,
 }: TournamentItemErrorDialogContentProps) {
-  const { iconSize, iconClassName, title, description } = MODAL_CONTENT[status];
+  const { iconClassName, title, description } = MODAL_CONTENT[status];
 
   const router = useRouter();
   const { deleteTournamentItemMutation, isDeleteTournamentItemPending } = useDeleteTournamentItem(
@@ -52,17 +51,15 @@ function TournamentItemErrorDialogContent({
   const handleEdit = () => router.push(ROUTES.TOURNAMENT_ITEM_EDIT(tournamentId, tournamentItemId));
 
   return (
-    <DialogContent showCloseButton={false} className="text-center">
-      <div className="flex justify-center">
-        <div style={{ width: iconSize, height: iconSize }}>
-          <WarningIconFill width="100%" height="100%" className={iconClassName} aria-hidden />
-        </div>
+    <DialogContent showCloseButton={false} className="gap-5 p-4 text-center">
+      <div className="flex flex-col items-center gap-3">
+        <WarningIconFill className={cn('size-[30px]', iconClassName)} aria-hidden />
+        <DialogHeader className="gap-1">
+          <DialogTitle className="heading-2-semibold">{title}</DialogTitle>
+          <p className="body-2-medium text-text-neutral-tertiary">{description}</p>
+        </DialogHeader>
       </div>
-      <DialogHeader className="mt-4 gap-1">
-        <DialogTitle className="heading-1-bold">{title}</DialogTitle>
-        <p className="body-1-medium text-text-neutral-tertiary">{description}</p>
-      </DialogHeader>
-      <DialogFooter className="mt-6 flex-row gap-3">
+      <DialogFooter className="flex-row gap-2.5">
         <Button
           variant="secondary"
           size="lg"
