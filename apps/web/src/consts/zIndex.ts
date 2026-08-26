@@ -14,4 +14,7 @@ export const Z_INDEX = {
   HOME_ONBOARDING: 55,
 
   NAVIGATION_OVERLAY: 60,
+
+  /** 인앱 브라우저 탈출 스플래시 — 튕기는 동안 모든 UI 를 덮는다 */
+  IN_APP_BROWSER_ESCAPE: 1000,
 };

@@ -7,7 +7,7 @@ const isLocalHost = (hostname: string) =>
 /**
  * 요청 호스트를 앱 링크가 실제로 발동하는 서비스 호스트로 정규화한다.
  *
- * 랜딩(`/open`)이 만드는 앱 진입 URL 은 등록된 호스트를 가리켜야 한다.
+ * 인앱 브라우저 탈출이 만드는 앱 진입 URL 은 등록된 호스트를 가리켜야 한다.
  * 로컬·서비스 호스트는 그대로 두고, 그 외에는 프로덕션으로 떨어뜨린다.
  */
 export const toServiceHost = (host: string) => {
@@ -19,4 +19,12 @@ export const toServiceHost = (host: string) => {
 
   /** 미등록 호스트(Vercel 프리뷰 등)에서는 UL 이 발동하지 않으므로 프로덕션을 가리킨다 */
   return SERVICE_HOSTS[0] as string;
+};
+
+type HeaderReaderT = { get: (name: string) => string | null };
+
+/** 요청 헤더로 앱 링크가 발동하는 서비스 오리진(`https://piki.day`)을 만든다 */
+export const getServiceOrigin = (headerStore: HeaderReaderT) => {
+  const protocol = headerStore.get('x-forwarded-proto') ?? 'https';
+  return `${protocol}://${toServiceHost(headerStore.get('host') ?? '')}`;
 };
