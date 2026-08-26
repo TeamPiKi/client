@@ -5,6 +5,7 @@ import BaseImage from '@/components/base-image';
 import Spinner from '@/components/spinner';
 import { ITEM_STATUS } from '@/consts/item';
 import type { ItemStatusT } from '@/types/item';
+import { cn } from '@/utils/cn';
 
 type ProductImageProps = {
   src?: string;
@@ -18,9 +19,16 @@ const loadingFallback = (
   </div>
 );
 
-const errorFallback = (
+const errorFallback = (status: ItemStatusT<'FAILED' | 'INCOMPLETE'> = 'FAILED') => (
   <div className="absolute inset-0 flex items-center justify-center">
-    <WarningIconFill className="size-7.5 text-red-300" aria-hidden />
+    <WarningIconFill
+      className={cn(
+        'size-7.5',
+        status === 'FAILED' && 'text-red-300',
+        status === 'INCOMPLETE' && 'text-icon-warning'
+      )}
+      aria-hidden
+    />
   </div>
 );
 
@@ -31,15 +39,9 @@ function ProductImage({ src, alt, status }: ProductImageProps) {
   return (
     <div className="relative h-full w-full overflow-hidden rounded-[16px] border-[2px] border-white bg-gray-50 shadow-[0_0_8px_rgba(0,0,0,0.16)]">
       {isProcessing && loadingFallback}
-      {isError && errorFallback}
+      {isError && errorFallback(status)}
       {!isProcessing && !isError && src && (
-        <BaseImage
-          src={src}
-          alt={alt}
-          className="object-cover"
-          loadingFallback={loadingFallback}
-          errorFallback={errorFallback}
-        />
+        <BaseImage src={src} alt={alt} className="object-cover" loadingFallback={loadingFallback} />
       )}
     </div>
   );
