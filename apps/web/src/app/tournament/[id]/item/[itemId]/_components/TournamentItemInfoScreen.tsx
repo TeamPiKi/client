@@ -38,8 +38,8 @@ function TournamentItemInfoScreen({
       item={{
         status: tournamentItemData.status,
         imageUrl: tournamentItemData.imageUrl ?? null,
-        name: tournamentItemData.name ?? '',
-        price: tournamentItemData.price ?? 0,
+        name: tournamentItemData.name ?? null,
+        price: tournamentItemData.price ?? null,
         sourceUrl: tournamentItemData.sourceUrl ?? null,
         sourcePlatform: null,
       }}

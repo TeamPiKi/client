@@ -2,8 +2,8 @@ import type {
   GetTournamentCompletedResponseT,
   GetTournamentInProgressResponseT,
   GetTournamentPendingResponseT,
+  PendingTournamentItemT,
   TournamentMatchT,
-  TournamentPendingItemT,
 } from '@/app/tournament/[id]/_common/_types/tournamentResponse';
 import type {
   GetTournamentListResponseT,
@@ -104,7 +104,7 @@ const createPendingTournament = (
   tournamentId: number,
   itemCount: number
 ): GetTournamentPendingResponseT => {
-  const items: TournamentPendingItemT[] = MOCK_TOURNAMENT_ITEMS.slice(0, itemCount);
+  const items: PendingTournamentItemT[] = MOCK_TOURNAMENT_ITEMS.slice(0, itemCount);
   return {
     ...MOCK_TOURNAMENT_PENDING,
     tournamentId,
