@@ -9,6 +9,3 @@ export const AUTO_LAUNCH_DELAY_MS = 200;
 
 /** 인앱 브라우저 UA 토큰 — UL 이 발동하지 않아 외부 브라우저로 탈출시킨다 (`Barcelona` = 스레드) */
 export const IN_APP_BROWSER_UA_TOKENS = ['KAKAOTALK', 'Instagram', 'Threads', 'Barcelona'] as const;
-
-/** 인스타 유입 소스 값 — GA4 이벤트 파라미터와 Play 스토어 referrer 에 같은 값이 나가야 한다 */
-export const INSTAGRAM_SOURCE = 'instagram';
