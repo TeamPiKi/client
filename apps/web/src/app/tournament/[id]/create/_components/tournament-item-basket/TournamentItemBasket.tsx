@@ -1,7 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { useState } from 'react';
 
 import AddIcon from '@/assets/icons/fill/add.svg';
 import { Dialog, DialogTrigger } from '@/components/dialog';
@@ -15,7 +14,7 @@ import type { PendingTournamentItemT } from '../../../_common/_types/tournamentR
 import basketImg from '../../_assets/basket-gray.png';
 import { ITEMS_PER_BASKET } from '../../_consts/tournamentItemBasket';
 import TournamentBasketItem from './TournamentBasketItem';
-import TournamentItemFailedModal from './TournamentItemFailedDrawer';
+import TournamentItemErrorDialogContent from './TournamentItemErrorDialogContent';
 
 type TournamentItemBasketProps = {
   basketIndex: number;
@@ -34,16 +33,11 @@ function TournamentItemBasket({
 }: TournamentItemBasketProps) {
   const { id } = useParams<{ id: string }>();
   const tournamentId = Number(id);
+
   const { userData } = useGetMe();
   const { tournamentData } = useGetTournament(tournamentId);
 
   const basketMaxWidth = maxHeight ? (maxHeight * 356) / 464 : null;
-
-  const [failedItem, setFailedItem] = useState<PendingTournamentItemT | null>(null);
-
-  const handleItemClick = (item: TournamentItemBasketProps['items'][number]) => {
-    if (item.status === ITEM_STATUS.FAILED) setFailedItem(item);
-  };
 
   const isFull = items.length >= ITEMS_PER_BASKET;
   const showAddButton = !isAddItemBlocked && !isFull;
@@ -97,22 +91,28 @@ function TournamentItemBasket({
                 );
               }
 
-              /** INCOMPLETE, FAILED 아이템 직접 입력은 주최자·본인만 가능 */
+              /** FAILED·INCOMPLETE 아이템은 탭하면 삭제/직접 입력 다이얼로그 — 주최자·본인만 가능 */
               const canEdit = tournamentData.isOwner || item.userId === userData.id;
 
-              /** INCOMPLETE 아이템도 수정 페이지로 이동 */
-              if (item.status === ITEM_STATUS.INCOMPLETE && canEdit) {
+              if (
+                canEdit &&
+                (item.status === ITEM_STATUS.FAILED || item.status === ITEM_STATUS.INCOMPLETE)
+              ) {
                 return (
-                  <Link
-                    key={item.tournamentItemId}
-                    href={ROUTES.TOURNAMENT_ITEM_EDIT(tournamentId, item.tournamentItemId)}
-                  >
-                    <TournamentBasketItem
-                      item={item}
-                      index={index}
-                      participantImageMap={participantImageMap}
+                  <Dialog key={item.tournamentItemId}>
+                    <DialogTrigger asChild>
+                      <TournamentBasketItem
+                        item={item}
+                        index={index}
+                        participantImageMap={participantImageMap}
+                      />
+                    </DialogTrigger>
+                    <TournamentItemErrorDialogContent
+                      status={item.status}
+                      tournamentId={tournamentId}
+                      tournamentItemId={item.tournamentItemId}
                     />
-                  </Link>
+                  </Dialog>
                 );
               }
 
@@ -121,7 +121,6 @@ function TournamentItemBasket({
                   key={item.tournamentItemId}
                   item={item}
                   index={index}
-                  {...(canEdit && { onClick: () => handleItemClick(item) })}
                   participantImageMap={participantImageMap}
                 />
               );
@@ -129,14 +128,6 @@ function TournamentItemBasket({
           </div>
         )}
       </div>
-      {failedItem && (
-        <TournamentItemFailedModal
-          open
-          tournamentId={tournamentId}
-          tournamentItemId={failedItem.tournamentItemId}
-          onClose={() => setFailedItem(null)}
-        />
-      )}
     </div>
   );
 }
