@@ -9,8 +9,8 @@ import { Z_INDEX } from '@/consts/zIndex';
 import type { GetWishlistResponseT } from '@/types/wish';
 import { SCROLL_NAMESPACE, saveScrollAnchor } from '@/utils/scrollRestoration';
 
-import WishFailedCard from './WishFailedCard';
 import WishProcessingCard from './WishProcessingCard';
+import WishUnresolvedCard from './WishUnresolvedCard';
 
 type WishGridProps = {
   items: GetWishlistResponseT[];
@@ -38,10 +38,10 @@ function WishGrid({ items, isDeleteMode = false, selectedIds, onToggleSelect }: 
               data-scroll-anchor-id={wish.id}
               onClick={event => handleCardClick(event, wish.id)}
             >
-              <WishFailedCard
+              <WishUnresolvedCard
                 message={
                   item.status === ITEM_STATUS.INCOMPLETE
-                    ? '일부만 가져왔어요'
+                    ? '일부 정보만 가져왔어요'
                     : '가져오는데 실패했어요'
                 }
               />

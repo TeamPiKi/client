@@ -1,6 +1,8 @@
 import { WarningIconFill } from '@/assets/icons';
 
-function WishFailedCard({ message }: { message: string }) {
+/** 정보를 못 가져왔거나(FAILED) 일부만 가져온(INCOMPLETE) 위시 카드 — 문구만 다르다 */
+
+function WishUnresolvedCard({ message }: { message: string }) {
   return (
     <div className="relative flex flex-col bg-black/5">
       <div className="aspect-[201/166] w-full" />
@@ -16,4 +18,4 @@ function WishFailedCard({ message }: { message: string }) {
   );
 }
 
-export default WishFailedCard;
+export default WishUnresolvedCard;
