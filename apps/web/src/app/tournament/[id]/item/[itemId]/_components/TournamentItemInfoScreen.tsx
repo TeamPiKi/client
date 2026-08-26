@@ -41,7 +41,6 @@ function TournamentItemInfoScreen({
         name: tournamentItemData.name ?? '',
         price: tournamentItemData.price ?? 0,
         sourceUrl: tournamentItemData.sourceUrl ?? null,
-        sourcePlatform: null,
       }}
       readOnly={!canEdit}
       onSave={data => patchTournamentItemMutation(data)}

@@ -6,10 +6,8 @@ export type ItemInfoT = {
   imageUrl: string | null;
   name: string;
   price: number;
-  /** 링크로 담은 경우에만 존재 — 이미지 위 원본 링크 칩 */
+  /** 링크로 담은 경우에만 존재 — 이미지 위 원본 링크 칩 (라벨은 hostname) */
   sourceUrl: string | null;
-  /** 원본 링크 칩 라벨 — 없으면 hostname으로 대체 */
-  sourcePlatform: string | null;
 };
 
 /** 조회 화면을 그릴 수 있는 상품 — 이미지가 보장된다 */

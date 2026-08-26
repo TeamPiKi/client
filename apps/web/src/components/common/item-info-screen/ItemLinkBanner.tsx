@@ -2,7 +2,6 @@ import { ChevronForwardIconFill, LinkIconFill } from '@/assets/icons';
 
 type ItemLinkBannerProps = {
   sourceUrl: string;
-  sourcePlatform: string | null;
 };
 
 const getHostLabel = (sourceUrl: string) => {
@@ -14,8 +13,8 @@ const getHostLabel = (sourceUrl: string) => {
 };
 
 /** 상품 이미지 위에 겹쳐 두는 원본 링크 칩 */
-function ItemLinkBanner({ sourceUrl, sourcePlatform }: ItemLinkBannerProps) {
-  const label = sourcePlatform ?? getHostLabel(sourceUrl);
+function ItemLinkBanner({ sourceUrl }: ItemLinkBannerProps) {
+  const label = getHostLabel(sourceUrl);
 
   return (
     <a

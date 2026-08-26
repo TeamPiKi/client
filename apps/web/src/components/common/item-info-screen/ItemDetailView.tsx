@@ -22,7 +22,7 @@ function ItemDetailView({ item, memo, priceRefresh, onEdit }: ItemDetailViewProp
       <div className="relative mt-5 aspect-square w-full overflow-hidden rounded-xl bg-gray-50">
         <Image src={item.imageUrl} alt="상품 이미지" fill sizes="440px" className="object-cover" />
         {item.sourceUrl && (
-          <ItemLinkBanner sourceUrl={item.sourceUrl} sourcePlatform={item.sourcePlatform} />
+          <ItemLinkBanner sourceUrl={item.sourceUrl} />
         )}
       </div>
 
