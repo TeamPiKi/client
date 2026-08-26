@@ -19,9 +19,9 @@ export type TournamentMatchT = {
 };
 
 /**
- * `pending` 필드 페이로드의 item — PENDING 단계라 name/imageUrl/price 등이 아직 없을 수 있다.
+ * PENDING(아이템 담는 중) 토너먼트의 item
  */
-export type TournamentPendingItemT = Partial<TournamentItemT> & {
+export type PendingTournamentItemT = Partial<TournamentItemT> & {
   tournamentItemId: number;
   itemId: number;
   userId?: string;
@@ -42,7 +42,7 @@ type TournamentPendingPayloadT = {
   inviteCode: string | null;
   /** 초대 코드 만료 시각 (ISO 8601). `ownerStarted=true` 이면 null */
   inviteExpiresAt: string | null;
-  items: TournamentPendingItemT[];
+  items: PendingTournamentItemT[];
   participants: TournamentParticipantT[];
 };
 
