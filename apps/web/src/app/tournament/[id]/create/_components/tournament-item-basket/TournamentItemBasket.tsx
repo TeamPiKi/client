@@ -101,11 +101,18 @@ function TournamentItemBasket({
                 return (
                   <Dialog key={item.tournamentItemId}>
                     <DialogTrigger asChild>
-                      <TournamentBasketItem
-                        item={item}
-                        index={index}
-                        participantImageMap={participantImageMap}
-                      />
+                      {/* 키보드로도 열 수 있도록 div 타일이 아닌 button 을 트리거로 */}
+                      <button
+                        type="button"
+                        className="block w-full cursor-pointer"
+                        aria-label={`토너먼트 아이템 ${index + 1} 삭제 또는 직접 입력`}
+                      >
+                        <TournamentBasketItem
+                          item={item}
+                          index={index}
+                          participantImageMap={participantImageMap}
+                        />
+                      </button>
                     </DialogTrigger>
                     <TournamentItemErrorDialogContent
                       status={item.status}

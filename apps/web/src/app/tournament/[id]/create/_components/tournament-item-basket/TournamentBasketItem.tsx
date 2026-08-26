@@ -1,38 +1,25 @@
 import Image from 'next/image';
-import type { ComponentProps } from 'react';
 
 import { Z_INDEX } from '@/consts/zIndex';
 import { useGetMe } from '@/hooks/useGetMe';
-import { cn } from '@/utils/cn';
 
 import type { PendingTournamentItemT } from '../../../_common/_types/tournamentResponse';
 import ProductImage from './ProductImage';
 
-type TournamentBasketItemProps = ComponentProps<'div'> & {
+type TournamentBasketItemProps = {
   item: PendingTournamentItemT;
   index: number;
   participantImageMap?: Map<string, string>;
 };
 
-/** 바스켓 타일. `DialogTrigger asChild` 로 감쌀 수 있도록 나머지 props(onClick·ref·aria)는 루트 div 에 전달한다 */
-function TournamentBasketItem({
-  item,
-  index,
-  participantImageMap,
-  className,
-  onClick,
-  ...props
-}: TournamentBasketItemProps) {
+/** 바스켓 타일 — 순수 표시용. 클릭 동작은 감싸는 Link·button 이 담당한다 */
+function TournamentBasketItem({ item, index, participantImageMap }: TournamentBasketItemProps) {
   const { userData } = useGetMe();
   const friendImageUrl =
     item.userId && item.userId !== userData.id ? participantImageMap?.get(item.userId) : null;
 
   return (
-    <div
-      className={cn('relative aspect-square w-full', onClick && 'cursor-pointer', className)}
-      onClick={onClick}
-      {...props}
-    >
+    <div className="relative aspect-square w-full">
       <div className="absolute inset-0 overflow-hidden rounded-2xl">
         <ProductImage
           {...(item.imageUrl ? { src: item.imageUrl } : {})}
