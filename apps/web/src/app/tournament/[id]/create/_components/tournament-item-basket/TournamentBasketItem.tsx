@@ -5,10 +5,10 @@ import { Z_INDEX } from '@/consts/zIndex';
 import { useGetMe } from '@/hooks/useGetMe';
 import { cn } from '@/utils/cn';
 
-import type { TournamentPendingItemT } from '../../../_common/_types/tournamentResponse';
+import type { PendingTournamentItemT } from '../../../_common/_types/tournamentResponse';
 
 type TournamentBasketItemProps = {
-  item: TournamentPendingItemT;
+  item: PendingTournamentItemT;
   index: number;
   onClick?: () => void;
   participantImageMap?: Map<string, string>;

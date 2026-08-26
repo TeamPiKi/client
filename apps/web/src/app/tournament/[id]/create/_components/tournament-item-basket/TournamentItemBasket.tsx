@@ -11,7 +11,7 @@ import { ROUTES } from '@/consts/route';
 import { useGetMe } from '@/hooks/useGetMe';
 
 import { useGetTournament } from '../../../_common/_hooks/useGetTournament';
-import type { TournamentPendingItemT } from '../../../_common/_types/tournamentResponse';
+import type { PendingTournamentItemT } from '../../../_common/_types/tournamentResponse';
 import basketImg from '../../_assets/basket-gray.png';
 import { ITEMS_PER_BASKET } from '../../_consts/tournamentItemBasket';
 import TournamentBasketItem from './TournamentBasketItem';
@@ -19,7 +19,7 @@ import TournamentItemFailedModal from './TournamentItemFailedDrawer';
 
 type TournamentItemBasketProps = {
   basketIndex: number;
-  items: TournamentPendingItemT[];
+  items: PendingTournamentItemT[];
   maxHeight?: number;
   isAddItemBlocked?: boolean;
   participantImageMap?: Map<string, string>;
@@ -39,7 +39,7 @@ function TournamentItemBasket({
 
   const basketMaxWidth = maxHeight ? (maxHeight * 356) / 464 : null;
 
-  const [failedItem, setFailedItem] = useState<TournamentPendingItemT | null>(null);
+  const [failedItem, setFailedItem] = useState<PendingTournamentItemT | null>(null);
 
   const handleItemClick = (item: TournamentItemBasketProps['items'][number]) => {
     if (item.status === ITEM_STATUS.FAILED) setFailedItem(item);

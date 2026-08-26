@@ -14,7 +14,7 @@ import { getQueryClient } from '@/utils/queryClient';
 import { getTournament } from '../_common/_apis/getTournament';
 import type {
   GetTournamentInProgressResponseT,
-  TournamentPendingItemT,
+  PendingTournamentItemT,
 } from '../_common/_types/tournamentResponse';
 import { postStartTournament } from './_apis/postStartTournament';
 import TournamentClient from './_components/TournamentClient';
@@ -51,7 +51,7 @@ const notStartablePath = (tournamentId: number) =>
   `${ROUTES.TOURNAMENT_CREATE(tournamentId)}?${QUERY_ACTION.KEY}=${QUERY_ACTION.VALUE.TOURNAMENT_NOT_STARTABLE}`;
 
 /** 대기실 시작 버튼(hasPendingItem · hasUnfinishedItem)과 동일한 기준 */
-const isStartable = (items: TournamentPendingItemT[]) =>
+const isStartable = (items: PendingTournamentItemT[]) =>
   items.length >= MIN_TOURNAMENT_ITEM_COUNT &&
   !hasParsingItems(items) &&
   !items.some(item => item.status === ITEM_STATUS.FAILED || item.status === ITEM_STATUS.INCOMPLETE);
