@@ -25,17 +25,17 @@ export const buildOpenAppPath = (target: string) => {
 };
 
 type BuildAndroidAppOpenUrlParamsT = {
-  serviceOrigin: string;
+  origin: string;
   target: string;
   fallbackUrl: string;
 };
 
 export const buildAndroidAppOpenUrl = ({
-  serviceOrigin,
+  origin,
   target,
   fallbackUrl,
 }: BuildAndroidAppOpenUrlParamsT) => {
-  const { host } = new URL(serviceOrigin);
+  const { host } = new URL(origin);
 
   return [
     `intent://${host}${target}#Intent`,
@@ -48,7 +48,7 @@ export const buildAndroidAppOpenUrl = ({
 
 type BuildInAppBrowserEscapeUrlParamsT = {
   landingEnv: LandingEnvT;
-  serviceOrigin: string;
+  origin: string;
   /** pathname + search */
   currentPath: string;
   utmSource: string | null;
@@ -62,7 +62,7 @@ type BuildInAppBrowserEscapeUrlParamsT = {
  */
 export const buildInAppBrowserEscapeUrl = ({
   landingEnv,
-  serviceOrigin,
+  origin,
   currentPath,
   utmSource,
 }: BuildInAppBrowserEscapeUrlParamsT) => {
@@ -71,13 +71,13 @@ export const buildInAppBrowserEscapeUrl = ({
 
   const isMarketingEntry = utmSource !== null;
   const target = isMarketingEntry ? buildOpenAppPath(currentPath) : currentPath;
-  const escapeUrl = `${serviceOrigin}${target}`;
+  const escapeUrl = `${origin}${target}`;
 
   if (isKakaoBrowser) return buildKakaoExternalUrl(escapeUrl);
 
   if (platform === 'android') {
     return buildAndroidAppOpenUrl({
-      serviceOrigin,
+      origin,
       target,
       fallbackUrl: isMarketingEntry ? buildAndroidStoreUrl(utmSource) : escapeUrl,
     });

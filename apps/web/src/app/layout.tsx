@@ -14,7 +14,6 @@ import { SCROLL_CONTAINER_ID } from '@/consts/layout';
 import { getAppVersion, isAppVersionSupported } from '@/utils/appVersion';
 import { getLandingEnv, shouldEscapeInAppBrowser } from '@/utils/landingEnv';
 import { getQueryClient } from '@/utils/queryClient';
-import { getServiceOrigin } from '@/utils/serviceHost';
 import { isWebview as _isWebView } from '@/utils/webBridge';
 
 import Providers from '../components/Providers';
@@ -101,12 +100,7 @@ async function RootLayout({
           <BottomTabBar />
 
           {shouldUpdateApp && <AppUpdateDialog />}
-          {shouldEscape && (
-            <InAppBrowserEscape
-              landingEnv={landingEnv}
-              serviceOrigin={getServiceOrigin(headerStore)}
-            />
-          )}
+          {shouldEscape && <InAppBrowserEscape landingEnv={landingEnv} />}
         </Providers>
         {/**
          * GA4 web stream — 일반 브라우저 사용자 추적용.

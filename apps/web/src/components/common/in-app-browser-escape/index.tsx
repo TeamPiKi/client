@@ -20,7 +20,6 @@ import type { LandingEnvT } from '@/utils/landingEnv';
 
 type InAppBrowserEscapeProps = {
   landingEnv: LandingEnvT;
-  serviceOrigin: string;
 };
 
 /** 루트 스플래시와 같은 로고 크기 — 원본 146px 을 116px 로 */
@@ -30,7 +29,7 @@ const SPLASH_LOGO_SCALE = 116 / 146;
  * 인앱 브라우저는 UL 을 무시하므로 자기 스킴으로 외부 브라우저에 다시 열어 OS 가 설치 여부를 판정하게 한다.
  * 튕기는 동안 본문이 보이지 않도록 스플래시로 덮고, 세션당 한 번만 시도한다.
  */
-function InAppBrowserEscape({ landingEnv, serviceOrigin }: InAppBrowserEscapeProps) {
+function InAppBrowserEscape({ landingEnv }: InAppBrowserEscapeProps) {
   const pathname = usePathname();
   const { platform, isInAppBrowser, inAppBrowserSource } = landingEnv;
 
@@ -57,13 +56,13 @@ function InAppBrowserEscape({ landingEnv, serviceOrigin }: InAppBrowserEscapePro
     });
 
     const timer = setTimeout(() => {
-      const { pathname: currentPathname, search } = window.location;
+      const { origin, pathname: currentPathname, search } = window.location;
       const currentPath = `${currentPathname}${search}`;
       const utmSource = new URLSearchParams(search).get('utm_source');
 
       const escapeUrl = buildInAppBrowserEscapeUrl({
         landingEnv,
-        serviceOrigin,
+        origin,
         currentPath: isSafeInternalPath(currentPath) ? currentPath : '/',
         utmSource: utmSource || null,
       });
@@ -85,7 +84,7 @@ function InAppBrowserEscape({ landingEnv, serviceOrigin }: InAppBrowserEscapePro
     }, AUTO_LAUNCH_DELAY_MS);
 
     return () => clearTimeout(timer);
-  }, [isActive, landingEnv, serviceOrigin, platform, isInAppBrowser, pathname, source]);
+  }, [isActive, landingEnv, platform, isInAppBrowser, pathname, source]);
 
   /** 이미 웹 위에 있으므로 이동 없이 오버레이만 내린다 */
   const handleWebContinueClick = () => {
