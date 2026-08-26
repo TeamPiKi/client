@@ -8,10 +8,13 @@ import React from 'react';
 import { getMeQueryOptions } from '@/apis/getMe';
 import BottomTabBar from '@/components/bottom-tab-bar';
 import AppUpdateDialog from '@/components/common/app-update-dialog';
+import InAppBrowserEscape from '@/components/common/in-app-browser-escape';
 import { APP_UPDATE_PROMPT } from '@/consts/appUpdate';
 import { SCROLL_CONTAINER_ID } from '@/consts/layout';
 import { getAppVersion, isAppVersionSupported } from '@/utils/appVersion';
+import { getLandingEnv, shouldEscapeInAppBrowser } from '@/utils/landingEnv';
 import { getQueryClient } from '@/utils/queryClient';
+import { getServiceOrigin } from '@/utils/serviceHost';
 import { isWebview as _isWebView } from '@/utils/webBridge';
 
 import Providers from '../components/Providers';
@@ -50,6 +53,10 @@ async function RootLayout({
 
   const shouldUpdateApp =
     isWebview && !isAppVersionSupported(getAppVersion(userAgent), APP_UPDATE_PROMPT.targetVersion);
+
+  /** 유저가 어떤 기기, 어떤 브라우저로 페이지에 도착했는지 UA 확인 */
+  const landingEnv = getLandingEnv(userAgent);
+  const shouldEscape = shouldEscapeInAppBrowser(landingEnv, isWebview);
 
   return (
     <html
@@ -94,6 +101,12 @@ async function RootLayout({
           <BottomTabBar />
 
           {shouldUpdateApp && <AppUpdateDialog />}
+          {shouldEscape && (
+            <InAppBrowserEscape
+              landingEnv={landingEnv}
+              serviceOrigin={getServiceOrigin(headerStore)}
+            />
+          )}
         </Providers>
         {/**
          * GA4 web stream — 일반 브라우저 사용자 추적용.
