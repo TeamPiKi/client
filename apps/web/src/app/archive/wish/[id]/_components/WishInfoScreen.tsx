@@ -34,8 +34,8 @@ function WishInfoScreen({ wishId }: WishInfoScreenProps) {
       item={{
         status: wishItem.status,
         imageUrl: wishItem.imageUrl,
-        name: wishItem.name ?? '',
-        price: wishItem.price ?? 0,
+        name: wishItem.name,
+        price: wishItem.price,
         sourceUrl: wishItem.sourceUrl,
         sourcePlatform: wishItem.sourcePlatform,
       }}
