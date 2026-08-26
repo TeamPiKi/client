@@ -24,6 +24,8 @@ export const useWebviewCookieSync = (isWebviewReady: boolean) => {
   /** 부팅 동기화 진행 단계 — 타임아웃 시 어느 await 에서 멈췄는지 Sentry 태그로 보고 */
   const stepRef = useRef('warmup');
   const isSettledRef = useRef(false);
+  /** 타임아웃 뒤 늦게 재개된 sync 가 사용자의 새 로그인 세션을 덮어쓰지 않도록 변경 작업을 차단 */
+  const isAbortedRef = useRef(false);
 
   const settle = useCallback(() => {
     isSettledRef.current = true;
@@ -39,6 +41,7 @@ export const useWebviewCookieSync = (isWebviewReady: boolean) => {
         tags: { source: 'cookie-sync', step: stepRef.current },
         extra: { timeoutMs: BOOT_SYNC_TIMEOUT_MS },
       });
+      isAbortedRef.current = true;
       settle();
     }, BOOT_SYNC_TIMEOUT_MS);
 
@@ -65,6 +68,7 @@ export const useWebviewCookieSync = (isWebviewReady: boolean) => {
       const cookies = await CookieManager.get(WEB_URL, useWebKit);
       const cookieAccessToken = cookies['access_token']?.value ?? null;
       const cookieRefreshToken = cookies['refresh_token']?.value ?? null;
+      if (isAbortedRef.current) return;
 
       if (
         cookieAccessToken &&
@@ -82,12 +86,14 @@ export const useWebviewCookieSync = (isWebviewReady: boolean) => {
         try {
           stepRef.current = 'refresh';
           const refreshResponse = await postTokenRefresh(refreshToken);
+          if (isAbortedRef.current) return;
 
           if (refreshResponse.ok) {
             stepRef.current = 'parse-refresh';
             const refreshBody = (await refreshResponse.json()) as {
               data: { accessToken: string; refreshToken: string };
             };
+            if (isAbortedRef.current) return;
             accessToken = refreshBody.data.accessToken;
             refreshToken = refreshBody.data.refreshToken;
             await TokenStorage.setTokens(accessToken, refreshToken);
@@ -115,6 +121,7 @@ export const useWebviewCookieSync = (isWebviewReady: boolean) => {
       };
 
       /** 앱 진입 시 유효한 최신 토큰을 웹뷰 쿠키에 주입 */
+      if (isAbortedRef.current) return;
       stepRef.current = 'set-cookie';
       if (accessToken) await setAuthCookie('access_token', accessToken);
       if (refreshToken) await setAuthCookie('refresh_token', refreshToken);
