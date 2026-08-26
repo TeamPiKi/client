@@ -8,10 +8,8 @@ export type ItemInfoT = {
   name: string | null;
   /** FAILED·INCOMPLETE 는 가격을 못 가져올 수 있다 */
   price: number | null;
-  /** 링크로 담은 경우에만 존재 — 이미지 위 원본 링크 칩 */
+  /** 링크로 담은 경우에만 존재 — 이미지 위 원본 링크 칩 (라벨은 hostname) */
   sourceUrl: string | null;
-  /** 원본 링크 칩 라벨 — 없으면 hostname으로 대체 */
-  sourcePlatform: string | null;
 };
 
 /** 조회 화면을 그릴 수 있는 상품 — 이미지·상품명·가격이 보장된다 */
