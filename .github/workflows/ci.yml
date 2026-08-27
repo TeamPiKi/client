@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   ci:
-    name: Lint, Type Check, Unit Test
+    name: Lint, Type Check
     runs-on: ubuntu-latest
 
     steps:
