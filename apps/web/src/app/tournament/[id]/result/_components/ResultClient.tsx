@@ -63,8 +63,6 @@ function ResultClient({ tournamentId, isGuest = false, isApp = false }: ResultCl
   const result = tournamentData.completed.result;
   // 플레이 링크 공유는 ROOT 의 소유자만 가능 — CLONE 소유자(친구 초대 → CLONE 생성한 사람) 제외
   const canSharePlayLink = tournamentData.isRoot && tournamentData.isOwner;
-  // 그룹 결과는 원본(ROOT) 단위로 집계된다. CLONE 에서 보고 있으면 원본 id 로 조회해야 한다.
-  const groupResultTournamentId = tournamentData.sourceTournamentId ?? tournamentId;
 
   const handleSharePlayLink = () => {
     setIsShareDialogOpen(true);
@@ -92,9 +90,10 @@ function ResultClient({ tournamentId, isGuest = false, isApp = false }: ResultCl
         )}
 
         {/* 전체 결과 보기 — 소셜 토너먼트면 주최자·참여자·게스트 모두에게 항상 노출 */}
+        {/* URL은 현재 토너먼트 ID로 설정 - sourceTournament 이동은 그룹 결과 페이지 내부에서 처리 */}
         {tournamentData.completed.isGroupTournament && (
           <div className="mx-5">
-            <GroupResultEntryCard tournamentId={groupResultTournamentId} />
+            <GroupResultEntryCard tournamentId={tournamentId} />
           </div>
         )}
       </div>
@@ -138,7 +137,6 @@ function ResultClient({ tournamentId, isGuest = false, isApp = false }: ResultCl
         open={isShareDialogOpen}
         onOpenChange={setIsShareDialogOpen}
         tournamentId={tournamentId}
-        initialPlayLinkExpiresAt={tournamentData.completed.playLinkExpiresAt}
       />
 
       <ReceiptShareDialog
