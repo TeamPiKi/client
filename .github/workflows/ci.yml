@@ -45,6 +45,9 @@ jobs:
       - name: Type Check
         run: pnpm check-types
 
+      - name: Unit Test
+        run: pnpm test
+
   e2e:
     name: E2E (Playwright)
     runs-on: ubuntu-latest

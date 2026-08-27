@@ -8,6 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "check-types": "next typegen && tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui"
   },
@@ -46,6 +48,7 @@
     "react-grab": "0.1.29",
     "shadcn": "^4.10.0",
     "tailwindcss": "^4.2.2",
-    "typescript": "5.9.2"
+    "typescript": "5.9.2",
+    "vitest": "^4.1.11"
   }
 }
