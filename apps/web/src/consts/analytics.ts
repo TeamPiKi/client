@@ -41,7 +41,7 @@ export const ANALYTICS_EVENT = {
   APP_UPDATE_PROMPT_CLICK: 'app_update_prompt_click',
   APP_UPDATE_PROMPT_DISMISS: 'app_update_prompt_dismiss',
 
-  /** 외부 유입 랜딩 (인스타 프로필 링크) — 인스타는 리퍼러를 안 넘겨 utm_source 로만 잡힌다 */
+  /** 인앱 브라우저 탈출 — source(kakao|instagram|threads)·path 파라미터 */
   LANDING_VIEW: 'landing_view',
   LANDING_APP_OPEN: 'landing_app_open',
   LANDING_STORE_OPEN: 'landing_store_open',

@@ -3,9 +3,11 @@ import type { ItemTypeT } from '@/types/item';
 
 import type { ItemInfoT, ReadyItemInfoT } from './itemInfoScreen.type';
 
-/** READY 응답은 이미지를 항상 포함하므로, imageUrl 검사는 타입을 좁히기 위한 것이다 */
 export const isReadyItemInfo = (item: ItemInfoT): item is ReadyItemInfoT =>
-  item.status === ITEM_STATUS.READY && item.imageUrl !== null;
+  item.status === ITEM_STATUS.READY &&
+  item.imageUrl !== null &&
+  item.name !== null &&
+  item.price !== null;
 
 type ItemInfoScreenConfigT = {
   viewTitle: string;

@@ -8,7 +8,7 @@ import Button from '@/components/button';
 import Input from '@/components/input';
 import Spacing from '@/components/spacing';
 import { ITEM_STATUS } from '@/consts/item';
-import type { PatchItemRequestT } from '@/types/item';
+import type { ItemStatusT, PatchItemRequestT } from '@/types/item';
 import formatPrice from '@/utils/formatPrice';
 import parsePriceToNumber from '@/utils/parsePriceToNumber';
 
@@ -21,17 +21,28 @@ type ItemEditFormProps = {
   isSavePending?: boolean;
 };
 
-/** 상품 정보를 직접 입력·수정하는 폼 — FAILED 진입과 READY 의 "상품 정보 수정"이 공유한다 */
+/** 상태별 상단 안내 배너 문구 */
+const EDIT_BANNER_MESSAGE: Partial<Record<ItemStatusT, string>> = {
+  [ITEM_STATUS.FAILED]: '상품 정보를 가져오는데 실패했어요. 직접 입력해주세요.',
+  [ITEM_STATUS.INCOMPLETE]: '일부 정보만 찾았어요. 조금만 더 채우면 등록이 끝나요.',
+};
+
+/**
+ * 상품 정보를 직접 입력·수정하는 폼
+ */
 function ItemEditForm({ item, onSave, isSavePending = false }: ItemEditFormProps) {
-  const [name, setName] = useState(item.name);
-  const [price, setPrice] = useState(item.price ? formatPrice(String(item.price)) : '');
+  const initialName = item.name?.trim() ?? '';
+  const initialPrice = item.price ?? 0;
+
+  const [name, setName] = useState(item.name ?? '');
+  const [price, setPrice] = useState(initialPrice ? formatPrice(String(initialPrice)) : '');
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
 
   const trimmedName = name.trim();
   const parsedPrice = parsePriceToNumber(price);
 
-  const isNameChanged = trimmedName !== item.name.trim();
-  const isPriceChanged = parsedPrice !== item.price;
+  const isNameChanged = trimmedName !== initialName;
+  const isPriceChanged = parsedPrice !== initialPrice;
 
   const hasImage = item.imageUrl !== null || selectedImage !== null;
   const isChanged = isNameChanged || isPriceChanged || selectedImage !== null;
@@ -41,6 +52,8 @@ function ItemEditForm({ item, onSave, isSavePending = false }: ItemEditFormProps
    * - 이미지, 상품명, 가격 필드가 모두 채워져 있어야 함
    */
   const isSavable = isChanged && hasImage && trimmedName.length > 0 && parsedPrice > 0;
+
+  const bannerMessage = EDIT_BANNER_MESSAGE[item.status];
 
   const handleSave = () => {
     onSave({
@@ -52,19 +65,17 @@ function ItemEditForm({ item, onSave, isSavePending = false }: ItemEditFormProps
 
   return (
     <>
-      {item.status === ITEM_STATUS.FAILED && (
+      {bannerMessage && (
         <div className="mt-4 flex items-center gap-2 rounded-xl bg-bg-warning p-3">
           <WarningIconFill className="size-5 shrink-0 text-icon-warning" />
-          <span className="body-2-regular text-text-warning">
-            상품 정보를 가져오는데 실패했어요. 직접 입력해주세요.
-          </span>
+          <span className="body-2-regular text-text-warning">{bannerMessage}</span>
         </div>
       )}
 
       <ItemImagePicker
         imageUrl={item.imageUrl}
         onImageSelect={setSelectedImage}
-        className={item.status === ITEM_STATUS.FAILED ? 'mt-4' : 'mt-5'}
+        className={bannerMessage ? 'mt-4' : 'mt-5'}
       />
 
       <Spacing size={16} />
