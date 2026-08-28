@@ -13,7 +13,8 @@ export type ItemT = {
   sourcePlatform: string | null;
 };
 
-export type ItemStatusT = (typeof ITEM_STATUS)[keyof typeof ITEM_STATUS];
+export type ItemStatusT<K extends keyof typeof ITEM_STATUS = keyof typeof ITEM_STATUS> =
+  (typeof ITEM_STATUS)[K];
 
 export type PatchItemRequestT = {
   name?: string;

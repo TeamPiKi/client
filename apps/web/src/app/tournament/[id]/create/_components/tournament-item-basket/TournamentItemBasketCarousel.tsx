@@ -7,7 +7,7 @@ import { Carousel, type CarouselApi, CarouselContent, CarouselItem } from '@/com
 import useContainerHeight from '@/hooks/useContainerHeight';
 import { cn } from '@/utils/cn';
 
-import type { TournamentPendingItemT } from '../../../_common/_types/tournamentResponse';
+import type { PendingTournamentItemT } from '../../../_common/_types/tournamentResponse';
 import {
   BASKET_CAROUSEL_SLIDE_SIZE_PERCENT,
   BASKET_STACK_GAP,
@@ -17,7 +17,7 @@ import { getActiveBasketCount, getBasketIndexForLastItem } from '../../_utils/to
 import TournamentItemBasket from './TournamentItemBasket';
 
 type TournamentItemBasketCarouselProps = {
-  items?: TournamentPendingItemT[];
+  items?: PendingTournamentItemT[];
   scrollToLast?: boolean;
   /** 위시 담기 등 재진입 시점의 기존 아이템 개수 */
   previousItemCount?: number | null;

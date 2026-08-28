@@ -17,8 +17,6 @@ type PlateShareDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   tournamentId: number;
-  /** 서버 응답의 playLinkExpiresAt — 아직 생성 전이면 undefined */
-  initialPlayLinkExpiresAt?: string;
 };
 
 const buildPlayLinkUrl = (tournamentId: number) => {
@@ -27,25 +25,20 @@ const buildPlayLinkUrl = (tournamentId: number) => {
   return `${window.location.origin}${path}`;
 };
 
-function PlateShareDialog({
-  open,
-  onOpenChange,
-  tournamentId,
-  initialPlayLinkExpiresAt,
-}: PlateShareDialogProps) {
+function PlateShareDialog({ open, onOpenChange, tournamentId }: PlateShareDialogProps) {
   const { postPlayLinkMutation, isPostPlayLinkPending } = usePostPlayLink(tournamentId);
 
-  // 이미 만들어진 플레이 링크가 있으면 mutation 건너뛰고 바로 공유한다.
-  const hasExistingPlayLink = Boolean(initialPlayLinkExpiresAt);
-
   const handleSendPlayLink = async () => {
-    if (!hasExistingPlayLink) {
-      try {
-        await postPlayLinkMutation();
-      } catch {
-        /** 안내는 usePostPlayLink 훅 레벨 onError 가 담당 — 여기선 공유 플로우만 중단 */
-        return;
-      }
+    /**
+     * 생성 API 가 멱등하므로 상태를 따지지 않고 항상 호출한다.
+     * 미생성이면 만들고, 만료됐으면 새로 발급하고, 살아 있으면 기존 만료시각을 그대로 준다.
+     * 클라가 만료 여부를 판단하려 들면 죽은 링크를 그대로 공유하게 된다.
+     */
+    try {
+      await postPlayLinkMutation();
+    } catch {
+      /** 안내는 usePostPlayLink 훅 레벨 onError 가 담당 — 여기선 공유 플로우만 중단 */
+      return;
     }
 
     const result = await share({

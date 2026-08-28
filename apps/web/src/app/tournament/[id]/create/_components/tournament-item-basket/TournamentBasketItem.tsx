@@ -1,41 +1,30 @@
 import Image from 'next/image';
 
-import ProductImage from '@/app/tournament/[id]/create/_components/product-image';
 import { Z_INDEX } from '@/consts/zIndex';
 import { useGetMe } from '@/hooks/useGetMe';
-import { cn } from '@/utils/cn';
 
-import type { TournamentPendingItemT } from '../../../_common/_types/tournamentResponse';
+import type { PendingTournamentItemT } from '../../../_common/_types/tournamentResponse';
+import ProductImage from './ProductImage';
 
 type TournamentBasketItemProps = {
-  item: TournamentPendingItemT;
+  item: PendingTournamentItemT;
   index: number;
-  onClick?: () => void;
   participantImageMap?: Map<string, string>;
 };
 
-function TournamentBasketItem({
-  item,
-  index,
-  onClick,
-  participantImageMap,
-}: TournamentBasketItemProps) {
+/** 바스켓 타일 — 순수 표시용. 클릭 동작은 감싸는 Link·button 이 담당한다 */
+function TournamentBasketItem({ item, index, participantImageMap }: TournamentBasketItemProps) {
   const { userData } = useGetMe();
   const friendImageUrl =
     item.userId && item.userId !== userData.id ? participantImageMap?.get(item.userId) : null;
 
   return (
-    <div
-      className={cn('relative aspect-square w-full', onClick && 'cursor-pointer')}
-      onClick={onClick}
-    >
+    <div className="relative aspect-square w-full">
       <div className="absolute inset-0 overflow-hidden rounded-2xl">
         <ProductImage
           {...(item.imageUrl ? { src: item.imageUrl } : {})}
-          size="sm"
-          fill
           alt={`토너먼트 아이템 ${index + 1}`}
-          parsingStatus={item.status}
+          status={item.status}
         />
       </div>
       {friendImageUrl && (

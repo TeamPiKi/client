@@ -137,7 +137,6 @@ function ResultClient({ tournamentId, isGuest = false, isApp = false }: ResultCl
         open={isShareDialogOpen}
         onOpenChange={setIsShareDialogOpen}
         tournamentId={tournamentId}
-        initialPlayLinkExpiresAt={tournamentData.completed.playLinkExpiresAt}
       />
 
       <ReceiptShareDialog

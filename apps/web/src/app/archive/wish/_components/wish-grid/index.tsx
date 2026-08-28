@@ -9,9 +9,6 @@ import { Z_INDEX } from '@/consts/zIndex';
 import type { GetWishlistResponseT } from '@/types/wish';
 import { SCROLL_NAMESPACE, saveScrollAnchor } from '@/utils/scrollRestoration';
 
-import WishFailedCard from './WishFailedCard';
-import WishProcessingCard from './WishProcessingCard';
-
 type WishGridProps = {
   items: GetWishlistResponseT[];
   isDeleteMode?: boolean;
@@ -30,27 +27,23 @@ function WishGrid({ items, isDeleteMode = false, selectedIds, onToggleSelect }: 
   return (
     <div className="grid grid-cols-2">
       {items.map(({ wish, item }, index) => {
-        if (item.status === ITEM_STATUS.FAILED || item.status === ITEM_STATUS.INCOMPLETE)
-          return (
-            <Link
-              href={ROUTES.WISH_EDIT(wish.id)}
-              key={wish.id}
-              data-scroll-anchor-id={wish.id}
-              onClick={event => handleCardClick(event, wish.id)}
-            >
-              <WishFailedCard
-                message={
-                  item.status === ITEM_STATUS.INCOMPLETE
-                    ? '일부만 가져왔어요'
-                    : '가져오는데 실패했어요'
-                }
-              />
-            </Link>
-          );
-        else if (item.status === ITEM_STATUS.PENDING || item.status === ITEM_STATUS.PROCESSING)
-          return <WishProcessingCard key={wish.id} />;
+        const card = (
+          <WishCard
+            status={item.status}
+            name={item.name}
+            price={item.price}
+            imageUrl={item.imageUrl}
+            sourcePlatform={item.sourcePlatform}
+            preload={index < 4}
+          />
+        );
 
-        if (isDeleteMode) {
+        /** 파싱 중인 위시는 진입할 곳이 없다 */
+        if (item.status === ITEM_STATUS.PENDING || item.status === ITEM_STATUS.PROCESSING)
+          return <div key={wish.id}>{card}</div>;
+
+        /** 삭제 모드는 READY 만 선택 가능 */
+        if (isDeleteMode && item.status === ITEM_STATUS.READY) {
           const isSelected = selectedIds?.has(wish.id) ?? false;
           return (
             <button
@@ -60,12 +53,7 @@ function WishGrid({ items, isDeleteMode = false, selectedIds, onToggleSelect }: 
               aria-pressed={isSelected}
               className="relative cursor-pointer text-left transition-opacity active:opacity-80"
             >
-              <WishCard
-                name={item.name}
-                price={item.price}
-                imageUrl={item.imageUrl}
-                sourcePlatform={item.sourcePlatform}
-              />
+              {card}
               <div
                 style={{ zIndex: Z_INDEX.BASE_IMAGE + 1 }}
                 className={`pointer-events-none absolute top-0 right-0 left-0 aspect-[201/166] bg-black/20 transition-opacity duration-200 ${isSelected ? 'opacity-100' : 'opacity-0'}`}
@@ -91,13 +79,7 @@ function WishGrid({ items, isDeleteMode = false, selectedIds, onToggleSelect }: 
             data-scroll-anchor-id={wish.id}
             onClick={event => handleCardClick(event, wish.id)}
           >
-            <WishCard
-              name={item.name}
-              price={item.price}
-              imageUrl={item.imageUrl}
-              sourcePlatform={item.sourcePlatform}
-              preload={index < 4}
-            />
+            {card}
           </Link>
         );
       })}
