@@ -117,6 +117,7 @@ export const ERROR_MESSAGE_MAP = {
   'STORAGE-002': '이미지 업로드 URL 을 발급하지 못했어요. 잠시 후 다시 시도해 주세요.',
   'STORAGE-003': '이미지 업로드 상태를 확인하지 못했어요. 잠시 후 다시 시도해 주세요.',
   'STORAGE-004': '이미지를 삭제하지 못했어요. 잠시 후 다시 시도해 주세요.',
+  'STORAGE-005': '이미지를 불러오지 못했어요. 잠시 후 다시 시도해 주세요.',
 
   /** UPLOAD */
   'UPLOAD-001': '올바르지 않은 이미지 업로드 정보예요. 업로드를 다시 시도해 주세요.',
@@ -250,6 +251,7 @@ export const ERROR_CODE = {
   STORAGE_PRESIGN_FAILED: 'STORAGE-002',
   STORAGE_EXISTS_CHECK_FAILED: 'STORAGE-003',
   STORAGE_DELETE_FAILED: 'STORAGE-004',
+  STORAGE_LOAD_FAILED: 'STORAGE-005',
 
   /** 이미지 업로드 */
   UPLOAD_INVALID_KEY: 'UPLOAD-001',
