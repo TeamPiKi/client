@@ -1,11 +1,10 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
+import { patchMe } from '@/apis/patchMe';
 import { QUERY_KEYS } from '@/consts/queryKeys';
 import { isGlobalNetError } from '@/utils/apiError';
 import { getApiErrorMessage } from '@/utils/getApiErrorMessage';
-
-import { patchMe } from '../_apis/patchMe';
 
 export const usePatchMe = () => {
   const queryClient = useQueryClient();
