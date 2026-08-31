@@ -49,9 +49,7 @@
 
 ### C. 클라 사전검증 부재
 
-| 위치                  | 문제                                              |
-| --------------------- | ------------------------------------------------- |
-| `PATCH /users/me` 413 | 업로드 전 용량 체크 없이 서버 413 토스트에만 의존 |
+> 해소됨 — `PATCH /users/me` 413 은 presigned 직접 업로드 전환으로 status 자체가 사라졌고, `useImagePicker` 가 5MB 사전검증을 유지한다(웹뷰 base64 브릿지·크롭 canvas 메모리 보호 목적).
 
 ### D. 미구현·Dead code
 
@@ -329,13 +327,24 @@
 - 401: ✅ 전역
 - 403 / 404: ✅ 카탈로그 문구 토스트 (`USER-007` 게스트 탈퇴 불가 등) + dialog 닫힘
 
-### PATCH /api/v1/users/me (정보 수정) · 200, 400, 401, 403, 404, 409, 413, 502
+### POST /api/v1/users/me/profile-image (presigned URL 발급) · 200, 400, 401, 403, 502
+
+- 200: ✅ `{ imageKey, uploadUrl, contentType }` 단건 flat 응답 — S3 직접 PUT 후 `PATCH /users/me` 로 imageKey 확정
+- 400: ✅ 카탈로그 문구 토스트 (미지원 contentType 등)
+- 401: ✅ 전역
+- 403: ✅ `USER-008`(게스트) 카탈로그 문구 토스트 — 버튼 자체를 MEMBER 조건으로 가려 1차 방어
+- 502: ✅ `STORAGE-00x` 전역 (`isGlobalNetError`)
+- uploadUrl 만료 5분 · 미확정 원본은 하루 뒤 서버가 자동 삭제
+- S3 PUT 실패(`S3UploadError`)도 전역이 처리
+
+### PATCH /api/v1/users/me (정보 수정) · 200, 400, 401, 403, 404, 409, 502
 
 - 200: ✅ `['me']` invalidate + `router.replace(MYPAGE)`
-- 400 / 403 / 404: ✅ 카탈로그 문구 토스트
+- 400: ✅ 카탈로그 문구 토스트 — 닉네임 형식 오류 · `USER-009/010/011`(빈 파일·미지원 형식·형식/내용 불일치) · `UPLOAD-001/002`(발급 안 된 key·미업로드 key)
+- 403 / 404: ✅ 카탈로그 문구 토스트 (`USER-008` 게스트 imageKey 요청 등)
 - 401: ✅ 전역
 - 409: ✅ `USER-004`(닉네임 중복)는 `GET /users/nickname/check` 사전검증이 1차 — 경합 시 토스트 / `USER-003` 은 인터셉터가 세션 정리
-- 413(이미지 용량 초과): ⚠️ **클라 사전 용량검증 없음** — 서버 413 토스트에만 의존
+- 413: **사라짐** — 이미지 바이트가 서버를 거치지 않는다 (presigned 직접 업로드)
 - 502: ✅ 전역 `MutationCache.onError` 단독 처리 (로컬은 401·5xx 위임 → 중복 해소)
 
 ### GET /api/v1/users/nickname/check · 200, 400, 401
