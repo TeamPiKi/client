@@ -45,26 +45,40 @@ function ProfileImageField({ userIdentityType, profileImage, onImageSelect }: Pr
   return (
     <>
       <div className="relative mx-auto size-[90px]">
-        <div className="relative size-[90px] overflow-hidden rounded-full">
-          <BaseImage
-            src={displayUrl}
-            alt="프로필 이미지"
-            sizes="90px"
-            className="object-cover"
-            loadingFallback={<Skeleton shape="circle" className="absolute inset-0" />}
-          />
-        </div>
-        {userIdentityType === 'MEMBER' && (
+        {userIdentityType === 'MEMBER' ? (
           <button
             type="button"
             onClick={openPicker}
             disabled={isPending}
             aria-label="프로필 이미지 변경"
-            className="absolute top-[54.5px] left-[59px] flex size-10 shrink-0 cursor-pointer items-center justify-center rounded-full bg-bg-layer-default"
-            style={{ zIndex: Z_INDEX.BASE_IMAGE + 1 }}
+            className="relative size-[90px] cursor-pointer"
           >
-            <CameraIconFill className="size-6 shrink-0 text-icon-neutral-secondary" />
+            <span className="relative block size-[90px] overflow-hidden rounded-full">
+              <BaseImage
+                src={displayUrl}
+                alt="프로필 이미지"
+                sizes="90px"
+                className="object-cover"
+                loadingFallback={<Skeleton shape="circle" className="absolute inset-0" />}
+              />
+            </span>
+            <span
+              className="absolute top-[54.5px] left-[59px] flex size-10 shrink-0 items-center justify-center rounded-full bg-bg-layer-default"
+              style={{ zIndex: Z_INDEX.BASE_IMAGE + 1 }}
+            >
+              <CameraIconFill className="size-6 shrink-0 text-icon-neutral-secondary" />
+            </span>
           </button>
+        ) : (
+          <div className="relative size-[90px] overflow-hidden rounded-full">
+            <BaseImage
+              src={displayUrl}
+              alt="프로필 이미지"
+              sizes="90px"
+              className="object-cover"
+              loadingFallback={<Skeleton shape="circle" className="absolute inset-0" />}
+            />
+          </div>
         )}
       </div>
 
