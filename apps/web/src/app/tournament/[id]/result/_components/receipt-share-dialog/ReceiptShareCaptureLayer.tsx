@@ -13,9 +13,6 @@ const RECEIPT_RENDER_WIDTH_PX = RECEIPT_PAPER_WIDTH_PX / RECEIPT_ZOOM;
 /** 이 높이를 넘길 때만 배율을 낮춘다 — 시안의 상품 4개 기준 종이 높이 */
 const RECEIPT_MAX_HEIGHT_PX = 772;
 
-/** ReceiptPaper 하단 물결(h-4.5). absolute 라 종이 높이에 안 잡힌다 */
-const RECEIPT_ZIGZAG_HEIGHT_PX = 18;
-
 /** 공유 이미지 전용 상품명 크기 — 화면 영수증은 읽기 크기를 유지한다 */
 const SHARE_PRODUCT_NAME_FONT_SIZE_PX = 12.2;
 const SHARE_PRODUCT_NAME_LINE_HEIGHT_PX = 17.4;
@@ -31,7 +28,6 @@ const ReceiptShareCaptureLayer = forwardRef<HTMLDivElement, ReceiptShareCaptureL
   function ReceiptShareCaptureLayer({ tournamentId, tournamentName, result, date }, ref) {
     const paperRef = useRef<HTMLDivElement>(null);
     const zoomRef = useRef<HTMLDivElement>(null);
-    const logoAreaRef = useRef<HTMLDivElement>(null);
 
     /**
      * 배율을 낮추면 레이아웃 폭이 넓어져 긴 상품명의 줄바꿈이 달라지고, 그러면 높이가 다시
@@ -69,16 +65,14 @@ const ReceiptShareCaptureLayer = forwardRef<HTMLDivElement, ReceiptShareCaptureL
       const fitZoom = best || candidate;
       zoomWrap.style.zoom = String(fitZoom);
       zoomWrap.style.width = `${RECEIPT_PAPER_WIDTH_PX / fitZoom}px`;
-
-      /** 물결 높이를 여백으로 되돌려야 로고가 물결 끝 기준으로 가운데 온다 */
-      if (logoAreaRef.current) {
-        logoAreaRef.current.style.paddingTop = `${RECEIPT_ZIGZAG_HEIGHT_PX * fitZoom}px`;
-      }
     }, [result, tournamentName, date]);
 
     return (
       <div aria-hidden className="pointer-events-none fixed top-0 -left-250">
-        <div ref={ref} className="flex h-240 w-135 flex-col items-center bg-sky-blue-200 pt-27.75">
+        <div
+          ref={ref}
+          className="flex h-240 w-135 flex-col items-center justify-between bg-sky-blue-200 pt-16 pb-11.25"
+        >
           <div className="flex w-92.5 items-center justify-center">
             <div ref={zoomRef} style={{ zoom: RECEIPT_ZOOM, width: RECEIPT_RENDER_WIDTH_PX }}>
               <div ref={paperRef}>
@@ -92,10 +86,7 @@ const ReceiptShareCaptureLayer = forwardRef<HTMLDivElement, ReceiptShareCaptureL
             </div>
           </div>
 
-          {/* 종이 아래 남는 공간의 한가운데에 로고를 둔다 */}
-          <div ref={logoAreaRef} className="flex flex-1 items-center justify-center">
-            <PikiLogoCart aria-hidden className="h-8 w-11 shrink-0 text-white" />
-          </div>
+          <PikiLogoCart aria-hidden className="h-8 w-11 shrink-0 text-white" />
         </div>
       </div>
     );
