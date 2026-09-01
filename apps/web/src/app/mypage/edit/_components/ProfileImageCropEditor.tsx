@@ -33,14 +33,20 @@ function ProfileImageCropEditor({ imageSrc, onCancel, onConfirm }: ProfileImageC
   const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
 
+  // 처리 중 취소를 막는다 — 에디터가 먼저 닫히면 뒤늦게 완료된 onConfirm 이 취소한 이미지를 적용해버린다
+  const handleCancel = () => {
+    if (isProcessing) return;
+    onCancel();
+  };
+
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') onCancel();
+      if (event.key === 'Escape' && !isProcessing) onCancel();
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [onCancel]);
+  }, [onCancel, isProcessing]);
 
   const handleRotate = () => setRotation(prev => (prev + ROTATION_STEP_DEGREE) % 360);
 
@@ -72,7 +78,7 @@ function ProfileImageCropEditor({ imageSrc, onCancel, onConfirm }: ProfileImageC
     >
       <div className="px-5">
         <Header
-          left={<HeaderIcon name="BACK" className="size-7.5" onClick={onCancel} />}
+          left={<HeaderIcon name="BACK" className="size-7.5" onClick={handleCancel} />}
           center={<h1 className="heading-1-bold text-text-neutral-primary">프로필 이미지 편집</h1>}
         />
       </div>
