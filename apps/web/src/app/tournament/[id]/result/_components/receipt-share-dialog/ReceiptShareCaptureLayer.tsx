@@ -13,6 +13,9 @@ const RECEIPT_RENDER_WIDTH_PX = RECEIPT_PAPER_WIDTH_PX / RECEIPT_ZOOM;
 /** 이 높이를 넘길 때만 배율을 낮춘다 — 로고 위까지 남는 공간 */
 const RECEIPT_MAX_HEIGHT_PX = 750;
 
+/** 종이가 짧을 때 시안처럼 아래로 내려오는 기본 여백. 길어지면 이만큼까지 잠식한다 */
+const RECEIPT_TOP_OFFSET_PX = 65;
+
 /** 공유 이미지 전용 상품명 크기 — 화면 영수증은 읽기 크기를 유지한다 */
 const SHARE_PRODUCT_NAME_FONT_SIZE_PX = 12.2;
 const SHARE_PRODUCT_NAME_LINE_HEIGHT_PX = 17.4;
@@ -28,6 +31,7 @@ const ReceiptShareCaptureLayer = forwardRef<HTMLDivElement, ReceiptShareCaptureL
   function ReceiptShareCaptureLayer({ tournamentId, tournamentName, result, date }, ref) {
     const paperRef = useRef<HTMLDivElement>(null);
     const zoomRef = useRef<HTMLDivElement>(null);
+    const paperAreaRef = useRef<HTMLDivElement>(null);
 
     /**
      * 배율을 낮추면 레이아웃 폭이 넓어져 긴 상품명의 줄바꿈이 달라지고, 그러면 높이가 다시
@@ -65,6 +69,13 @@ const ReceiptShareCaptureLayer = forwardRef<HTMLDivElement, ReceiptShareCaptureL
       const fitZoom = best || candidate;
       zoomWrap.style.zoom = String(fitZoom);
       zoomWrap.style.width = `${RECEIPT_PAPER_WIDTH_PX / fitZoom}px`;
+
+      /** 남는 만큼만 내린다 — 종이가 길면 여백이 0 이 되어 시안처럼 위로 붙는다 */
+      const spare = RECEIPT_MAX_HEIGHT_PX - paper.scrollHeight * fitZoom;
+      paperAreaRef.current?.style.setProperty(
+        'padding-top',
+        `${Math.max(0, Math.min(RECEIPT_TOP_OFFSET_PX, spare))}px`
+      );
     }, [result, tournamentName, date]);
 
     return (
@@ -73,7 +84,8 @@ const ReceiptShareCaptureLayer = forwardRef<HTMLDivElement, ReceiptShareCaptureL
           ref={ref}
           className="flex h-240 w-135 flex-col items-center justify-between bg-sky-blue-200 pt-21.75 pb-11.25"
         >
-          <div className="flex w-92.5 items-center justify-center">
+          {/* 종이가 짧으면 시안처럼 내려오고, 길어지면 이 여백을 잠식한다 */}
+          <div ref={paperAreaRef} className="flex w-92.5 items-center justify-center">
             <div ref={zoomRef} style={{ zoom: RECEIPT_ZOOM, width: RECEIPT_RENDER_WIDTH_PX }}>
               <div ref={paperRef}>
                 <ReceiptPaper
