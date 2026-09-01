@@ -10,8 +10,8 @@ const RECEIPT_PAPER_WIDTH_PX = 370;
 const RECEIPT_ZOOM = 1.42;
 const RECEIPT_RENDER_WIDTH_PX = RECEIPT_PAPER_WIDTH_PX / RECEIPT_ZOOM;
 
-/** 이 높이를 넘길 때만 배율을 낮춘다 — 시안의 상품 4개 기준 종이 높이 */
-const RECEIPT_MAX_HEIGHT_PX = 772;
+/** 이 높이를 넘길 때만 배율을 낮춘다 — 로고 위까지 남는 공간 */
+const RECEIPT_MAX_HEIGHT_PX = 750;
 
 /** 공유 이미지 전용 상품명 크기 — 화면 영수증은 읽기 크기를 유지한다 */
 const SHARE_PRODUCT_NAME_FONT_SIZE_PX = 12.2;
@@ -71,7 +71,7 @@ const ReceiptShareCaptureLayer = forwardRef<HTMLDivElement, ReceiptShareCaptureL
       <div aria-hidden className="pointer-events-none fixed top-0 -left-250">
         <div
           ref={ref}
-          className="flex h-240 w-135 flex-col items-center justify-between bg-sky-blue-200 pt-16 pb-11.25"
+          className="flex h-240 w-135 flex-col items-center justify-between bg-sky-blue-200 pt-21.75 pb-11.25"
         >
           <div className="flex w-92.5 items-center justify-center">
             <div ref={zoomRef} style={{ zoom: RECEIPT_ZOOM, width: RECEIPT_RENDER_WIDTH_PX }}>
