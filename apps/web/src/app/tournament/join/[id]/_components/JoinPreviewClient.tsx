@@ -3,7 +3,6 @@
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-import { usePatchMe } from '@/app/mypage/edit/_hooks/usePatchMe';
 import { EditIconFill } from '@/assets/icons/fill';
 import Button from '@/components/button';
 import JoinErrorDialog from '@/components/common/join-error-dialog';
@@ -16,6 +15,7 @@ import { ROUTES } from '@/consts/route';
 import { useGetMe } from '@/hooks/useGetMe';
 import { useNicknameValidation } from '@/hooks/useNicknameValidation';
 import { usePageBackground } from '@/hooks/usePageBackground';
+import { usePatchMe } from '@/hooks/usePatchMe';
 import type { GetInvitePreviewResponseT } from '@/types/tournament';
 
 import { usePostJoin } from '../../_hooks/usePostJoin';
