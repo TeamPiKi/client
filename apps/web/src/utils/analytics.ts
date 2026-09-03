@@ -6,7 +6,10 @@ import type { AnalyticsEventNameT } from '@/consts/analytics';
 import { WebBridge, isWebview } from './webBridge';
 
 /** `@next/third-parties/google` 의 GoogleAnalytics 가 주입하는 전역 gtag 함수 */
-type GtagT = (command: 'event', name: string, params?: AnalyticsEventParamsT) => void;
+type GtagT = {
+  (command: 'event', name: string, params?: AnalyticsEventParamsT): void;
+  (command: 'set', target: 'user_properties', params: AnalyticsEventParamsT): void;
+};
 
 /**
  * GA4 이벤트 로깅 — 환경별로 분기한다.
@@ -26,10 +29,7 @@ type GtagT = (command: 'event', name: string, params?: AnalyticsEventParamsT) =>
  * logAnalyticsEvent(ANALYTICS_EVENT.TOURNAMENT_CREATE, { tournament_id: id });
  * ```
  */
-export const logAnalyticsEvent = (
-  name: AnalyticsEventNameT,
-  params?: AnalyticsEventParamsT
-) => {
+export const logAnalyticsEvent = (name: AnalyticsEventNameT, params?: AnalyticsEventParamsT) => {
   if (isWebview()) {
     WebBridge.postMessage({
       type: WEBBRIDGE_MESSAGE_TYPE.WEB_REQ_LOG_ANALYTICS_EVENT,
@@ -44,4 +44,22 @@ export const logAnalyticsEvent = (
   const gtag = (window as unknown as { gtag?: GtagT }).gtag;
   if (typeof gtag !== 'function') return;
   gtag('event', name, params);
+};
+
+/**
+ * GA4 사용자 속성 설정 — 이후 모든 이벤트에 자동으로 따라붙는다.
+ *
+ * 이벤트 파라미터와 달리 한 번 설정하면 그 사용자의 모든 이벤트에 실려서,
+ * A/B 그룹별 후속 퍼널(완주율·공유율 등)을 추가 코드 없이 볼 수 있다.
+ *
+ * 앱(웹뷰)은 아직 브릿지 메시지가 없어 웹 스트림에서만 적용된다.
+ */
+export const setAnalyticsUserProperties = (params: AnalyticsEventParamsT) => {
+  if (isWebview()) return;
+  if (typeof window === 'undefined') return;
+
+  const gtag = (window as unknown as { gtag?: GtagT }).gtag;
+  if (typeof gtag !== 'function') return;
+
+  gtag('set', 'user_properties', params);
 };
