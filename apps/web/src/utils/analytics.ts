@@ -5,10 +5,17 @@ import type { AnalyticsEventNameT } from '@/consts/analytics';
 
 import { WebBridge, isWebview } from './webBridge';
 
-/** `@next/third-parties/google` 의 GoogleAnalytics 가 주입하는 전역 gtag 함수 */
-type GtagT = {
-  (command: 'event', name: string, params?: AnalyticsEventParamsT): void;
-  (command: 'set', target: 'user_properties', params: AnalyticsEventParamsT): void;
+/**
+ * gtag 는 인자를 `dataLayer` 에 밀어넣기만 하는 얇은 함수다.
+ * GoogleAnalytics 스크립트가 아직 로드되기 전이어도 배열에 쌓아두면 로드 후 그대로 처리되므로,
+ * `window.gtag` 존재 여부를 기다리지 않고 직접 큐에 넣는다. (하이드레이션 직후 유실 방지)
+ */
+const pushToDataLayer = (...args: unknown[]) => {
+  if (typeof window === 'undefined') return;
+
+  const target = window as unknown as { dataLayer?: unknown[] };
+  target.dataLayer = target.dataLayer ?? [];
+  target.dataLayer.push(args);
 };
 
 /**
@@ -38,12 +45,7 @@ export const logAnalyticsEvent = (name: AnalyticsEventNameT, params?: AnalyticsE
     return;
   }
 
-  // 일반 브라우저 — @next/third-parties 가 주입한 gtag 호출.
-  // NEXT_PUBLIC_GA_ID 미설정 시 GoogleAnalytics 가 마운트 안 되므로 gtag 도 undefined.
-  if (typeof window === 'undefined') return;
-  const gtag = (window as unknown as { gtag?: GtagT }).gtag;
-  if (typeof gtag !== 'function') return;
-  gtag('event', name, params);
+  pushToDataLayer('event', name, params);
 };
 
 /**
@@ -56,10 +58,6 @@ export const logAnalyticsEvent = (name: AnalyticsEventNameT, params?: AnalyticsE
  */
 export const setAnalyticsUserProperties = (params: AnalyticsEventParamsT) => {
   if (isWebview()) return;
-  if (typeof window === 'undefined') return;
 
-  const gtag = (window as unknown as { gtag?: GtagT }).gtag;
-  if (typeof gtag !== 'function') return;
-
-  gtag('set', 'user_properties', params);
+  pushToDataLayer('set', 'user_properties', params);
 };
