@@ -78,9 +78,16 @@ jobs:
           git push origin "refs/tags/$TAG"
           git push origin HEAD:refs/heads/production
 
-      # 직전 web-v* 태그부터의 squash 커밋(=PR 제목)으로 릴리즈 노트 자동 생성
+      # 직전 web-v* 태그부터의 squash 커밋(=PR 제목)으로 릴리즈 노트 자동 생성.
+      # 첫 줄 "배포일: YYYY-MM-DD(요일)" 은 기존 릴리즈들과의 포맷 통일
       - name: GitHub Release 생성
         env:
           GH_TOKEN: ${{ github.token }}
           TAG: ${{ steps.version.outputs.tag }}
-        run: gh release create "$TAG" --verify-tag --generate-notes --title "$TAG"
+          TZ: Asia/Seoul
+        run: |
+          set -euo pipefail
+          days=(월 화 수 목 금 토 일)
+          wd=${days[$(($(date +%u) - 1))]}
+          gh release create "$TAG" --verify-tag --generate-notes --title "$TAG" \
+            --notes "배포일: $(date +%Y-%m-%d)(${wd})"
