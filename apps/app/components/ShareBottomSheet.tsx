@@ -185,10 +185,10 @@ function ShareBottomSheetContent({ url, text }: ShareExtensionProps) {
           위시를 담고 있어요
         </Text>
 
-        <View style={styles.imageContainer}>
+        <View style={styles.imageArea}>
           <Image
             source={require('@/assets/images/share-bottom-sheet/basket.png')}
-            style={styles.image}
+            style={styles.basket}
           />
 
           <LoadingDots />
@@ -219,22 +219,22 @@ function ShareBottomSheetContent({ url, text }: ShareExtensionProps) {
         </View>
 
         {isLoginPrompt ? (
-          <View style={styles.imageContainer}>
+          <View style={styles.imageArea}>
             <Image
               source={require('@/assets/images/share-bottom-sheet/login-tag.png')}
               style={styles.loginImage}
             />
           </View>
         ) : (
-          <View style={styles.imageContainer}>
+          <View style={styles.imageArea}>
             <Image
               source={require('@/assets/images/share-bottom-sheet/basket.png')}
-              style={styles.image}
+              style={styles.basket}
             />
 
             <Image
               source={require('@/assets/images/share-bottom-sheet/icon-error.png')}
-              style={styles.icon}
+              style={styles.overlayIcon}
             />
           </View>
         )}
@@ -272,7 +272,7 @@ function ShareBottomSheetContent({ url, text }: ShareExtensionProps) {
 
     return (
       <SheetContainer onDimPress={handleClose}>
-        <View style={[styles.handle, styles.handleParsingResult]} />
+        <View style={styles.handle} />
 
         <Text allowFontScaling={false} style={styles.title}>
           위시를 담았어요
@@ -322,7 +322,7 @@ function ShareBottomSheetContent({ url, text }: ShareExtensionProps) {
 
     return (
       <SheetContainer onDimPress={handleClose}>
-        <View style={[styles.handle, styles.handleParsingResult]} />
+        <View style={styles.handle} />
 
         <View style={styles.titleGroup}>
           <Text allowFontScaling={false} style={styles.title}>
@@ -333,10 +333,10 @@ function ShareBottomSheetContent({ url, text }: ShareExtensionProps) {
           </Text>
         </View>
 
-        <View style={styles.parsingResultImageArea}>
+        <View style={styles.imageArea}>
           <Image
             source={require('@/assets/images/share-bottom-sheet/basket.png')}
-            style={styles.parsingResultBasket}
+            style={styles.basket}
           />
 
           <Image
@@ -345,7 +345,7 @@ function ShareBottomSheetContent({ url, text }: ShareExtensionProps) {
                 ? require('@/assets/images/share-bottom-sheet/icon-warning.png')
                 : require('@/assets/images/share-bottom-sheet/icon-error.png')
             }
-            style={styles.parsingResultIcon}
+            style={styles.overlayIcon}
           />
         </View>
 
@@ -374,18 +374,18 @@ function ShareBottomSheetContent({ url, text }: ShareExtensionProps) {
       <View style={styles.handle} />
 
       <Text allowFontScaling={false} style={styles.title}>
-        위시를 저장 했어요
+        위시를 담았어요
       </Text>
 
-      <View style={styles.imageContainer}>
+      <View style={styles.imageArea}>
         <Image
           source={require('@/assets/images/share-bottom-sheet/basket.png')}
-          style={styles.image}
+          style={styles.basket}
         />
 
         <Image
           source={require('@/assets/images/share-bottom-sheet/icon-success.png')}
-          style={styles.icon}
+          style={styles.overlayIcon}
         />
       </View>
 
@@ -414,7 +414,8 @@ function SheetContainer({ children, onDimPress }: SheetContainerProps) {
   return (
     <View style={styles.wrapper}>
       <Pressable style={[styles.dim, { top: -top }]} onPress={onDimPress} disabled={!onDimPress} />
-      <View style={[styles.sheet, { paddingBottom: bottom }]}>{children}</View>
+      {/* 시안 하단 패딩 20 보장 — 홈 인디케이터 인셋이 더 크면 그만큼 띄운다 */}
+      <View style={[styles.sheet, { paddingBottom: Math.max(bottom, 20) }]}>{children}</View>
     </View>
   );
 }
@@ -478,9 +479,6 @@ const styles = StyleSheet.create({
     width: 36,
     backgroundColor: '#D9D9D9',
     borderRadius: 24,
-    marginBottom: 20,
-  },
-  handleParsingResult: {
     marginBottom: 16,
   },
   titleGroup: {
@@ -490,6 +488,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 20,
     lineHeight: 28,
+    letterSpacing: -0.6,
     fontWeight: 'bold',
     color: '#2D3037',
     textAlign: 'center',
@@ -497,27 +496,37 @@ const styles = StyleSheet.create({
   description: {
     fontSize: 16,
     lineHeight: 22,
+    letterSpacing: -0.6,
     fontWeight: '500',
     color: '#686F7E',
     textAlign: 'center',
   },
-  image: {
+  imageArea: {
+    width: 320,
+    height: 169,
+    marginTop: 16,
+    marginBottom: 16,
+    alignItems: 'center',
+  },
+  basket: {
     width: 145,
-    height: 105,
-    marginTop: 52,
-    marginBottom: 45,
+    height: 106,
+    marginTop: 32,
+  },
+  overlayIcon: {
+    width: 48,
+    height: 46,
+    position: 'absolute',
+    top: 73,
   },
   loginImage: {
     width: 118,
     height: 143,
-    marginVertical: 13,
-  },
-  imageContainer: {
-    position: 'relative',
+    marginTop: 13,
   },
   dots: {
     position: 'absolute',
-    top: 114,
+    top: 94,
     left: 0,
     right: 0,
     flexDirection: 'row',
@@ -579,33 +588,16 @@ const styles = StyleSheet.create({
   productName: {
     fontSize: 16,
     lineHeight: 22,
+    letterSpacing: -0.6,
     fontWeight: '600',
     color: '#171719',
   },
   productPrice: {
     fontSize: 18,
     lineHeight: 26,
+    letterSpacing: -0.6,
     fontWeight: '600',
     color: 'rgba(55, 56, 60, 0.61)',
-  },
-
-  parsingResultImageArea: {
-    width: 320,
-    height: 169,
-    marginTop: 16,
-    marginBottom: 16,
-    alignItems: 'center',
-  },
-  parsingResultBasket: {
-    width: 145,
-    height: 106,
-    marginTop: 31.5,
-  },
-  parsingResultIcon: {
-    width: 48,
-    height: 46,
-    position: 'absolute',
-    top: 73,
   },
 
   /** 시안 버튼 폭 175/176 + gap 12 — 기기 폭에 맞춰 균등 분할한다 */
@@ -623,10 +615,14 @@ const styles = StyleSheet.create({
   buttonFull: {
     width: '100%',
     backgroundColor: '#191B1F',
+    borderWidth: 1,
+    borderColor: '#2D3037',
   },
   buttonPrimary: {
     flex: 1,
     backgroundColor: '#191B1F',
+    borderWidth: 1,
+    borderColor: '#2D3037',
   },
   buttonSecondary: {
     flex: 1,
@@ -636,20 +632,14 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 16,
     lineHeight: 22,
+    letterSpacing: -0.6,
     fontWeight: '600',
   },
   buttonSecondaryText: {
     color: '#686F7E',
     fontSize: 16,
     lineHeight: 22,
+    letterSpacing: -0.6,
     fontWeight: '600',
-  },
-
-  icon: {
-    width: 48,
-    height: 48,
-    position: 'absolute',
-    top: 93,
-    left: 49,
   },
 });
