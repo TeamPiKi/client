@@ -69,14 +69,17 @@ jobs:
               "$TARGET" "$REF" "$TARGET" "${DEPLOY_URL:-vercel}" "$AUTHOR_MENTION" "$SHORT_SHA" "$COMMIT_URL" "$MESSAGE")
             case "$ENVIRONMENT" in Production*) TEXT=$(printf '%s\n• [릴리즈 노트](<https://github.com/${{ github.repository }}/releases/latest>)' "$TEXT");; esac
           else
-            TEXT=$(printf '❌ `%s` 배포 실패\n• 경로: `%s` 브랜치 → %s\n• 배포자: %s\n• 커밋: [%s](<%s>)  %s\n• [배포 로그](<%s>)' \
-              "$TARGET" "$REF" "$TARGET" "$AUTHOR_MENTION" "$SHORT_SHA" "$COMMIT_URL" "$MESSAGE" "$LOG_URL")
+            TEXT=$(printf '❌ `%s` 배포 실패\n• 경로: `%s` 브랜치 → %s\n• 배포자: %s\n• 커밋: [%s](<%s>)  %s' \
+              "$TARGET" "$REF" "$TARGET" "$AUTHOR_MENTION" "$SHORT_SHA" "$COMMIT_URL" "$MESSAGE")
+            # target_url 이 비면 깨진 링크(<>) 가 나가므로 값이 있을 때만 로그 줄을 붙인다
+            [ -n "$LOG_URL" ] && TEXT=$(printf '%s\n• [배포 로그](<%s>)' "$TEXT" "$LOG_URL")
           fi
 
           HTTP_CODE=$(curl -s --max-time 10 -o resp.json -w '%{http_code}' \
             -X POST "https://discord.com/api/v10/channels/$CHANNEL_ID/messages" \
             -H "Authorization: Bot $DISCORD_BOT_TOKEN" \
             -H "Content-Type: application/json; charset=utf-8" \
-            --data "$(jq -n --arg content "$TEXT" '{content: $content, allowed_mentions: {parse: ["users"]}}')") || HTTP_CODE="000"
+            --data "$(jq -n --arg content "$TEXT" --arg did "$DISCORD_ID" \
+              '{content: $content, allowed_mentions: {parse: [], users: (if $did != "" then [$did] else [] end)}}')") || HTTP_CODE="000"
           [ "$HTTP_CODE" -ge 200 ] && [ "$HTTP_CODE" -lt 300 ] \
             || { echo "::error::Discord 알림 전송 실패 (HTTP $HTTP_CODE) $(cat resp.json 2>/dev/null)"; exit 1; }
