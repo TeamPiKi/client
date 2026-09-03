@@ -11,16 +11,40 @@ permissions: {}
 
 jobs:
   notify:
-    # Production 승격과 dev 브랜치 배포만 알린다 — PR Preview 는 소음이라 제외
-    if: >-
-      contains(fromJSON('["success", "failure", "error"]'), github.event.deployment_status.state) &&
-      (startsWith(github.event.deployment.environment, 'Production') || github.event.deployment.ref == 'dev')
+    if: contains(fromJSON('["success", "failure", "error"]'), github.event.deployment_status.state)
     runs-on: ubuntu-latest
     permissions:
       contents: read
     steps:
+      # Production 승격과 dev 브랜치 배포만 알린다 — PR Preview 는 소음이라 제외.
+      # Vercel 은 deployment.ref 에 브랜치명이 아니라 커밋 SHA 를 넣는다(실측, payload 도 빈 객체).
+      # squash 머지라 PR 커밋은 dev 에 존재하지 않으므로, dev 도달 가능 여부가 dev 배포와 PR Preview 를 가른다
+      - name: 알림 대상 판별
+        id: gate
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ENVIRONMENT: ${{ github.event.deployment.environment }}
+          SHA: ${{ github.event.deployment.sha }}
+        run: |
+          set -euo pipefail
+          case "$ENVIRONMENT" in
+            Production*)
+              echo "notify=true" >> "$GITHUB_OUTPUT"
+              echo "branch=production" >> "$GITHUB_OUTPUT"
+              exit 0 ;;
+          esac
+          status=$(gh api "repos/${{ github.repository }}/compare/dev...$SHA" --jq .status)
+          if [ "$status" = "identical" ] || [ "$status" = "behind" ]; then
+            echo "notify=true" >> "$GITHUB_OUTPUT"
+            echo "branch=dev" >> "$GITHUB_OUTPUT"
+          else
+            echo "notify=false" >> "$GITHUB_OUTPUT"
+            echo "PR Preview 배포 (compare status: $status) — 알림 생략"
+          fi
+
       # Vercel 배포의 actor 는 vercel[bot] 이라, 배포자는 커밋 author 로 잡는다
       - name: 커밋 정보 조회
+        if: steps.gate.outputs.notify == 'true'
         id: commit
         env:
           GH_TOKEN: ${{ github.token }}
@@ -32,13 +56,14 @@ jobs:
           echo "author=$(jq -r '.author.login // .commit.author.name' commit.json)" >> "$GITHUB_OUTPUT"
 
       - name: Discord 전송 (허거덩 봇)
+        if: steps.gate.outputs.notify == 'true'
         env:
           DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
           CHANNEL_ID: ${{ secrets.DISCORD_DEPLOY_CHANNEL_ID }}
           DISCORD_USER_MAP: ${{ secrets.DISCORD_USER_MAP }}
           STATE: ${{ github.event.deployment_status.state }}
           ENVIRONMENT: ${{ github.event.deployment.environment }}
-          REF: ${{ github.event.deployment.ref }}
+          BRANCH: ${{ steps.gate.outputs.branch }}
           SHA: ${{ github.event.deployment.sha }}
           DEPLOY_URL: ${{ github.event.deployment_status.environment_url }}
           LOG_URL: ${{ github.event.deployment_status.target_url }}
@@ -66,11 +91,11 @@ jobs:
           # 서버 배포알림과 동일 포맷. named 링크도 임베드 카드를 만들므로 URL 을 <> 로 감싼다
           if [ "$STATE" = "success" ]; then
             TEXT=$(printf '✅ `%s` 배포 성공!\n• 경로: `%s` 브랜치 → %s (%s)\n• 배포자: %s\n• 커밋: [%s](<%s>)  %s' \
-              "$TARGET" "$REF" "$TARGET" "${DEPLOY_URL:-vercel}" "$AUTHOR_MENTION" "$SHORT_SHA" "$COMMIT_URL" "$MESSAGE")
+              "$TARGET" "$BRANCH" "$TARGET" "${DEPLOY_URL:-vercel}" "$AUTHOR_MENTION" "$SHORT_SHA" "$COMMIT_URL" "$MESSAGE")
             case "$ENVIRONMENT" in Production*) TEXT=$(printf '%s\n• [릴리즈 노트](<https://github.com/${{ github.repository }}/releases/latest>)' "$TEXT");; esac
           else
             TEXT=$(printf '❌ `%s` 배포 실패\n• 경로: `%s` 브랜치 → %s\n• 배포자: %s\n• 커밋: [%s](<%s>)  %s' \
-              "$TARGET" "$REF" "$TARGET" "$AUTHOR_MENTION" "$SHORT_SHA" "$COMMIT_URL" "$MESSAGE")
+              "$TARGET" "$BRANCH" "$TARGET" "$AUTHOR_MENTION" "$SHORT_SHA" "$COMMIT_URL" "$MESSAGE")
             # target_url 이 비면 깨진 링크(<>) 가 나가므로 값이 있을 때만 로그 줄을 붙인다
             [ -n "$LOG_URL" ] && TEXT=$(printf '%s\n• [배포 로그](<%s>)' "$TEXT" "$LOG_URL")
           fi
