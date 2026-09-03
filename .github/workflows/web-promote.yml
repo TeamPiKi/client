@@ -45,12 +45,12 @@ jobs:
           VERSION: ${{ inputs.version }}
         run: |
           set -euo pipefail
+          latest=$(git tag -l 'web-v*' --sort=-v:refname | head -1)
+          [ -n "$latest" ] || { echo "::error::web-v* 태그가 없습니다"; exit 1; }
           if [ -n "$VERSION" ]; then
             [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "::error::버전 형식은 X.Y.Z 여야 합니다: $VERSION"; exit 1; }
             next="$VERSION"
           else
-            latest=$(git tag -l 'web-v*' --sort=-v:refname | head -1)
-            [ -n "$latest" ] || { echo "::error::web-v* 태그가 없습니다"; exit 1; }
             ver=${latest#web-v}
             IFS=. read -r major minor patch <<< "$ver"
             case "$BUMP" in
@@ -60,7 +60,8 @@ jobs:
             esac
           fi
           echo "tag=web-v${next}" >> "$GITHUB_OUTPUT"
-          echo "승격 버전: web-v${next} ($(git rev-parse --short HEAD))"
+          echo "prev=${latest}" >> "$GITHUB_OUTPUT"
+          echo "승격 버전: ${latest} → web-v${next} ($(git rev-parse --short HEAD))"
 
       - name: fast-forward 가능 확인
         run: |
@@ -79,15 +80,18 @@ jobs:
           git push origin HEAD:refs/heads/production
 
       # 직전 web-v* 태그부터의 squash 커밋(=PR 제목)으로 릴리즈 노트 자동 생성.
+      # 시작 태그를 명시해야 한다 — 자동 추론은 "마지막 발행 릴리즈" 기준이라 app-v* 릴리즈가 생기면 어긋난다.
       # 첫 줄 "배포일: YYYY-MM-DD(요일)" 은 기존 릴리즈들과의 포맷 통일
       - name: GitHub Release 생성
         env:
           GH_TOKEN: ${{ github.token }}
           TAG: ${{ steps.version.outputs.tag }}
+          PREV: ${{ steps.version.outputs.prev }}
           TZ: Asia/Seoul
         run: |
           set -euo pipefail
           days=(월 화 수 목 금 토 일)
           wd=${days[$(($(date +%u) - 1))]}
           gh release create "$TAG" --verify-tag --generate-notes --title "$TAG" \
+            --notes-start-tag "$PREV" \
             --notes "배포일: $(date +%Y-%m-%d)(${wd})"
