@@ -1,0 +1,82 @@
+# Vercel 배포 결과 Discord 알림 — Vercel Git 연동이 배포마다 만드는 GitHub Deployment 의
+# 상태 변화(deployment_status)를 구독한다. 이 이벤트는 default 브랜치(dev)에 있는 워크플로우만
+# 실행하므로, dev 에 머지된 뒤부터 동작한다.
+# 전송은 webhook 이 아니라 허거덩 봇 본인(DISCORD_BOT_TOKEN — PR 봇과 공유)이 한다.
+# secrets: DISCORD_BOT_TOKEN(기존), DISCORD_DEPLOY_CHANNEL_ID(신규 — 배포알림 채널), DISCORD_USER_MAP(기존)
+name: Web Deploy Notify
+
+on: deployment_status
+
+permissions: {}
+
+jobs:
+  notify:
+    # Production 승격과 dev 브랜치 배포만 알린다 — PR Preview 는 소음이라 제외
+    if: >-
+      contains(fromJSON('["success", "failure", "error"]'), github.event.deployment_status.state) &&
+      (startsWith(github.event.deployment.environment, 'Production') || github.event.deployment.ref == 'dev')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      # Vercel 배포의 actor 는 vercel[bot] 이라, 배포자는 커밋 author 로 잡는다
+      - name: 커밋 정보 조회
+        id: commit
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SHA: ${{ github.event.deployment.sha }}
+        run: |
+          set -euo pipefail
+          gh api "repos/${{ github.repository }}/commits/$SHA" > commit.json
+          echo "message=$(jq -r '.commit.message | split("\n")[0]' commit.json)" >> "$GITHUB_OUTPUT"
+          echo "author=$(jq -r '.author.login // .commit.author.name' commit.json)" >> "$GITHUB_OUTPUT"
+
+      - name: Discord 전송 (허거덩 봇)
+        env:
+          DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
+          CHANNEL_ID: ${{ secrets.DISCORD_DEPLOY_CHANNEL_ID }}
+          DISCORD_USER_MAP: ${{ secrets.DISCORD_USER_MAP }}
+          STATE: ${{ github.event.deployment_status.state }}
+          ENVIRONMENT: ${{ github.event.deployment.environment }}
+          REF: ${{ github.event.deployment.ref }}
+          SHA: ${{ github.event.deployment.sha }}
+          DEPLOY_URL: ${{ github.event.deployment_status.environment_url }}
+          LOG_URL: ${{ github.event.deployment_status.target_url }}
+          MESSAGE: ${{ steps.commit.outputs.message }}
+          AUTHOR: ${{ steps.commit.outputs.author }}
+        run: |
+          set -euo pipefail
+          [ -n "$DISCORD_BOT_TOKEN" ] || { echo "::error::DISCORD_BOT_TOKEN secret 이 없습니다"; exit 1; }
+          [ -n "$CHANNEL_ID" ] || { echo "::error::DISCORD_DEPLOY_CHANNEL_ID secret 이 없습니다"; exit 1; }
+
+          # github 로그인 → discord id 멘션. 매핑 없으면 로그인 이름으로 폴백(핑은 안 감)
+          DISCORD_MAP="$DISCORD_USER_MAP"; [ -n "$DISCORD_MAP" ] || DISCORD_MAP='{}'
+          DISCORD_ID=$(echo "$DISCORD_MAP" | jq -r --arg login "$AUTHOR" '.[$login] // empty')
+          AUTHOR_MENTION="${DISCORD_ID:+<@$DISCORD_ID>}"
+          AUTHOR_MENTION="${AUTHOR_MENTION:-$AUTHOR}"
+
+          case "$ENVIRONMENT" in
+            Production*) TARGET="PiKi-Web-Prod" ;;
+            *)           TARGET="PiKi-Web-Dev" ;;
+          esac
+
+          SHORT_SHA="${SHA:0:7}"
+          COMMIT_URL="https://github.com/${{ github.repository }}/commit/$SHA"
+
+          # 서버 배포알림과 동일 포맷. named 링크도 임베드 카드를 만들므로 URL 을 <> 로 감싼다
+          if [ "$STATE" = "success" ]; then
+            TEXT=$(printf '✅ `%s` 배포 성공!\n• 경로: `%s` 브랜치 → %s (%s)\n• 배포자: %s\n• 커밋: [%s](<%s>)  %s' \
+              "$TARGET" "$REF" "$TARGET" "${DEPLOY_URL:-vercel}" "$AUTHOR_MENTION" "$SHORT_SHA" "$COMMIT_URL" "$MESSAGE")
+            case "$ENVIRONMENT" in Production*) TEXT=$(printf '%s\n• [릴리즈 노트](<https://github.com/${{ github.repository }}/releases/latest>)' "$TEXT");; esac
+          else
+            TEXT=$(printf '❌ `%s` 배포 실패\n• 경로: `%s` 브랜치 → %s\n• 배포자: %s\n• 커밋: [%s](<%s>)  %s\n• [배포 로그](<%s>)' \
+              "$TARGET" "$REF" "$TARGET" "$AUTHOR_MENTION" "$SHORT_SHA" "$COMMIT_URL" "$MESSAGE" "$LOG_URL")
+          fi
+
+          HTTP_CODE=$(curl -s --max-time 10 -o resp.json -w '%{http_code}' \
+            -X POST "https://discord.com/api/v10/channels/$CHANNEL_ID/messages" \
+            -H "Authorization: Bot $DISCORD_BOT_TOKEN" \
+            -H "Content-Type: application/json; charset=utf-8" \
+            --data "$(jq -n --arg content "$TEXT" '{content: $content, allowed_mentions: {parse: ["users"]}}')") || HTTP_CODE="000"
+          [ "$HTTP_CODE" -ge 200 ] && [ "$HTTP_CODE" -lt 300 ] \
+            || { echo "::error::Discord 알림 전송 실패 (HTTP $HTTP_CODE) $(cat resp.json 2>/dev/null)"; exit 1; }
