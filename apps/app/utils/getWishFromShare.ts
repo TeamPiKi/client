@@ -1,4 +1,4 @@
-import type { ShareItemT } from './postWishLinkFromShare';
+import { type ShareItemT, isShareItemStatus } from './postWishLinkFromShare';
 
 /** 카드 데이터 조달용 재조회 — 성공 화면 폴백이 있으니 오래 붙잡지 않는다 */
 const FETCH_TIMEOUT_MS = 5_000;
@@ -28,7 +28,7 @@ export const getWishFromShare = async (
     const body = (await response.json()) as { data?: { item?: ShareItemT | null } | null };
     const item = body.data?.item;
 
-    return typeof item?.id === 'number' ? item : null;
+    return typeof item?.id === 'number' && isShareItemStatus(item.status) ? item : null;
   } catch {
     return null;
   } finally {

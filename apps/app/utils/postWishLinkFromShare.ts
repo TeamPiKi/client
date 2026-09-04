@@ -11,7 +11,13 @@ import { TokenStorage } from './tokenStorage';
  */
 export type ShareFailureReasonT = 'unauthenticated' | 'sessionExpired' | 'network' | 'server';
 
-export type ShareItemStatusT = 'PENDING' | 'PROCESSING' | 'READY' | 'INCOMPLETE' | 'FAILED';
+const SHARE_ITEM_STATUSES = ['PENDING', 'PROCESSING', 'READY', 'INCOMPLETE', 'FAILED'] as const;
+
+export type ShareItemStatusT = (typeof SHARE_ITEM_STATUSES)[number];
+
+/** 응답 body 의 status 는 런타임 검증이 없어 모르는 값이 그대로 흘러들 수 있다 */
+export const isShareItemStatus = (value: unknown): value is ShareItemStatusT =>
+  SHARE_ITEM_STATUSES.includes(value as ShareItemStatusT);
 
 export type ShareWishT = {
   id: number;
@@ -82,7 +88,9 @@ const readSuccessBody = async (
     const wish = body.data?.wish;
     const item = body.data?.item;
 
-    if (typeof wish?.id !== 'number' || typeof item?.id !== 'number' || !item.status) return null;
+    if (typeof wish?.id !== 'number' || typeof item?.id !== 'number') return null;
+    /** 모르는 status 는 종결 여부를 판단할 수 없다 — SSE 로 넘기지 않고 성공 폴백 */
+    if (!isShareItemStatus(item.status)) return null;
 
     return { wish, item };
   } catch {
