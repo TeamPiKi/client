@@ -1,0 +1,64 @@
+import {
+  editChannelMessage,
+  ensureThreadOnMessage,
+  listRecentMessages,
+  postChannelMessage,
+  postThreadMessage,
+} from './discord';
+
+/** 진행 중 사이클 판별 마커 — 출시/반려 시 제목이 🎉/❌로 바뀌며 다음 사이클과 분리된다 */
+const OPEN_PREFIX = '📦 [iOS] PiKi';
+const MAX_AGE_MS = 14 * 24 * 60 * 60 * 1000;
+
+export const PROFILE_LABEL: Record<string, string> = {
+  production: '심사용 (production)',
+  'production-dev': '팀 테스트용 (production-dev)',
+};
+
+export type ReleaseUpdateT = {
+  /** 스레드에 남길 로그 */
+  log: string;
+  /** 루트 상태판에서 갱신할 줄 — 함수면 기존 값 기반으로 계산 (카운터 등) */
+  line?: { key: string; value: string | ((prev: string | null) => string) };
+  /** 알게 된 시점에 제목·스레드명에 1회 채워지는 버전 */
+  version?: string | null;
+  /** 사이클 종료 (출시·반려) 시 제목 교체 */
+  final?: { emoji: string; text: string };
+};
+
+/** 진행 중 루트 상태판을 찾아(없으면 새로 열어) 갱신하고 스레드에 로그를 남긴다 */
+export const updateReleaseThread = async (update: ReleaseUpdateT) => {
+  const versionSuffix = update.version ? ` v${update.version}` : '';
+
+  let root = (await listRecentMessages()).find(
+    message =>
+      message.content.startsWith(OPEN_PREFIX) && Date.now() - Date.parse(message.timestamp) < MAX_AGE_MS
+  );
+  if (!root) {
+    root = await postChannelMessage(`${OPEN_PREFIX}${versionSuffix} 배포 진행 중`);
+  }
+  await ensureThreadOnMessage(root.id, `iOS${versionSuffix} 배포`);
+
+  const [title = '', ...lines] = root.content.split('\n');
+  let nextTitle = title;
+  if (update.version && !/ v\d/.test(nextTitle)) {
+    nextTitle = nextTitle.replace('PiKi', `PiKi v${update.version}`);
+  }
+  if (update.final) {
+    const version = / v[\d.]+/.exec(nextTitle)?.[0] ?? '';
+    nextTitle = `${update.final.emoji} [iOS] PiKi${version} ${update.final.text}`;
+  }
+
+  if (update.line) {
+    const prefix = `• ${update.line.key}:`;
+    const index = lines.findIndex(line => line.startsWith(prefix));
+    const prev = index >= 0 ? (lines[index]?.slice(prefix.length).trim() ?? null) : null;
+    const value = typeof update.line.value === 'function' ? update.line.value(prev) : update.line.value;
+    const nextLine = `${prefix} ${value}`;
+    if (index >= 0) lines[index] = nextLine;
+    else lines.push(nextLine);
+  }
+
+  await editChannelMessage(root.id, [nextTitle, ...lines].join('\n'));
+  await postThreadMessage(root.id, update.log);
+};
