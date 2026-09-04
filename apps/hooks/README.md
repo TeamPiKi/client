@@ -49,4 +49,6 @@ Create Public Threads / Send Messages in Threads** 권한이 필요하다 (루�
 
 번들할 것이 없는 순수 함수 프로젝트라 `vercel.json`이 빌드 단계를 no-op으로 덮는다 — 없으면 Vercel의 Turborepo 자동 감지가 `turbo run build`를 돌린 뒤 출력 디렉터리를 못 찾아 실패한다. Vercel은 출력 디렉터리가 비어 있어도 거부하므로 `public/index.html`을 안내 페이지로 둔다. `api/**/*.ts`는 이와 무관하게 그대로 함수로 배포된다.
 
+`package.json`에 `type: module`을 두지 않는다 — Vercel Node 런타임은 TS를 번들 없이 트랜스파일만 하므로, ESM 으로 실행되면 `'../../lib/release'` 같은 확장자 없는 상대 import 가 런타임에 `ERR_MODULE_NOT_FOUND` 로 죽는다.
+
 웹훅·Vercel 프로젝트 등록 등 1회성 셋업 진행 상황은 #618 체크리스트에서 관리한다.
