@@ -30,10 +30,16 @@ export type ReleaseUpdateT = {
 export const updateReleaseThread = async (update: ReleaseUpdateT) => {
   const versionSuffix = update.version ? ` v${update.version}` : '';
 
-  let root = (await listRecentMessages()).find(
-    message =>
-      message.content.startsWith(OPEN_PREFIX) && Date.now() - Date.parse(message.timestamp) < MAX_AGE_MS
-  );
+  let root = (await listRecentMessages()).find(message => {
+    if (!message.content.startsWith(OPEN_PREFIX)) return false;
+    if (Date.now() - Date.parse(message.timestamp) >= MAX_AGE_MS) return false;
+    /** 버전을 아는 이벤트는 다른 버전의 열린 루트에 붙지 않는다 (ASC 이벤트는 버전이 없어 최신 열린 루트) */
+    if (update.version) {
+      const rootVersion = / v([\d.]+)/.exec(message.content.split('\n')[0] ?? '')?.[1];
+      if (rootVersion && rootVersion !== update.version) return false;
+    }
+    return true;
+  });
   if (!root) {
     root = await postChannelMessage(`${OPEN_PREFIX}${versionSuffix} 배포 진행 중`);
   }
