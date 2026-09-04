@@ -18,38 +18,31 @@ iOS 앱 배포 이벤트(EAS Build·Submit, App Store Connect)를 받아 허거�
   └ 스레드: 🛠 빌드 완료 → ✅ 제출 완료 → … → 🎉 출시 완료!   ← append-only 로그
 ```
 
+- **심사 표시는 대기·통과·출시·반려만** — 수동/자동 출시 구분은 통과 후 전이 상태로 드러난다
+- **TestFlight 처리는 건수 집계** — ASC 페이로드에 빌드 식별 정보가 없어 어느 빌드인지 알 수 없다
+- **무시 케이스** — 제출 취소·미매핑 상태·테스트 ping·미구독 이벤트는 200으로 조용히 응답 (재시도 유발 금지)
+
 ## 엔드포인트
 
-| 경로 | 발신자 | 서명 검증 |
-| --- | --- | --- |
-| `POST /api/webhooks/eas-build` | EAS Build (BUILD 이벤트) | `expo-signature` — HMAC-SHA1 |
-| `POST /api/webhooks/eas` | EAS Submit (SUBMIT 이벤트) | `expo-signature` — HMAC-SHA1 |
-| `POST /api/webhooks/asc` | App Store Connect | `x-apple-signature` — HMAC-SHA256 |
+| 경로 | 발신자 | 서명 검증 | 역할 |
+| --- | --- | --- | --- |
+| `POST /api/webhooks/eas-build` | EAS Build (BUILD 이벤트) | `expo-signature` — HMAC-SHA1 | 빌드 완료가 사이클(스레드)을 연다 |
+| `POST /api/webhooks/eas` | EAS Submit (SUBMIT 이벤트) | `expo-signature` — HMAC-SHA1 | 심사 제출·TestFlight 업로드 기록 |
+| `POST /api/webhooks/asc` | App Store Connect | `x-apple-signature` — HMAC-SHA256 | TestFlight 빌드 처리·심사 상태 전이 기록 |
 
-## Vercel 프로젝트 설정
+## 런타임 요구사항
 
-1. Vercel에서 **Add New Project** → 이 레포 선택 → Root Directory를 `apps/hooks`로 지정 (Framework: Other)
-2. 환경변수 등록:
-   - `DISCORD_BOT_TOKEN` — 허거덩 봇 토큰 (GitHub Actions secret과 동일 값)
-   - `DISCORD_DEPLOY_CHANNEL_ID` — 배포알림 채널 ID
-   - `EAS_WEBHOOK_SECRET` — 16자 이상 임의 문자열 (아래 EAS 등록 시 같은 값 사용)
-   - `ASC_WEBHOOK_SECRET` — ASC 웹훅 등록 시 입력한 Secret과 같은 값
-   - `EXPO_TOKEN` (선택) — expo.dev Access Token (robot 권장). 있으면 제출 이벤트에서
-     빌드 프로필(심사용/팀 테스트용)·버전을 조회해 상태판에 반영, 없으면 로그만 남는다
+환경변수:
+
+| 변수 | 용도 |
+| --- | --- |
+| `DISCORD_BOT_TOKEN` | 허거덩 봇 토큰 (GitHub Actions secret과 동일 값) |
+| `DISCORD_DEPLOY_CHANNEL_ID` | 배포알림 채널 ID |
+| `EAS_WEBHOOK_SECRET` | EAS 웹훅 서명 검증 키 (`eas webhook:create`에 넣은 값) |
+| `ASC_WEBHOOK_SECRET` | ASC 웹훅 서명 검증 키 (ASC 웹훅 등록 시 입력한 Secret) |
+| `EXPO_TOKEN` (선택) | EAS API로 빌드 프로필(심사용/팀 테스트용)·버전 조회. 없으면 해당 줄만 생략 |
 
 봇에게 배포알림 채널의 **View Channel / Send Messages / Read Message History /
 Create Public Threads / Send Messages in Threads** 권한이 필요하다 (루트 검색·스레드 기록).
 
-## 웹훅 등록
-
-**EAS** (레포의 `apps/app`에서 실행, 시크릿은 둘 다 같은 값):
-
-```sh
-eas webhook:create --event BUILD --url https://<hooks-domain>/api/webhooks/eas-build --secret <EAS_WEBHOOK_SECRET>
-eas webhook:create --event SUBMIT --url https://<hooks-domain>/api/webhooks/eas --secret <EAS_WEBHOOK_SECRET>
-```
-
-**App Store Connect** (계정 Admin):
-App Store Connect → Users and Access → Integrations → Webhooks → `+`
-URL에 `https://<hooks-domain>/api/webhooks/asc`, Secret에 `ASC_WEBHOOK_SECRET` 값 입력 후
-이벤트로 **Build upload state changes**, **App version state changes** 선택.
+웹훅·Vercel 프로젝트 등록 등 1회성 셋업 진행 상황은 #618 체크리스트에서 관리한다.
