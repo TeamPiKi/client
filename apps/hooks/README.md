@@ -47,7 +47,16 @@ Create Public Threads / Send Messages in Threads** 권한이 필요하다 (루�
 
 ## 빌드 설정
 
-번들할 것이 없는 순수 함수 프로젝트라 `vercel.json`이 빌드 단계를 no-op으로 덮는다 — 없으면 Vercel의 Turborepo 자동 감지가 `turbo run build`를 돌린 뒤 출력 디렉터리를 못 찾아 실패한다. Vercel은 출력 디렉터리가 비어 있어도 거부하므로 `public/index.html`을 안내 페이지로 둔다. `api/**/*.ts`는 이와 무관하게 그대로 함수로 배포된다. `ignoreCommand` 로 `apps/hooks` 가 안 바뀐 커밋에서는 빌드를 건너뛴다.
+번들할 것이 없는 순수 함수 프로젝트라 빌드 단계가 없다. Vercel 프로젝트 설정(대시보드)에서 관리한다 — 레포에 `vercel.json` 을 두지 않는다.
+
+| 설정 | 값 | 이유 |
+| --- | --- | --- |
+| Framework Preset | Other | 프리셋 기본 빌드 명령·출력 경로가 끼어드는 것을 막는다 |
+| Build Command (Override) | `echo skip` | 비워두면 Turborepo 자동 감지가 `turbo run build` 를 돌린 뒤 출력 디렉터리를 못 찾아 실패한다 |
+| Output Directory (Override) | `public` | Vercel 은 출력 디렉터리가 없어도, 비어 있어도 거부한다 (`public/index.html` 이 안내 페이지 겸 채움) |
+| Ignored Build Step | `git diff --quiet HEAD^ HEAD -- .` | `apps/hooks` 가 안 바뀐 커밋에서는 빌드를 건너뛴다 |
+
+`api/**/*.ts` 는 이 설정과 무관하게 Root Directory 아래 `api/` 스캔으로 함수가 된다.
 
 tsconfig 에 `noEmit` 을 두지 않는다 — Vercel 이 함수를 빌드할 때 이 tsconfig 를 그대로 쓰므로, `noEmit` 이면 JS 가 하나도 나오지 않아 모든 함수가 `FUNCTION_INVOCATION_FAILED` 로 죽는다 (`check-types` 는 `tsc --noEmit` 플래그로 검사한다). NodeNext ESM 이라 상대 import 에는 `.js` 확장자가 필요하다.
 

@@ -1,7 +1,0 @@
-{
-  "$schema": "https://openapi.vercel.sh/vercel.json",
-  "framework": null,
-  "buildCommand": "echo 'no build step - api/ functions only'",
-  "outputDirectory": "public",
-  "ignoreCommand": "git diff --quiet HEAD^ HEAD -- ."
-}
