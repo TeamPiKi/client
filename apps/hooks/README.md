@@ -45,4 +45,8 @@ iOS 앱 배포 이벤트(EAS Build·Submit, App Store Connect)를 받아 허거�
 봇에게 배포알림 채널의 **View Channel / Send Messages / Read Message History /
 Create Public Threads / Send Messages in Threads** 권한이 필요하다 (루트 검색·스레드 기록).
 
+## 빌드 설정
+
+번들할 것이 없는 순수 함수 프로젝트라 `vercel.json`이 빌드 단계를 빈 `public/` 생성으로 대체한다 — 없으면 Vercel의 Turborepo 자동 감지가 `turbo run build`를 돌린 뒤 출력 디렉터리를 못 찾아 실패한다. `api/**/*.ts`는 빌드 없이 그대로 함수로 배포된다.
+
 웹훅·Vercel 프로젝트 등록 등 1회성 셋업 진행 상황은 #618 체크리스트에서 관리한다.
