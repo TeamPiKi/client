@@ -33,10 +33,10 @@ export const updateReleaseThread = async (update: ReleaseUpdateT) => {
   let root = (await listRecentMessages()).find(message => {
     if (!message.content.startsWith(OPEN_PREFIX)) return false;
     if (Date.now() - Date.parse(message.timestamp) >= MAX_AGE_MS) return false;
-    /** 버전을 아는 이벤트는 다른 버전의 열린 루트에 붙지 않는다 (ASC 이벤트는 버전이 없어 최신 열린 루트) */
+    /** 버전을 아는 이벤트는 같은 버전 루트에만 붙는다 (ASC 이벤트는 버전이 없어 최신 열린 루트) */
     if (update.version) {
       const rootVersion = / v([\d.]+)/.exec(message.content.split('\n')[0] ?? '')?.[1];
-      if (rootVersion && rootVersion !== update.version) return false;
+      if (rootVersion !== update.version) return false;
     }
     return true;
   });
@@ -47,9 +47,6 @@ export const updateReleaseThread = async (update: ReleaseUpdateT) => {
 
   const [title = '', ...lines] = root.content.split('\n');
   let nextTitle = title;
-  if (update.version && !/ v\d/.test(nextTitle)) {
-    nextTitle = nextTitle.replace('PiKi', `PiKi v${update.version}`);
-  }
   if (update.final) {
     const version = / v[\d.]+/.exec(nextTitle)?.[0] ?? '';
     nextTitle = `${update.final.emoji} [iOS] PiKi${version} ${update.final.text}`;
