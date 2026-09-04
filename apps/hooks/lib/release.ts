@@ -4,7 +4,7 @@ import {
   listRecentMessages,
   postChannelMessage,
   postThreadMessage,
-} from './discord';
+} from './discord.js';
 
 /** 진행 중 사이클 판별 마커 — 출시/반려 시 제목이 🎉/❌로 바뀌며 다음 사이클과 분리된다 */
 const OPEN_PREFIX = '📦 [iOS] PiKi';

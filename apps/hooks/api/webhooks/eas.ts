@@ -1,8 +1,8 @@
-import { escapeMarkdown, sendDiscordMessage } from '../../lib/discord';
-import { getEasBuildInfo } from '../../lib/eas';
-import type { ReleaseUpdateT } from '../../lib/release';
-import { PROFILE_LABEL, updateReleaseThread } from '../../lib/release';
-import { verifySignature } from '../../lib/verify';
+import { escapeMarkdown, sendDiscordMessage } from '../../lib/discord.js';
+import { getEasBuildInfo } from '../../lib/eas.js';
+import type { ReleaseUpdateT } from '../../lib/release.js';
+import { PROFILE_LABEL, updateReleaseThread } from '../../lib/release.js';
+import { verifySignature } from '../../lib/verify.js';
 
 type EasSubmitPayloadT = {
   platform?: 'ios' | 'android';

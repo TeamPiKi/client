@@ -1,5 +1,5 @@
-import { updateReleaseThread } from '../../lib/release';
-import { verifySignature } from '../../lib/verify';
+import { updateReleaseThread } from '../../lib/release.js';
+import { verifySignature } from '../../lib/verify.js';
 
 type AscWebhookPayloadT = {
   data?: {
