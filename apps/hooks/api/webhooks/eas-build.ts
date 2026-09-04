@@ -1,6 +1,6 @@
-import { escapeMarkdown } from '../../lib/discord';
-import { PROFILE_LABEL, updateReleaseThread } from '../../lib/release';
-import { verifySignature } from '../../lib/verify';
+import { escapeMarkdown } from '../../lib/discord.js';
+import { PROFILE_LABEL, updateReleaseThread } from '../../lib/release.js';
+import { verifySignature } from '../../lib/verify.js';
 
 type EasBuildPayloadT = {
   platform?: 'ios' | 'android';
