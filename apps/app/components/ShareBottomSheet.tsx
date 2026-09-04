@@ -576,7 +576,7 @@ const styles = StyleSheet.create({
   },
   productCheckBadge: {
     width: 28,
-    height: 28,
+    height: 27,
     position: 'absolute',
     top: 21.5,
     left: 20,
