@@ -54,7 +54,7 @@ Create Public Threads / Send Messages in Threads** 권한이 필요하다 (루�
 | Framework Preset | Other | 프리셋 기본 빌드 명령·출력 경로가 끼어드는 것을 막는다 |
 | Build Command (Override) | `echo skip` | 비워두면 Turborepo 자동 감지가 `turbo run build` 를 돌린 뒤 출력 디렉터리를 못 찾아 실패한다 |
 | Output Directory (Override) | `public` | Vercel 은 출력 디렉터리가 없어도, 비어 있어도 거부한다 (`public/index.html` 이 안내 페이지 겸 채움) |
-| Ignored Build Step | `git diff --quiet HEAD^ HEAD -- .` | `apps/hooks` 가 안 바뀐 커밋에서는 빌드를 건너뛴다 |
+| Root Directory → Skip deployment | 켬 | `apps/hooks` 와 그 의존이 안 바뀐 커밋에서는 배포를 건너뛴다 (Ignored Build Step 은 Automatic 그대로) |
 
 `api/**/*.ts` 는 이 설정과 무관하게 Root Directory 아래 `api/` 스캔으로 함수가 된다.
 
