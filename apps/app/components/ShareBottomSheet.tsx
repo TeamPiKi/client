@@ -329,7 +329,7 @@ export function ShareBottomSheetView({
           </View>
 
           <View style={styles.productInfo}>
-            <Text allowFontScaling={false} numberOfLines={2} style={styles.productName}>
+            <Text allowFontScaling={false} numberOfLines={1} style={styles.productName}>
               {item.name}
             </Text>
             {item.price != null ? (
