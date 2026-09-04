@@ -12,6 +12,7 @@ export const getEasBuildInfo = async (buildId: string): Promise<EasBuildInfoT | 
   try {
     const response = await fetch('https://api.expo.dev/graphql', {
       method: 'POST',
+      signal: AbortSignal.timeout(10_000),
       headers: {
         Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',

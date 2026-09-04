@@ -1,6 +1,16 @@
 export type DiscordMessageT = { id: string; content: string; timestamp: string };
 
 const API_BASE = 'https://discord.com/api/v10';
+const REQUEST_TIMEOUT_MS = 10_000;
+
+export class DiscordApiError extends Error {
+  constructor(
+    message: string,
+    readonly status: number
+  ) {
+    super(message);
+  }
+}
 
 const discordRequest = async (path: string, init?: RequestInit) => {
   const token = process.env.DISCORD_BOT_TOKEN;
@@ -8,6 +18,7 @@ const discordRequest = async (path: string, init?: RequestInit) => {
 
   const response = await fetch(`${API_BASE}${path}`, {
     ...init,
+    signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
     headers: {
       Authorization: `Bot ${token}`,
       'Content-Type': 'application/json; charset=utf-8',
@@ -15,8 +26,9 @@ const discordRequest = async (path: string, init?: RequestInit) => {
     },
   });
   if (!response.ok) {
-    throw new Error(
-      `Discord API 실패 (${init?.method ?? 'GET'} ${path} → HTTP ${response.status}) ${await response.text()}`
+    throw new DiscordApiError(
+      `Discord API 실패 (${init?.method ?? 'GET'} ${path} → HTTP ${response.status}) ${await response.text()}`,
+      response.status
     );
   }
   return response;
@@ -58,15 +70,16 @@ export const editChannelMessage = async (messageId: string, content: string) => 
   });
 };
 
-/** 메시지에서 스레드 생성 (스레드 id == 메시지 id) — 이미 있으면 400이 오므로 무시 */
+/** 메시지에서 스레드 생성 (스레드 id == 메시지 id) — "이미 존재"(400)만 무시, 그 외는 전파 */
 export const ensureThreadOnMessage = async (messageId: string, name: string) => {
   try {
     await discordRequest(`/channels/${requireChannelId()}/messages/${messageId}/threads`, {
       method: 'POST',
       body: JSON.stringify({ name, auto_archive_duration: 10080 }),
     });
-  } catch {
-    /* 스레드가 이미 존재 */
+  } catch (error) {
+    if (error instanceof DiscordApiError && error.status === 400) return;
+    throw error;
   }
 };
 
