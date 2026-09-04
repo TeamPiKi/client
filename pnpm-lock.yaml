@@ -216,6 +216,18 @@ importers:
         specifier: 5.9.2
         version: 5.9.2
 
+  apps/hooks:
+    devDependencies:
+      '@piki/typescript-config':
+        specifier: workspace:*
+        version: link:../../packages/typescript-config
+      '@types/node':
+        specifier: ^22.15.3
+        version: 22.15.3
+      typescript:
+        specifier: 5.9.2
+        version: 5.9.2
+
   apps/web:
     dependencies:
       '@microsoft/fetch-event-source':
