@@ -26,7 +26,7 @@ const LOGIN_REQUIRED_REASONS: ShareFailureReasonT[] = ['unauthenticated', 'sessi
 /** 재시도는 1회까지. 또 실패하면 확인 버튼만 남긴다. */
 const MAX_RETRY_COUNT = 1;
 
-type SheetStateT =
+export type SheetStateT =
   /** POST 진행 중 + 파싱 대기(SSE) — 화면은 동일한 로딩 */
   | { status: 'loading' }
   /** 파싱 결과를 못 받은 폴백 — 저장 성공은 POST 응답으로 이미 확정 */
@@ -176,6 +176,42 @@ function ShareBottomSheetContent({ url, text }: ShareExtensionProps) {
     setRetryCount(count => count + 1);
   };
 
+  const canRetry =
+    sheetState.status === 'error' && sheetState.retryable && retryCount < MAX_RETRY_COUNT;
+
+  return (
+    <ShareBottomSheetView
+      state={sheetState}
+      canRetry={canRetry}
+      onClose={handleClose}
+      onRetry={handleRetry}
+      onOpenLogin={handleOpenLogin}
+      onOpenWishlist={handleOpenWishlist}
+      onOpenWishEdit={handleOpenWishEdit}
+    />
+  );
+}
+
+type ShareBottomSheetViewProps = {
+  state: SheetStateT;
+  canRetry: boolean;
+  onClose: () => void;
+  onRetry: () => void;
+  onOpenLogin: () => void;
+  onOpenWishlist: () => void;
+  onOpenWishEdit: (wishId: number) => void;
+};
+
+/** 상태별 렌더만 담당 — dev 프리뷰(dev/share-sheet-preview)에서 mock 상태로 재사용한다 */
+export function ShareBottomSheetView({
+  state: sheetState,
+  canRetry,
+  onClose,
+  onRetry,
+  onOpenLogin,
+  onOpenWishlist,
+  onOpenWishEdit,
+}: ShareBottomSheetViewProps) {
   if (sheetState.status === 'loading')
     return (
       <SheetContainer>
@@ -197,14 +233,13 @@ function ShareBottomSheetContent({ url, text }: ShareExtensionProps) {
     );
 
   if (sheetState.status === 'error') {
-    const { reason, retryable } = sheetState;
+    const { reason } = sheetState;
     const isLoginRequired = LOGIN_REQUIRED_REASONS.includes(reason);
     /** 토큰 자체가 없으면 실패가 아니라 로그인 유도 화면 (세션 만료는 실패 화면 + 로그인 버튼) */
     const isLoginPrompt = reason === 'unauthenticated';
-    const canRetry = retryable && retryCount < MAX_RETRY_COUNT;
 
     return (
-      <SheetContainer onDimPress={handleClose}>
+      <SheetContainer onDimPress={onClose}>
         <View style={styles.handle} />
 
         <View style={styles.titleGroup}>
@@ -241,7 +276,7 @@ function ShareBottomSheetContent({ url, text }: ShareExtensionProps) {
 
         {isLoginRequired || canRetry ? (
           <View style={styles.buttonRow}>
-            <Pressable style={[styles.button, styles.buttonSecondary]} onPress={handleClose}>
+            <Pressable style={[styles.button, styles.buttonSecondary]} onPress={onClose}>
               <Text allowFontScaling={false} style={styles.buttonSecondaryText}>
                 {isLoginRequired ? '나중에 할게요' : '확인'}
               </Text>
@@ -249,7 +284,7 @@ function ShareBottomSheetContent({ url, text }: ShareExtensionProps) {
 
             <Pressable
               style={[styles.button, styles.buttonPrimary]}
-              onPress={isLoginRequired ? handleOpenLogin : handleRetry}
+              onPress={isLoginRequired ? onOpenLogin : onRetry}
             >
               <Text allowFontScaling={false} style={styles.buttonText}>
                 {isLoginRequired ? '로그인하기' : '다시 시도'}
@@ -257,7 +292,7 @@ function ShareBottomSheetContent({ url, text }: ShareExtensionProps) {
             </Pressable>
           </View>
         ) : (
-          <Pressable style={[styles.button, styles.buttonFull]} onPress={handleClose}>
+          <Pressable style={[styles.button, styles.buttonFull]} onPress={onClose}>
             <Text allowFontScaling={false} style={styles.buttonText}>
               확인
             </Text>
@@ -271,7 +306,7 @@ function ShareBottomSheetContent({ url, text }: ShareExtensionProps) {
     const { item, wishId } = sheetState;
 
     return (
-      <SheetContainer onDimPress={handleClose}>
+      <SheetContainer onDimPress={onClose}>
         <View style={styles.handle} />
 
         <Text allowFontScaling={false} style={styles.title}>
@@ -307,7 +342,7 @@ function ShareBottomSheetContent({ url, text }: ShareExtensionProps) {
 
         <Pressable
           style={[styles.button, styles.buttonFull]}
-          onPress={() => handleOpenWishEdit(wishId)}
+          onPress={() => onOpenWishEdit(wishId)}
         >
           <Text allowFontScaling={false} style={styles.buttonText}>
             위시 보러가기
@@ -321,7 +356,7 @@ function ShareBottomSheetContent({ url, text }: ShareExtensionProps) {
     const isIncomplete = sheetState.status === 'incomplete';
 
     return (
-      <SheetContainer onDimPress={handleClose}>
+      <SheetContainer onDimPress={onClose}>
         <View style={styles.handle} />
 
         <View style={styles.titleGroup}>
@@ -350,7 +385,7 @@ function ShareBottomSheetContent({ url, text }: ShareExtensionProps) {
         </View>
 
         <View style={styles.buttonRow}>
-          <Pressable style={[styles.button, styles.buttonSecondary]} onPress={handleClose}>
+          <Pressable style={[styles.button, styles.buttonSecondary]} onPress={onClose}>
             <Text allowFontScaling={false} style={styles.buttonSecondaryText}>
               나중에 할게요
             </Text>
@@ -358,7 +393,7 @@ function ShareBottomSheetContent({ url, text }: ShareExtensionProps) {
 
           <Pressable
             style={[styles.button, styles.buttonPrimary]}
-            onPress={() => handleOpenWishEdit(sheetState.wishId)}
+            onPress={() => onOpenWishEdit(sheetState.wishId)}
           >
             <Text allowFontScaling={false} style={styles.buttonText}>
               {isIncomplete ? '상품정보 확인하기' : '상품정보 입력하기'}
@@ -370,7 +405,7 @@ function ShareBottomSheetContent({ url, text }: ShareExtensionProps) {
   }
 
   return (
-    <SheetContainer onDimPress={handleClose}>
+    <SheetContainer onDimPress={onClose}>
       <View style={styles.handle} />
 
       <Text allowFontScaling={false} style={styles.title}>
@@ -392,7 +427,7 @@ function ShareBottomSheetContent({ url, text }: ShareExtensionProps) {
       <Pressable
         style={[styles.button, styles.buttonFull]}
         onPress={() =>
-          sheetState.wishId != null ? handleOpenWishEdit(sheetState.wishId) : handleOpenWishlist()
+          sheetState.wishId != null ? onOpenWishEdit(sheetState.wishId) : onOpenWishlist()
         }
       >
         <Text allowFontScaling={false} style={styles.buttonText}>
