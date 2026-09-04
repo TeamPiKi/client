@@ -76,8 +76,9 @@ jobs:
           # github 로그인 → discord id 멘션. 매핑 없으면 로그인 이름으로 폴백(핑은 안 감)
           DISCORD_MAP="$DISCORD_USER_MAP"; [ -n "$DISCORD_MAP" ] || DISCORD_MAP='{}'
           DISCORD_ID=$(echo "$DISCORD_MAP" | jq -r --arg login "$AUTHOR" '.[$login] // empty')
+          # 매핑 없으면 이름 텍스트 폴백(핑 없음) — 커밋 author 명은 외부 입력이라 Markdown 특수문자 이스케이프
           AUTHOR_MENTION="${DISCORD_ID:+<@$DISCORD_ID>}"
-          AUTHOR_MENTION="${AUTHOR_MENTION:-$AUTHOR}"
+          AUTHOR_MENTION="${AUTHOR_MENTION:-$(printf '%s' "$AUTHOR" | sed 's/[][\`]/\\&/g')}"
 
           if [ "$BRANCH" = "production" ]; then
             LABEL="[PROD]"; DOMAIN="piki.day"
@@ -85,11 +86,14 @@ jobs:
             LABEL="[DEV]"; DOMAIN="dev.piki.day"
           fi
 
-          # 배포 커밋을 가리키는 web-v* 태그 = 이번에 나간 버전 (승격 배포에서만 잡힌다)
+          # 배포 커밋을 가리키는 web-v* 태그 = 이번에 나간 버전 (승격 배포에서만 잡힌다).
+          # 조회 실패(API 오류·rate limit)는 알림을 막지 않는다 — 버전·릴리즈 줄만 생략.
+          # --paginate 는 페이지별 배열을 내므로 스트림으로 모은 뒤 semver 최신 하나를 고른다
           VERSION=""
           if [ "$BRANCH" = "production" ]; then
             VERSION=$(gh api --paginate "repos/${{ github.repository }}/tags?per_page=100" \
-              | jq -r --arg sha "$SHA" '[.[] | select(.commit.sha == $sha) | .name | select(startswith("web-v"))] | first // empty')
+              | jq -r --arg sha "$SHA" '.[] | select(.commit.sha == $sha) | .name | select(startswith("web-v"))' \
+              | sort -V | tail -1) || VERSION=""
           fi
 
           # prod 는 버전+릴리즈 노트, dev 는 무엇이 머지됐는지(커밋)를 보여준다.
@@ -102,14 +106,15 @@ jobs:
           if [ "$BRANCH" = "production" ]; then
             [ -n "$VERSION" ] && TEXT=$(printf '%s\n• 버전: `%s`' "$TEXT" "$VERSION")
           else
+            # 커밋 제목은 외부 입력 — 링크 라벨 탈출(](url)) 인젝션을 이스케이프로 차단
+            SAFE_MESSAGE=$(printf '%s' "$MESSAGE" | sed 's/[][\`]/\\&/g')
             COMMIT_URL="https://github.com/${{ github.repository }}/commit/$SHA"
-            TEXT=$(printf '%s\n• 커밋: [%s](<%s>)' "$TEXT" "$MESSAGE" "$COMMIT_URL")
+            TEXT=$(printf '%s\n• 커밋: [%s](<%s>)' "$TEXT" "$SAFE_MESSAGE" "$COMMIT_URL")
           fi
           TEXT=$(printf '%s\n• 배포자: %s' "$TEXT" "$AUTHOR_MENTION")
-          if [ "$STATE" = "success" ] && [ "$BRANCH" = "production" ]; then
-            if [ -n "$VERSION" ]; then NOTES_URL="https://github.com/${{ github.repository }}/releases/tag/$VERSION"
-            else NOTES_URL="https://github.com/${{ github.repository }}/releases/latest"; fi
-            TEXT=$(printf '%s\n• [릴리즈 노트](<%s>)' "$TEXT" "$NOTES_URL")
+          # releases/latest 폴백 금지 — 다른 릴리즈(예: app-v*)를 가리킬 수 있어 버전을 아는 경우에만 링크
+          if [ "$STATE" = "success" ] && [ "$BRANCH" = "production" ] && [ -n "$VERSION" ]; then
+            TEXT=$(printf '%s\n• [릴리즈 노트](<https://github.com/${{ github.repository }}/releases/tag/%s>)' "$TEXT" "$VERSION")
           fi
           # target_url 이 비면 깨진 링크(<>) 가 나가므로 값이 있을 때만 로그 줄을 붙인다
           if [ "$STATE" != "success" ] && [ -n "$LOG_URL" ]; then
