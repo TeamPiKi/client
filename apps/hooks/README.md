@@ -47,6 +47,6 @@ Create Public Threads / Send Messages in Threads** 권한이 필요하다 (루�
 
 ## 빌드 설정
 
-번들할 것이 없는 순수 함수 프로젝트라 `vercel.json`이 빌드 단계를 빈 `public/` 생성으로 대체한다 — 없으면 Vercel의 Turborepo 자동 감지가 `turbo run build`를 돌린 뒤 출력 디렉터리를 못 찾아 실패한다. `api/**/*.ts`는 빌드 없이 그대로 함수로 배포된다.
+번들할 것이 없는 순수 함수 프로젝트라 `vercel.json`이 빌드 단계를 no-op으로 덮는다 — 없으면 Vercel의 Turborepo 자동 감지가 `turbo run build`를 돌린 뒤 출력 디렉터리를 못 찾아 실패한다. Vercel은 출력 디렉터리가 비어 있어도 거부하므로 `public/index.html`을 안내 페이지로 둔다. `api/**/*.ts`는 이와 무관하게 그대로 함수로 배포된다.
 
 웹훅·Vercel 프로젝트 등록 등 1회성 셋업 진행 상황은 #618 체크리스트에서 관리한다.
