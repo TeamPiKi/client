@@ -24,7 +24,7 @@ type OptionButtonButtonPropsT = OptionItemBaseT & {
 type OptionButtonPropsT = OptionButtonLinkPropsT | OptionButtonButtonPropsT;
 
 const optionItemClassName =
-  'flex cursor-pointer w-full items-center gap-4 rounded-[12px] border border-gray-100 bg-bg-layer-default px-5 pt-4 pb-[15px] transition-colors active:bg-gray-50';
+  'flex cursor-pointer w-full items-center gap-4 rounded-[12px] border border-border-neutral-muted bg-bg-layer-default px-5 pt-4 pb-[15px] transition-colors active:bg-gray-50';
 
 /**
  * 위시템 담기 다이얼로그 버튼

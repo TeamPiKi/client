@@ -142,7 +142,7 @@
   --color-border-neutral-primary: var(--color-gray-700);
   --color-border-neutral-secondary: var(--color-gray-500);
   --color-border-neutral-tertiary: var(--color-gray-300);
-  --color-border-neutral-muted: var(--color-gray-100);
+  --color-border-neutral-muted: var(--color-gray-75);
 
   --color-icon-accent: var(--color-sky-blue-500);
 
