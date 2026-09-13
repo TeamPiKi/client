@@ -21,7 +21,7 @@ function TournamentItemBasketStatus({ isProcessing, count }: TournamentItemBaske
         className={cn(
           'inline-flex items-center rounded-3xl border px-3 py-2 body-2-regular',
           isBlue && 'border-sky-blue-100 bg-sky-blue-50 text-text-accent',
-          !isBlue && 'border-gray-100 bg-gray-75 text-gray-600'
+          !isBlue && 'border-border-neutral-muted bg-gray-75 text-gray-600'
         )}
       >
         {label}

@@ -94,7 +94,7 @@ function NotificationContent() {
         )}
 
         <div className="rounded-xl bg-base-50">
-          <ul className="divide-y divide-gray-100 px-5">
+          <ul className="divide-y divide-border-neutral-muted px-5">
             {notificationsData.map(notification => (
               <NotificationItem
                 key={notification.id}
