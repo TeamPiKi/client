@@ -34,9 +34,9 @@ export type PendingTournamentItemT = Partial<TournamentItemT> & {
  */
 type TournamentPendingPayloadT = {
   /**
-   * 주최자가 ROOT 토너먼트를 시작했는지 여부.
+   * 주최자가 토너먼트를 시작했는지 여부.
    * - false (status=PENDING): 참여자는 아직 시작할 수 없음
-   * - true (status=IN_PROGRESS): 참여자도 본인 CLONE 시작 가능
+   * - true (status=IN_PROGRESS): 참여자도 본인 플레이 시작 가능
    */
   ownerStarted: boolean;
   /** 초대 코드. `ownerStarted=true` 이면 이미 초대 기간이 종료돼 null */
@@ -53,22 +53,19 @@ export type GetTournamentPendingResponseT = {
   name: string;
   /** 요청자가 토너먼트 소유자(주최자)인지 여부 */
   isOwner: boolean;
-  /** ROOT(원본)이면 true, CLONE(플레이 링크/멤버 시작으로 복제된 인스턴스)이면 false */
-  isRoot: boolean;
   status: Extract<TournamentStatusT, 'PENDING'>;
   pending: TournamentPendingPayloadT;
 };
 
 /**
  * IN_PROGRESS — 참여자가 본인 매치를 아직 시작하지 않은 대기 상태.
- * 주최자가 ROOT 를 시작했지만 참여자(isOwner=false)는 본인 CLONE 시작 전.
+ * 주최자가 시작했지만 참여자(isOwner=false)는 본인 플레이 시작 전.
  * 응답은 PENDING 과 동일한 `pending` 페이로드를 받지만 `ownerStarted=true`.
  */
 type GetTournamentMemberWaitingResponseT = {
   tournamentId: number;
   name: string;
   isOwner: boolean;
-  isRoot: boolean;
   status: Extract<TournamentStatusT, 'IN_PROGRESS'>;
   pending: TournamentPendingPayloadT;
   inProgress?: undefined;
@@ -80,10 +77,6 @@ export type GetTournamentInProgressResponseT = {
   name: string;
   /** 요청자가 토너먼트 소유자(주최자)인지 여부 */
   isOwner: boolean;
-  /** ROOT(원본)이면 true, CLONE 이면 false */
-  isRoot: boolean;
-  /** CLONE 일 때만 존재 — 원본(ROOT) 토너먼트 id. group-result 호출 등에서 사용. */
-  sourceTournamentId?: number;
   status: Extract<TournamentStatusT, 'IN_PROGRESS'>;
   pending?: undefined;
   inProgress: {
@@ -101,10 +94,6 @@ export type GetTournamentCompletedResponseT = {
   name: string;
   /** 요청자가 토너먼트 소유자(주최자)인지 여부 */
   isOwner: boolean;
-  /** ROOT(원본)이면 true, CLONE 이면 false */
-  isRoot: boolean;
-  /** CLONE 일 때만 존재 — 원본(ROOT) 토너먼트 id. group-result 호출 등에서 사용. */
-  sourceTournamentId?: number;
   status: Extract<TournamentStatusT, 'COMPLETED'>;
   completed: {
     result: TournamentRankingT[];
@@ -125,8 +114,7 @@ export type GetTournamentResponseT =
 
 /**
  * 시작 응답.
- * - 주최자(ROOT): 본인 tournamentId 반환
- * - 참여자(CLONE): 새로 생성된 CLONE tournamentId 반환 (이후 본인 ID 로 진행)
+ * 주최자·참여자 모두 진행할 tournamentId 를 반환한다.
  */
 export type PostStartTournamentResponseT = {
   tournamentId: number;
