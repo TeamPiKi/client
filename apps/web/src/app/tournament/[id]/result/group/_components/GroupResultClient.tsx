@@ -77,13 +77,8 @@ const PlaceLabel = ({ label }: { label: string }) => (
 function GroupResultClient({ tournamentId }: GroupResultClientProps) {
   const backWithFallback = useBackWithFallback();
   const { tournamentData } = useGetTournament(tournamentId);
-  // 그룹 결과는 원본(ROOT) 단위로 집계된다. CLONE 에서 진입하면 원본 id 로 조회한다.
-  const groupResultTournamentId =
-    'sourceTournamentId' in tournamentData && tournamentData.sourceTournamentId
-      ? tournamentData.sourceTournamentId
-      : tournamentId;
   const { groupResultData, isGroupResultPending, isGroupResultError } =
-    useGetGroupResult(groupResultTournamentId);
+    useGetGroupResult(tournamentId);
 
   const date = new Date();
   const tournamentName = tournamentData.name;
