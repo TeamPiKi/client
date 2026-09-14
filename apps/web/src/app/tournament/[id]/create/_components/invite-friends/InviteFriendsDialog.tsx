@@ -13,6 +13,8 @@ import { parseServerLocalDateTime } from '@/utils/formatDate';
 import { markInviteSent } from '@/utils/inviteSentSession';
 import { copyToClipboard, share } from '@/utils/share';
 
+import { useGetMe } from '@/hooks/useGetMe';
+
 import { usePatchInviteExpiry } from '../../_hooks/usePatchInviteExpiry';
 import InviteExpiresPicker from './InviteExpiresPicker';
 
@@ -73,6 +75,9 @@ function InviteFriendsDialog({
   inviteCode,
   inviteExpiresAt,
 }: InviteFriendsDialogProps) {
+  const { userData } = useGetMe();
+  const isGuest = userData.identityType === 'GUEST';
+
   const [isPickerOpen, setIsPickerOpen] = useState(false);
   // 남은 시간 라벨은 시간이 흐르면 스스로 낡는다. 열려 있는 동안만 분 단위로 기준 시각을 갱신한다.
   const [now, setNow] = useState(() => Date.now());
@@ -181,13 +186,15 @@ function InviteFriendsDialog({
                       </p>
                     </div>
                   </div>
-                  <button
-                    type="button"
-                    className="cursor-pointer body-2-medium text-text-neutral-tertiary"
-                    onClick={handleOpenPicker}
-                  >
-                    변경
-                  </button>
+                  {!isGuest && (
+                    <button
+                      type="button"
+                      className="cursor-pointer body-2-medium text-text-neutral-tertiary"
+                      onClick={handleOpenPicker}
+                    >
+                      변경
+                    </button>
+                  )}
                 </div>
               </div>
             )}
