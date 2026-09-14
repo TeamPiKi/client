@@ -9,6 +9,7 @@ import { getMeQueryOptions } from '@/apis/getMe';
 import BottomTabBar from '@/components/bottom-tab-bar';
 import AppUpdateDialog from '@/components/common/app-update-dialog';
 import InAppBrowserEscape from '@/components/common/in-app-browser-escape';
+import StageBadge from '@/components/common/stage-badge';
 import { APP_UPDATE_PROMPT } from '@/consts/appUpdate';
 import { SCROLL_CONTAINER_ID } from '@/consts/layout';
 import { getAppVersion, isAppVersionSupported } from '@/utils/appVersion';
@@ -101,6 +102,8 @@ async function RootLayout({
 
           {/* NOTE: 전환 애니메이션이 끊기지 않게 하기 위해 탭바를 레이아웃에 렌더 */}
           <BottomTabBar />
+
+          <StageBadge />
 
           {shouldUpdateApp && <AppUpdateDialog />}
           {shouldEscape && <InAppBrowserEscape landingEnv={landingEnv} />}
