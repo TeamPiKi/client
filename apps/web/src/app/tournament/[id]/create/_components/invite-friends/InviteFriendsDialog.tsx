@@ -42,7 +42,7 @@ const formatExpiresInfo = (expiresAt: string | undefined, nowMs: number) => {
   const remainingMs = expires.getTime() - nowMs;
   if (remainingMs <= 0) return { remainingLabel: '마감', absoluteLabel: '만료됨' };
 
-  const totalMinutes = Math.floor(remainingMs / 60_000);
+  const totalMinutes = Math.ceil(remainingMs / 60_000);
   const hours = Math.floor(totalMinutes / 60);
   const minutes = totalMinutes % 60;
 
@@ -80,9 +80,17 @@ function InviteFriendsDialog({
   useEffect(() => {
     if (!open) return;
 
-    const timerId = setInterval(() => setNow(Date.now()), 60_000);
+    let intervalId: ReturnType<typeof setInterval>;
+    const msUntilNextMinute = 60_000 - (Date.now() % 60_000);
+    const timeoutId = setTimeout(() => {
+      setNow(Date.now());
+      intervalId = setInterval(() => setNow(Date.now()), 60_000);
+    }, msUntilNextMinute);
 
-    return () => clearInterval(timerId);
+    return () => {
+      clearTimeout(timeoutId);
+      clearInterval(intervalId);
+    };
   }, [open]);
 
   const expiresInfo = useMemo(
