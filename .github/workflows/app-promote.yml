@@ -10,6 +10,8 @@
 #
 # 전제:
 # - secrets.EXPO_TOKEN — EAS robot token
+# - secrets.RELEASE_PUSH_TOKEN — admin 계정 PAT (repo Contents read/write). 버전 커밋·태그를
+#   dev 보호 우회로 푸시한다. 없으면 마지막 스텝이 거부돼 수동 폴백이 필요하다
 # - EAS 에 App Store Connect API Key 가 등록돼 있어야 --auto-submit 이 비대화형으로 통과한다
 #   (expo.dev → Project → Credentials 에서 확인)
 # - 네이티브 설정 파일(GoogleService-Info.plist·google-services.json)은 체크아웃에 없지만
@@ -179,14 +181,16 @@ jobs:
       # 태그는 BRIDGE_GATE 의 minAppVersion 판단 근거이므로 (`git tag --contains <sha>`)
       # 반드시 "실제로 빌드된 커밋"을 가리켜야 한다. 재빌드면 태그를 그 커밋으로 옮긴다 —
       # 옛 커밋에 남아 있으면 그 사이 들어간 브릿지 핸들러가 미포함으로 판정돼 게이트가 잘못 막는다.
-      # dev 는 PR 필수 보호가 걸려 있어 이 푸시가 거부될 수 있다 (봇은 admin 이 아니라 우회 못 한다).
+      # dev 는 PR 필수 보호가 걸려 있고 GITHUB_TOKEN 은 admin 이 아니라 우회 못 한다 (v1.2.3 승격에서 거부 실측).
+      # RELEASE_PUSH_TOKEN — admin 계정의 PAT (repo Contents read/write). enforce_admins 가 꺼져 있어
+      # admin 자격 푸시는 보호를 통과한다. 미등록이면 GITHUB_TOKEN 으로 시도하다 거부되며,
       # 그때는 빌드가 이미 도는 중이니 아래를 로컬에서 직접 밀면 된다 — admin 은 통과한다.
       #   git commit -am "chore: 앱 버전 v{버전}" && git tag app-v{버전} && git push origin dev --follow-tags
       - name: 버전 커밋·태그 푸시
         env:
           NEXT: ${{ steps.version.outputs.next }}
           BUMPED: ${{ steps.version.outputs.bump }}
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.RELEASE_PUSH_TOKEN || secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
           git config user.name 'github-actions[bot]'
