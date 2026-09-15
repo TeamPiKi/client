@@ -3,6 +3,23 @@ export type PostJoinRequestT = {
   inviteCode?: string;
 };
 
+export type PostJoinGuestRequestT = {
+  inviteCode: string;
+  /** 토너먼트 표시명 겸 게스트 닉네임 (1~10자) */
+  nickname: string;
+};
+
+export type PostJoinGuestResponseT = {
+  userId: string;
+  nickname: string;
+  profileImage: string;
+  tournamentId: number;
+  /** 웹 - null, 웹뷰 - string */
+  accessToken: string | null;
+  /** 웹 - null, 웹뷰 - string */
+  refreshToken: string | null;
+};
+
 export type PatchTournamentNicknameRequestT = {
   /** 이 토너먼트에서만 쓰이는 표시명 (1~10자). 전역 프로필 닉네임과 별개 */
   nickname: string;
