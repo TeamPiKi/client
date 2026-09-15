@@ -12,7 +12,7 @@ function AccountInfoSection() {
 
   return (
     <section className="flex w-full flex-col gap-3">
-      <h2 className="body-1-bold text-gray-900">계정 및 정보</h2>
+      <h2 className="body-2-semibold text-text-neutral-secondary">약관 및 정책</h2>
       <div className="flex flex-col divide-y divide-border-neutral-muted rounded-xl bg-bg-layer-default px-4">
         {userData.identityType === 'MEMBER' && <LogoutMenuItem />}
         {userData.identityType === 'MEMBER' && (
