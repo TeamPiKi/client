@@ -153,11 +153,13 @@ jobs:
           set -euo pipefail
           eas env:pull --environment production --non-interactive
           for VAR in GOOGLE_SERVICES_INFO_PLIST GOOGLE_SERVICES_JSON; do
-            if ! grep -q "^$VAR=" .env.local; then
-              echo "::error::.env.local 에 $VAR 가 없습니다 — EAS 환경변수 가시성이 sensitive 인지 확인하세요"
+            LINE="$(grep -m1 "^$VAR=" .env.local || true)"
+            VALUE="${LINE#*=}"
+            if [ -z "$VALUE" ]; then
+              echo "::error::.env.local 에 $VAR 가 없거나 비어 있습니다 — EAS 환경변수 가시성이 sensitive 인지 확인하세요"
               exit 1
             fi
-            grep "^$VAR=" .env.local >> "$GITHUB_ENV"
+            printf '%s=%s\n' "$VAR" "$VALUE" >> "$GITHUB_ENV"
           done
 
       # iOS 2건만 --auto-submit — Android 는 Play 제출이 수동이라 빌드까지만 돌린다
