@@ -1,25 +1,12 @@
-import type { Page } from '@playwright/test';
-
 import { ENDPOINTS } from '@/consts/api';
 
 import { expect, test } from '@e2e/fixtures/mockApiFixture';
-import { createFakeJwt } from '@e2e/helpers/fakeJwt';
+import { applyGuestToken } from '@e2e/helpers/guestToken';
 import { MOCK_GUEST_ME } from '@e2e/mocks/me';
-
-/** 기본 storageState(MEMBER)를 게스트 role 토큰으로 덮어써 서버 게이트를 게스트로 통과 */
-const useGuestToken = async (page: Page) => {
-  const token = createFakeJwt(60 * 60, 'GUEST');
-  const cookie = { domain: 'localhost', path: '/', value: token };
-
-  await page.context().addCookies([
-    { ...cookie, name: 'access_token' },
-    { ...cookie, name: 'refresh_token' },
-  ]);
-};
 
 test('게스트가 위시 탭에 들어가면 로그인 유도 화면이 뜬다', async ({ page, api }) => {
   api.get(ENDPOINTS.USER, MOCK_GUEST_ME);
-  await useGuestToken(page);
+  await applyGuestToken(page);
 
   await page.goto('/archive/wish');
 
@@ -37,7 +24,7 @@ test('게스트가 위시 탭에 들어가면 로그인 유도 화면이 뜬다'
 
 test('게스트가 토너먼트 탭에 들어가면 로그인 유도 화면이 뜬다', async ({ page, api }) => {
   api.get(ENDPOINTS.USER, MOCK_GUEST_ME);
-  await useGuestToken(page);
+  await applyGuestToken(page);
 
   await page.goto('/archive/tournament');
 
