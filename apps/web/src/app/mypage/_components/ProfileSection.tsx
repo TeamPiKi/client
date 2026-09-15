@@ -2,25 +2,33 @@
 
 import Link from 'next/link';
 
-import { EditIconFill } from '@/assets/icons';
+import { EditIconFill, PersonIconFill } from '@/assets/icons';
 import BaseImage from '@/components/base-image';
 import Skeleton from '@/components/skeleton';
 import { ROUTES } from '@/consts/route';
 import { useGetMe } from '@/hooks/useGetMe';
-import type { UserT } from '@/types/user';
+import { getLoginPath } from '@/utils/loginRedirect';
+import type { MemberUserT } from '@/types/user';
 
 function ProfileSection() {
   const { userData } = useGetMe();
-  const isGuest = userData.identityType === 'GUEST';
 
   return (
     <section className="flex w-full flex-col gap-3">
       <h2 className="body-1-bold text-gray-900">프로필</h2>
-      {/** 게스트는 닉네임 재설정 경로를 두지 않아 편집 진입점 없음 */}
-      {isGuest ? (
-        <div className="flex items-center gap-4 rounded-xl bg-bg-layer-default p-5">
-          <ProfileSummary userData={userData} />
-        </div>
+      {/** 게스트는 계정이 없어 프로필 대신 로그인을 유도한다 */}
+      {userData.identityType === 'GUEST' ? (
+        <Link
+          href={getLoginPath(ROUTES.MYPAGE)}
+          className="flex items-center gap-4 rounded-xl bg-bg-layer-default p-5"
+        >
+          <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-bg-neutral-tertiary">
+            <PersonIconFill aria-hidden className="size-5 text-icon-neutral-secondary" />
+          </span>
+          <p className="min-w-0 flex-1 truncate body-1-medium text-text-neutral-secondary">
+            로그인해주세요.
+          </p>
+        </Link>
       ) : (
         <Link
           href={ROUTES.MYPAGE_EDIT}
@@ -35,7 +43,7 @@ function ProfileSection() {
 }
 
 type ProfileSummaryProps = {
-  userData: UserT;
+  userData: MemberUserT;
 };
 
 function ProfileSummary({ userData }: ProfileSummaryProps) {
@@ -53,11 +61,9 @@ function ProfileSummary({ userData }: ProfileSummaryProps) {
 
       <div className="min-w-0 flex-1">
         <p className="truncate body-1-bold text-text-neutral-primary">{userData.nickname}</p>
-        {userData.identityType === 'MEMBER' && (
-          <p className="truncate body-2-medium text-text-neutral-tertiary" data-sentry-mask>
-            {userData.email}
-          </p>
-        )}
+        <p className="truncate body-2-medium text-text-neutral-tertiary" data-sentry-mask>
+          {userData.email}
+        </p>
       </div>
     </>
   );
