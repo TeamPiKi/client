@@ -65,12 +65,16 @@ function CreateTournamentDialog() {
     hasLoggedViewRef.current = true;
 
     setAnalyticsUserProperties({ tooltip_variant: variant });
-    logAnalyticsEvent(ANALYTICS_EVENT.HOME_VIEW, { tooltip_variant: variant });
-  }, [variant]);
+    logAnalyticsEvent(ANALYTICS_EVENT.HOME_VIEW, {
+      tooltip_variant: variant,
+      identity_type: userData.identityType,
+    });
+  }, [variant, userData.identityType]);
 
   const handleTriggerClick = () => {
     logAnalyticsEvent(ANALYTICS_EVENT.NEW_TOURNAMENT_CLICK, {
       ...(variant && { tooltip_variant: variant }),
+      identity_type: userData.identityType,
     });
     
     /** 게스트 - 생성 다이얼로그 대신 로그인 유도 UI 띄우기 */
