@@ -53,7 +53,7 @@ function LoginButtons({ redirect, action, errorCode, showAppleLogin }: LoginButt
 
   const [nativePendingProvider, setNativePendingProvider] = useState<SocialProviderT | null>(null);
   const [webPendingProvider, setWebPendingProvider] = useState<SocialProviderT | null>(null);
-  /** localStorage 는 서버에서 못 읽어 서버 스냅샷을 null 로 둔다 — 하이드레이션 불일치 방지 */
+
   const recentProvider = useSyncExternalStore(
     subscribeRecentLoginProvider,
     getRecentLoginProvider,
