@@ -143,8 +143,10 @@ jobs:
           token: ${{ secrets.EXPO_TOKEN }}
 
       # eas build 가 업로드 전 러너에서 돌리는 introspect 가 googleServicesFile 실파일을 열므로,
-      # file 타입 환경변수를 .eas/.env/ 로 내려받고 경로를 .env.local 에 기록해 둔다
-      # (Expo CLI 가 .env.local 을 자동 로드. .env.local·.eas/ 는 gitignore 대상이라 EAS 업로드에 미포함)
+      # file 타입 환경변수를 .eas/.env/ 로 내려받고 경로를 GITHUB_ENV 로 export 한다.
+      # .env.local 기록만으로는 안 된다 — eas build 는 EAS 환경을 서버에서 직접 로드하는 경로라
+      # .env.local 자동 로드 없이 introspect 를 돌린다 (env:pull 만 있던 첫 실행이 그래서 실패).
+      # 셸 env 로 export 하면 introspect 자식 프로세스에 그대로 전달된다 (eas config 로 재현 검증).
       - name: EAS 환경변수 pull (introspect 용)
         working-directory: apps/app
         run: |
@@ -155,6 +157,7 @@ jobs:
               echo "::error::.env.local 에 $VAR 가 없습니다 — EAS 환경변수 가시성이 sensitive 인지 확인하세요"
               exit 1
             fi
+            grep "^$VAR=" .env.local >> "$GITHUB_ENV"
           done
 
       # iOS 2건만 --auto-submit — Android 는 Play 제출이 수동이라 빌드까지만 돌린다
