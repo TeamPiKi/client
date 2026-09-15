@@ -10,6 +10,8 @@
 #
 # 전제:
 # - secrets.EXPO_TOKEN — EAS robot token
+# - secrets.RELEASE_PUSH_TOKEN — admin 계정 PAT (repo Contents read/write). 버전 커밋·태그를
+#   dev 보호 우회로 푸시한다. 없으면 마지막 스텝이 거부돼 수동 폴백이 필요하다
 # - EAS 에 App Store Connect API Key 가 등록돼 있어야 --auto-submit 이 비대화형으로 통과한다
 #   (expo.dev → Project → Credentials 에서 확인)
 # - 네이티브 설정 파일(GoogleService-Info.plist·google-services.json)은 체크아웃에 없지만
@@ -143,18 +145,23 @@ jobs:
           token: ${{ secrets.EXPO_TOKEN }}
 
       # eas build 가 업로드 전 러너에서 돌리는 introspect 가 googleServicesFile 실파일을 열므로,
-      # file 타입 환경변수를 .eas/.env/ 로 내려받고 경로를 .env.local 에 기록해 둔다
-      # (Expo CLI 가 .env.local 을 자동 로드. .env.local·.eas/ 는 gitignore 대상이라 EAS 업로드에 미포함)
+      # file 타입 환경변수를 .eas/.env/ 로 내려받고 경로를 GITHUB_ENV 로 export 한다.
+      # .env.local 기록만으로는 안 된다 — eas build 는 EAS 환경을 서버에서 직접 로드하는 경로라
+      # .env.local 자동 로드 없이 introspect 를 돌린다 (env:pull 만 있던 첫 실행이 그래서 실패).
+      # 셸 env 로 export 하면 introspect 자식 프로세스에 그대로 전달된다 (eas config 로 재현 검증).
       - name: EAS 환경변수 pull (introspect 용)
         working-directory: apps/app
         run: |
           set -euo pipefail
           eas env:pull --environment production --non-interactive
           for VAR in GOOGLE_SERVICES_INFO_PLIST GOOGLE_SERVICES_JSON; do
-            if ! grep -q "^$VAR=" .env.local; then
-              echo "::error::.env.local 에 $VAR 가 없습니다 — EAS 환경변수 가시성이 sensitive 인지 확인하세요"
+            LINE="$(grep -m1 "^$VAR=" .env.local || true)"
+            VALUE="${LINE#*=}"
+            if [ -z "$VALUE" ]; then
+              echo "::error::.env.local 에 $VAR 가 없거나 비어 있습니다 — EAS 환경변수 가시성이 sensitive 인지 확인하세요"
               exit 1
             fi
+            printf '%s=%s\n' "$VAR" "$VALUE" >> "$GITHUB_ENV"
           done
 
       # iOS 2건만 --auto-submit — Android 는 Play 제출이 수동이라 빌드까지만 돌린다
@@ -174,14 +181,16 @@ jobs:
       # 태그는 BRIDGE_GATE 의 minAppVersion 판단 근거이므로 (`git tag --contains <sha>`)
       # 반드시 "실제로 빌드된 커밋"을 가리켜야 한다. 재빌드면 태그를 그 커밋으로 옮긴다 —
       # 옛 커밋에 남아 있으면 그 사이 들어간 브릿지 핸들러가 미포함으로 판정돼 게이트가 잘못 막는다.
-      # dev 는 PR 필수 보호가 걸려 있어 이 푸시가 거부될 수 있다 (봇은 admin 이 아니라 우회 못 한다).
+      # dev 는 PR 필수 보호가 걸려 있고 GITHUB_TOKEN 은 admin 이 아니라 우회 못 한다 (v1.2.3 승격에서 거부 실측).
+      # RELEASE_PUSH_TOKEN — admin 계정의 PAT (repo Contents read/write). enforce_admins 가 꺼져 있어
+      # admin 자격 푸시는 보호를 통과한다. 미등록이면 GITHUB_TOKEN 으로 시도하다 거부되며,
       # 그때는 빌드가 이미 도는 중이니 아래를 로컬에서 직접 밀면 된다 — admin 은 통과한다.
       #   git commit -am "chore: 앱 버전 v{버전}" && git tag app-v{버전} && git push origin dev --follow-tags
       - name: 버전 커밋·태그 푸시
         env:
           NEXT: ${{ steps.version.outputs.next }}
           BUMPED: ${{ steps.version.outputs.bump }}
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.RELEASE_PUSH_TOKEN || secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
           git config user.name 'github-actions[bot]'
