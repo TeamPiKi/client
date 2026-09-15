@@ -9,7 +9,7 @@ import {
   getErrorMessageByCode,
 } from '@piki/core';
 import { useRouter } from 'next/navigation';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, useSyncExternalStore } from 'react';
 import { toast } from 'sonner';
 
 import AppleIcon from '@/assets/icons/social/apple.svg';
@@ -26,7 +26,12 @@ import {
   setLoginRedirectPath,
 } from '@/utils/loginRedirect';
 import { consumeLoginSource } from '@/utils/loginSource';
-import { getRecentLoginProvider, setRecentLoginProvider } from '@/utils/recentLoginProvider';
+import {
+  getRecentLoginProvider,
+  getRecentLoginProviderServerSnapshot,
+  setRecentLoginProvider,
+  subscribeRecentLoginProvider,
+} from '@/utils/recentLoginProvider';
 import { WebBridge, isWebview } from '@/utils/webBridge';
 
 import { getAuthUrl } from '../_apis/getAuthUrl';
@@ -48,10 +53,12 @@ function LoginButtons({ redirect, action, errorCode, showAppleLogin }: LoginButt
 
   const [nativePendingProvider, setNativePendingProvider] = useState<SocialProviderT | null>(null);
   const [webPendingProvider, setWebPendingProvider] = useState<SocialProviderT | null>(null);
-  /** localStorage 는 서버에서 못 읽어 마운트 후 채운다 — 하이드레이션 불일치 방지 */
-  const [recentProvider, setRecentProvider] = useState<SocialProviderT | null>(null);
-
-  useEffect(() => setRecentProvider(getRecentLoginProvider()), []);
+  /** localStorage 는 서버에서 못 읽어 서버 스냅샷을 null 로 둔다 — 하이드레이션 불일치 방지 */
+  const recentProvider = useSyncExternalStore(
+    subscribeRecentLoginProvider,
+    getRecentLoginProvider,
+    getRecentLoginProviderServerSnapshot
+  );
 
   const handleNativeLoginSettled = useCallback(() => setNativePendingProvider(null), []);
   /** 앱 성공 payload 에 provider 가 없어, 요청 시점에 눌린 버튼을 그대로 기록한다 */
