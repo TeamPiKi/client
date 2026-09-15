@@ -1,10 +1,12 @@
 'use client';
 
+import { ERROR_CODE, ERROR_MESSAGE_MAP } from '@piki/core';
 import { useRouter } from 'next/navigation';
 import { useCallback, useState } from 'react';
 
 import { usePatchTournamentNickname } from '@/app/tournament/join/_hooks/usePatchTournamentNickname';
 import { usePostJoin } from '@/app/tournament/join/_hooks/usePostJoin';
+import { usePostJoinGuest } from '@/app/tournament/join/_hooks/usePostJoinGuest';
 import { EditIconFill } from '@/assets/icons/fill';
 import Button from '@/components/button';
 import type { JoinErrorTypeT } from '@/components/common/join-error-dialog';
@@ -24,24 +26,60 @@ type JoinPreviewClientProps = {
   inviteCode: string;
   /** 링크 유효성과 함께 RSC 가 이미 조회한 미리보기 */
   preview: GetInvitePreviewResponseT;
+  /** 무토큰이면 참여하기 클릭 시 join/guest 로 게스트 발급+참여를 한 번에 처리 */
+  hasToken: boolean;
+};
+
+type JoinPreviewFormProps = Omit<JoinPreviewClientProps, 'hasToken'> & {
+  initialNickname: string;
+  isGuest: boolean;
 };
 
 const MAX_NICKNAME_LENGTH = 10;
+const DUPLICATE_NICKNAME_ERROR_TEXT = ERROR_MESSAGE_MAP[ERROR_CODE.USER_DUPLICATE_NICKNAME];
 
-function JoinPreviewClient({ tournamentId, inviteCode, preview }: JoinPreviewClientProps) {
+function JoinPreviewClient({ hasToken, ...props }: JoinPreviewClientProps) {
+  if (!hasToken) return <JoinPreviewForm {...props} initialNickname="" isGuest />;
+
+  return <MemberJoinPreview {...props} />;
+}
+
+/** useGetMe가 무토큰일 때 로그인 리다이렉트를 유발하므로 토큰 있는 경우에만 분리 호출 */
+function MemberJoinPreview(props: Omit<JoinPreviewClientProps, 'hasToken'>) {
+  const { userData } = useGetMe();
+
+  return <JoinPreviewForm {...props} initialNickname={userData.nickname} isGuest={false} />;
+}
+
+function JoinPreviewForm({
+  tournamentId,
+  inviteCode,
+  preview,
+  initialNickname,
+  isGuest,
+}: JoinPreviewFormProps) {
   /** 이 페이지는 흰색 배경(bg-layer-default) — iOS 노치 영역까지 흰색으로 칠해야 자연스럽다. */
   usePageBackground('var(--color-bg-layer-default)');
 
   const router = useRouter();
-  const { userData } = useGetMe();
   const { patchTournamentNicknameMutation, isPatchTournamentNicknamePending } =
     usePatchTournamentNickname();
 
-  const [nickname, setNickname] = useState(userData.nickname);
+  const [nickname, setNickname] = useState(initialNickname);
   const [joinErrorType, setJoinErrorType] = useState<JoinErrorTypeT | null>(null);
+  /** 중복 체크 통과 후 참여 사이에 선점당한 닉네임 — 재입력 안내 (입력 변경 시 해제) */
+  const [duplicateNicknameError, setDuplicateNicknameError] = useState<string | null>(null);
 
   const { postJoinMutation, isPostJoinPending } = usePostJoin({
     onAlreadyJoined: () => router.replace(ROUTES.TOURNAMENT_CREATE(tournamentId)),
+    onParticipantsFull: () => setJoinErrorType('PARTICIPANTS_FULL'),
+    onAlreadyStarted: () => setJoinErrorType('ALREADY_STARTED'),
+    onUnavailable: () => setJoinErrorType('LINK_EXPIRED'),
+    onDeleted: () => setJoinErrorType('DELETED'),
+  });
+
+  const { postJoinGuestMutation, isPostJoinGuestPending } = usePostJoinGuest({
+    onDuplicateNickname: () => setDuplicateNicknameError(DUPLICATE_NICKNAME_ERROR_TEXT),
     onParticipantsFull: () => setJoinErrorType('PARTICIPANTS_FULL'),
     onAlreadyStarted: () => setJoinErrorType('ALREADY_STARTED'),
     onUnavailable: () => setJoinErrorType('LINK_EXPIRED'),
@@ -54,12 +92,15 @@ function JoinPreviewClient({ tournamentId, inviteCode, preview }: JoinPreviewCli
     isNicknameValid,
     nicknameErrorText,
     trimmedNickname,
-  } = useNicknameValidation(nickname, userData.nickname);
+  } = useNicknameValidation(nickname, initialNickname);
+
+  const helperText = nicknameErrorText ?? duplicateNicknameError;
 
   const isComplete =
     isNicknameValid &&
     !isCheckingNickname &&
     !isPostJoinPending &&
+    !isPostJoinGuestPending &&
     !isPatchTournamentNicknamePending;
 
   /** 참여 완료 후 뒤로가기로 join 화면에 돌아오면 재참여(409)가 되므로 히스토리에서 제거 */
@@ -69,8 +110,21 @@ function JoinPreviewClient({ tournamentId, inviteCode, preview }: JoinPreviewCli
     );
   }, [router, tournamentId]);
 
+  const handleNicknameChange = (value: string) => {
+    setNickname(value);
+    setDuplicateNicknameError(null);
+  };
+
   const handleConfirm = () => {
     if (!isComplete) return;
+
+    if (isGuest) {
+      postJoinGuestMutation(
+        { tournamentId, body: { inviteCode, nickname: trimmedNickname } },
+        { onSuccess: goToTournament }
+      );
+      return;
+    }
 
     postJoinMutation(
       {
@@ -116,11 +170,11 @@ function JoinPreviewClient({ tournamentId, inviteCode, preview }: JoinPreviewCli
           <Input
             label="토너먼트용 닉네임을 설정해주세요."
             value={nickname}
-            onChange={event => setNickname(event.target.value)}
+            onChange={event => handleNicknameChange(event.target.value)}
             right={<EditIconFill className="size-5" />}
             maxLength={MAX_NICKNAME_LENGTH}
-            aria-invalid={Boolean(nicknameErrorText)}
-            {...(nicknameErrorText ? { helperText: nicknameErrorText } : {})}
+            aria-invalid={Boolean(helperText)}
+            {...(helperText ? { helperText } : {})}
           />
         </section>
 
@@ -130,7 +184,9 @@ function JoinPreviewClient({ tournamentId, inviteCode, preview }: JoinPreviewCli
             variant="primary"
             disabled={!isComplete}
             onClick={handleConfirm}
-            isLoading={isPostJoinPending || isPatchTournamentNicknamePending}
+            isLoading={
+              isPostJoinPending || isPostJoinGuestPending || isPatchTournamentNicknamePending
+            }
           >
             참여하기
           </Button>
