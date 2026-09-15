@@ -42,7 +42,7 @@ test('게스트가 토너먼트 탭에 들어가면 로그인 유도 화면이 �
   await page.goto('/archive/tournament');
 
   await expect(
-    page.getByRole('heading', { name: '토너먼트를 확인하려면 로그인이 필요해요' })
+    page.getByRole('heading', { name: '토너먼트를 만들려면 로그인이 필요해요' })
   ).toBeVisible();
 
   await expect(page.getByRole('link', { name: '홈' })).toBeVisible();
