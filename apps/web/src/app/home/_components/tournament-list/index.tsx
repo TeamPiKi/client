@@ -9,6 +9,7 @@ import { QUERY_KEYS } from '@/consts/queryKeys';
 import { ROUTES } from '@/consts/route';
 import { getQueryClient } from '@/utils/queryClient';
 
+import GuestLoginPrompt from './GuestLoginPrompt';
 import TournamentListClient from './client';
 
 type TournamentListProps = {
@@ -16,6 +17,14 @@ type TournamentListProps = {
 };
 
 function TournamentList({ isGuest = false }: TournamentListProps) {
+  if (isGuest) {
+    return (
+      <section className="flex flex-1 flex-col">
+        <GuestLoginPrompt />
+      </section>
+    );
+  }
+
   const queryClient = getQueryClient();
 
   queryClient.prefetchQuery({
@@ -42,7 +51,7 @@ function TournamentList({ isGuest = false }: TournamentListProps) {
             </>
           }
         >
-          <TournamentListClient isGuest={isGuest} />
+          <TournamentListClient />
         </Suspense>
       </section>
     </HydrationBoundary>
