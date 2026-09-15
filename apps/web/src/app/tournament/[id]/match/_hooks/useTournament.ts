@@ -51,14 +51,11 @@ const useTournament = ({ tournamentId, inProgress }: UseTournamentArgs) => {
       }
 
       const { playLinkExpiresAt } = completed;
-      const { sourceTournamentId } = previous;
 
       queryClient.setQueryData<GetTournamentResponseT>(['tournament', tournamentId], {
         tournamentId: previous.tournamentId,
         name: previous.name,
         isOwner: previous.isOwner,
-        isRoot: previous.isRoot,
-        ...(sourceTournamentId ? { sourceTournamentId } : {}),
         status: TOURNAMENT_STATUS.COMPLETED,
         completed: {
           result: completed.result,

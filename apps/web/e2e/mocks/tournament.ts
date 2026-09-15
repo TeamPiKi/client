@@ -72,7 +72,6 @@ export const MOCK_TOURNAMENT_PENDING: GetTournamentPendingResponseT = {
   tournamentId: 1,
   name: 'E2E 토너먼트',
   isOwner: true,
-  isRoot: true,
   status: 'PENDING',
   pending: {
     ownerStarted: false,
@@ -159,7 +158,6 @@ export const MOCK_TOURNAMENT_IN_PROGRESS: GetTournamentInProgressResponseT = {
   tournamentId: 2,
   name: 'E2E 매치 토너먼트',
   isOwner: true,
-  isRoot: true,
   status: 'IN_PROGRESS',
   inProgress: {
     currentRound: 4,
@@ -193,7 +191,6 @@ export const MOCK_TOURNAMENT_COMPLETED: GetTournamentCompletedResponseT = {
   tournamentId: 3,
   name: 'E2E 결과 토너먼트',
   isOwner: true,
-  isRoot: true,
   status: 'COMPLETED',
   completed: {
     result: MOCK_TOURNAMENT_RESULT,

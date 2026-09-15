@@ -11,10 +11,11 @@
 # 전제:
 # - secrets.EXPO_TOKEN — EAS robot token
 # - EAS 에 App Store Connect API Key 가 등록돼 있어야 --auto-submit 이 비대화형으로 통과한다
-#   (expo.dev → Project → Credentials 에서 확인. 로컬 `eas credentials` 는 GoogleService-Info.plist
-#    가 EAS 파일 시크릿에만 있어 app config introspect 단계에서 실패한다)
-# - 네이티브 설정 파일(GoogleService-Info.plist·google-services.json)은 EAS 파일 시크릿에 있어
-#   러너 체크아웃에 없어도 무방하다 — 빌드는 EAS 서버에서 돌며 거기서 주입된다
+#   (expo.dev → Project → Credentials 에서 확인)
+# - 네이티브 설정 파일(GoogleService-Info.plist·google-services.json)은 체크아웃에 없지만
+#   eas build 가 업로드 전 러너에서 돌리는 app config introspect 는 실파일을 연다.
+#   file 타입 환경변수는 eas build 가 로컬 env 로 싣지 않으므로 env:pull 스텝이 먼저 내려받는다
+#   — 두 변수의 가시성은 sensitive 유지 (secret 으로 되돌리면 pull 이 안 돼 재발)
 name: App Promote
 
 on:
@@ -122,7 +123,11 @@ jobs:
           set -euo pipefail
           # 0,/re/ 는 첫 일치만 바꾼다 — 뒤쪽 url·extraMavenRepos 줄을 건드리지 않는다
           sed -i "0,/\"version\": \"[0-9][0-9.]*\"/s//\"version\": \"$NEXT\"/" apps/app/app.json
-          git diff --quiet apps/app/app.json && { echo "::error::버전이 갱신되지 않았습니다"; exit 1; }
+          # git diff --quiet 는 변경 없음=0 — && 연결이면 정상 경로(변경 있음=1)가 스텝을 실패시킨다
+          if git diff --quiet apps/app/app.json; then
+            echo "::error::버전이 갱신되지 않았습니다"
+            exit 1
+          fi
 
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
@@ -136,6 +141,21 @@ jobs:
         with:
           eas-version: latest
           token: ${{ secrets.EXPO_TOKEN }}
+
+      # eas build 가 업로드 전 러너에서 돌리는 introspect 가 googleServicesFile 실파일을 열므로,
+      # file 타입 환경변수를 .eas/.env/ 로 내려받고 경로를 .env.local 에 기록해 둔다
+      # (Expo CLI 가 .env.local 을 자동 로드. .env.local·.eas/ 는 gitignore 대상이라 EAS 업로드에 미포함)
+      - name: EAS 환경변수 pull (introspect 용)
+        working-directory: apps/app
+        run: |
+          set -euo pipefail
+          eas env:pull --environment production --non-interactive
+          for VAR in GOOGLE_SERVICES_INFO_PLIST GOOGLE_SERVICES_JSON; do
+            if ! grep -q "^$VAR=" .env.local; then
+              echo "::error::.env.local 에 $VAR 가 없습니다 — EAS 환경변수 가시성이 sensitive 인지 확인하세요"
+              exit 1
+            fi
+          done
 
       # iOS 2건만 --auto-submit — Android 는 Play 제출이 수동이라 빌드까지만 돌린다
       # (--platform all 로 묶으면 Android 까지 Play 에 올리려 해서 submit 설정이 없어 실패한다)

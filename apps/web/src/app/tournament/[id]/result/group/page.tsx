@@ -20,20 +20,15 @@ async function GroupResultPage({ params }: GroupResultPageProps) {
 
   const queryClient = getQueryClient();
 
-  // 그룹 결과는 원본(ROOT) 단위로 집계된다. CLONE 진입이면 원본 id 로 조회해야 해서 토너먼트를 먼저 확인한다.
-  // (layout 과 병렬 렌더라 캐시 히트가 보장되지 않아 ensureQueryData 로 조회)
-  const tournamentData = await queryClient.ensureQueryData({
+  // 클라이언트가 토너먼트 이름을 쓴다. layout 과 병렬 렌더라 캐시 히트가 보장되지 않아 여기서 확보한다.
+  await queryClient.ensureQueryData({
     queryKey: ['tournament', tournamentId],
     queryFn: () => getTournament(tournamentId),
   });
-  const groupResultTournamentId =
-    'sourceTournamentId' in tournamentData && tournamentData.sourceTournamentId
-      ? tournamentData.sourceTournamentId
-      : tournamentId;
 
   queryClient.prefetchQuery({
-    queryKey: ['groupResult', groupResultTournamentId],
-    queryFn: () => getGroupResult(groupResultTournamentId),
+    queryKey: ['groupResult', tournamentId],
+    queryFn: () => getGroupResult(tournamentId),
   });
 
   return (

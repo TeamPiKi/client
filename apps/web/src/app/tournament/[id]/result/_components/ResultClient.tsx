@@ -61,8 +61,8 @@ function ResultClient({ tournamentId, isGuest = false, isApp = false }: ResultCl
 
   const tournamentName = tournamentData.name;
   const result = tournamentData.completed.result;
-  // 플레이 링크 공유는 ROOT 의 소유자만 가능 — CLONE 소유자(친구 초대 → CLONE 생성한 사람) 제외
-  const canSharePlayLink = tournamentData.isRoot && tournamentData.isOwner;
+  // 플레이 링크 공유는 소유자만 가능
+  const canSharePlayLink = tournamentData.isOwner;
 
   const handleSharePlayLink = () => {
     setIsShareDialogOpen(true);

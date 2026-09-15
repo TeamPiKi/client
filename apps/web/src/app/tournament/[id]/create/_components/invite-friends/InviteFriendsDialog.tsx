@@ -13,6 +13,8 @@ import { parseServerLocalDateTime } from '@/utils/formatDate';
 import { markInviteSent } from '@/utils/inviteSentSession';
 import { copyToClipboard, share } from '@/utils/share';
 
+import { useGetMe } from '@/hooks/useGetMe';
+
 import { usePatchInviteExpiry } from '../../_hooks/usePatchInviteExpiry';
 import InviteExpiresPicker from './InviteExpiresPicker';
 
@@ -42,7 +44,7 @@ const formatExpiresInfo = (expiresAt: string | undefined, nowMs: number) => {
   const remainingMs = expires.getTime() - nowMs;
   if (remainingMs <= 0) return { remainingLabel: '마감', absoluteLabel: '만료됨' };
 
-  const totalMinutes = Math.floor(remainingMs / 60_000);
+  const totalMinutes = Math.ceil(remainingMs / 60_000);
   const hours = Math.floor(totalMinutes / 60);
   const minutes = totalMinutes % 60;
 
@@ -73,6 +75,9 @@ function InviteFriendsDialog({
   inviteCode,
   inviteExpiresAt,
 }: InviteFriendsDialogProps) {
+  const { userData } = useGetMe();
+  const isGuest = userData.identityType === 'GUEST';
+
   const [isPickerOpen, setIsPickerOpen] = useState(false);
   // 남은 시간 라벨은 시간이 흐르면 스스로 낡는다. 열려 있는 동안만 분 단위로 기준 시각을 갱신한다.
   const [now, setNow] = useState(() => Date.now());
@@ -80,9 +85,17 @@ function InviteFriendsDialog({
   useEffect(() => {
     if (!open) return;
 
-    const timerId = setInterval(() => setNow(Date.now()), 60_000);
+    let intervalId: ReturnType<typeof setInterval>;
+    const msUntilNextMinute = 60_000 - (Date.now() % 60_000);
+    const timeoutId = setTimeout(() => {
+      setNow(Date.now());
+      intervalId = setInterval(() => setNow(Date.now()), 60_000);
+    }, msUntilNextMinute);
 
-    return () => clearInterval(timerId);
+    return () => {
+      clearTimeout(timeoutId);
+      clearInterval(intervalId);
+    };
   }, [open]);
 
   const expiresInfo = useMemo(
@@ -173,13 +186,15 @@ function InviteFriendsDialog({
                       </p>
                     </div>
                   </div>
-                  <button
-                    type="button"
-                    className="cursor-pointer body-2-medium text-text-neutral-tertiary"
-                    onClick={handleOpenPicker}
-                  >
-                    변경
-                  </button>
+                  {!isGuest && (
+                    <button
+                      type="button"
+                      className="cursor-pointer body-2-medium text-text-neutral-tertiary"
+                      onClick={handleOpenPicker}
+                    >
+                      변경
+                    </button>
+                  )}
                 </div>
               </div>
             )}
