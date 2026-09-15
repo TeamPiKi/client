@@ -14,8 +14,7 @@ function ProfileSection() {
   const { userData } = useGetMe();
 
   return (
-    <section className="flex w-full flex-col gap-3">
-      <h2 className="body-1-bold text-gray-900">프로필</h2>
+    <section className="flex w-full flex-col">
       {/** 게스트는 계정이 없어 프로필 대신 로그인을 유도한다 */}
       {userData.identityType === 'GUEST' ? (
         <Link
