@@ -7,5 +7,8 @@ test('로그인 화면에 비회원 진입점이 없다', async ({ page }) => {
   await page.goto('/login');
 
   await expect(page.getByRole('button', { name: '카카오로 시작하기' })).toBeVisible();
-  await expect(page.getByText('비회원으로 시작하기')).toBeHidden();
+  /** 숨김(invisible) 부활 회귀까지 잡도록 DOM 부재를 직접 검증 */
+  await expect(
+    page.getByRole('button', { name: '비회원으로 시작하기', includeHidden: true })
+  ).toHaveCount(0);
 });
