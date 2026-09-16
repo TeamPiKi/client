@@ -8,14 +8,20 @@ import { ROUTES } from '@/consts/route';
 import { useNotificationSSE } from '@/hooks/useNotificationSSE';
 import { getRouteType } from '@/utils/getRouteType';
 
-function NotificationSSEProvider() {
+type NotificationSSEProviderProps = {
+  /** 서버 렌더 시점의 access_token 유효 여부 */
+  hasInitialToken: boolean;
+};
+
+function NotificationSSEProvider({ hasInitialToken }: NotificationSSEProviderProps) {
   const pathname = usePathname();
   const routeType = getRouteType(pathname);
 
-  /** 초대 프리뷰는 무토큰 진입 가능 — getMe 401 이 세션 만료 리다이렉트를 유발하므로 제외 */
+  /** 초대 프리뷰는 무토큰 진입 가능 — 무토큰일 때는 getMe 호출 제외 */
   const isTokenOptionalRoute = pathname.startsWith(ROUTES.TOURNAMENT_JOIN_BY_CODE);
 
-  const enabled = !!routeType && routeType !== 'PUBLIC' && !isTokenOptionalRoute;
+  const enabled =
+    !!routeType && routeType !== 'PUBLIC' && (!isTokenOptionalRoute || hasInitialToken);
 
   const { data: meData } = useQuery({
     ...getMeQueryOptions,

@@ -41,7 +41,13 @@ function AppNavigateHandler() {
   return isNavigatePending ? <NavigationOverlay /> : null;
 }
 
-function Providers({ children }: Readonly<{ children: ReactNode }>) {
+type ProvidersProps = Readonly<{
+  children: ReactNode;
+  /** 서버 렌더 시점의 access_token 유효 여부 */
+  hasInitialToken: boolean;
+}>;
+
+function Providers({ children, hasInitialToken }: ProvidersProps) {
   const queryClient = getQueryClient();
 
   useTrackAppHistoryDepth();
@@ -54,7 +60,7 @@ function Providers({ children }: Readonly<{ children: ReactNode }>) {
       {/* NOTE: children 보다 먼저 마운트해 페이지 마운트 시 토스트가 뜨지 않는 오류 방지 */}
       <Toaster />
       {children}
-      <NotificationSSEProvider />
+      <NotificationSSEProvider hasInitialToken={hasInitialToken} />
 
       {/* NOTE: useSearchParams 가 페이지 전체를 클라이언트 렌더로 끌어내리지 않도록 Suspense 경계 사용*/}
       <Suspense fallback={null}>
