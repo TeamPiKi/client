@@ -174,7 +174,7 @@ function LoginButtons({ redirect, action, errorCode, showAppleLogin }: LoginButt
   const tooltipProvider = recentProvider === 'apple' && !showAppleLogin ? null : recentProvider;
 
   return (
-    <div className="flex w-full flex-col items-center gap-3">
+    <div className="flex w-full flex-col items-center gap-4">
       <div className="relative w-full">
         {tooltipProvider === 'google' && <RecentLoginTooltip />}
         <SocialLoginButton
