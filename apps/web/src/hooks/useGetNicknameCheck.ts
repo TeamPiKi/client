@@ -28,6 +28,7 @@ export const useGetNicknameCheck = (nickname: string, enabled = true) => {
     queryFn: () => getNicknameCheck(debouncedNickname),
     enabled: enabled && isValidLength,
     placeholderData: keepPreviousData,
+    staleTime: 0, // NOTE: 재호출 시 최신 결과를 받아와야 하므로 staleTime 0으로 설정
     retry: false,
   });
 
