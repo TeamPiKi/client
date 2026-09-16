@@ -21,16 +21,19 @@ export const useNicknameValidation = (nickname: string, originalNickname: string
     isGetNicknameCheckSuccess,
   } = useGetNicknameCheck(nickname, canCheckNickname);
 
+  const isCheckingNickname =
+    isNicknameChanged && hasNickname && !hasInvalidPrefix && isNicknameCheckFetching;
+
+  /** 검사 진행 중에는 에러 표시 X */
+  const isDuplicateConfirmed =
+    canCheckNickname && !isCheckingNickname && nicknameCheckData?.available === false;
+
   let nicknameErrorText: string | null = null;
 
   if (hasInvalidPrefix) nicknameErrorText = WITHDRAW_PREFIX_ERROR_TEXT;
   else if (canCheckNickname && nicknameCheckError)
     nicknameErrorText = getApiErrorMessage(nicknameCheckError);
-  else if (canCheckNickname && nicknameCheckData && !nicknameCheckData.available)
-    nicknameErrorText = DUPLICATE_NICKNAME_ERROR_TEXT;
-
-  const isCheckingNickname =
-    isNicknameChanged && hasNickname && !hasInvalidPrefix && isNicknameCheckFetching;
+  else if (isDuplicateConfirmed) nicknameErrorText = DUPLICATE_NICKNAME_ERROR_TEXT;
 
   const isNicknameValid =
     hasNickname &&
