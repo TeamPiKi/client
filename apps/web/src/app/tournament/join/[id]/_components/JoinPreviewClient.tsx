@@ -98,6 +98,7 @@ function JoinPreviewForm({
 
   const isComplete =
     isNicknameValid &&
+    !duplicateNicknameError &&
     !isCheckingNickname &&
     !isPostJoinPending &&
     !isPostJoinGuestPending &&
