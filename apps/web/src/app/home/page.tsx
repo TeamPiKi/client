@@ -5,7 +5,6 @@ import { getIsGuest } from '@/utils/auth';
 
 import AddWishHomeDialog from './_components/AddWishHomeDialog';
 import CreateTournamentDialog from './_components/CreateTournamentDialog';
-import HomeGuestBannerClient from './_components/HomeGuestBannerClient';
 import InviteTournamentDialog from './_components/InviteTournamentDialog';
 import HomeOnboarding from './_components/home-onboarding';
 import TournamentList from './_components/tournament-list';
@@ -18,18 +17,15 @@ async function HomePage() {
       {/* 상단 헤더 */}
       <Header left={<PiKiLogo />} right={<HeaderIcon name="ALARM" />} />
 
-      <Spacing size={isGuest ? 12 : 24} />
+      <Spacing size={24} />
 
       {/* 메인 컨텐츠 */}
       <main className="flex w-full flex-1 flex-col gap-8">
-        <div className="flex flex-col gap-3">
-          {isGuest && <HomeGuestBannerClient />}
-          <section className="grid grid-cols-2 gap-3">
-            <AddWishHomeDialog />
-            <CreateTournamentDialog />
-            <InviteTournamentDialog />
-          </section>
-        </div>
+        <section className="grid grid-cols-2 gap-3">
+          <AddWishHomeDialog />
+          <CreateTournamentDialog />
+          <InviteTournamentDialog />
+        </section>
 
         {/* 최근 생성한 토너먼트 */}
         <TournamentList isGuest={isGuest} />

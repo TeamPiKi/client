@@ -25,6 +25,12 @@ export const getRecentLoginProvider = (): SocialProviderT | null => {
   }
 };
 
+/** `useSyncExternalStore` 용 — 외부 변경 구독 없이 마운트 후 저장값을 1회 읽는다 */
+export const subscribeRecentLoginProvider = () => () => {};
+
+/** `useSyncExternalStore` 용 서버 스냅샷 — localStorage 를 못 읽는 서버 렌더에서는 힌트 없음 */
+export const getRecentLoginProviderServerSnapshot = (): SocialProviderT | null => null;
+
 /** 최근 로그인 수단 기록 — 매 소셜 로그인 성공 시 덮어써 마지막 수단 하나만 유지한다 */
 export const setRecentLoginProvider = (provider: SocialProviderT) => {
   if (typeof window === 'undefined') return;

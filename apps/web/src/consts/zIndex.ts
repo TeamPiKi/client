@@ -1,6 +1,9 @@
 export const Z_INDEX = {
   BASE_IMAGE: 10,
 
+  /** 게스트 - 로그인 유도 전체 화면 */
+  LOGIN_REQUIRED_OVERLAY: 15,
+
   BOTTOM_TAB_BAR: 20,
 
   BOTTOM_CTA: 30,
