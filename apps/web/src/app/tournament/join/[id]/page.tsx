@@ -1,6 +1,6 @@
-import { ERROR_CODE } from '@piki/core';
+import { ERROR_CODE, isTokenUnexpired } from '@piki/core';
 import type { Metadata } from 'next';
-import { headers } from 'next/headers';
+import { cookies, headers } from 'next/headers';
 import { notFound, redirect } from 'next/navigation';
 
 import { getInvitePreviewByCode } from '@/apis/getInvitePreviewByCode';
@@ -77,7 +77,17 @@ async function TournamentJoinPage({ params, searchParams }: TournamentJoinPagePr
   /** 이미 참여한 유저인 경우 - 바로 토너먼트 준비 화면으로 진입 */
   if (preview.joined) redirect(ROUTES.TOURNAMENT_CREATE(tournamentId));
 
-  return <JoinPreviewClient tournamentId={tournamentId} inviteCode={code} preview={preview} />;
+  const accessToken = (await cookies()).get('access_token')?.value;
+  const hasToken = isTokenUnexpired(accessToken ?? null);
+
+  return (
+    <JoinPreviewClient
+      tournamentId={tournamentId}
+      inviteCode={code}
+      preview={preview}
+      hasToken={hasToken}
+    />
+  );
 }
 
 export default TournamentJoinPage;
