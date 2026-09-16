@@ -48,7 +48,12 @@ export const useSocialLogin = () => {
       }
 
       const body = { accessToken };
-      const { accessToken: jwtAccessToken, refreshToken } = await postSocialLogin(provider, body);
+      const guestAccessToken = await TokenStorage.getAccessToken();
+      const { accessToken: jwtAccessToken, refreshToken } = await postSocialLogin(
+        provider,
+        body,
+        guestAccessToken
+      );
 
       await TokenStorage.setTokens(jwtAccessToken, refreshToken);
 

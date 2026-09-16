@@ -9,7 +9,8 @@ type PostSocialLoginRequestT = {
 
 export const postSocialLogin = async (
   provider: SocialProviderT,
-  body: PostSocialLoginRequestT
+  body: PostSocialLoginRequestT,
+  guestAccessToken: string | null
 ): Promise<SocialLoginSuccessPayloadT> => {
   let response: Response;
   try {
@@ -18,6 +19,8 @@ export const postSocialLogin = async (
       headers: {
         'Content-Type': 'application/json',
         'X-Client-Type': 'app',
+        /** 게스트 토큰 포함 시 기록 승계 */
+        ...(guestAccessToken ? { Authorization: `Bearer ${guestAccessToken}` } : {}),
       },
       body: JSON.stringify(body),
     });
