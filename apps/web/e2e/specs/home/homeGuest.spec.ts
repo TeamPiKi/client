@@ -1,7 +1,7 @@
 import { ENDPOINTS } from '@/consts/api';
 
 import { expect, test } from '@e2e/fixtures/mockApiFixture';
-import { useGuestToken } from '@e2e/helpers/guestToken';
+import { applyGuestToken } from '@e2e/helpers/guestToken';
 import { MOCK_GUEST_ME } from '@e2e/mocks/me';
 import { MOCK_TOURNAMENT_LIST } from '@e2e/mocks/tournament';
 
@@ -9,7 +9,7 @@ test('게스트 홈은 토너먼트를 보유해도 리스트 대신 로그인 �
   api.get(ENDPOINTS.USER, MOCK_GUEST_ME);
   /** 보유 여부와 무관함을 검증 — 리스트 목이 있어도 게스트는 조회 자체를 하지 않는다 */
   api.get(ENDPOINTS.TOURNAMENTS, MOCK_TOURNAMENT_LIST);
-  await useGuestToken(page);
+  await applyGuestToken(page);
 
   await page.goto('/home');
 
@@ -20,7 +20,7 @@ test('게스트 홈은 토너먼트를 보유해도 리스트 대신 로그인 �
 
 test('게스트가 새 토너먼트 만들기를 누르면 로그인 유도 화면이 뜬다', async ({ page, api }) => {
   api.get(ENDPOINTS.USER, MOCK_GUEST_ME);
-  await useGuestToken(page);
+  await applyGuestToken(page);
 
   await page.goto('/home');
   await page.getByRole('button', { name: '새 토너먼트 만들기' }).click();
@@ -41,7 +41,7 @@ test('게스트가 새 토너먼트 만들기를 누르면 로그인 유도 화�
 
 test('게스트가 위시 담기를 누르면 로그인 유도 화면이 뜬다', async ({ page, api }) => {
   api.get(ENDPOINTS.USER, MOCK_GUEST_ME);
-  await useGuestToken(page);
+  await applyGuestToken(page);
 
   await page.goto('/home');
   await page.getByRole('button', { name: '위시 담기' }).click();
@@ -56,9 +56,7 @@ test.describe('무토큰', () => {
   /** 자동 게스트 발급 제거 검증이라 기본 storageState(토큰)를 비운다 */
   test.use({ storageState: { cookies: [], origins: [] } });
 
-  test('무토큰으로 홈에 들어가면 게스트 발급 없이 로그인으로 리다이렉트된다', async ({
-    page,
-  }) => {
+  test('무토큰으로 홈에 들어가면 게스트 발급 없이 로그인으로 리다이렉트된다', async ({ page }) => {
     await page.goto('/home');
 
     await expect(page).toHaveURL(/\/login\?redirect=%2Fhome/);

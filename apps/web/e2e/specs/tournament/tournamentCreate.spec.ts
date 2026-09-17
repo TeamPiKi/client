@@ -1,7 +1,7 @@
 import { ENDPOINTS } from '@/consts/api';
 
 import { expect, test } from '@e2e/fixtures/mockApiFixture';
-import { useGuestToken } from '@e2e/helpers/guestToken';
+import { applyGuestToken } from '@e2e/helpers/guestToken';
 import { MOCK_GUEST_ME, MOCK_MEMBER_ME } from '@e2e/mocks/me';
 import { MOCK_TOURNAMENT_LIST, MOCK_TOURNAMENT_PENDING } from '@e2e/mocks/tournament';
 
@@ -30,7 +30,7 @@ test('홈에서 토너먼트 카드를 누르면 준비 페이지로 이동하�
 test('게스트에게는 준비 화면 헤더 뒤로가기가 보이지 않는다', async ({ page, api }) => {
   api.get(ENDPOINTS.USER, MOCK_GUEST_ME);
   api.get(ENDPOINTS.TOURNAMENT(1), MOCK_TOURNAMENT_PENDING);
-  await useGuestToken(page);
+  await applyGuestToken(page);
 
   await page.goto('/tournament/1/create');
 

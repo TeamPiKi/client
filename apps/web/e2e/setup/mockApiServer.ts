@@ -45,7 +45,7 @@ const SSR_MOCK_ROUTES: Record<string, unknown> = {
 /**
  * me 는 요청 토큰(access_token 쿠키)의 role 클레임과 정합시킨다 — 서버 게이트 판정과 me 응답이
  * 항상 같은 유저를 가리키도록. 'me' 는 루트 layout 이 pending 으로 dehydrate 해 브라우저 목으로
- * 테스트별 덮어쓰기가 불가하므로, `useGuestToken` 이 심은 게스트 토큰이 곧 게스트 me 가 된다.
+ * 테스트별 덮어쓰기가 불가하므로, `applyGuestToken` 이 심은 게스트 토큰이 곧 게스트 me 가 된다.
  */
 const resolveMe = (req: http.IncomingMessage) => {
   const token = req.headers.cookie
