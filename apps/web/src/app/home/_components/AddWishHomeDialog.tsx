@@ -3,12 +3,10 @@
 import Image from 'next/image';
 import { useState } from 'react';
 
-import LoginRequired from '@/components/common/login-required';
-import { LOGIN_REQUIRED_TITLE } from '@/components/common/login-required/loginRequired.const';
+import WishLoginRequired from '@/components/common/wish-login-required';
 import { Dialog, DialogTrigger } from '@/components/dialog';
 import GetItemDialogContent from '@/components/get-item-dialog';
 import { ANALYTICS_EVENT } from '@/consts/analytics';
-import { ROUTES } from '@/consts/route';
 import { useGetMe } from '@/hooks/useGetMe';
 import { logAnalyticsEvent } from '@/utils/analytics';
 
@@ -40,11 +38,7 @@ function AddWishHomeDialog() {
         </button>
         {isLoginRequiredOpen && (
           <div className="absolute inset-0 z-50">
-            <LoginRequired
-              title={LOGIN_REQUIRED_TITLE.WISH}
-              redirectPath={ROUTES.WISHLIST}
-              onGoHome={() => setIsLoginRequiredOpen(false)}
-            />
+            <WishLoginRequired onGoHome={() => setIsLoginRequiredOpen(false)} />
           </div>
         )}
       </>

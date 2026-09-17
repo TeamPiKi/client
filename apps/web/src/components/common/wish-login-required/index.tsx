@@ -9,21 +9,17 @@ import { Header, HeaderIcon } from '@/components/header';
 import { ROUTES } from '@/consts/route';
 import { getLoginPath } from '@/utils/loginRedirect';
 
-type LoginRequiredProps = {
-  /** 지점별 안내 문구 — loginRequired.const.ts 카탈로그에서 주입 */
-  title: string;
-  /** 로그인 성공 후 복귀 경로 */
-  redirectPath: string;
+type WishLoginRequiredProps = {
   /** '홈으로 돌아가기' 동작 — 미지정 시 홈으로 이동 (홈 오버레이에서는 닫기 핸들러 주입) */
   onGoHome?: () => void;
 };
 
-/** 게스트가 잠긴 기능에 접근할 때 로그인을 유도하는 전체 화면 */
-function LoginRequired({ title, redirectPath, onGoHome }: LoginRequiredProps) {
+/** 게스트가 위시에 접근할 때 로그인을 유도하는 전체 화면 */
+function WishLoginRequired({ onGoHome }: WishLoginRequiredProps) {
   const router = useRouter();
 
   const handleLoginClick = () => {
-    router.push(getLoginPath(redirectPath));
+    router.push(getLoginPath(ROUTES.WISHLIST));
   };
 
   const handleGoHomeClick = () => {
@@ -42,7 +38,9 @@ function LoginRequired({ title, redirectPath, onGoHome }: LoginRequiredProps) {
         <LockIconFill width={60} height={60} className="text-sky-blue-400" aria-hidden />
 
         <div className="flex flex-col items-center gap-[30px]">
-          <h2 className="heading-1-semibold text-text-neutral-primary">{title}</h2>
+          <h2 className="heading-1-semibold text-text-neutral-primary">
+            위시를 담으려면 로그인이 필요해요
+          </h2>
 
           <div className="flex flex-col items-center gap-6">
             <Button variant="primary" size="md" onClick={handleLoginClick}>
@@ -62,4 +60,4 @@ function LoginRequired({ title, redirectPath, onGoHome }: LoginRequiredProps) {
   );
 }
 
-export default LoginRequired;
+export default WishLoginRequired;

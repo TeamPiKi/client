@@ -1,7 +1,7 @@
 import PiKiLogo from '@/assets/images/piki-logo-text.svg';
 import { Header, HeaderIcon } from '@/components/header';
 import Spacing from '@/components/spacing';
-import { getIsGuest } from '@/utils/auth';
+import { getIsGuest } from '@/utils/getIsGuest';
 
 import AddWishHomeDialog from './_components/AddWishHomeDialog';
 import CreateTournamentDialog from './_components/CreateTournamentDialog';
