@@ -12,7 +12,7 @@ import { logAnalyticsEvent } from '@/utils/analytics';
 import { setLoginSource } from '@/utils/loginSource';
 import { getLoginPath } from '@/utils/loginRedirect';
 
-function TournamentGuestEmptyState() {
+function GuestLoginPrompt() {
   useEffect(() => {
     logAnalyticsEvent(ANALYTICS_EVENT.GUEST_BANNER_VIEW, { location: LOGIN_SOURCE.HOME_EMPTY });
   }, []);
@@ -41,4 +41,4 @@ function TournamentGuestEmptyState() {
   );
 }
 
-export default TournamentGuestEmptyState;
+export default GuestLoginPrompt;

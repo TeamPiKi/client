@@ -50,9 +50,8 @@ async function RootLayout({
 
   const queryClient = getQueryClient();
   const accessToken = (await cookies()).get('access_token')?.value;
-  if (isTokenUnexpired(accessToken ?? null)) {
-    queryClient.prefetchQuery(getMeQueryOptions);
-  }
+  const hasToken = isTokenUnexpired(accessToken ?? null);
+  if (hasToken) queryClient.prefetchQuery(getMeQueryOptions);
 
   const shouldUpdateApp =
     isWebview && !isAppVersionSupported(getAppVersion(userAgent), APP_UPDATE_PROMPT.targetVersion);
@@ -91,7 +90,7 @@ async function RootLayout({
         )}
       </head>
       <body className="h-full overflow-hidden">
-        <Providers>
+        <Providers hasInitialToken={hasToken}>
           {/** TEMP: max width 임시 값 */}
           <div
             id={SCROLL_CONTAINER_ID}

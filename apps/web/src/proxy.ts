@@ -270,8 +270,11 @@ export const proxy = async (request: NextRequest) => {
     /** access(X), refresh(O): 토큰 갱신, 실패 시 로그인 페이지로 리다이렉트 */
     if (refreshToken) return await handleTokenRefresh(request);
 
-    /** access(X), refresh(X): 자동 게스트 로그인 */
-    return await handleGuestLogin(request);
+    /** access(X), refresh(X): 토너먼트 프리뷰는 무토큰이어도 진입 가능, 플레이 링크 진입 시에는 게스트 자동 발급 */
+    if (pathname.startsWith(ROUTES.TOURNAMENT_JOIN_BY_CODE)) return NextResponse.next();
+    if (pathname.startsWith('/play')) return await handleGuestLogin(request);
+
+    return NextResponse.redirect(new URL(getLoginPath(`${pathname}${search}`), request.url));
   }
 
   if (routeType === 'MEMBER_ONLY' || routeType === 'AUTHORIZED') {

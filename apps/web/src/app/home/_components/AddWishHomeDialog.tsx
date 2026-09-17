@@ -9,6 +9,7 @@ import { Dialog, DialogTrigger } from '@/components/dialog';
 import GetItemDialogContent from '@/components/get-item-dialog';
 import { ANALYTICS_EVENT } from '@/consts/analytics';
 import { ROUTES } from '@/consts/route';
+import { Z_INDEX } from '@/consts/zIndex';
 import { useGetMe } from '@/hooks/useGetMe';
 import { logAnalyticsEvent } from '@/utils/analytics';
 
@@ -39,7 +40,7 @@ function AddWishHomeDialog() {
           <WishButtonContent />
         </button>
         {isLoginRequiredOpen && (
-          <div className="absolute inset-0 z-50">
+          <div className="absolute inset-0" style={{ zIndex: Z_INDEX.LOGIN_REQUIRED_OVERLAY }}>
             <LoginRequired
               title={LOGIN_REQUIRED_TITLE.WISH}
               redirectPath={ROUTES.WISHLIST}

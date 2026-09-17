@@ -4,6 +4,8 @@ import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 
 import { BasketIconFill } from '@/assets/icons';
 import Button from '@/components/button';
+import LoginRequired from '@/components/common/login-required';
+import { LOGIN_REQUIRED_TITLE } from '@/components/common/login-required/loginRequired.const';
 import {
   Dialog,
   DialogContent,
@@ -12,8 +14,12 @@ import {
   DialogTrigger,
 } from '@/components/dialog';
 import Input from '@/components/input';
+import type { AbVariantT } from '@/consts/abTest';
 import { TOOLTIP_VARIANT_KEY } from '@/consts/abTest';
 import { ANALYTICS_EVENT } from '@/consts/analytics';
+import { ROUTES } from '@/consts/route';
+import { Z_INDEX } from '@/consts/zIndex';
+import { useGetMe } from '@/hooks/useGetMe';
 import { usePostCreateTournament } from '@/hooks/usePostCreateTournament';
 import {
   getAbVariantServerSnapshot,
@@ -29,7 +35,13 @@ const DEFAULT_INVITE_DURATION_MINUTES = 30;
 
 const getTooltipVariant = () => getOrAssignAbVariant(TOOLTIP_VARIANT_KEY);
 
+const createButtonClassName =
+  'relative flex h-[104px] cursor-pointer flex-col rounded-2xl bg-gray-900 p-4';
+
 function CreateTournamentDialog() {
+  const { userData } = useGetMe();
+
+  const [isLoginRequiredOpen, setIsLoginRequiredOpen] = useState(false);
   const [open, setOpen] = useState(false);
   const [name, setName] = useState('');
   const { postCreateTournamentMutation, isPostCreateTournamentPending } = usePostCreateTournament();
@@ -53,13 +65,20 @@ function CreateTournamentDialog() {
     hasLoggedViewRef.current = true;
 
     setAnalyticsUserProperties({ tooltip_variant: variant });
-    logAnalyticsEvent(ANALYTICS_EVENT.HOME_VIEW, { tooltip_variant: variant });
-  }, [variant]);
+    logAnalyticsEvent(ANALYTICS_EVENT.HOME_VIEW, {
+      tooltip_variant: variant,
+      identity_type: userData.identityType,
+    });
+  }, [variant, userData.identityType]);
 
   const handleTriggerClick = () => {
     logAnalyticsEvent(ANALYTICS_EVENT.NEW_TOURNAMENT_CLICK, {
       ...(variant && { tooltip_variant: variant }),
+      identity_type: userData.identityType,
     });
+    
+    /** 게스트 - 생성 다이얼로그 대신 로그인 유도 UI 띄우기 */
+    if (userData.identityType !== 'MEMBER') setIsLoginRequiredOpen(true);
   };
 
   const trimmedName = name.trim();
@@ -79,6 +98,30 @@ function CreateTournamentDialog() {
     );
   };
 
+  if (userData.identityType !== 'MEMBER') {
+    return (
+      <>
+        <button
+          type="button"
+          aria-label="새 토너먼트 만들기"
+          onClick={handleTriggerClick}
+          className={createButtonClassName}
+        >
+          <CreateButtonContent variant={variant} />
+        </button>
+        {isLoginRequiredOpen && (
+          <div className="absolute inset-0" style={{ zIndex: Z_INDEX.LOGIN_REQUIRED_OVERLAY }}>
+            <LoginRequired
+              title={LOGIN_REQUIRED_TITLE.TOURNAMENT_CREATE}
+              redirectPath={ROUTES.HOME}
+              onGoHome={() => setIsLoginRequiredOpen(false)}
+            />
+          </div>
+        )}
+      </>
+    );
+  }
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
@@ -86,13 +129,9 @@ function CreateTournamentDialog() {
           type="button"
           aria-label="새 토너먼트 만들기"
           onClick={handleTriggerClick}
-          className="relative flex h-[104px] cursor-pointer flex-col rounded-2xl bg-gray-900 p-4"
+          className={createButtonClassName}
         >
-          {variant && <TooltipAb variant={variant} />}
-          <span className="text-left body-1-semibold whitespace-pre-line text-base-50">
-            {'새 토너먼트\n만들기'}
-          </span>
-          <BasketIconFill className="size-7.5 self-end text-white" />
+          <CreateButtonContent variant={variant} />
         </button>
       </DialogTrigger>
       <DialogContent showCloseButton={false} className="flex flex-col gap-5">
@@ -117,5 +156,15 @@ function CreateTournamentDialog() {
     </Dialog>
   );
 }
+
+const CreateButtonContent = ({ variant }: { variant: AbVariantT | null }) => (
+  <>
+    {variant && <TooltipAb variant={variant} />}
+    <span className="text-left body-1-semibold whitespace-pre-line text-base-50">
+      {'새 토너먼트\n만들기'}
+    </span>
+    <BasketIconFill className="size-7.5 self-end text-white" />
+  </>
+);
 
 export default CreateTournamentDialog;
