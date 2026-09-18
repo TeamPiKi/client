@@ -8,6 +8,7 @@ import { LOGIN_REQUIRED_TITLE } from '@/components/common/login-required/loginRe
 import { Dialog, DialogTrigger } from '@/components/dialog';
 import GetItemDialogContent from '@/components/get-item-dialog';
 import { ANALYTICS_EVENT } from '@/consts/analytics';
+import { GUEST_BLOCK_LOCATION } from '@/consts/guestBlockLocation';
 import { ROUTES } from '@/consts/route';
 import { Z_INDEX } from '@/consts/zIndex';
 import { useGetMe } from '@/hooks/useGetMe';
@@ -44,6 +45,7 @@ function AddWishHomeDialog() {
             <LoginRequired
               title={LOGIN_REQUIRED_TITLE.WISH}
               redirectPath={ROUTES.WISHLIST}
+              location={GUEST_BLOCK_LOCATION.HOME_WISH_ADD}
               onGoHome={() => setIsLoginRequiredOpen(false)}
             />
           </div>

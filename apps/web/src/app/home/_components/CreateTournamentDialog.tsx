@@ -17,6 +17,7 @@ import Input from '@/components/input';
 import type { AbVariantT } from '@/consts/abTest';
 import { TOOLTIP_VARIANT_KEY } from '@/consts/abTest';
 import { ANALYTICS_EVENT } from '@/consts/analytics';
+import { GUEST_BLOCK_LOCATION } from '@/consts/guestBlockLocation';
 import { ROUTES } from '@/consts/route';
 import { Z_INDEX } from '@/consts/zIndex';
 import { useGetMe } from '@/hooks/useGetMe';
@@ -114,6 +115,7 @@ function CreateTournamentDialog() {
             <LoginRequired
               title={LOGIN_REQUIRED_TITLE.TOURNAMENT_CREATE}
               redirectPath={ROUTES.HOME}
+              location={GUEST_BLOCK_LOCATION.HOME_TOURNAMENT_CREATE}
               onGoHome={() => setIsLoginRequiredOpen(false)}
             />
           </div>
