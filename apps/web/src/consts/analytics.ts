@@ -37,6 +37,10 @@ export const ANALYTICS_EVENT = {
   GUEST_BANNER_VIEW: 'guest_banner_view',
   GUEST_BANNER_CTA_CLICK: 'guest_banner_cta_click',
 
+  /** 게스트 차단 지점 — 배너와 분리. location 값은 consts/guestBlockLocation.ts */
+  GUEST_BLOCK_VIEW: 'guest_block_view',
+  GUEST_BLOCK_CTA_CLICK: 'guest_block_cta_click',
+
   /** 설정 */
   INVITE_EXPIRY_CHANGE: 'invite_expiry_change',
 
