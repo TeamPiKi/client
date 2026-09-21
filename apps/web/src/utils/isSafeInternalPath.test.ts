@@ -23,11 +23,11 @@ describe('isSafeInternalPath', () => {
 
   it('문자열이 아니거나 비어 있으면 차단한다', () => {
     const { to: missingParam } = {} as { to?: string };
+    const repeatedParam = ['/home', '/archive/wish'];
 
     expect(isSafeInternalPath('')).toBe(false);
     expect(isSafeInternalPath(null)).toBe(false);
     expect(isSafeInternalPath(missingParam)).toBe(false);
-    expect(isSafeInternalPath(123)).toBe(false);
-    expect(isSafeInternalPath({})).toBe(false);
+    expect(isSafeInternalPath(repeatedParam)).toBe(false);
   });
 });
