@@ -6,6 +6,7 @@ import type {
   TournamentMatchT,
 } from '@/app/tournament/[id]/_common/_types/tournamentResponse';
 import type {
+  GetInvitePreviewResponseT,
   GetTournamentListResponseT,
   TournamentItemT,
   TournamentRankingT,
@@ -208,4 +209,13 @@ export const MOCK_TOURNAMENT_GROUP_COMPLETED: GetTournamentCompletedResponseT = 
     ...MOCK_TOURNAMENT_COMPLETED.completed,
     isGroupTournament: true,
   },
+};
+
+/** 초대 코드 프리뷰 (id 1) — joined 가 true 면 RSC 가 준비 화면으로 redirect 하므로 false 고정 */
+export const MOCK_INVITE_PREVIEW: GetInvitePreviewResponseT = {
+  tournamentId: 1,
+  tournamentName: 'E2E 토너먼트',
+  itemCount: 3,
+  participantCount: 4,
+  joined: false,
 };
