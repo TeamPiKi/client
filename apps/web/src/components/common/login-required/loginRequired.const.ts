@@ -3,5 +3,6 @@ export const LOGIN_REQUIRED_TITLE = {
   WISH: '위시를 담으려면 로그인이 필요해요',
   TOURNAMENT_HISTORY: '토너먼트를 만들려면 로그인이 필요해요',
   TOURNAMENT_CREATE: '토너먼트를 만들려면 로그인이 필요해요',
+  RECEIPT_SAVE: '로그인하고 영수증을 저장해보세요',
   NOTIFICATION: '알림을 확인하려면 로그인이 필요해요',
 } as const;

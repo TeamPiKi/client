@@ -7,10 +7,13 @@ import { useEffect, useRef, useState } from 'react';
 import { ChevronForwardIconFill, DownloadIconFill, UploadIconFill } from '@/assets/icons';
 import BottomCta from '@/components/bottom-cta';
 import Button from '@/components/button';
+import LoginRequired from '@/components/common/login-required';
+import { LOGIN_REQUIRED_TITLE } from '@/components/common/login-required/loginRequired.const';
 import { Header } from '@/components/header';
 import { ANALYTICS_EVENT } from '@/consts/analytics';
 import { ROUTES } from '@/consts/route';
 import { TOURNAMENT_STATUS } from '@/consts/tournament';
+import { Z_INDEX } from '@/consts/zIndex';
 import { logAnalyticsEvent } from '@/utils/analytics';
 
 import { useGetTournament } from '../../_common/_hooks/useGetTournament';
@@ -34,6 +37,7 @@ function ResultClient({ tournamentId, isGuest = false, isApp = false }: ResultCl
   const [date] = useState(() => new Date());
   const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
   const [isReceiptShareDialogOpen, setIsReceiptShareDialogOpen] = useState(false);
+  const [isLoginRequiredOpen, setIsLoginRequiredOpen] = useState(false);
 
   // RSC에서 status 검사를 하지만, 클라에서 status가 바뀐 경우 방어
   useEffect(() => {
@@ -66,6 +70,14 @@ function ResultClient({ tournamentId, isGuest = false, isApp = false }: ResultCl
 
   const handleSharePlayLink = () => {
     setIsShareDialogOpen(true);
+  };
+
+  const handleReceiptSaveClick = () => {
+    if (isGuest) {
+      setIsLoginRequiredOpen(true);
+      return;
+    }
+    setIsReceiptShareDialogOpen(true);
   };
 
   return (
@@ -105,7 +117,7 @@ function ResultClient({ tournamentId, isGuest = false, isApp = false }: ResultCl
             size="lg"
             icon="leading"
             leadingIcon={<DownloadIconFill aria-hidden className="size-5" />}
-            onClick={() => setIsReceiptShareDialogOpen(true)}
+            onClick={handleReceiptSaveClick}
             className="flex-1 border-gray-75 bg-gray-75 text-text-neutral-secondary"
           >
             영수증 저장
@@ -132,6 +144,15 @@ function ResultClient({ tournamentId, isGuest = false, isApp = false }: ResultCl
           <ChevronForwardIconFill aria-hidden className="size-4" />
         </Link>
       </BottomCta>
+
+      {isLoginRequiredOpen && (
+        <div className="fixed inset-0 mx-auto max-w-120" style={{ zIndex: Z_INDEX.DIALOG }}>
+          <LoginRequired
+            title={LOGIN_REQUIRED_TITLE.RECEIPT_SAVE}
+            redirectPath={ROUTES.TOURNAMENT_RESULT(tournamentId)}
+          />
+        </div>
+      )}
 
       <PlateShareDialog
         open={isShareDialogOpen}
