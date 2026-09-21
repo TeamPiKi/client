@@ -253,6 +253,7 @@ export const useNotificationSSE = (enabled: boolean) => {
               switch (payload.type) {
                 case 'ITEM_REFRESH_COMPLETED':
                 case 'ITEM_PARSING_COMPLETED':
+                case 'ITEM_PARSING_RECOVERED':
                   if (payload.kind === 'TOURNAMENT' && payload.tournamentId != null) {
                     queryClient.invalidateQueries({
                       queryKey: ['tournament', payload.tournamentId],
@@ -265,6 +266,7 @@ export const useNotificationSSE = (enabled: boolean) => {
                 /** 미완성·실패 모두 동일한 데이터를 갱신하고, 사용자 안내만 다르다. */
                 case 'ITEM_PARSING_INCOMPLETE':
                 case 'ITEM_PARSING_FAILED':
+                case 'ITEM_REFRESH_FAILED':
                   if (payload.kind === 'TOURNAMENT' && payload.tournamentId != null) {
                     queryClient.invalidateQueries({
                       queryKey: ['tournament', payload.tournamentId],
