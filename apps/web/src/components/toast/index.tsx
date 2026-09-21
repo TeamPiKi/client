@@ -40,6 +40,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
       toastOptions={{
         classNames: {
           toast: '!border-none',
+          content: 'min-w-0',
           title: '!body-2-semibold !opacity-88',
           icon: '!size-6 !ml-0 !mr-0',
           actionButton:
