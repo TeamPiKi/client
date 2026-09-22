@@ -16,6 +16,8 @@ export const LOGIN_SOURCE = {
   RESULT: 'result',
   /** 마이페이지 배너 */
   MYPAGE: 'mypage',
+  /** 초대 프리뷰(무토큰) 가입 유도 */
+  INVITE: 'invite',
 } as const;
 
 export type LoginSourceT = (typeof LOGIN_SOURCE)[keyof typeof LOGIN_SOURCE];

@@ -17,10 +17,6 @@ type QueryActionToastT = {
  * 해당 컴포넌트에서 `useQueryAction` 의 `isActive` 로 처리한다.
  */
 export const QUERY_ACTION_TOAST: Partial<Record<QueryActionValueT, QueryActionToastT>> = {
-  [QUERY_ACTION.VALUE.MEMBER_ONLY]: {
-    message: '회원만 이용할 수 있는 기능이에요.',
-    variant: 'info',
-  },
   [QUERY_ACTION.VALUE.TOURNAMENT_ITEM_NOT_FOUND]: {
     message: ERROR_MESSAGE_MAP[ERROR_CODE.TOURNAMENT_NOT_FOUND_ITEM],
     variant: 'error',
