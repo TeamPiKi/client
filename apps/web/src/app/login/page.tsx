@@ -1,9 +1,9 @@
 import { WEBVIEW_UA_TOKEN } from '@piki/core';
 import { cookies, headers } from 'next/headers';
-import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
 import PikiLogo from '@/assets/images/piki-logo-cart.svg';
+import TermsAgreementNotice from '@/components/common/terms-agreement-notice';
 import { QUERY_ACTION } from '@/consts/queryAction';
 import { ROUTES } from '@/consts/route';
 import { getRoleFromToken } from '@/utils/auth';
@@ -65,23 +65,7 @@ async function LoginPage({ searchParams }: LoginPageProps) {
             showAppleLogin={!isAndroidWebview}
           />
 
-          <p className="mt-[26px] text-center caption-1-semibold text-text-neutral-tertiary">
-            가입 시{' '}
-            <Link
-              href={ROUTES.TERMS}
-              className="underline decoration-solid [text-decoration-skip-ink:none] [text-underline-position:from-font]"
-            >
-              이용약관
-            </Link>
-            {' 및 '}
-            <Link
-              href={ROUTES.POLICY}
-              className="underline decoration-solid [text-decoration-skip-ink:none] [text-underline-position:from-font]"
-            >
-              개인정보 처리방침
-            </Link>
-            에 동의하게 됩니다.
-          </p>
+          <TermsAgreementNotice action="가입" className="mt-6.5 text-center" />
         </div>
       </div>
     </div>
