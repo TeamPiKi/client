@@ -11,15 +11,17 @@ import LoginRequired from '@/components/common/login-required';
 import { LOGIN_REQUIRED_TITLE } from '@/components/common/login-required/loginRequired.const';
 import { Header } from '@/components/header';
 import { ANALYTICS_EVENT } from '@/consts/analytics';
+import { LOGIN_SOURCE } from '@/consts/loginSource';
 import { ROUTES } from '@/consts/route';
 import { TOURNAMENT_STATUS } from '@/consts/tournament';
 import { Z_INDEX } from '@/consts/zIndex';
 import { logAnalyticsEvent } from '@/utils/analytics';
+import { getLoginPath } from '@/utils/loginRedirect';
 
+import GuestSignupBanner from '../../../_common/_components/GuestSignupBanner';
 import { useGetTournament } from '../../_common/_hooks/useGetTournament';
 import ReceiptDrawMachine from './ReceiptDrawMachine';
 import ReceiptPaper from './ReceiptPaper';
-import ResultGuestBanner from './ResultGuestBanner';
 import GroupResultEntryCard from './group-result-entry-card/GroupResultEntryCard';
 import PlateShareDialog from './plate-share-dialog/PlateShareDialog';
 import ReceiptShareDialog from './receipt-share-dialog/ReceiptShareDialog';
@@ -81,7 +83,6 @@ function ResultClient({ tournamentId, isGuest = false, isApp = false }: ResultCl
   };
 
   return (
-    // pb-46(184px): 마지막 요소가 CTA(144px) + 상단 그라디언트(36px)에 가려지지 않는 하단 여백
     <main className="flex min-h-dvh flex-col overflow-x-hidden bg-bg-layer-basement pt-padding-top pb-46">
       <Header center="토너먼트 결과" centerClassName="heading-1-bold" />
 
@@ -97,7 +98,10 @@ function ResultClient({ tournamentId, isGuest = false, isApp = false }: ResultCl
 
         {isGuest && (
           <div className="mx-5 mt-[49px]">
-            <ResultGuestBanner />
+            <GuestSignupBanner
+              loginHref={getLoginPath(ROUTES.HOME)}
+              location={LOGIN_SOURCE.RESULT}
+            />
           </div>
         )}
 
@@ -150,6 +154,7 @@ function ResultClient({ tournamentId, isGuest = false, isApp = false }: ResultCl
           <LoginRequired
             title={LOGIN_REQUIRED_TITLE.RECEIPT_SAVE}
             redirectPath={ROUTES.TOURNAMENT_RESULT(tournamentId)}
+            onGoBack={() => setIsLoginRequiredOpen(false)}
           />
         </div>
       )}
