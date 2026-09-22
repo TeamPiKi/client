@@ -3,7 +3,7 @@
 import { Kode_Mono } from 'next/font/google';
 import Image from 'next/image';
 import type { ReactNode } from 'react';
-import { useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 
 import {
   ChevronBackwardIconFill,
@@ -15,8 +15,11 @@ import ReceiptZigzag from '@/assets/images/tournament/result/receipt-zigzag.svg'
 import TrophyBadge from '@/assets/images/tournament/result/trophy-badge.svg';
 import HostBadge from '@/components/common/host-badge';
 import Spinner from '@/components/spinner';
+import { ANALYTICS_EVENT } from '@/consts/analytics';
+import { GUEST_BLOCK_LOCATION } from '@/consts/guestBlockLocation';
 import { ROUTES } from '@/consts/route';
 import { useBackWithFallback } from '@/hooks/useBackWithFallback';
+import { logAnalyticsEvent } from '@/utils/analytics';
 import { cn } from '@/utils/cn';
 
 import { useGetTournament } from '../../../_common/_hooks/useGetTournament';
@@ -79,6 +82,16 @@ function GroupResultClient({ tournamentId }: GroupResultClientProps) {
   const { tournamentData } = useGetTournament(tournamentId);
   const { groupResultData, isGroupResultPending, isGroupResultError } =
     useGetGroupResult(tournamentId);
+
+  const hasLoggedLockViewRef = useRef(false);
+  const handleLockView = useCallback(() => {
+    if (hasLoggedLockViewRef.current) return;
+    hasLoggedLockViewRef.current = true;
+    /** 카드 펼쳐질 때마다가 아니라 페이지 당 1번만 집계되도록 */
+    logAnalyticsEvent(ANALYTICS_EVENT.GUEST_BLOCK_VIEW, {
+      location: GUEST_BLOCK_LOCATION.GROUP_RESULT_MASK,
+    });
+  }, []);
 
   const date = new Date();
   const tournamentName = tournamentData.name;
@@ -154,7 +167,12 @@ function GroupResultClient({ tournamentId }: GroupResultClientProps) {
               {firstItem && (
                 <div className="flex flex-col gap-3 pb-3">
                   <PlaceLabel label="1st Place" />
-                  <GroupProductCard item={firstItem} tournamentId={tournamentId} highlight />
+                  <GroupProductCard
+                    item={firstItem}
+                    tournamentId={tournamentId}
+                    onLockView={handleLockView}
+                    highlight
+                  />
                 </div>
               )}
 
@@ -165,7 +183,11 @@ function GroupResultClient({ tournamentId }: GroupResultClientProps) {
                   <ul className="flex flex-col gap-3">
                     {otherItems.map(item => (
                       <li key={`${item.rank}-${item.itemId}`}>
-                        <GroupProductCard item={item} tournamentId={tournamentId} />
+                        <GroupProductCard
+                          item={item}
+                          tournamentId={tournamentId}
+                          onLockView={handleLockView}
+                        />
                       </li>
                     ))}
                   </ul>
@@ -199,13 +221,20 @@ function GroupResultClient({ tournamentId }: GroupResultClientProps) {
 type GroupProductCardProps = {
   item: GroupResultItemT;
   tournamentId: number;
+  /** 게스트 잠금 화면 노출 시 호출 — 페이지 단위 1회 로깅은 부모가 보장 */
+  onLockView: () => void;
   /** 1위 카드에 트로피 뱃지 표시 */
   highlight?: boolean;
 };
 
 const MAX_PROFILE_STACK = 3;
 
-function GroupProductCard({ item, tournamentId, highlight = false }: GroupProductCardProps) {
+function GroupProductCard({
+  item,
+  tournamentId,
+  onLockView,
+  highlight = false,
+}: GroupProductCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const count = item.chosenBy.length;
   const visibleChoosers = item.chosenBy.slice(0, MAX_PROFILE_STACK);
@@ -279,7 +308,7 @@ function GroupProductCard({ item, tournamentId, highlight = false }: GroupProduc
       </div>
 
       {isExpanded && count > 0 && hasMaskedChooser && (
-        <ChooserLockOverlay tournamentId={tournamentId} />
+        <ChooserLockOverlay tournamentId={tournamentId} onView={onLockView} />
       )}
 
       {isExpanded && count > 0 && !hasMaskedChooser && (

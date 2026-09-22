@@ -11,6 +11,7 @@ import LoginRequired from '@/components/common/login-required';
 import { LOGIN_REQUIRED_TITLE } from '@/components/common/login-required/loginRequired.const';
 import { Header } from '@/components/header';
 import { ANALYTICS_EVENT } from '@/consts/analytics';
+import { GUEST_BLOCK_LOCATION } from '@/consts/guestBlockLocation';
 import { LOGIN_SOURCE } from '@/consts/loginSource';
 import { ROUTES } from '@/consts/route';
 import { TOURNAMENT_STATUS } from '@/consts/tournament';
@@ -154,6 +155,7 @@ function ResultClient({ tournamentId, isGuest = false, isApp = false }: ResultCl
           <LoginRequired
             title={LOGIN_REQUIRED_TITLE.RECEIPT_SAVE}
             redirectPath={ROUTES.TOURNAMENT_RESULT(tournamentId)}
+            location={GUEST_BLOCK_LOCATION.RECEIPT_SAVE}
             onGoBack={() => setIsLoginRequiredOpen(false)}
           />
         </div>
