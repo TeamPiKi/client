@@ -44,7 +44,7 @@ function AddWishHomeDialog() {
             <LoginRequired
               title={LOGIN_REQUIRED_TITLE.WISH}
               redirectPath={ROUTES.WISHLIST}
-              onGoHome={() => setIsLoginRequiredOpen(false)}
+              onGoBack={() => setIsLoginRequiredOpen(false)}
             />
           </div>
         )}
