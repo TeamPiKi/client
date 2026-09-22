@@ -6,8 +6,6 @@ import { LockIconFill } from '@/assets/icons';
 import PiKiLogo from '@/assets/images/piki-logo-text.svg';
 import Button from '@/components/button';
 import { Header, HeaderIcon } from '@/components/header';
-import { ROUTES } from '@/consts/route';
-import { useBackWithFallback } from '@/hooks/useBackWithFallback';
 import { getLoginPath } from '@/utils/loginRedirect';
 
 type LoginRequiredProps = {
@@ -15,25 +13,16 @@ type LoginRequiredProps = {
   title: string;
   /** 로그인 성공 후 복귀 경로 */
   redirectPath: string;
-  /** '이전으로 돌아가기' 클릭 시 - 마자정 시 로그인 유도 화면만 닫힘 */
-  onGoBack?: () => void;
+  /** '이전으로 돌아가기' 동작 (오버레이는 닫기, 라우트 전체 화면은 LoginRequiredPage 경유 back) */
+  onGoBack: () => void;
 };
 
 /** 게스트가 잠긴 기능에 접근할 때 로그인을 유도하는 전체 화면 */
 function LoginRequired({ title, redirectPath, onGoBack }: LoginRequiredProps) {
   const router = useRouter();
-  const backWithFallback = useBackWithFallback();
 
   const handleLoginClick = () => {
     router.push(getLoginPath(redirectPath));
-  };
-
-  const handleGoBackClick = () => {
-    if (onGoBack) {
-      onGoBack();
-      return;
-    }
-    backWithFallback(ROUTES.HOME);
   };
 
   return (
@@ -52,7 +41,7 @@ function LoginRequired({ title, redirectPath, onGoBack }: LoginRequiredProps) {
             </Button>
             <button
               type="button"
-              onClick={handleGoBackClick}
+              onClick={onGoBack}
               className="cursor-pointer body-1-medium text-text-neutral-secondary"
             >
               이전으로 돌아가기
