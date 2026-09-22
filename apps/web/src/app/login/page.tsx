@@ -5,7 +5,6 @@ import { redirect } from 'next/navigation';
 import PikiLogo from '@/assets/images/piki-logo-cart.svg';
 import TermsAgreementNotice from '@/components/common/terms-agreement-notice';
 import { QUERY_ACTION } from '@/consts/queryAction';
-import { ROUTES } from '@/consts/route';
 import { getRoleFromToken } from '@/utils/auth';
 import { getLoginRedirectPath } from '@/utils/loginRedirect';
 
