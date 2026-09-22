@@ -11,15 +11,17 @@ import LoginRequired from '@/components/common/login-required';
 import { LOGIN_REQUIRED_TITLE } from '@/components/common/login-required/loginRequired.const';
 import { Header } from '@/components/header';
 import { ANALYTICS_EVENT } from '@/consts/analytics';
+import { LOGIN_SOURCE } from '@/consts/loginSource';
 import { ROUTES } from '@/consts/route';
 import { TOURNAMENT_STATUS } from '@/consts/tournament';
 import { Z_INDEX } from '@/consts/zIndex';
 import { logAnalyticsEvent } from '@/utils/analytics';
+import { getLoginPath } from '@/utils/loginRedirect';
 
+import GuestSignupBanner from '../../../_common/_components/GuestSignupBanner';
 import { useGetTournament } from '../../_common/_hooks/useGetTournament';
 import ReceiptDrawMachine from './ReceiptDrawMachine';
 import ReceiptPaper from './ReceiptPaper';
-import ResultGuestBanner from './ResultGuestBanner';
 import GroupResultEntryCard from './group-result-entry-card/GroupResultEntryCard';
 import PlateShareDialog from './plate-share-dialog/PlateShareDialog';
 import ReceiptShareDialog from './receipt-share-dialog/ReceiptShareDialog';
@@ -96,7 +98,10 @@ function ResultClient({ tournamentId, isGuest = false, isApp = false }: ResultCl
 
         {isGuest && (
           <div className="mx-5 mt-[49px]">
-            <ResultGuestBanner />
+            <GuestSignupBanner
+              loginHref={getLoginPath(ROUTES.HOME)}
+              location={LOGIN_SOURCE.RESULT}
+            />
           </div>
         )}
 

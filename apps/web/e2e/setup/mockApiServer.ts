@@ -6,6 +6,7 @@ import { SSR_EMPTY_COOKIE } from '../consts';
 import { createApiError, createApiSuccess } from '../helpers/apiResponse';
 import { MOCK_GUEST_ME, MOCK_MEMBER_ME } from '../mocks/me';
 import {
+  MOCK_INVITE_PREVIEW,
   MOCK_TOURNAMENT_COMPLETED,
   MOCK_TOURNAMENT_GROUP_COMPLETED,
   MOCK_TOURNAMENT_IN_PROGRESS,
@@ -36,6 +37,8 @@ const SSR_MOCK_ROUTES: Record<string, unknown> = {
   [`GET ${ENDPOINTS.TOURNAMENT(11)}`]: createApiSuccess(MOCK_TOURNAMENT_PENDING_1ITEM),
   [`GET ${ENDPOINTS.TOURNAMENT(13)}`]: createApiSuccess(MOCK_TOURNAMENT_PENDING_3ITEMS),
   [`GET ${ENDPOINTS.TOURNAMENT(14)}`]: createApiSuccess(MOCK_TOURNAMENT_PENDING_4ITEMS),
+  /** 요청의 ?code= 는 무시된다 — 스텁은 pathname 만 매칭 */
+  [`GET ${ENDPOINTS.TOURNAMENT_INVITE_PREVIEW_BY_CODE}`]: createApiSuccess(MOCK_INVITE_PREVIEW),
   [`GET ${ENDPOINTS.NOTIFICATIONS}`]: {
     ...createApiSuccess({ items: [], unreadCount: 0 }),
     pageResponse: { nextCursor: null, hasNext: false },
