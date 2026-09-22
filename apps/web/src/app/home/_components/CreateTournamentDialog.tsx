@@ -77,7 +77,7 @@ function CreateTournamentDialog() {
       ...(variant && { tooltip_variant: variant }),
       identity_type: userData.identityType,
     });
-    
+
     /** 게스트 - 생성 다이얼로그 대신 로그인 유도 UI 띄우기 */
     if (userData.identityType !== 'MEMBER') setIsLoginRequiredOpen(true);
   };
@@ -116,7 +116,7 @@ function CreateTournamentDialog() {
               title={LOGIN_REQUIRED_TITLE.TOURNAMENT_CREATE}
               redirectPath={ROUTES.HOME}
               location={GUEST_BLOCK_LOCATION.HOME_TOURNAMENT_CREATE}
-              onGoHome={() => setIsLoginRequiredOpen(false)}
+              onGoBack={() => setIsLoginRequiredOpen(false)}
             />
           </div>
         )}

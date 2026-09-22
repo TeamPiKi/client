@@ -46,7 +46,7 @@ function AddWishHomeDialog() {
               title={LOGIN_REQUIRED_TITLE.WISH}
               redirectPath={ROUTES.WISHLIST}
               location={GUEST_BLOCK_LOCATION.HOME_WISH_ADD}
-              onGoHome={() => setIsLoginRequiredOpen(false)}
+              onGoBack={() => setIsLoginRequiredOpen(false)}
             />
           </div>
         )}

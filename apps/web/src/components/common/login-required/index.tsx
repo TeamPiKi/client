@@ -9,7 +9,6 @@ import Button from '@/components/button';
 import { Header, HeaderIcon } from '@/components/header';
 import { ANALYTICS_EVENT } from '@/consts/analytics';
 import type { GuestBlockLocationT } from '@/consts/guestBlockLocation';
-import { ROUTES } from '@/consts/route';
 import { logAnalyticsEvent } from '@/utils/analytics';
 import { getLoginPath } from '@/utils/loginRedirect';
 import { setLoginSource } from '@/utils/loginSource';
@@ -21,12 +20,12 @@ type LoginRequiredProps = {
   redirectPath: string;
   /** 차단 지점 식별자 — 노출·클릭 이벤트의 location */
   location: GuestBlockLocationT;
-  /** '홈으로 돌아가기' 동작 — 미지정 시 홈으로 이동 (홈 오버레이에서는 닫기 핸들러 주입) */
-  onGoHome?: () => void;
+  /** '이전으로 돌아가기' 동작 (오버레이는 닫기, 라우트 전체 화면은 LoginRequiredPage 경유 back) */
+  onGoBack: () => void;
 };
 
 /** 게스트가 잠긴 기능에 접근할 때 로그인을 유도하는 전체 화면 */
-function LoginRequired({ title, redirectPath, location, onGoHome }: LoginRequiredProps) {
+function LoginRequired({ title, redirectPath, location, onGoBack }: LoginRequiredProps) {
   const router = useRouter();
 
   useEffect(() => {
@@ -38,14 +37,6 @@ function LoginRequired({ title, redirectPath, location, onGoHome }: LoginRequire
     /** 로그인·OAuth 를 거치며 location 이 사라지므로 가입 완료까지 들고 갈 유입 지점을 남긴다 */
     setLoginSource(location);
     router.push(getLoginPath(redirectPath));
-  };
-
-  const handleGoHomeClick = () => {
-    if (onGoHome) {
-      onGoHome();
-      return;
-    }
-    router.push(ROUTES.HOME);
   };
 
   return (
@@ -64,10 +55,10 @@ function LoginRequired({ title, redirectPath, location, onGoHome }: LoginRequire
             </Button>
             <button
               type="button"
-              onClick={handleGoHomeClick}
+              onClick={onGoBack}
               className="cursor-pointer body-1-medium text-text-neutral-secondary"
             >
-              홈으로 돌아가기
+              이전으로 돌아가기
             </button>
           </div>
         </div>

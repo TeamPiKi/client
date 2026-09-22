@@ -25,7 +25,7 @@ function LogoutMenuItem() {
       <DialogTrigger asChild>
         <button
           type="button"
-          className="flex w-full cursor-pointer items-center px-2 py-2 body-1-medium text-text-neutral-primary"
+          className="flex w-full cursor-pointer items-center px-2 py-4 body-1-medium text-text-neutral-primary"
         >
           로그아웃
         </button>

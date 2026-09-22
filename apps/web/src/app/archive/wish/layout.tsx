@@ -1,4 +1,4 @@
-import LoginRequired from '@/components/common/login-required';
+import LoginRequiredPage from '@/components/common/login-required/LoginRequiredPage';
 import { LOGIN_REQUIRED_TITLE } from '@/components/common/login-required/loginRequired.const';
 import { GUEST_BLOCK_LOCATION } from '@/consts/guestBlockLocation';
 import { ROUTES } from '@/consts/route';
@@ -14,7 +14,7 @@ async function WishArchiveLayout({ children }: WishArchiveLayoutProps) {
   /** 위시 페이지는 멤버가 아니면 로그인 유도 화면을 렌더 */
   if (role !== 'MEMBER')
     return (
-      <LoginRequired
+      <LoginRequiredPage
         title={LOGIN_REQUIRED_TITLE.WISH}
         redirectPath={ROUTES.WISHLIST}
         location={GUEST_BLOCK_LOCATION.WISH_TAB}

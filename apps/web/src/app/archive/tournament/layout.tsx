@@ -1,4 +1,4 @@
-import LoginRequired from '@/components/common/login-required';
+import LoginRequiredPage from '@/components/common/login-required/LoginRequiredPage';
 import { LOGIN_REQUIRED_TITLE } from '@/components/common/login-required/loginRequired.const';
 import { GUEST_BLOCK_LOCATION } from '@/consts/guestBlockLocation';
 import { ROUTES } from '@/consts/route';
@@ -13,7 +13,7 @@ async function TournamentArchiveLayout({ children }: TournamentArchiveLayoutProp
 
   if (role !== 'MEMBER')
     return (
-      <LoginRequired
+      <LoginRequiredPage
         title={LOGIN_REQUIRED_TITLE.TOURNAMENT_HISTORY}
         redirectPath={ROUTES.TOURNAMENT_HISTORY}
         location={GUEST_BLOCK_LOCATION.TOURNAMENT_TAB}
