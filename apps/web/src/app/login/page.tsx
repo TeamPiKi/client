@@ -7,6 +7,7 @@ import PikiLogo from '@/assets/images/piki-logo-cart.svg';
 import { QUERY_ACTION } from '@/consts/queryAction';
 import { ROUTES } from '@/consts/route';
 import { getRoleFromToken } from '@/utils/auth';
+import { getLoginRedirectPath } from '@/utils/loginRedirect';
 
 import LoginButtons from './_components/LoginButtons';
 import OnboardingGate from './_components/OnboardingGate';
@@ -19,8 +20,8 @@ async function LoginPage({ searchParams }: LoginPageProps) {
   const { redirect: redirectParam, action, code } = await searchParams;
 
   /**
-   * 멤버가 로그인 페이지 직접 진입 시 홈으로 리다이렉트
-   * - 세션 만료나 탈퇴한 경우에는 홈으로 리다이렉트하지 않음
+   * 멤버가 로그인 페이지 진입 시 redirect 경로로, 없으면 홈으로 리다이렉트
+   * - 세션 만료나 탈퇴한 경우에는 리다이렉트하지 않음
    */
   const accessToken = (await cookies()).get('access_token')?.value;
   const role = getRoleFromToken(accessToken);
@@ -31,7 +32,7 @@ async function LoginPage({ searchParams }: LoginPageProps) {
       action === QUERY_ACTION.VALUE.WITHDRAWN_ACCOUNT
     )
   )
-    redirect(ROUTES.HOME);
+    redirect(getLoginRedirectPath(redirectParam));
 
   /**
    * Android 웹뷰에서는 Apple 로그인 미노출.
