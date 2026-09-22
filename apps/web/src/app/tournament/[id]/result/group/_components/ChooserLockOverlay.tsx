@@ -14,14 +14,13 @@ import { setLoginSource } from '@/utils/loginSource';
 
 type ChooserLockOverlayProps = {
   tournamentId: number;
+  onView: () => void;
 };
 
-function ChooserLockOverlay({ tournamentId }: ChooserLockOverlayProps) {
+function ChooserLockOverlay({ tournamentId, onView }: ChooserLockOverlayProps) {
   useEffect(() => {
-    logAnalyticsEvent(ANALYTICS_EVENT.GUEST_BLOCK_VIEW, {
-      location: GUEST_BLOCK_LOCATION.GROUP_RESULT_MASK,
-    });
-  }, []);
+    onView();
+  }, [onView]);
 
   const handleClick = () => {
     logAnalyticsEvent(ANALYTICS_EVENT.GUEST_BLOCK_CTA_CLICK, {
