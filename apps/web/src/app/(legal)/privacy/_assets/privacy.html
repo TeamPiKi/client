@@ -1199,9 +1199,11 @@
         <div style="display: contents" dir="auto">
           <ol type="1" id="7ee48229-c630-494c-bf46-1355075f506d" class="numbered-list" start="3">
             <li>
-              서비스 이용·접속 기록은 별도의 데이터베이스에 저장하지 않으며, 운영 및 보안 모니터링을
-              위한 시스템 로그(외부 모니터링 서비스 포함)에 한해
-              <strong>단기간 보관된 후 자동 삭제</strong>됩니다.
+              접속 기록(IP·브라우저 정보 등)은 별도의 데이터베이스에 저장하지 않으며, 운영 및 보안
+              모니터링을 위한 시스템 로그(외부 모니터링 서비스 포함)에 한해
+              <strong>단기간 보관된 후 자동 삭제</strong>됩니다. 다만 서비스 개선을 위한 통계
+              목적으로 일 단위 이용 여부(이용자 식별자·이용 일자)는 저장되며, 개인을 직접 식별할 수
+              없는 형태로만 집계에 사용됩니다.
             </li>
           </ol>
         </div>
@@ -1256,7 +1258,7 @@
               <div style="display: contents" dir="ltr">
                 <tr id="95db429c-9a21-45d2-b6c0-db08bf8b1029">
                   <td id="Tfm\" class="">Amazon Web Services, Inc.</td>
-                  <td id="?OG[" class="">데이터베이스(RDS)·이미지 저장소(S3) 운영 (서울 리전)</td>
+                  <td id="?OG[" class="">데이터베이스·이미지 저장소(S3) 운영 (서울 리전)</td>
                   <td id="iZJ=" class="">회원 데이터(이메일 포함), 프로필·상품 이미지</td>
                 </tr>
               </div>
@@ -1303,6 +1305,16 @@
                 </tr>
               </div>
               <div style="display: contents" dir="ltr">
+                <tr id="c1aa5454-c70f-4d94-9e3f-0ceec0d4f9c0">
+                  <td id="Tfm\" class="">Functional Software, Inc. (Sentry)</td>
+                  <td id="?OG[" class="">오류 수집·분석, 에러 세션 화면 기록</td>
+                  <td id="iZJ=" class="">
+                    오류 정보, 접속 환경(브라우저·기기), 이용자 식별자(UUID), 에러 발생 시점의 화면
+                    기록
+                  </td>
+                </tr>
+              </div>
+              <div style="display: contents" dir="ltr">
                 <tr id="f06c535e-428e-42f6-b3e9-a7cc5582badb">
                   <td id="Tfm\" class=""></td>
                   <td id="?OG[" class=""></td>
@@ -1320,8 +1332,14 @@
         </div>
         <div style="display: contents" dir="auto">
           <p id="b6bfe905-368f-4600-9271-aab0b8711f01" class="">
-            &gt; - 서비스 모니터링 로그에 포함될 수 있는 이메일 등은 마스킹 처리되며, 이용자
-            식별에는 직접 식별이 불가능한 임의 식별자(UUID)만 사용됩니다.
+            &gt; - 서비스 모니터링 로그에 포함될 수 있는 이메일 등 개인정보는 마스킹 처리되며,
+            이용자 식별에는 직접 식별이 불가능한 임의 식별자(UUID)만 사용됩니다.
+          </p>
+        </div>
+        <div style="display: contents" dir="auto">
+          <p id="b6bfe905-368f-4600-9271-aab0b8711f02" class="">
+            &gt; - 에러 세션 화면 기록은 오류가 발생한 세션에 한해 수집되며, 이메일과 이용자가
+            입력하는 내용은 마스킹 처리됩니다.
           </p>
         </div>
         <div style="display: contents" dir="auto">
@@ -1375,6 +1393,15 @@
                   <td id="dXxk" class="">접속 로그, 이용자 식별자(UUID) / 서비스 모니터링</td>
                 </tr>
               </div>
+              <div style="display: contents" dir="ltr">
+                <tr id="e5b3bdb7-fd1b-4a3a-9831-dc6179991930">
+                  <td id="@Eus" class="">Functional Software, Inc. (Sentry)</td>
+                  <td id="mAge" class="">미국</td>
+                  <td id="dXxk" class="">
+                    오류 정보, 접속 환경, 이용자 식별자(UUID), 에러 세션 화면 기록 / 오류 수집·분석
+                  </td>
+                </tr>
+              </div>
             </tbody>
           </table>
         </div>
@@ -1383,7 +1410,7 @@
             <div style="display: contents" dir="auto">
               <ul id="383c800c-72cf-8016-ba5f-d19a50a0058b" class="bulleted-list">
                 <li style="list-style-type: disc">
-                  데이터베이스(RDS)·이미지(S3)는 국내(서울) 리전에 저장되어 국외로 이전되지
+                  데이터베이스·이미지(S3)는 국내(서울) 리전에 저장되어 국외로 이전되지
                   않습니다.
                 </li>
               </ul>
