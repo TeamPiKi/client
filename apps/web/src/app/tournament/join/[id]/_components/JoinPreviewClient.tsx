@@ -26,7 +26,6 @@ import { usePageBackground } from '@/hooks/usePageBackground';
 import type { GetInvitePreviewResponseT } from '@/types/tournament';
 import { logAnalyticsEvent } from '@/utils/analytics';
 import { getLoginPath } from '@/utils/loginRedirect';
-import { setLoginSource } from '@/utils/loginSource';
 
 type JoinPreviewClientProps = {
   tournamentId: number;
@@ -125,7 +124,6 @@ function JoinPreviewForm({
 
   const handleLoginLinkClick = () => {
     logAnalyticsEvent(ANALYTICS_EVENT.GUEST_BANNER_CTA_CLICK, { location: LOGIN_SOURCE.INVITE });
-    setLoginSource(LOGIN_SOURCE.INVITE);
   };
 
   const handleNicknameChange = (value: string) => {
