@@ -114,7 +114,7 @@ function CreateTournamentDialog() {
             <LoginRequired
               title={LOGIN_REQUIRED_TITLE.TOURNAMENT_CREATE}
               redirectPath={ROUTES.HOME}
-              onGoHome={() => setIsLoginRequiredOpen(false)}
+              onGoBack={() => setIsLoginRequiredOpen(false)}
             />
           </div>
         )}

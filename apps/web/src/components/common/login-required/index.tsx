@@ -6,7 +6,6 @@ import { LockIconFill } from '@/assets/icons';
 import PiKiLogo from '@/assets/images/piki-logo-text.svg';
 import Button from '@/components/button';
 import { Header, HeaderIcon } from '@/components/header';
-import { ROUTES } from '@/consts/route';
 import { getLoginPath } from '@/utils/loginRedirect';
 
 type LoginRequiredProps = {
@@ -14,24 +13,16 @@ type LoginRequiredProps = {
   title: string;
   /** 로그인 성공 후 복귀 경로 */
   redirectPath: string;
-  /** '홈으로 돌아가기' 동작 — 미지정 시 홈으로 이동 (홈 오버레이에서는 닫기 핸들러 주입) */
-  onGoHome?: () => void;
+  /** '이전으로 돌아가기' 동작 (오버레이는 닫기, 라우트 전체 화면은 LoginRequiredPage 경유 back) */
+  onGoBack: () => void;
 };
 
 /** 게스트가 잠긴 기능에 접근할 때 로그인을 유도하는 전체 화면 */
-function LoginRequired({ title, redirectPath, onGoHome }: LoginRequiredProps) {
+function LoginRequired({ title, redirectPath, onGoBack }: LoginRequiredProps) {
   const router = useRouter();
 
   const handleLoginClick = () => {
     router.push(getLoginPath(redirectPath));
-  };
-
-  const handleGoHomeClick = () => {
-    if (onGoHome) {
-      onGoHome();
-      return;
-    }
-    router.push(ROUTES.HOME);
   };
 
   return (
@@ -50,10 +41,10 @@ function LoginRequired({ title, redirectPath, onGoHome }: LoginRequiredProps) {
             </Button>
             <button
               type="button"
-              onClick={handleGoHomeClick}
+              onClick={onGoBack}
               className="cursor-pointer body-1-medium text-text-neutral-secondary"
             >
-              홈으로 돌아가기
+              이전으로 돌아가기
             </button>
           </div>
         </div>

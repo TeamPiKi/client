@@ -83,7 +83,6 @@ function ResultClient({ tournamentId, isGuest = false, isApp = false }: ResultCl
   };
 
   return (
-    // pb-46(184px): 마지막 요소가 CTA(144px) + 상단 그라디언트(36px)에 가려지지 않는 하단 여백
     <main className="flex min-h-dvh flex-col overflow-x-hidden bg-bg-layer-basement pt-padding-top pb-46">
       <Header center="토너먼트 결과" centerClassName="heading-1-bold" />
 
@@ -155,6 +154,7 @@ function ResultClient({ tournamentId, isGuest = false, isApp = false }: ResultCl
           <LoginRequired
             title={LOGIN_REQUIRED_TITLE.RECEIPT_SAVE}
             redirectPath={ROUTES.TOURNAMENT_RESULT(tournamentId)}
+            onGoBack={() => setIsLoginRequiredOpen(false)}
           />
         </div>
       )}

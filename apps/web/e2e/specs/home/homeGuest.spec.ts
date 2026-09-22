@@ -32,8 +32,8 @@ test('게스트가 새 토너먼트 만들기를 누르면 로그인 유도 화�
   /** 오버레이가 탭바를 가리지 않는다 — z-index 회귀 방지 */
   await expect(page.getByRole('link', { name: '홈' })).toBeVisible();
 
-  /** 홈으로 돌아가기는 오버레이만 닫는다 */
-  await page.getByRole('button', { name: '홈으로 돌아가기' }).click();
+  /** 이전으로 돌아가기는 오버레이만 닫는다 */
+  await page.getByRole('button', { name: '이전으로 돌아가기' }).click();
   await expect(
     page.getByRole('heading', { name: '토너먼트를 만들려면 로그인이 필요해요' })
   ).toBeHidden();
