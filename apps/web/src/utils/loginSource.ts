@@ -1,10 +1,18 @@
+import type { GuestBlockLocationT } from '@/consts/guestBlockLocation';
+import { GUEST_BLOCK_LOCATION } from '@/consts/guestBlockLocation';
 import type { LoginSourceT } from '@/consts/loginSource';
 import { LOGIN_SOURCE, LOGIN_SOURCE_KEY } from '@/consts/loginSource';
 
-/** 저장값 검증용 화이트리스트 — 손상된 값이 GA 차원으로 새지 않도록 읽을 때 대조한다 */
-const LOGIN_SOURCES: readonly string[] = Object.values(LOGIN_SOURCE);
+/** 가입 완료 이벤트의 `source` 로 실리는 유입 지점 — 배너와 차단 지점 양쪽을 받는다 */
+export type LoginEntrySourceT = LoginSourceT | GuestBlockLocationT;
 
-const isLoginSource = (value: string | null): value is LoginSourceT =>
+/** 저장값 검증용 화이트리스트 — 손상된 값이 GA 차원으로 새지 않도록 읽을 때 대조한다 */
+const LOGIN_SOURCES: readonly string[] = [
+  ...Object.values(LOGIN_SOURCE),
+  ...Object.values(GUEST_BLOCK_LOCATION),
+];
+
+const isLoginSource = (value: string | null): value is LoginEntrySourceT =>
   !!value && LOGIN_SOURCES.includes(value);
 
 /**
@@ -14,7 +22,7 @@ const isLoginSource = (value: string | null): value is LoginSourceT =>
  * 가입 완료 시점까지 들고 가기 위해 클릭 지점에서 저장한다.
  * sessionStorage 를 쓰는 이유는 탭을 닫으면 유입 맥락도 끝나기 때문이다.
  */
-export const setLoginSource = (source: LoginSourceT) => {
+export const setLoginSource = (source: LoginEntrySourceT) => {
   if (typeof window === 'undefined') return;
 
   try {
@@ -25,7 +33,7 @@ export const setLoginSource = (source: LoginSourceT) => {
 };
 
 /** 로그인 유입 지점을 읽고 지운다 — 가입 완료 이벤트 1건에만 실리도록 소비형으로 둔다 */
-export const consumeLoginSource = (): LoginSourceT | null => {
+export const consumeLoginSource = (): LoginEntrySourceT | null => {
   if (typeof window === 'undefined') return null;
 
   try {
