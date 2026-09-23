@@ -1,6 +1,5 @@
 import type { QueryActionValueT } from '@/consts/queryAction';
 import { ROUTES } from '@/consts/route';
-import { getRouteType } from '@/utils/getRouteType';
 import isSafeInternalPath from '@/utils/isSafeInternalPath';
 
 const LOGIN_REDIRECT_STORAGE_KEY = 'login_redirect';

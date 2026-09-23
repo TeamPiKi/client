@@ -19,8 +19,8 @@ describe('getLoginPath', () => {
     expect(getLoginPath(null, QUERY_ACTION.VALUE.SESSION_EXPIRED)).toBe(
       '/login?action=session-expired'
     );
-    expect(getLoginPath('/home', QUERY_ACTION.VALUE.MEMBER_ONLY, 'USER-003')).toBe(
-      '/login?redirect=%2Fhome&action=member-only&code=USER-003'
+    expect(getLoginPath('/home', QUERY_ACTION.VALUE.WITHDRAWN_ACCOUNT, 'USER-003')).toBe(
+      '/login?redirect=%2Fhome&action=withdrawn-account&code=USER-003'
     );
   });
 });
