@@ -26,9 +26,7 @@ function TooltipAb({ variant }: TooltipAbProps) {
 
   if (isRemoved) return null;
 
-  const handleClick = (event: React.MouseEvent) => {
-    event.stopPropagation();
-
+  const handleClick = () => {
     if (isClicked) return;
 
     setIsClicked(true);
@@ -41,7 +39,8 @@ function TooltipAb({ variant }: TooltipAbProps) {
   };
 
   return (
-    <div
+    <button
+      type="button"
       onClick={handleClick}
       onTransitionEnd={() => isClicked && setIsRemoved(true)}
       className={cn(
@@ -53,7 +52,7 @@ function TooltipAb({ variant }: TooltipAbProps) {
       <Tooltip icon={<Icon aria-hidden className={`size-4.5 shrink-0 ${iconClassName}`} />}>
         {message}
       </Tooltip>
-    </div>
+    </button>
   );
 }
 
