@@ -36,6 +36,9 @@ function TooltipAb({ variant }: TooltipAbProps) {
       tooltip_variant: variant,
       identity_type: userData.identityType,
     });
+
+    /** NOTE: 모션 감소 설정은 페이드 없이 즉시 제거 — transitionend 에 기대면 언마운트가 안 됨 */
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) setIsRemoved(true);
   };
 
   return (
