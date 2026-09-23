@@ -19,6 +19,7 @@ export const ANALYTICS_EVENT = {
   /** 홈 */
   HOME_VIEW: 'home_view',
   NEW_TOURNAMENT_CLICK: 'new_tournament_click',
+  TOOLTIP_DISMISS: 'tooltip_dismiss',
 
   /** 토너먼트 funnel */
   TOURNAMENT_CREATE: 'tournament_create',
