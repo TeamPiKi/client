@@ -1,10 +1,11 @@
 import type { QueryActionValueT } from '@/consts/queryAction';
 import { ROUTES } from '@/consts/route';
+import isSafeInternalPath from '@/utils/isSafeInternalPath';
 
 const LOGIN_REDIRECT_STORAGE_KEY = 'login_redirect';
 
 export const isValidLoginRedirectPath = (path: string | null | undefined): path is string =>
-  !!path && path.startsWith('/') && !path.startsWith('//');
+  isSafeInternalPath(path);
 
 export const setLoginRedirectPath = (redirectPath: string | null) => {
   if (typeof window === 'undefined') return;
