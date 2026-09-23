@@ -37,7 +37,6 @@ function TooltipAb({ variant }: TooltipAbProps) {
       identity_type: userData.identityType,
     });
 
-    /** NOTE: 모션 감소 설정은 페이드 없이 즉시 제거 — transitionend 에 기대면 언마운트가 안 됨 */
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) setIsRemoved(true);
   };
 
@@ -47,7 +46,6 @@ function TooltipAb({ variant }: TooltipAbProps) {
       onTransitionEnd={() => isClicked && setIsRemoved(true)}
       className={cn(
         'absolute -top-11 right-0 cursor-pointer transition-opacity duration-100 ease-out',
-        /** NOTE: pointer-events 는 유지 — 끄면 페이드 중 클릭이 뚫고 아래 요소를 실행함 */
         isClicked && 'opacity-0'
       )}
       style={{ zIndex: Z_INDEX.BASE + 1 }}
