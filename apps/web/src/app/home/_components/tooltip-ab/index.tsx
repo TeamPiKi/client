@@ -44,7 +44,8 @@ function TooltipAb({ variant }: TooltipAbProps) {
       onTransitionEnd={() => isClicked && setIsRemoved(true)}
       className={cn(
         'absolute -top-11 right-0 cursor-pointer transition-opacity duration-100 ease-out',
-        isClicked && 'pointer-events-none opacity-0'
+        /** NOTE: pointer-events 는 유지 — 끄면 페이드 중 클릭이 뚫고 아래 요소를 실행함 */
+        isClicked && 'opacity-0'
       )}
       style={{ zIndex: Z_INDEX.BASE + 1 }}
     >
