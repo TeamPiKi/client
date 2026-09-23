@@ -22,6 +22,12 @@ describe('getRouteType', () => {
     expect(getRouteType('/tournament/1/item')).toBeNull();
   });
 
+  it('참여 링크 하위 경로는 토너먼트 동적 패턴과 겹쳐도 검사 순서로 MEMBER_AND_GUEST 가 이긴다', () => {
+    expect(getRouteType('/tournament/join/match')).toBe('MEMBER_AND_GUEST');
+    expect(getRouteType('/tournament/join/create')).toBe('MEMBER_AND_GUEST');
+    expect(getRouteType('/tournament/join/result')).toBe('MEMBER_AND_GUEST');
+  });
+
   it('선택 하위 세그먼트는 정해진 것만 붙는다', () => {
     expect(getRouteType('/tournament/1/create')).toBe('AUTHORIZED');
     expect(getRouteType('/tournament/1/create/by-wish')).toBe('AUTHORIZED');
