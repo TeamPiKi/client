@@ -43,13 +43,16 @@ function TooltipAb({ variant }: TooltipAbProps) {
       type="button"
       onClick={handleClick}
       onTransitionEnd={() => isClicked && setIsRemoved(true)}
-      className={cn(
-        'absolute -top-11 right-0 cursor-pointer transition-opacity duration-100 ease-out',
-        isClicked && 'opacity-0'
-      )}
+      className="absolute -top-11 right-0 cursor-pointer"
       style={{ zIndex: Z_INDEX.BASE + 1 }}
     >
-      <Tooltip icon={<Icon aria-hidden className={`size-4.5 shrink-0 ${iconClassName}`} />}>
+      <Tooltip
+        className={cn(
+          'transform-gpu transition-opacity duration-100 ease-out will-change-[opacity]',
+          isClicked && 'opacity-0'
+        )}
+        icon={<Icon aria-hidden className={`size-4.5 shrink-0 ${iconClassName}`} />}
+      >
         {message}
       </Tooltip>
     </button>
