@@ -32,8 +32,16 @@ setup('게스트 storageState 생성', async () => {
     JSON.stringify(
       {
         cookies: [createCookie('access_token'), createCookie('refresh_token')],
-        /** NOTE: 재방문 유저 기준으로 테스트. 온보딩 모달 생략 */
-        origins: [{ origin: BASE_URL, localStorage: [{ name: ONBOARDING_KEY.HOME, value: '1' }] }],
+        /** NOTE: 재방문 유저 기준으로 테스트. 온보딩 생략 */
+        origins: [
+          {
+            origin: BASE_URL,
+            localStorage: [
+              { name: ONBOARDING_KEY.HOME, value: '1' },
+              { name: ONBOARDING_KEY.INTRO, value: '1' },
+            ],
+          },
+        ],
       },
       null,
       2
