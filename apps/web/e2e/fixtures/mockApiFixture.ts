@@ -71,8 +71,14 @@ export const test = base.extend<{ api: ApiMockT }>({
       },
     });
 
+    /** 알림 SSE 는 웹(Next Route Handler)·웹뷰(/api/v1 직접 구독) 모두 빈 스트림으로 응답해 upstream 접근 차단 */
+    const fulfillEmptySse = (route: Route) =>
+      route.fulfill({ status: 200, headers: { 'content-type': 'text/event-stream' }, body: '' });
+
     await page.route('**/api/v1/**', route => {
       const { pathname } = new URL(route.request().url());
+      if (pathname === ENDPOINTS.NOTIFICATIONS_SUBSCRIBE) return fulfillEmptySse(route);
+
       const method = route.request().method();
       const entry = [...entries].reverse().find(e => e.method === method && e.path === pathname);
 
@@ -95,10 +101,7 @@ export const test = base.extend<{ api: ApiMockT }>({
       });
     });
 
-    /** 알림 SSE(Next Route Handler — /api/v1 아님): 빈 스트림으로 응답해 upstream 접근 차단 */
-    await page.route('**/api/notifications/subscribe', route =>
-      route.fulfill({ status: 200, headers: { 'content-type': 'text/event-stream' }, body: '' })
-    );
+    await page.route('**/api/notifications/subscribe', fulfillEmptySse);
 
     const fulfillMockImage = (route: Route, originalUrl: string) =>
       route.fulfill({
