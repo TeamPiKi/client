@@ -132,7 +132,7 @@ await setSsrStatus(page, `POST ${ENDPOINTS.AUTH_TOKEN_REFRESH}`, 401); // 생략
 await page.goto('/archive/wish');
 ```
 
-라우트 키는 `SSR_MOCK_ROUTES` 와 같은 `"METHOD /path"` 형식이고, 등록되지 않은 경로에도 적용됩니다.
+라우트 키는 `SSR_MOCK_ROUTES` 와 같은 `"METHOD /path"` 형식이고, 등록되지 않은 경로에도 적용됩니다. 화면이 `code` 로 분기하면 네 번째 인자로 넘기세요: `setSsrStatus(page, key, 409, ERROR_CODE.TOURNAMENT_NOT_PENDING)`.
 
 ## 목킹 구조
 
