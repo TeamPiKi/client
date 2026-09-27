@@ -9,7 +9,7 @@ import { EXPIRED_ACCESS_TOKEN_SUB, applyExpiredAccessToken } from '@e2e/helpers/
 import { readFakeJwtPayload } from '@e2e/helpers/fakeJwt';
 import { setSsrStatus } from '@e2e/helpers/ssrStatus';
 import { REFRESHED_BODY_TOKEN_SUB, REFRESHED_COOKIE_TOKEN_SUB } from '@e2e/mocks/auth';
-import { MOCK_MEMBER_ME } from '@e2e/mocks/me';
+import { MOCK_GUEST_ME, MOCK_MEMBER_ME } from '@e2e/mocks/me';
 import { MOCK_TOURNAMENT_LIST } from '@e2e/mocks/tournament';
 
 const REFRESH_ROUTE_KEY = `POST ${ENDPOINTS.AUTH_TOKEN_REFRESH}`;
@@ -40,6 +40,19 @@ test('access 만료·refresh 유효면 갱신 후 페이지가 열리고 Set-Coo
   expect(access?.sub).toBe(REFRESHED_COOKIE_TOKEN_SUB);
   expect(refresh?.sub).toBe(REFRESHED_COOKIE_TOKEN_SUB);
   expect(access!.exp * 1000).toBeGreaterThan(Date.now());
+});
+
+test('게스트 토큰을 갱신하면 게스트 role 이 유지된다', async ({ page, api }) => {
+  api.get(ENDPOINTS.TOURNAMENTS, MOCK_TOURNAMENT_LIST);
+  api.get(ENDPOINTS.USER, MOCK_GUEST_ME);
+  await applyExpiredAccessToken(page, 'GUEST');
+
+  await page.goto('/home');
+
+  const { access, refresh } = await readTokenPayloads(page);
+  expect(access?.sub).toBe(REFRESHED_COOKIE_TOKEN_SUB);
+  expect(access?.role).toBe('GUEST');
+  expect(refresh?.role).toBe('GUEST');
 });
 
 test.describe('앱(웹뷰) 환경', () => {

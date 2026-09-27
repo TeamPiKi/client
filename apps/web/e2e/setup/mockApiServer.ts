@@ -54,21 +54,24 @@ const readCookie = (req: http.IncomingMessage, name: string) =>
     .find(part => part.startsWith(`${name}=`))
     ?.slice(name.length + 1);
 
+const readTokenRole = (req: http.IncomingMessage, cookieName: string): 'GUEST' | 'MEMBER' => {
+  const token = readCookie(req, cookieName);
+
+  try {
+    const payload = JSON.parse(Buffer.from(token?.split('.')[1] ?? '', 'base64url').toString());
+    return payload.role === 'GUEST' ? 'GUEST' : 'MEMBER';
+  } catch {
+    return 'MEMBER';
+  }
+};
+
 /**
  * me 는 요청 토큰(access_token 쿠키)의 role 클레임과 정합시킨다 — 서버 게이트 판정과 me 응답이
  * 항상 같은 유저를 가리키도록. 'me' 는 루트 layout 이 pending 으로 dehydrate 해 브라우저 목으로
  * 테스트별 덮어쓰기가 불가하므로, `applyGuestToken` 이 심은 게스트 토큰이 곧 게스트 me 가 된다.
  */
-const resolveMe = (req: http.IncomingMessage) => {
-  const token = readCookie(req, 'access_token');
-
-  try {
-    const payload = JSON.parse(Buffer.from(token?.split('.')[1] ?? '', 'base64url').toString());
-    return createApiSuccess(payload.role === 'GUEST' ? MOCK_GUEST_ME : MOCK_MEMBER_ME);
-  } catch {
-    return createApiSuccess(MOCK_MEMBER_ME);
-  }
-};
+const resolveMe = (req: http.IncomingMessage) =>
+  createApiSuccess(readTokenRole(req, 'access_token') === 'GUEST' ? MOCK_GUEST_ME : MOCK_MEMBER_ME);
 
 /**
  * 테스트가 `setSsrEmpty` 로 심은 쿠키에 이 경로가 있으면 빈 목록을 응답한다.
@@ -98,9 +101,10 @@ const readStatusOverride = (req: http.IncomingMessage, routeKey: string): number
 const TOKEN_TTL_SECONDS = 60 * 60;
 
 /** 백엔드는 web 에 Set-Cookie 로, app 에 body 로 토큰을 준다 */
-const respondRefreshedTokens = (res: http.ServerResponse) => {
-  const cookieToken = () => createFakeJwt(TOKEN_TTL_SECONDS, 'MEMBER', REFRESHED_COOKIE_TOKEN_SUB);
-  const bodyToken = () => createFakeJwt(TOKEN_TTL_SECONDS, 'MEMBER', REFRESHED_BODY_TOKEN_SUB);
+const respondRefreshedTokens = (req: http.IncomingMessage, res: http.ServerResponse) => {
+  const role = readTokenRole(req, 'refresh_token');
+  const cookieToken = () => createFakeJwt(TOKEN_TTL_SECONDS, role, REFRESHED_COOKIE_TOKEN_SUB);
+  const bodyToken = () => createFakeJwt(TOKEN_TTL_SECONDS, role, REFRESHED_BODY_TOKEN_SUB);
   const cookieOptions = `Path=/; SameSite=Lax; Max-Age=${TOKEN_TTL_SECONDS}`;
 
   res.writeHead(200, {
@@ -134,7 +138,8 @@ export const startMockApiServer = (port: number) =>
       if (statusOverride !== null)
         return respondJson(res, statusOverride, createApiError({ code: 'E2E_SSR_STATUS' }));
 
-      if (routeKey === `POST ${ENDPOINTS.AUTH_TOKEN_REFRESH}`) return respondRefreshedTokens(res);
+      if (routeKey === `POST ${ENDPOINTS.AUTH_TOKEN_REFRESH}`)
+        return respondRefreshedTokens(req, res);
       if (routeKey === `GET ${ENDPOINTS.USER}`) return respondJson(res, 200, resolveMe(req));
       if (isEmptyRequested(req, pathname)) return respondJson(res, 200, createApiSuccess([]));
 
