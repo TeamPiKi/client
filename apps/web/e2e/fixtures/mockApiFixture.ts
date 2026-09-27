@@ -71,13 +71,12 @@ export const test = base.extend<{ api: ApiMockT }>({
       },
     });
 
-    /** 알림 SSE 는 웹(Next Route Handler)·웹뷰(/api/v1 직접 구독) 모두 빈 스트림으로 응답해 upstream 접근 차단 */
-    const fulfillEmptySse = (route: Route) =>
-      route.fulfill({ status: 200, headers: { 'content-type': 'text/event-stream' }, body: '' });
+    /** 알림 SSE 는 응답하지 않고 열어 둔다 — 빈 스트림으로 끝내면 훅이 onclose 에서 1초마다 재연결하며 쿼리를 invalidate 한다 */
+    const holdSseOpen = (_route: Route) => {};
 
     await page.route('**/api/v1/**', route => {
       const { pathname } = new URL(route.request().url());
-      if (pathname === ENDPOINTS.NOTIFICATIONS_SUBSCRIBE) return fulfillEmptySse(route);
+      if (pathname === ENDPOINTS.NOTIFICATIONS_SUBSCRIBE) return holdSseOpen(route);
 
       const method = route.request().method();
       const entry = [...entries].reverse().find(e => e.method === method && e.path === pathname);
@@ -101,7 +100,7 @@ export const test = base.extend<{ api: ApiMockT }>({
       });
     });
 
-    await page.route('**/api/notifications/subscribe', fulfillEmptySse);
+    await page.route('**/api/notifications/subscribe', holdSseOpen);
 
     const fulfillMockImage = (route: Route, originalUrl: string) =>
       route.fulfill({
