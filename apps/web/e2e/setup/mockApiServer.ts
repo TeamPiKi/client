@@ -18,6 +18,7 @@ import {
   MOCK_TOURNAMENT_PENDING_3ITEMS,
   MOCK_TOURNAMENT_PENDING_4ITEMS,
 } from '../mocks/tournament';
+import { MOCK_WISHLIST_ENTRIES, MOCK_WISH_DETAIL } from '../mocks/wish';
 
 /**
  * SSR(serverApi·RSC 레이아웃·미들웨어) 발 API 요청을 받아주는 목 스텁 서버 — node:http 내장만 사용.
@@ -45,6 +46,8 @@ const SSR_MOCK_ROUTES: Record<string, unknown> = {
     ...createApiSuccess({ items: [], unreadCount: 0 }),
     pageResponse: { nextCursor: null, hasNext: false },
   },
+  [`GET ${ENDPOINTS.WISHLISTS}`]: createApiSuccess(MOCK_WISHLIST_ENTRIES),
+  [`GET ${ENDPOINTS.WISHLIST(1)}`]: createApiSuccess(MOCK_WISH_DETAIL),
 };
 
 const readCookie = (req: http.IncomingMessage, name: string) =>
