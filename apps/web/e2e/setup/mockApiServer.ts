@@ -156,6 +156,9 @@ export const startMockApiServer = (port: number) =>
       return respondJson(res, 200, SSR_MOCK_ROUTES[routeKey]);
     });
 
+    /** 유휴 keep-alive 소켓을 서버가 닫는 순간 serverApi 가 재사용하면 ECONNRESET 이 나 SSR 이 에러 화면으로 떨어진다 */
+    server.keepAliveTimeout = 0;
+
     server.on('error', (error: NodeJS.ErrnoException) => {
       if (error.code === 'EADDRINUSE') resolve(null);
       else reject(error);
