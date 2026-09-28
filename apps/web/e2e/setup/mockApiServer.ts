@@ -2,8 +2,10 @@ import http from 'node:http';
 
 import { ENDPOINTS } from '@/consts/api';
 
-import { SSR_EMPTY_COOKIE } from '../consts';
+import { SSR_EMPTY_COOKIE, SSR_STATUS_COOKIE } from '../consts';
 import { createApiError, createApiSuccess } from '../helpers/apiResponse';
+import { createFakeJwt } from '../helpers/fakeJwt';
+import { REFRESHED_BODY_TOKEN_SUB, REFRESHED_COOKIE_TOKEN_SUB } from '../mocks/auth';
 import { MOCK_GUEST_ME, MOCK_MEMBER_ME } from '../mocks/me';
 import {
   MOCK_INVITE_PREVIEW,
@@ -16,9 +18,10 @@ import {
   MOCK_TOURNAMENT_PENDING_3ITEMS,
   MOCK_TOURNAMENT_PENDING_4ITEMS,
 } from '../mocks/tournament';
+import { MOCK_WISHLIST_ENTRIES, MOCK_WISH_DETAIL } from '../mocks/wish';
 
 /**
- * SSR(serverApi·RSC 레이아웃) 발 API 요청을 받아주는 목 스텁 서버 — node:http 내장만 사용.
+ * SSR(serverApi·RSC 레이아웃·미들웨어) 발 API 요청을 받아주는 목 스텁 서버 — node:http 내장만 사용.
  *
  * page.route 는 브라우저 발 요청만 가로챌 수 있는데, tournament/[id]/layout.tsx 처럼
  * RSC 가 직접 await 하는 요청(접근 권한 확인)은 서버에서 나가므로 이 스텁이 응답한다.
@@ -43,6 +46,26 @@ const SSR_MOCK_ROUTES: Record<string, unknown> = {
     ...createApiSuccess({ items: [], unreadCount: 0 }),
     pageResponse: { nextCursor: null, hasNext: false },
   },
+  [`GET ${ENDPOINTS.WISHLISTS}`]: createApiSuccess(MOCK_WISHLIST_ENTRIES),
+  [`GET ${ENDPOINTS.WISHLIST(1)}`]: createApiSuccess(MOCK_WISH_DETAIL),
+};
+
+const readCookie = (req: http.IncomingMessage, name: string) =>
+  req.headers.cookie
+    ?.split(';')
+    .map(part => part.trim())
+    .find(part => part.startsWith(`${name}=`))
+    ?.slice(name.length + 1);
+
+const readTokenRole = (req: http.IncomingMessage, cookieName: string): 'GUEST' | 'MEMBER' => {
+  const token = readCookie(req, cookieName);
+
+  try {
+    const payload = JSON.parse(Buffer.from(token?.split('.')[1] ?? '', 'base64url').toString());
+    return payload.role === 'GUEST' ? 'GUEST' : 'MEMBER';
+  } catch {
+    return 'MEMBER';
+  }
 };
 
 /**
@@ -50,20 +73,8 @@ const SSR_MOCK_ROUTES: Record<string, unknown> = {
  * 항상 같은 유저를 가리키도록. 'me' 는 루트 layout 이 pending 으로 dehydrate 해 브라우저 목으로
  * 테스트별 덮어쓰기가 불가하므로, `applyGuestToken` 이 심은 게스트 토큰이 곧 게스트 me 가 된다.
  */
-const resolveMe = (req: http.IncomingMessage) => {
-  const token = req.headers.cookie
-    ?.split(';')
-    .map(part => part.trim())
-    .find(part => part.startsWith('access_token='))
-    ?.slice('access_token='.length);
-
-  try {
-    const payload = JSON.parse(Buffer.from(token?.split('.')[1] ?? '', 'base64url').toString());
-    return createApiSuccess(payload.role === 'GUEST' ? MOCK_GUEST_ME : MOCK_MEMBER_ME);
-  } catch {
-    return createApiSuccess(MOCK_MEMBER_ME);
-  }
-};
+const resolveMe = (req: http.IncomingMessage) =>
+  createApiSuccess(readTokenRole(req, 'access_token') === 'GUEST' ? MOCK_GUEST_ME : MOCK_MEMBER_ME);
 
 /**
  * 테스트가 `setSsrEmpty` 로 심은 쿠키에 이 경로가 있으면 빈 목록을 응답한다.
@@ -72,16 +83,48 @@ const resolveMe = (req: http.IncomingMessage) => {
 const isEmptyRequested = (req: http.IncomingMessage, pathname: string) => {
   if (req.method !== 'GET') return false;
 
-  const cookie = req.headers.cookie
-    ?.split(';')
-    .map(part => part.trim())
-    .find(part => part.startsWith(`${SSR_EMPTY_COOKIE}=`));
-
+  const cookie = readCookie(req, SSR_EMPTY_COOKIE);
   if (!cookie) return false;
 
-  return decodeURIComponent(cookie.slice(SSR_EMPTY_COOKIE.length + 1))
-    .split(',')
-    .includes(pathname);
+  return decodeURIComponent(cookie).split(',').includes(pathname);
+};
+
+/** 테스트가 `setSsrStatus` 로 심은 쿠키가 이 라우트를 가리키면 그 status — 라우트 등록 여부와 무관 */
+const readStatusOverride = (req: http.IncomingMessage, routeKey: string): number | null => {
+  const cookie = readCookie(req, SSR_STATUS_COOKIE);
+  if (!cookie) return null;
+
+  const [overriddenRouteKey, status] = decodeURIComponent(cookie).split('=');
+  if (overriddenRouteKey !== routeKey) return null;
+
+  const parsedStatus = Number(status);
+  return Number.isInteger(parsedStatus) ? parsedStatus : null;
+};
+
+const TOKEN_TTL_SECONDS = 60 * 60;
+
+/** 백엔드는 web 에 Set-Cookie 로, app 에 body 로 토큰을 준다 */
+const respondRefreshedTokens = (req: http.IncomingMessage, res: http.ServerResponse) => {
+  const role = readTokenRole(req, 'refresh_token');
+  const cookieToken = () => createFakeJwt(TOKEN_TTL_SECONDS, role, REFRESHED_COOKIE_TOKEN_SUB);
+  const bodyToken = () => createFakeJwt(TOKEN_TTL_SECONDS, role, REFRESHED_BODY_TOKEN_SUB);
+  const cookieOptions = `Path=/; SameSite=Lax; Max-Age=${TOKEN_TTL_SECONDS}`;
+
+  res.writeHead(200, {
+    'content-type': 'application/json',
+    'set-cookie': [
+      `access_token=${cookieToken()}; ${cookieOptions}`,
+      `refresh_token=${cookieToken()}; ${cookieOptions}`,
+    ],
+  });
+  res.end(
+    JSON.stringify(createApiSuccess({ accessToken: bodyToken(), refreshToken: bodyToken() }))
+  );
+};
+
+const respondJson = (res: http.ServerResponse, status: number, body: unknown) => {
+  res.writeHead(status, { 'content-type': 'application/json' });
+  res.end(JSON.stringify(body));
 };
 
 /**
@@ -92,24 +135,25 @@ export const startMockApiServer = (port: number) =>
   new Promise<http.Server | null>((resolve, reject) => {
     const server = http.createServer((req, res) => {
       const pathname = new URL(req.url ?? '/', `http://127.0.0.1:${port}`).pathname;
-      let body: unknown;
-      if (req.method === 'GET' && pathname === ENDPOINTS.USER) body = resolveMe(req);
-      else if (isEmptyRequested(req, pathname)) body = createApiSuccess([]);
-      else body = SSR_MOCK_ROUTES[`${req.method} ${pathname}`];
+      const routeKey = `${req.method} ${pathname}`;
 
-      if (!body) {
-        res.writeHead(404, { 'content-type': 'application/json' });
-        res.end(
-          JSON.stringify({
-            ...createApiError({ code: 'E2E_SSR_UNMOCKED' }),
-            debug: `SSR 목 스텁에 등록되지 않은 요청: ${req.method} ${pathname}`,
-          })
-        );
-        return;
+      const statusOverride = readStatusOverride(req, routeKey);
+      if (statusOverride !== null)
+        return respondJson(res, statusOverride, createApiError({ code: 'E2E_SSR_STATUS' }));
+
+      if (routeKey === `POST ${ENDPOINTS.AUTH_TOKEN_REFRESH}`)
+        return respondRefreshedTokens(req, res);
+      if (routeKey === `GET ${ENDPOINTS.USER}`) return respondJson(res, 200, resolveMe(req));
+      if (isEmptyRequested(req, pathname)) return respondJson(res, 200, createApiSuccess([]));
+
+      if (!(routeKey in SSR_MOCK_ROUTES)) {
+        return respondJson(res, 404, {
+          ...createApiError({ code: 'E2E_SSR_UNMOCKED' }),
+          debug: `SSR 목 스텁에 등록되지 않은 요청: ${routeKey}`,
+        });
       }
 
-      res.writeHead(200, { 'content-type': 'application/json' });
-      res.end(JSON.stringify(body));
+      return respondJson(res, 200, SSR_MOCK_ROUTES[routeKey]);
     });
 
     /** 유휴 keep-alive 소켓을 서버가 닫는 순간 serverApi 가 재사용하면 ECONNRESET 이 나 SSR 이 에러 화면으로 떨어진다 */

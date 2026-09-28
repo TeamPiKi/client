@@ -15,3 +15,6 @@ export const MOCK_API_URL = `http://127.0.0.1:${MOCK_API_PORT}`;
  * 스텁은 경로당 고정 응답이라, 테스트별 '데이터 없음' 은 이 쿠키로만 표현한다.
  */
 export const SSR_EMPTY_COOKIE = 'e2e-ssr-empty';
+
+/** SSR 스텁이 한 라우트를 에러 status 로 응답할 때 쓰는 쿠키 이름 — 값은 `METHOD /path=status` (helpers/ssrStatus.ts) */
+export const SSR_STATUS_COOKIE = 'e2e-ssr-status';
