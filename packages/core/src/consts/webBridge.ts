@@ -55,6 +55,8 @@ export const WEBBRIDGE_MESSAGE_TYPE = {
 
   /** 앱 업데이트 유도 — 플랫폼에 맞는 스토어 상세 페이지 열기 */
   WEB_REQ_OPEN_STORE: 'WEB_REQ_OPEN_STORE',
+
+  WEB_REQ_HAPTIC: 'WEB_REQ_HAPTIC',
 } as const;
 
 export const PUSH_NOTIFICATION_TYPE = {
