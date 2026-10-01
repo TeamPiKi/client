@@ -1,8 +1,10 @@
 'use client';
 
+import { HAPTIC_STYLE } from '@piki/core';
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
 
 import { cn } from '@/utils/cn';
+import { triggerHaptic } from '@/utils/haptic';
 
 export type WheelColumnHandleT = {
   /** 현재 스크롤 위치로부터 인덱스를 즉시 계산해 반환 (디바운스 무시) */
@@ -37,6 +39,7 @@ const WheelColumn = forwardRef<WheelColumnHandleT, WheelColumnProps>(function Wh
   const containerRef = useRef<HTMLDivElement>(null);
   const scrollTimerRef = useRef<number | null>(null);
   const lastEmittedIndexRef = useRef(selectedIndex);
+  const lastTickedIndexRef = useRef(selectedIndex);
 
   const padRows = Math.floor(visibleRows / 2);
   const containerHeight = itemHeight * visibleRows;
@@ -50,12 +53,22 @@ const WheelColumn = forwardRef<WheelColumnHandleT, WheelColumnProps>(function Wh
     if (!el || hasInitializedRef.current) return;
     el.scrollTop = selectedIndex * itemHeight;
     lastEmittedIndexRef.current = selectedIndex;
+    lastTickedIndexRef.current = selectedIndex;
     hasInitializedRef.current = true;
   }, [selectedIndex, itemHeight]);
 
   const handleScroll = () => {
     const el = containerRef.current;
     if (!el) return;
+
+    const tickIndex = Math.max(
+      0,
+      Math.min(items.length - 1, Math.round(el.scrollTop / itemHeight))
+    );
+    if (tickIndex !== lastTickedIndexRef.current) {
+      lastTickedIndexRef.current = tickIndex;
+      triggerHaptic(HAPTIC_STYLE.SELECTION);
+    }
 
     if (scrollTimerRef.current !== null) {
       window.clearTimeout(scrollTimerRef.current);

@@ -9,6 +9,7 @@ export {
   S3_UPLOAD_ERROR_MESSAGE,
   SERVER_ERROR_MESSAGE,
 } from './consts/errorCode';
+export { HAPTIC_STYLE } from './consts/haptic';
 export { MAX_IMAGE_UPLOAD_BYTES, SUPPORTED_IMAGE_MIME_TYPES } from './consts/image';
 export {
   PUSH_NOTIFICATION_TYPE,
@@ -26,6 +27,7 @@ export type {
   WebReqLogAnalyticsEventMessageT,
 } from './types/analytics';
 export type { WebReqOpenStoreMessageT } from './types/appUpdate';
+export type { HapticPayloadT, HapticStyleT, WebReqHapticMessageT } from './types/haptic';
 export type {
   AppResImagePickerCancelMessageT,
   AppResImagePickerErrorMessageT,
