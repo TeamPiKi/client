@@ -1,6 +1,6 @@
 'use client';
 
-import { HAPTIC_STYLE, WEBBRIDGE_MESSAGE_TYPE } from '@piki/core';
+import { HAPTIC_STYLE } from '@piki/core';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
@@ -18,7 +18,7 @@ import {
 import { ROUTES } from '@/consts/route';
 import { Z_INDEX } from '@/consts/zIndex';
 import { cn } from '@/utils/cn';
-import { WebBridge } from '@/utils/webBridge';
+import { triggerHaptic } from '@/utils/haptic';
 
 const TABS = [
   { label: '홈', activeIcon: HomeIconFill, inactiveIcon: HomeIconOutline, href: ROUTES.HOME },
@@ -103,11 +103,7 @@ function BottomTabBar() {
     if (event.button !== 0 || isGrabbingRef.current) return;
     isDraggedRef.current = false;
     setIsPressed(true);
-    
-    WebBridge.postMessage({
-      type: WEBBRIDGE_MESSAGE_TYPE.WEB_REQ_HAPTIC,
-      payload: { style: HAPTIC_STYLE.LIGHT },
-    });
+    triggerHaptic(HAPTIC_STYLE.LIGHT);
 
     const bar = barRef.current;
     const indicator = indicatorRef.current;
@@ -159,10 +155,7 @@ function BottomTabBar() {
       const nextHoverIndex = leftToIndex(left);
       if (nextHoverIndex !== hoverIndex) {
         hoverIndex = nextHoverIndex;
-        WebBridge.postMessage({
-          type: WEBBRIDGE_MESSAGE_TYPE.WEB_REQ_HAPTIC,
-          payload: { style: HAPTIC_STYLE.SELECTION },
-        });
+        triggerHaptic(HAPTIC_STYLE.SELECTION);
       }
 
       // 이동 속도만큼 진행 방향으로 늘어나는 스쿼시 + 끌려가듯 기우는 스큐
