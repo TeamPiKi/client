@@ -14,7 +14,7 @@ const TOAST_HAPTIC_STYLE: Partial<Record<NonNullable<ToastT['type']>, HapticStyl
   success: HAPTIC_STYLE.SUCCESS,
   info: HAPTIC_STYLE.LIGHT,
   warning: HAPTIC_STYLE.WARNING,
-  error: HAPTIC_STYLE.ERROR,
+  error: HAPTIC_STYLE.WARNING, // ERROR 햅틱 대신 WARNING 사용
 };
 
 function ToastHaptic() {
@@ -32,7 +32,7 @@ function ToastHaptic() {
 
       const style = type && TOAST_HAPTIC_STYLE[type];
       if (!style) return;
-      
+
       hapticDoneIdsRef.current.add(id);
       triggerHaptic(style);
     });
