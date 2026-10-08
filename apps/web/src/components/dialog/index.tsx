@@ -47,16 +47,19 @@ function DialogContent({
   children,
   showCloseButton = true,
   closeOnDimClick = true,
+  showOverlay = true,
   onInteractOutside,
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Content> & {
   showCloseButton?: boolean;
   /** false 면 딤 클릭으로 닫히지 않음 */
   closeOnDimClick?: boolean;
+  /** false 면 딤 없이 콘텐츠만 — 전체 화면 콘텐츠용 */
+  showOverlay?: boolean;
 }) {
   return (
     <DialogPortal>
-      <DialogOverlay />
+      {showOverlay && <DialogOverlay />}
       <DialogPrimitive.Content
         data-slot="dialog-content"
         onInteractOutside={event => {
