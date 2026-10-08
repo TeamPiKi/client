@@ -2,7 +2,7 @@
 
 import { SUPPORTED_IMAGE_MIME_TYPES } from '@piki/core';
 import { useParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 
 import { ImageIconFill } from '@/assets/icons';
@@ -60,6 +60,11 @@ function ByImageDialog({ type, open, onOpenChange }: Props) {
 
   /** 피커에서 고른 원본 — 값이 있으면 크롭 에디터가 열린다 */
   const [picked, setPicked] = useState<PickedResultT | null>(null);
+  const isOpenRef = useRef(open);
+
+  useEffect(() => {
+    isOpenRef.current = open;
+  }, [open]);
 
   const {
     openPicker,
@@ -71,6 +76,11 @@ function ByImageDialog({ type, open, onOpenChange }: Props) {
     maxCount: MAX_IMAGE_COUNT,
     onSuccess: async (files, skippedCount) => {
       const images = await Promise.all(files.map(toPickedImage));
+      /** NOTE: 디코드 중 다이얼로그가 닫혔으면 버림. 안 그러면 다시 열 때 이전 선택으로 에디터가 뜸 */
+      if (!isOpenRef.current) {
+        revokePickedImages(images);
+        return;
+      }
       setPicked({ images, skippedCount });
     },
   });
