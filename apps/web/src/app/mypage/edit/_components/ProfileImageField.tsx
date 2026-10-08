@@ -17,7 +17,6 @@ import { useImagePicker } from '@/hooks/useImagePicker';
 import type { UserIdentityTypeT } from '@/types/user';
 import { loadImage } from '@/utils/cropImage';
 
-/** 프로필은 원형 90px 노출 — 원본이 커도 출력 한 변이 이 값을 넘지 않게 줄인다 */
 const CROP_OUTPUT_MAX_SIZE = 1080;
 
 type Props = {

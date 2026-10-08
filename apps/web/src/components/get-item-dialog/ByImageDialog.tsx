@@ -22,7 +22,6 @@ import { loadImage } from '@/utils/cropImage';
 import Spacing from '../spacing';
 
 const MAX_IMAGE_COUNT = 5;
-/** OCR 은 상품명·가격 글자가 읽혀야 하므로 프로필보다 크게 둔다 */
 const CROP_OUTPUT_MAX_SIZE = 2048;
 
 type PickedImageT = ImageCropEditorImageT & { file: File };

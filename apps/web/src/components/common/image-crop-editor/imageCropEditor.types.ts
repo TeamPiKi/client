@@ -8,6 +8,6 @@ export type ImageCropEditorImageT = {
 
 export type ImageCropResultT = {
   id: string;
-  /** NOTE: null 이면 편집하지 않은 이미지 — 호출부가 원본 파일을 그대로 씀 */
+  /** null 이면 편집하지 않은 이미지 */
   blob: Blob | null;
 };
