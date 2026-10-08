@@ -28,7 +28,6 @@ type Props = {
 
 function ProfileImageField({ userIdentityType, profileImage, onImageSelect }: Props) {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  /** 피커에서 고른 원본 — 값이 있으면 크롭 에디터가 열린다 */
   const [cropTarget, setCropTarget] = useState<ImageCropEditorImageT | null>(null);
 
   const { openPicker, inputRef, handleInputChange, isPending } = useImagePicker({
@@ -48,10 +47,7 @@ function ProfileImageField({ userIdentityType, profileImage, onImageSelect }: Pr
         return;
       }
 
-      setCropTarget(prev => {
-        if (prev) URL.revokeObjectURL(prev.src);
-        return { id: 'profile', src: url, size };
-      });
+      setCropTarget({ id: 'profile', src: url, size });
     },
   });
 
@@ -69,12 +65,7 @@ function ProfileImageField({ userIdentityType, profileImage, onImageSelect }: Pr
     [cropTarget]
   );
 
-  const closeCropEditor = () => {
-    setCropTarget(prev => {
-      if (prev) URL.revokeObjectURL(prev.src);
-      return null;
-    });
-  };
+  const closeCropEditor = () => setCropTarget(null);
 
   const handleCropConfirm = (results: ImageCropResultT[]) => {
     const blob = results[0]?.blob;
