@@ -54,8 +54,6 @@ test('프로필 이미지를 고르면 크롭 에디터가 열리고, 완료하�
   });
 
   await expect(page.getByText('프로필 이미지 편집')).toBeVisible();
-  /** 터치 환경(기본 프로젝트는 iPhone 에뮬레이션)은 핀치줌을 쓰므로 줌 슬라이더가 숨겨진다 */
-  await expect(page.getByRole('slider', { name: '이미지 확대/축소' })).toBeHidden();
 
   await page.getByRole('button', { name: '완료' }).click();
   await expect(page.getByText('프로필 이미지 편집')).not.toBeVisible();
@@ -70,28 +68,6 @@ test('프로필 이미지를 고르면 크롭 에디터가 열리고, 완료하�
   const presignBody = (await presignRequestPromise).postDataJSON() as { contentLength?: number };
   expect(putBodyByteLength).toBeGreaterThan(0);
   expect(presignBody.contentLength).toBe(putBodyByteLength);
-});
-
-test.describe('마우스(fine pointer) 환경', () => {
-  test.use({ hasTouch: false, isMobile: false });
-
-  test('핀치줌이 없는 마우스 환경에서는 줌 슬라이더가 노출된다', async ({ page, api }) => {
-    api.get(ENDPOINTS.USER, MOCK_MEMBER_ME);
-
-    await page.goto('/mypage/edit');
-    const fileChooserPromise = page.waitForEvent('filechooser');
-    await page.getByRole('button', { name: '프로필 이미지 변경' }).click();
-    await (
-      await fileChooserPromise
-    ).setFiles({
-      name: 'photo.svg',
-      mimeType: 'image/svg+xml',
-      buffer: Buffer.from(MOCK_PICKED_IMAGE_SVG),
-    });
-
-    await expect(page.getByText('프로필 이미지 편집')).toBeVisible();
-    await expect(page.getByRole('slider', { name: '이미지 확대/축소' })).toBeVisible();
-  });
 });
 
 test('브라우저가 디코드하지 못하는 이미지는 크롭 에디터 대신 안내 토스트를 띄운다', async ({

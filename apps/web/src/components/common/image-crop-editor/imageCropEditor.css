@@ -1,0 +1,28 @@
+/** NOTE: cropper.css 는 레이어 밖이라 Tailwind 유틸리티로는 못 덮음. 같은 레이어 밖에서 뒤에 선언해 이김 */
+.image-crop-editor .cropper-view-box {
+  outline-color: var(--color-bg-accent);
+}
+
+.image-crop-editor .cropper-line,
+.image-crop-editor .cropper-point,
+.image-crop-editor .cropper-point.point-se::before {
+  background-color: var(--color-bg-accent);
+}
+
+.image-crop-editor[data-crop-shape='round'] .cropper-view-box,
+.image-crop-editor[data-crop-shape='round'] .cropper-face {
+  border-radius: 50%;
+}
+
+/** 원형은 변 핸들·확대된 모서리 핸들을 숨기고 작은 모서리 점만 남김 */
+.image-crop-editor[data-crop-shape='round'] .cropper-line,
+.image-crop-editor[data-crop-shape='round'] .cropper-point.point-se::before {
+  display: none;
+}
+
+.image-crop-editor[data-crop-shape='round'] .cropper-point.point-se {
+  width: 5px;
+  height: 5px;
+  opacity: 0.75;
+}
+
