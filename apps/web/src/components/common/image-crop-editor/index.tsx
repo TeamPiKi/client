@@ -47,7 +47,6 @@ const getIsCropApplied = (
   return cropArea.width < size.width - 1 || cropArea.height < size.height - 1;
 };
 
-/** 피커 선택 직후 화면 전체를 덮는 크롭 에디터. 여러 장이면 하단 썸네일로 장을 옮겨가며 편집 */
 function ImageCropEditor({
   title,
   images,
@@ -59,9 +58,8 @@ function ImageCropEditor({
   onConfirm,
 }: ImageCropEditorProps) {
   const [activeIndex, setActiveIndex] = useState(0);
-  const [cropAreas, setCropAreas] = useState<Record<string, CropAreaT>>({});
-  const cropAreasRef = useRef(cropAreas);
-  cropAreasRef.current = cropAreas;
+  /** NOTE: crop 이벤트가 드래그 중 매 프레임 발생해 state 로 두면 에디터 전체가 계속 리렌더됨 */
+  const cropAreasRef = useRef<Record<string, CropAreaT>>({});
   const [isCropperReady, setIsCropperReady] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
 
@@ -75,7 +73,6 @@ function ImageCropEditor({
 
   /** 장을 옮길 때마다 Cropper 를 새로 붙인다 */
   useEffect(() => {
-    /** NOTE: img 가 key 로 교체되는 커밋에선 state 의 엘리먼트가 아직 이전 것이라 DOM 에서 떨어져 있음. 다음 렌더에서 새 엘리먼트로 다시 돎 */
     if (!imageElement?.isConnected || !activeImage?.size) return;
 
     const imageId = activeImage.id;
@@ -101,7 +98,7 @@ function ImageCropEditor({
       },
       crop(event) {
         const { x, y, width, height } = event.detail;
-        setCropAreas(prev => ({ ...prev, [imageId]: { x, y, width, height } }));
+        cropAreasRef.current[imageId] = { x, y, width, height };
       },
     });
 
@@ -129,7 +126,7 @@ function ImageCropEditor({
           continue;
         }
 
-        const cropArea = cropAreas[image.id] ?? { x: 0, y: 0, ...image.size };
+        const cropArea = cropAreasRef.current[image.id] ?? { x: 0, y: 0, ...image.size };
         if (!getIsCropApplied(cropArea, image.size, hasFixedAspect)) {
           results.push({ id: image.id, blob: null });
           continue;
