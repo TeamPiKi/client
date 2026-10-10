@@ -65,6 +65,8 @@ function ImageCropEditor({
 
   /** NOTE: Dialog Portal 이 첫 렌더에선 자식을 안 그려 ref 가 비어 있음. 엘리먼트를 state 로 받아 붙은 뒤 effect 를 돌림 */
   const [imageElement, setImageElement] = useState<HTMLImageElement | null>(null);
+  /** NOTE: 가이드 표시를 state 로 두면 드래그 시작·끝마다 에디터 전체가 리렌더돼 속성만 직접 바꿈 */
+  const cropAreaElementRef = useRef<HTMLDivElement>(null);
 
   const activeImage = images[activeIndex] ?? images[0];
   const hasFixedAspect = typeof aspect === 'number';
@@ -76,6 +78,7 @@ function ImageCropEditor({
     if (!imageElement?.isConnected || !activeImage?.size) return;
 
     const imageId = activeImage.id;
+    const cropAreaElement = cropAreaElementRef.current;
     setIsCropperReady(false);
 
     const cropper = new Cropper(imageElement, {
@@ -96,6 +99,12 @@ function ImageCropEditor({
       ready() {
         setIsCropperReady(true);
       },
+      cropstart() {
+        cropAreaElement?.setAttribute('data-cropping', '');
+      },
+      cropend() {
+        cropAreaElement?.removeAttribute('data-cropping');
+      },
       crop(event) {
         const { x, y, width, height } = event.detail;
         cropAreasRef.current[imageId] = { x, y, width, height };
@@ -103,6 +112,7 @@ function ImageCropEditor({
     });
 
     return () => {
+      cropAreaElement?.removeAttribute('data-cropping');
       cropper.destroy();
     };
   }, [imageElement, activeImage, aspect, cropShape]);
@@ -182,12 +192,13 @@ function ImageCropEditor({
           </DialogDescription>
 
           <div
+            ref={cropAreaElementRef}
             data-crop-shape={cropShape}
             className="image-crop-editor relative mt-6 min-h-0 flex-1 touch-none bg-black"
           >
             {isActiveEditable ? (
-              <div className="absolute inset-0">
-                {/* eslint-disable-next-line @next/next/no-img-element -- Cropper.js 가 직접 붙잡는 원본 엘리먼트 */}
+              <div className="absolute inset-5">
+                {/* eslint-disable-next-line @next/next/no-img-element -- Next/Image 쓰면 오류 발생 */}
                 <img
                   key={activeImage.src}
                   ref={setImageElement}
