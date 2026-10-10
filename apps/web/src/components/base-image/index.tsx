@@ -3,7 +3,7 @@
 import type { ImageProps } from 'next/image';
 import Image from 'next/image';
 import type { ReactNode, SyntheticEvent } from 'react';
-import { useLayoutEffect, useRef, useState } from 'react';
+import { useCallback, useLayoutEffect, useRef, useState } from 'react';
 
 import { Z_INDEX } from '@/consts/zIndex';
 import { cn } from '@/utils/cn';
@@ -45,7 +45,12 @@ function BaseImage({
 }: BaseImageProps) {
   const [state, setState] = useState<ImageState>('loading');
   const imgRef = useRef<HTMLImageElement>(null);
+  const onErrorRef = useRef(onError);
   const srcKey = getImageSrcKey(src);
+
+  useLayoutEffect(() => {
+    onErrorRef.current = onError;
+  }, [onError]);
 
   useLayoutEffect(() => {
     const img = imgRef.current;
@@ -58,10 +63,11 @@ function BaseImage({
     onLoad?.(event);
   };
 
-  const handleError = (event: ImgEvent) => {
+  /** NOTE: next/image 는 onError 가 바뀔 때마다 img.src 를 다시 넣어 이미지를 재로드함. 렌더마다 깜빡이지 않게 고정함 */
+  const handleError = useCallback((event: ImgEvent) => {
     setState('error');
-    onError?.(event);
-  };
+    onErrorRef.current?.(event);
+  }, []);
 
   const isImageVisible = state === 'success';
   const showLoadingFallback = loadingFallback != null && state !== 'error';
