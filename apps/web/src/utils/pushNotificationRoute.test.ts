@@ -12,6 +12,9 @@ describe('getPushNotificationRoute', () => {
     { type: 'ITEM_PARSING_COMPLETED', refId: 3, kind: 'WISH' },
     { type: 'ITEM_PARSING_INCOMPLETE', refId: 4, kind: 'TOURNAMENT', tournamentId: 8 },
     { type: 'ITEM_PARSING_FAILED', refId: 5, kind: 'TOURNAMENT', tournamentId: 9 },
+    { type: 'ITEM_PARSING_RECOVERED', refId: 6, kind: 'TOURNAMENT', tournamentId: 10 },
+    { type: 'ITEM_REFRESH_COMPLETED', refId: 7, kind: 'WISH' },
+    { type: 'ITEM_REFRESH_FAILED', refId: 8, kind: 'WISH' },
   ];
 
   it.each(payloads)('$type 은 푸시로 눌러도, 인앱에서 눌러도 같은 화면으로 간다', payload => {

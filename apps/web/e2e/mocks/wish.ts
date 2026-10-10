@@ -1,4 +1,5 @@
-import type { GetWishlistResponseT } from '@/types/wish';
+import type { GetWishResponseT } from '@/app/archive/wish/[id]/_types/wish';
+import type { GetWishlistResponseT, PostWishLinkResponseT } from '@/types/wish';
 
 import { MOCK_IMAGE_URLS } from './images';
 import { MOCK_TOURNAMENT_ITEMS } from './tournament';
@@ -24,3 +25,38 @@ export const MOCK_WISHLIST_ENTRIES: GetWishlistResponseT[] = MOCK_TOURNAMENT_ITE
     refreshNeeded: null,
   })
 );
+
+export const MOCK_WISH_SOURCE_URL = 'https://shop.example/items/101';
+
+export const MOCK_WISH_DETAIL: GetWishResponseT = {
+  wish: { id: 1, createdAt: '2026-01-01T00:00:00Z' },
+  memo: null,
+  item: {
+    id: 101,
+    status: 'READY',
+    name: 'E2E 스니커즈',
+    price: 10000,
+    currency: 'KRW',
+    imageUrl: MOCK_IMAGE_URLS.product,
+    sourceUrl: MOCK_WISH_SOURCE_URL,
+    sourcePlatform: 'E2E몰',
+    source: 'SERVER',
+  },
+  priceHistory: [],
+};
+
+export const MOCK_WISH_ADDED_BY_LINK: PostWishLinkResponseT = {
+  wish: { id: 5, createdAt: '2026-01-02T00:00:00Z' },
+  item: {
+    id: 105,
+    status: 'READY',
+    name: 'E2E 코트',
+    price: 50000,
+    currency: 'KRW',
+    imageUrl: MOCK_IMAGE_URLS.product,
+    sourceUrl: 'https://shop.example/items/105',
+    sourcePlatform: 'E2E몰',
+  },
+  refreshNeeded: false,
+  reused: false,
+};

@@ -3,7 +3,8 @@ import { WEBVIEW_UA_TOKEN } from '@piki/core';
 import { ENDPOINTS } from '@/consts/api';
 
 import { expect, test } from '@e2e/fixtures/mockApiFixture';
-import { MOCK_MEMBER_ME } from '@e2e/mocks/me';
+import { applyGuestToken } from '@e2e/helpers/guestToken';
+import { MOCK_GUEST_ME, MOCK_MEMBER_ME } from '@e2e/mocks/me';
 import {
   MOCK_TOURNAMENT_COMPLETED,
   MOCK_TOURNAMENT_GROUP_COMPLETED,
@@ -11,12 +12,6 @@ import {
   MOCK_TOURNAMENT_RESULT,
 } from '@e2e/mocks/tournament';
 
-/**
- * 솔로 토너먼트 3단계 — 영수증 결과 화면 (id 3, SSR 목 = COMPLETED).
- *
- * 영수증 이미지 실제 저장(html-to-image + Web Share)과 공유 동작은 headless 환경이
- * 실제 유저 환경(모바일 공유 시트)을 대변하지 못해 버튼 노출까지만 검증한다.
- */
 test('결과 페이지에 영수증과 순위, 공유 버튼이 렌더링된다', async ({ page, api }) => {
   api.get(ENDPOINTS.USER, MOCK_MEMBER_ME);
   api.get(ENDPOINTS.TOURNAMENT(3), MOCK_TOURNAMENT_COMPLETED);
@@ -25,10 +20,6 @@ test('결과 페이지에 영수증과 순위, 공유 버튼이 렌더링된다'
 
   await expect(page.getByText('토너먼트 결과')).toBeVisible();
 
-  /**
-   * 영수증에 1~4위 상품명이 모두 표시된다 (영수증 뽑기 애니메이션은 auto-waiting 으로 흡수).
-   * ReceiptPaper 는 레이아웃 확보용 invisible 사본이 먼저 렌더되므로 실제 사본은 last().
-   */
   for (const rankedItem of MOCK_TOURNAMENT_RESULT) {
     await expect(page.getByText(rankedItem.name).last()).toBeVisible();
   }
@@ -37,14 +28,9 @@ test('결과 페이지에 영수증과 순위, 공유 버튼이 렌더링된다'
   /** isOwner — 플레이 링크 공유 버튼 노출 */
   await expect(page.getByRole('button', { name: '토너먼트 공유' })).toBeVisible();
 
-  /** 솔로 토너먼트(isGroupTournament: false)는 전체 결과 보기 배너가 없다 */
   await expect(page.getByRole('link', { name: '전체 결과 보기' })).toBeHidden();
 });
 
-/**
- * 소셜 토너먼트에서 내가 먼저 완주한 상태(id 4 — isGroupTournament: true, hasGroupResult: false).
- * 예전엔 hasGroupResult 기준이라 이 지점에서 배너가 사라졌다 — 노출은 소셜 여부로만 판단한다.
- */
 test('소셜 토너먼트는 친구가 완주하기 전에도 전체 결과 보기 배너가 노출된다', async ({
   page,
   api,
@@ -68,10 +54,6 @@ test('결과 페이지에서 홈으로 가기를 누르면 홈으로 이동한�
   await expect(page).toHaveURL('/home');
 });
 
-/**
- * 스토리 공유는 네이티브 전용이라 웹 브라우저에서는 버튼 자체가 없어야 한다.
- * 앱에서의 노출은 아래 웹뷰 UA 테스트에서 검증한다.
- */
 test('웹 브라우저에서는 공유 시트에 스토리 공유 버튼이 없다', async ({ page, api }) => {
   api.get(ENDPOINTS.USER, MOCK_MEMBER_ME);
   api.get(ENDPOINTS.TOURNAMENT(3), MOCK_TOURNAMENT_COMPLETED);
@@ -84,10 +66,6 @@ test('웹 브라우저에서는 공유 시트에 스토리 공유 버튼이 없�
 });
 
 test.describe('앱(웹뷰) 환경', () => {
-  /**
-   * 모든 BRIDGE_GATE 기준과 앱 업데이트 유도 targetVersion 을 넘는 최신 앱을 시뮬레이션한다.
-   * 낮은 버전이면 업데이트 유도 모달이 화면을 가리고, APP_UPDATE_PROMPT 는 SVG 를 import 해서 spec 에서 못 읽는다.
-   */
   test.use({ userAgent: `Mozilla/5.0 ${WEBVIEW_UA_TOKEN}/99.0.0` });
 
   test('스토리 공유 버튼이 노출되고, 인스타그램 미설치면 안내 토스트를 띄운다', async ({
@@ -134,4 +112,22 @@ test.describe('앱(웹뷰) 환경', () => {
       page.getByText('인스타그램 앱을 설치하면 스토리에 공유할 수 있어요.')
     ).toBeVisible();
   });
+});
+
+test('게스트가 영수증 저장을 누르면 로그인 유도 화면이 뜬다', async ({ page, api }) => {
+  api.get(ENDPOINTS.USER, MOCK_GUEST_ME);
+  api.get(ENDPOINTS.TOURNAMENT(3), MOCK_TOURNAMENT_COMPLETED);
+  await applyGuestToken(page);
+
+  await page.goto('/tournament/3/result');
+  await page.getByRole('button', { name: '영수증 저장' }).click();
+
+  await expect(
+    page.getByRole('heading', { name: '로그인하고 영수증을 저장해보세요' })
+  ).toBeVisible();
+
+  await expect(page.getByRole('dialog')).toHaveCount(0);
+
+  await page.getByRole('button', { name: '로그인하기' }).click();
+  await expect(page).toHaveURL(/\/login\?redirect=%2Ftournament%2F3%2Fresult/);
 });

@@ -7,16 +7,22 @@ import { useEffect, useRef, useState } from 'react';
 import { ChevronForwardIconFill, DownloadIconFill, UploadIconFill } from '@/assets/icons';
 import BottomCta from '@/components/bottom-cta';
 import Button from '@/components/button';
+import LoginRequired from '@/components/common/login-required';
+import { LOGIN_REQUIRED_TITLE } from '@/components/common/login-required/loginRequired.const';
 import { Header } from '@/components/header';
 import { ANALYTICS_EVENT } from '@/consts/analytics';
+import { GUEST_BLOCK_LOCATION } from '@/consts/guestBlockLocation';
+import { LOGIN_SOURCE } from '@/consts/loginSource';
 import { ROUTES } from '@/consts/route';
 import { TOURNAMENT_STATUS } from '@/consts/tournament';
+import { Z_INDEX } from '@/consts/zIndex';
 import { logAnalyticsEvent } from '@/utils/analytics';
+import { getLoginPath } from '@/utils/loginRedirect';
 
+import GuestSignupBanner from '../../../_common/_components/GuestSignupBanner';
 import { useGetTournament } from '../../_common/_hooks/useGetTournament';
 import ReceiptDrawMachine from './ReceiptDrawMachine';
 import ReceiptPaper from './ReceiptPaper';
-import ResultGuestBanner from './ResultGuestBanner';
 import GroupResultEntryCard from './group-result-entry-card/GroupResultEntryCard';
 import PlateShareDialog from './plate-share-dialog/PlateShareDialog';
 import ReceiptShareDialog from './receipt-share-dialog/ReceiptShareDialog';
@@ -34,6 +40,7 @@ function ResultClient({ tournamentId, isGuest = false, isApp = false }: ResultCl
   const [date] = useState(() => new Date());
   const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
   const [isReceiptShareDialogOpen, setIsReceiptShareDialogOpen] = useState(false);
+  const [isLoginRequiredOpen, setIsLoginRequiredOpen] = useState(false);
 
   // RSC에서 status 검사를 하지만, 클라에서 status가 바뀐 경우 방어
   useEffect(() => {
@@ -68,8 +75,15 @@ function ResultClient({ tournamentId, isGuest = false, isApp = false }: ResultCl
     setIsShareDialogOpen(true);
   };
 
+  const handleReceiptSaveClick = () => {
+    if (isGuest) {
+      setIsLoginRequiredOpen(true);
+      return;
+    }
+    setIsReceiptShareDialogOpen(true);
+  };
+
   return (
-    // pb-46(184px): 마지막 요소가 CTA(144px) + 상단 그라디언트(36px)에 가려지지 않는 하단 여백
     <main className="flex min-h-dvh flex-col overflow-x-hidden bg-bg-layer-basement pt-padding-top pb-46">
       <Header center="토너먼트 결과" centerClassName="heading-1-bold" />
 
@@ -85,7 +99,10 @@ function ResultClient({ tournamentId, isGuest = false, isApp = false }: ResultCl
 
         {isGuest && (
           <div className="mx-5 mt-[49px]">
-            <ResultGuestBanner />
+            <GuestSignupBanner
+              loginHref={getLoginPath(ROUTES.HOME)}
+              location={LOGIN_SOURCE.RESULT}
+            />
           </div>
         )}
 
@@ -105,7 +122,7 @@ function ResultClient({ tournamentId, isGuest = false, isApp = false }: ResultCl
             size="lg"
             icon="leading"
             leadingIcon={<DownloadIconFill aria-hidden className="size-5" />}
-            onClick={() => setIsReceiptShareDialogOpen(true)}
+            onClick={handleReceiptSaveClick}
             className="flex-1 border-gray-75 bg-gray-75 text-text-neutral-secondary"
           >
             영수증 저장
@@ -132,6 +149,17 @@ function ResultClient({ tournamentId, isGuest = false, isApp = false }: ResultCl
           <ChevronForwardIconFill aria-hidden className="size-4" />
         </Link>
       </BottomCta>
+
+      {isLoginRequiredOpen && (
+        <div className="fixed inset-0 mx-auto max-w-120" style={{ zIndex: Z_INDEX.DIALOG }}>
+          <LoginRequired
+            title={LOGIN_REQUIRED_TITLE.RECEIPT_SAVE}
+            redirectPath={ROUTES.TOURNAMENT_RESULT(tournamentId)}
+            location={GUEST_BLOCK_LOCATION.RECEIPT_SAVE}
+            onGoBack={() => setIsLoginRequiredOpen(false)}
+          />
+        </div>
+      )}
 
       <PlateShareDialog
         open={isShareDialogOpen}

@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { Header, HeaderIcon } from '@/components/header';
 import { ROUTES } from '@/consts/route';
 import { useBackWithFallback } from '@/hooks/useBackWithFallback';
+import { useGetMe } from '@/hooks/useGetMe';
 
 import ConfirmExitDialog from './ConfirmExitDialog';
 import TournamentGuidePopover from './TournamentGuidePopover';
@@ -15,7 +16,9 @@ type TournamentHeaderProps = {
 };
 
 function TournamentHeader({ name, hasFriends }: TournamentHeaderProps) {
+  const { userData } = useGetMe();
   const backWithFallback = useBackWithFallback();
+
   const [isExitConfirmOpen, setIsExitConfirmOpen] = useState(false);
 
   const handleExit = () => {
@@ -34,7 +37,7 @@ function TournamentHeader({ name, hasFriends }: TournamentHeaderProps) {
   return (
     <>
       <Header
-        left={<HeaderIcon name="BACK" onClick={handleBackClick} />}
+        left={userData.identityType === 'MEMBER' && <HeaderIcon name="BACK" onClick={handleBackClick} />}
         center={<span className="block w-full truncate">{name}</span>}
         centerClassName="heading-1-bold w-[calc(100%-40px-30px-30px)] text-center"
         right={<TournamentGuidePopover />}

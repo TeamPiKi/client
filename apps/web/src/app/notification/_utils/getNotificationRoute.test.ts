@@ -8,6 +8,7 @@ const ITEM_TYPES: NotificationTypeT[] = [
   'ITEM_PARSING_COMPLETED',
   'ITEM_PARSING_INCOMPLETE',
   'ITEM_PARSING_FAILED',
+  'ITEM_PARSING_RECOVERED',
   'ITEM_REFRESH_COMPLETED',
 ];
 
@@ -56,5 +57,12 @@ describe('getNotificationRoute', () => {
 
   it.each(ITEM_TYPES)('%s — wishId 가 없는 구버전 알림은 위시함 목록으로 보낸다', type => {
     expect(getNotificationRoute(type, 99, { kind: 'WISH' })).toBe('/archive/wish');
+  });
+
+  it('새로고침 실패는 위시에서만 일어나므로 wishId 로 위시 상세로 이동한다', () => {
+    expect(getNotificationRoute('ITEM_REFRESH_FAILED', 99, { kind: 'WISH', wishId: 12 })).toBe(
+      '/archive/wish/12'
+    );
+    expect(getNotificationRoute('ITEM_REFRESH_FAILED', 99, { kind: 'WISH' })).toBe('/archive/wish');
   });
 });

@@ -38,7 +38,8 @@ function MenuGroup({ title, children }: MenuGroupProps) {
   return (
     <section className="flex w-full flex-col gap-3">
       <h2 className="body-2-semibold text-text-neutral-secondary">{title}</h2>
-      <div className="flex flex-col gap-2 divide-y divide-border-neutral-muted rounded-xl bg-bg-layer-default px-4 py-2">
+      {/** divide-y 선은 윗 아이템 border-bottom 이라 gap 을 주면 선 아래로만 쌓임 — 선 양쪽 여백은 아이템 py 로 */}
+      <div className="flex flex-col divide-y divide-border-neutral-muted rounded-xl bg-bg-layer-default px-4">
         {children}
       </div>
     </section>
@@ -54,7 +55,7 @@ function AccountLinkItem({ href, label }: AccountLinkItemProps) {
   return (
     <Link
       href={href}
-      className="flex w-full cursor-pointer items-center px-2 py-2 body-1-medium text-text-neutral-primary"
+      className="flex w-full cursor-pointer items-center px-2 py-4 body-1-medium text-text-neutral-primary"
     >
       {label}
     </Link>

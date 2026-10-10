@@ -7,23 +7,23 @@ import Spinner from '@/components/spinner';
 import { cn } from '@/utils/cn';
 
 const socialButtonStyles = cva(
-  'flex h-[54px] w-full cursor-pointer items-center justify-center gap-[9px] rounded-[14px] disabled:opacity-50',
+  'flex h-[54px] w-full cursor-pointer items-center justify-center gap-3 rounded-[14px] disabled:opacity-50',
   {
     variants: {
       variant: {
-        google: 'border border-[#E5E7EB] bg-white',
-        apple: 'bg-[#1A1A1A]',
+        google: 'border border-border-neutral-muted bg-white',
+        apple: 'bg-gray-950',
         kakao: 'bg-[#FEE500]',
       },
     },
   }
 );
 
-const labelStyles = cva('text-[16px] font-semibold leading-6 tracking-[-0.312px]', {
+const labelStyles = cva('body-1-semibold', {
   variants: {
     variant: {
       google: 'text-text-neutral-primary',
-      apple: 'text-white',
+      apple: 'text-text-neutral-inverse',
       kakao: 'text-text-neutral-primary',
     },
   },

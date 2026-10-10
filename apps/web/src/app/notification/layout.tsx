@@ -1,5 +1,6 @@
-import LoginRequired from '@/components/common/login-required';
+import LoginRequiredPage from '@/components/common/login-required/LoginRequiredPage';
 import { LOGIN_REQUIRED_TITLE } from '@/components/common/login-required/loginRequired.const';
+import { GUEST_BLOCK_LOCATION } from '@/consts/guestBlockLocation';
 import { ROUTES } from '@/consts/route';
 import { getRoleOrRedirect } from '@/utils/getRoleOrRedirect';
 
@@ -12,7 +13,11 @@ async function NotificationLayout({ children }: NotificationLayoutProps) {
 
   if (role !== 'MEMBER')
     return (
-      <LoginRequired title={LOGIN_REQUIRED_TITLE.NOTIFICATION} redirectPath={ROUTES.NOTIFICATION} />
+      <LoginRequiredPage
+        title={LOGIN_REQUIRED_TITLE.NOTIFICATION}
+        redirectPath={ROUTES.NOTIFICATION}
+        location={GUEST_BLOCK_LOCATION.NOTIFICATION_TAB}
+      />
     );
 
   return children;

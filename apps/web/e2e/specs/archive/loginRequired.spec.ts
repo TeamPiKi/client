@@ -1,12 +1,12 @@
 import { ENDPOINTS } from '@/consts/api';
 
 import { expect, test } from '@e2e/fixtures/mockApiFixture';
-import { useGuestToken } from '@e2e/helpers/guestToken';
+import { applyGuestToken } from '@e2e/helpers/guestToken';
 import { MOCK_GUEST_ME } from '@e2e/mocks/me';
 
 test('게스트가 위시 탭에 들어가면 로그인 유도 화면이 뜬다', async ({ page, api }) => {
   api.get(ENDPOINTS.USER, MOCK_GUEST_ME);
-  await useGuestToken(page);
+  await applyGuestToken(page);
 
   await page.goto('/archive/wish');
 
@@ -24,7 +24,7 @@ test('게스트가 위시 탭에 들어가면 로그인 유도 화면이 뜬다'
 
 test('게스트가 토너먼트 탭에 들어가면 로그인 유도 화면이 뜬다', async ({ page, api }) => {
   api.get(ENDPOINTS.USER, MOCK_GUEST_ME);
-  await useGuestToken(page);
+  await applyGuestToken(page);
 
   await page.goto('/archive/tournament');
 

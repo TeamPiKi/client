@@ -19,6 +19,7 @@ export const ANALYTICS_EVENT = {
   /** 홈 */
   HOME_VIEW: 'home_view',
   NEW_TOURNAMENT_CLICK: 'new_tournament_click',
+  TOOLTIP_DISMISS: 'tooltip_dismiss',
 
   /** 토너먼트 funnel */
   TOURNAMENT_CREATE: 'tournament_create',
@@ -36,6 +37,10 @@ export const ANALYTICS_EVENT = {
   /** 게스트 로그인 유도 배너 */
   GUEST_BANNER_VIEW: 'guest_banner_view',
   GUEST_BANNER_CTA_CLICK: 'guest_banner_cta_click',
+
+  /** 게스트 차단 지점 — 배너와 분리. location 값은 consts/guestBlockLocation.ts */
+  GUEST_BLOCK_VIEW: 'guest_block_view',
+  GUEST_BLOCK_CTA_CLICK: 'guest_block_cta_click',
 
   /** 설정 */
   INVITE_EXPIRY_CHANGE: 'invite_expiry_change',

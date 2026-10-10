@@ -34,8 +34,17 @@ const invalidateWishQueries = (queryClient: QueryClient, wishId?: number) => {
   queryClient.invalidateQueries({ queryKey: isValidWishId ? ['wish', wishId] : ['wish'] });
 };
 
-const buildToastMessage = (payload: NotificationSsePayloadT) =>
-  payload.body ? `${payload.title} ${payload.body}` : payload.title;
+/** 상품명만 화면 너비에 맞춰 줄여 토스트를 항상 한 줄로 유지 */
+const buildToastMessage = (payload: NotificationSsePayloadT) => {
+  if (!payload.body) return payload.title;
+
+  return (
+    <span className="flex min-w-0 items-baseline gap-1 whitespace-nowrap">
+      <span className="min-w-0 truncate">{payload.title}</span>
+      <span className="shrink-0">{payload.body}</span>
+    </span>
+  );
+};
 
 export const useNotificationSSE = (enabled: boolean) => {
   const pathname = usePathname();
@@ -244,6 +253,7 @@ export const useNotificationSSE = (enabled: boolean) => {
               switch (payload.type) {
                 case 'ITEM_REFRESH_COMPLETED':
                 case 'ITEM_PARSING_COMPLETED':
+                case 'ITEM_PARSING_RECOVERED':
                   if (payload.kind === 'TOURNAMENT' && payload.tournamentId != null) {
                     queryClient.invalidateQueries({
                       queryKey: ['tournament', payload.tournamentId],
@@ -256,6 +266,7 @@ export const useNotificationSSE = (enabled: boolean) => {
                 /** 미완성·실패 모두 동일한 데이터를 갱신하고, 사용자 안내만 다르다. */
                 case 'ITEM_PARSING_INCOMPLETE':
                 case 'ITEM_PARSING_FAILED':
+                case 'ITEM_REFRESH_FAILED':
                   if (payload.kind === 'TOURNAMENT' && payload.tournamentId != null) {
                     queryClient.invalidateQueries({
                       queryKey: ['tournament', payload.tournamentId],

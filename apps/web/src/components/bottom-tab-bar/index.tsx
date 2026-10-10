@@ -1,5 +1,6 @@
 'use client';
 
+import { HAPTIC_STYLE } from '@piki/core';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
@@ -17,6 +18,7 @@ import {
 import { ROUTES } from '@/consts/route';
 import { Z_INDEX } from '@/consts/zIndex';
 import { cn } from '@/utils/cn';
+import { triggerHaptic } from '@/utils/haptic';
 
 const TABS = [
   { label: '홈', activeIcon: HomeIconFill, inactiveIcon: HomeIconOutline, href: ROUTES.HOME },
@@ -101,6 +103,7 @@ function BottomTabBar() {
     if (event.button !== 0 || isGrabbingRef.current) return;
     isDraggedRef.current = false;
     setIsPressed(true);
+    triggerHaptic(HAPTIC_STYLE.LIGHT);
 
     const bar = barRef.current;
     const indicator = indicatorRef.current;
@@ -133,6 +136,7 @@ function BottomTabBar() {
     let anchorLeft = pressLeft;
     let anchorX = event.clientX;
     let lastX = event.clientX;
+    let hoverIndex = pressIndex;
 
     const handleMove = (e: PointerEvent) => {
       if (!isDraggedRef.current) {
@@ -147,6 +151,12 @@ function BottomTabBar() {
       indicator.style.transition = 'none';
       indicator.style.left = `${left}px`;
       indicator.style.right = `${BAR_WIDTH - left - TAB_WIDTH}px`;
+
+      const nextHoverIndex = leftToIndex(left);
+      if (nextHoverIndex !== hoverIndex) {
+        hoverIndex = nextHoverIndex;
+        triggerHaptic(HAPTIC_STYLE.SELECTION);
+      }
 
       // 이동 속도만큼 진행 방향으로 늘어나는 스쿼시 + 끌려가듯 기우는 스큐
       const velocity = clamp(e.clientX - lastX, -10, 10);

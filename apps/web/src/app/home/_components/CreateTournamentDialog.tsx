@@ -14,9 +14,9 @@ import {
   DialogTrigger,
 } from '@/components/dialog';
 import Input from '@/components/input';
-import type { AbVariantT } from '@/consts/abTest';
 import { TOOLTIP_VARIANT_KEY } from '@/consts/abTest';
 import { ANALYTICS_EVENT } from '@/consts/analytics';
+import { GUEST_BLOCK_LOCATION } from '@/consts/guestBlockLocation';
 import { ROUTES } from '@/consts/route';
 import { Z_INDEX } from '@/consts/zIndex';
 import { useGetMe } from '@/hooks/useGetMe';
@@ -36,7 +36,7 @@ const DEFAULT_INVITE_DURATION_MINUTES = 30;
 const getTooltipVariant = () => getOrAssignAbVariant(TOOLTIP_VARIANT_KEY);
 
 const createButtonClassName =
-  'relative flex h-[104px] cursor-pointer flex-col rounded-2xl bg-gray-900 p-4';
+  'flex h-[104px] w-full cursor-pointer flex-col rounded-2xl bg-gray-900 p-4';
 
 function CreateTournamentDialog() {
   const { userData } = useGetMe();
@@ -76,7 +76,7 @@ function CreateTournamentDialog() {
       ...(variant && { tooltip_variant: variant }),
       identity_type: userData.identityType,
     });
-    
+
     /** 게스트 - 생성 다이얼로그 대신 로그인 유도 UI 띄우기 */
     if (userData.identityType !== 'MEMBER') setIsLoginRequiredOpen(true);
   };
@@ -101,20 +101,24 @@ function CreateTournamentDialog() {
   if (userData.identityType !== 'MEMBER') {
     return (
       <>
-        <button
-          type="button"
-          aria-label="새 토너먼트 만들기"
-          onClick={handleTriggerClick}
-          className={createButtonClassName}
-        >
-          <CreateButtonContent variant={variant} />
-        </button>
+        <div className="relative">
+          {variant && <TooltipAb variant={variant} />}
+          <button
+            type="button"
+            aria-label="새 토너먼트 만들기"
+            onClick={handleTriggerClick}
+            className={createButtonClassName}
+          >
+            <CreateButtonContent />
+          </button>
+        </div>
         {isLoginRequiredOpen && (
           <div className="absolute inset-0" style={{ zIndex: Z_INDEX.LOGIN_REQUIRED_OVERLAY }}>
             <LoginRequired
               title={LOGIN_REQUIRED_TITLE.TOURNAMENT_CREATE}
               redirectPath={ROUTES.HOME}
-              onGoHome={() => setIsLoginRequiredOpen(false)}
+              location={GUEST_BLOCK_LOCATION.HOME_TOURNAMENT_CREATE}
+              onGoBack={() => setIsLoginRequiredOpen(false)}
             />
           </div>
         )}
@@ -124,16 +128,19 @@ function CreateTournamentDialog() {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <button
-          type="button"
-          aria-label="새 토너먼트 만들기"
-          onClick={handleTriggerClick}
-          className={createButtonClassName}
-        >
-          <CreateButtonContent variant={variant} />
-        </button>
-      </DialogTrigger>
+      <div className="relative">
+        {variant && <TooltipAb variant={variant} />}
+        <DialogTrigger asChild>
+          <button
+            type="button"
+            aria-label="새 토너먼트 만들기"
+            onClick={handleTriggerClick}
+            className={createButtonClassName}
+          >
+            <CreateButtonContent />
+          </button>
+        </DialogTrigger>
+      </div>
       <DialogContent showCloseButton={false} className="flex flex-col gap-5">
         <DialogDescription className="sr-only">새 토너먼트 생성 다이얼로그</DialogDescription>
         <DialogTitle className="text-center heading-1-bold text-text-neutral-primary">
@@ -157,9 +164,8 @@ function CreateTournamentDialog() {
   );
 }
 
-const CreateButtonContent = ({ variant }: { variant: AbVariantT | null }) => (
+const CreateButtonContent = () => (
   <>
-    {variant && <TooltipAb variant={variant} />}
     <span className="text-left body-1-semibold whitespace-pre-line text-base-50">
       {'새 토너먼트\n만들기'}
     </span>

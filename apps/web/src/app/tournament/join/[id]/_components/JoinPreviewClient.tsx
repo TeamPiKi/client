@@ -1,9 +1,11 @@
 'use client';
 
 import { ERROR_CODE, ERROR_MESSAGE_MAP } from '@piki/core';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useCallback, useState } from 'react';
 
+import GuestSignupBanner from '@/app/tournament/_common/_components/GuestSignupBanner';
 import { usePatchTournamentNickname } from '@/app/tournament/join/_hooks/usePatchTournamentNickname';
 import { usePostJoin } from '@/app/tournament/join/_hooks/usePostJoin';
 import { usePostJoinGuest } from '@/app/tournament/join/_hooks/usePostJoinGuest';
@@ -11,14 +13,19 @@ import { EditIconFill } from '@/assets/icons/fill';
 import Button from '@/components/button';
 import type { JoinErrorTypeT } from '@/components/common/join-error-dialog';
 import JoinErrorDialog from '@/components/common/join-error-dialog';
+import TermsAgreementNotice from '@/components/common/terms-agreement-notice';
 import { Header } from '@/components/header';
 import Input from '@/components/input';
+import { ANALYTICS_EVENT } from '@/consts/analytics';
+import { LOGIN_SOURCE } from '@/consts/loginSource';
 import { QUERY_ACTION } from '@/consts/queryAction';
 import { ROUTES } from '@/consts/route';
 import { useGetMe } from '@/hooks/useGetMe';
 import { useNicknameValidation } from '@/hooks/useNicknameValidation';
 import { usePageBackground } from '@/hooks/usePageBackground';
 import type { GetInvitePreviewResponseT } from '@/types/tournament';
+import { logAnalyticsEvent } from '@/utils/analytics';
+import { getLoginPath } from '@/utils/loginRedirect';
 
 type JoinPreviewClientProps = {
   tournamentId: number;
@@ -96,6 +103,10 @@ function JoinPreviewForm({
 
   const helperText = nicknameErrorText ?? duplicateNicknameError;
 
+  const loginHref = getLoginPath(
+    `${ROUTES.TOURNAMENT_JOIN_BY_LINK(tournamentId)}?${new URLSearchParams({ code: inviteCode })}`
+  );
+
   const isComplete =
     isNicknameValid &&
     !duplicateNicknameError &&
@@ -110,6 +121,10 @@ function JoinPreviewForm({
       `${ROUTES.TOURNAMENT_CREATE(tournamentId)}?${QUERY_ACTION.KEY}=${QUERY_ACTION.VALUE.WELCOME_JOIN}`
     );
   }, [router, tournamentId]);
+
+  const handleLoginLinkClick = () => {
+    logAnalyticsEvent(ANALYTICS_EVENT.GUEST_BANNER_CTA_CLICK, { location: LOGIN_SOURCE.INVITE });
+  };
 
   const handleNicknameChange = (value: string) => {
     setNickname(value);
@@ -150,7 +165,7 @@ function JoinPreviewForm({
 
   return (
     <>
-      <main className="flex min-h-dvh flex-col bg-bg-layer-default pt-padding-top pb-8">
+      <main className="flex min-h-dvh flex-col bg-bg-layer-default pt-padding-top pb-10">
         <Header
           center="초대 참여하기"
           centerClassName="heading-1-bold text-text-neutral-primary"
@@ -158,7 +173,7 @@ function JoinPreviewForm({
         />
 
         <section className="mt-8.75 flex flex-col gap-2 px-5">
-          <p className="body-2-semibold text-text-neutral-primary">공유받은 토너먼트</p>
+          <p className="body-2-semibold text-text-neutral-primary">초대받은 토너먼트</p>
           <div className="flex flex-col gap-1 rounded-xl bg-gray-50 p-4">
             <p className="body-1-semibold text-text-neutral-primary">{preview.tournamentName}</p>
             <p className="body-2-medium text-text-neutral-secondary">
@@ -169,7 +184,7 @@ function JoinPreviewForm({
 
         <section className="mt-8 px-5">
           <Input
-            label="토너먼트용 닉네임을 설정해주세요."
+            label="닉네임을 설정해주세요."
             value={nickname}
             onChange={event => handleNicknameChange(event.target.value)}
             right={<EditIconFill className="size-5" />}
@@ -177,9 +192,19 @@ function JoinPreviewForm({
             aria-invalid={Boolean(helperText)}
             {...(helperText ? { helperText } : {})}
           />
+          {isGuest && <TermsAgreementNotice action="참여" className="mt-2" />}
         </section>
 
-        <div className="mt-auto px-5">
+        <div className="mt-auto flex flex-col px-5">
+          {isGuest && (
+            <div className="mb-6">
+              <GuestSignupBanner
+                loginHref={loginHref}
+                location={LOGIN_SOURCE.INVITE}
+                variant="plain"
+              />
+            </div>
+          )}
           <Button
             size="lg"
             variant="primary"
@@ -191,6 +216,15 @@ function JoinPreviewForm({
           >
             참여하기
           </Button>
+          {isGuest && (
+            <Link
+              href={loginHref}
+              onClick={handleLoginLinkClick}
+              className="mt-4 self-center body-2-medium text-text-neutral-secondary underline"
+            >
+              이미 회원이세요? 로그인하기
+            </Link>
+          )}
         </div>
       </main>
 

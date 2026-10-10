@@ -23,6 +23,7 @@ import { useWebDeepLink } from '@/hooks/useWebDeepLink';
 import { useWebviewCookieSync } from '@/hooks/useWebviewCookieSync';
 import { logAnalyticsEvent, logAppOpenEvent } from '@/utils/analytics';
 import { captureError } from '@/utils/captureError';
+import { handleHaptic } from '@/utils/handleHaptic';
 import { handleOpenImagePicker } from '@/utils/handleImage';
 import { handleShareInstagramStory } from '@/utils/handleInstagramStory';
 import { handleOpenStore } from '@/utils/handleOpenStore';
@@ -143,6 +144,10 @@ function Page() {
           await handleOpenStore();
           return;
 
+        case WEBBRIDGE_MESSAGE_TYPE.WEB_REQ_HAPTIC:
+          await handleHaptic(message.payload);
+          return;
+
         default:
           return;
       }
@@ -205,8 +210,7 @@ function Page() {
         allowsBackForwardNavigationGestures
         setBuiltInZoomControls={false}
         cacheEnabled
-        /** Android 기본값 false — 켜지 않으면 웹의 localStorage 가 동작하지 않는다 (온보딩 스킵·최근 로그인 힌트) */
-        domStorageEnabled
+        domStorageEnabled // NOTE: true로 설정해야 안드로이드 localStorage 작동 가능
         sharedCookiesEnabled
         webviewDebuggingEnabled={__DEV__}
         startInLoadingState

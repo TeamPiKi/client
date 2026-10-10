@@ -119,14 +119,30 @@ await setSsrEmpty(page, ENDPOINTS.TOURNAMENTS); // goto 전에
 await page.goto('/home');
 ```
 
+#### 토큰 만료·갱신 실패를 테스트할 때
+
+기본 storageState 는 1시간 유효한 토큰입니다. 미들웨어의 refresh 분기를 태우려면 `applyExpiredAccessToken` 으로 access 만 만료시키세요. 갱신 요청은 서버(미들웨어)에서 나가므로 스텁의 `POST /auth/token/refresh` 가 새 토큰을 Set-Cookie(웹)·body(앱) 양쪽으로 응답합니다. 실패 케이스는 `setSsrStatus` 로 그 라우트의 status 만 바꿉니다:
+
+```ts
+import { applyExpiredAccessToken } from '@e2e/helpers/expiredAccessToken';
+import { setSsrStatus } from '@e2e/helpers/ssrStatus';
+
+await applyExpiredAccessToken(page);
+await setSsrStatus(page, `POST ${ENDPOINTS.AUTH_TOKEN_REFRESH}`, 401); // 생략하면 갱신 성공
+await page.goto('/archive/wish');
+```
+
+라우트 키는 `SSR_MOCK_ROUTES` 와 같은 `"METHOD /path"` 형식이고, 등록되지 않은 경로에도 적용됩니다. 화면이 `code` 로 분기하면 네 번째 인자로 넘기세요: `setSsrStatus(page, key, 409, ERROR_CODE.TOURNAMENT_NOT_PENDING)`.
+
 ## 목킹 구조
 
 요청 경로별로 3겹입니다. 테스트 작성 시엔 몰라도 되지만, 구조가 궁금할 때:
 
-| 요청 경로                     | 처리                                         | 위치                         |
-| ----------------------------- | -------------------------------------------- | ---------------------------- |
-| 인증 (미들웨어 게스트 로그인) | 가짜 JWT 쿠키로 우회 (미들웨어는 exp만 검사) | `setup/auth.setup.ts`        |
-| 브라우저 발 API               | `page.route()` 인터셉트                      | `fixtures/mockApiFixture.ts` |
-| 서버(SSR) 발 API              | 로컬 목 스텁 서버 `127.0.0.1:4010`           | `setup/mockApiServer.ts`     |
+| 요청 경로                 | 처리                                                                        | 위치                         |
+| ------------------------- | --------------------------------------------------------------------------- | ---------------------------- |
+| 인증 (미들웨어 토큰 검사) | 가짜 JWT 쿠키로 우회 (미들웨어는 exp만 검사)                                | `setup/auth.setup.ts`        |
+| 인증 (미들웨어 refresh)   | 스텁의 `POST /auth/token/refresh` 가 새 가짜 JWT 를 Set-Cookie·body 로 응답 | `setup/mockApiServer.ts`     |
+| 브라우저 발 API           | `page.route()` 인터셉트                                                     | `fixtures/mockApiFixture.ts` |
+| 서버(SSR) 발 API          | 로컬 목 스텁 서버 `127.0.0.1:4010`                                          | `setup/mockApiServer.ts`     |
 
 CI에서는 프로덕션 빌드(`next build` + `next start`) 기준으로 같은 테스트가 돌며, PR의 `e2e` 체크로 표시됩니다(현재 required 아님).

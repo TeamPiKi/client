@@ -35,7 +35,7 @@ export const usePostJoinGuest = ({
     onSuccess: (data, variables) => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.USER.ME });
 
-      /** 웹은 Set-Cookie 로 자동 저장 — 웹뷰만 body 토큰을 쿠키·네이티브에 동기화 (usePostGuestLogin 과 동일) */
+      /** 웹은 Set-Cookie 로 자동 저장 — 웹뷰만 body 토큰을 쿠키·네이티브에 동기화 */
       if (isWebview() && data.accessToken && data.refreshToken) {
         setCookie('access_token', data.accessToken, { minutes: 15 });
         setCookie('refresh_token', data.refreshToken, { days: 14 });

@@ -1,0 +1,11 @@
+export const HAPTIC_STYLE = {
+  LIGHT: 'LIGHT',
+  MEDIUM: 'MEDIUM',
+  HEAVY: 'HEAVY',
+  SOFT: 'SOFT',
+  RIGID: 'RIGID',
+  SELECTION: 'SELECTION',
+  SUCCESS: 'SUCCESS',
+  WARNING: 'WARNING',
+  ERROR: 'ERROR',
+} as const;

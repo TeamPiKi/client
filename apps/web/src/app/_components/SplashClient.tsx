@@ -10,35 +10,27 @@ import './splash.css';
 
 type LogoTransformT = {
   top: number | string;
-  scale: number;
   transition: string;
 };
 
-/** 로그인 페이지 PikiLogo 원본 너비(px) */
-const LOGIN_LOGO_WIDTH = 146;
-/** 스플래시에서 보여줄 로고 너비(px) */
-const SPLASH_LOGO_WIDTH = 116;
-/**
- * SVG width attribute로 바꾸면 viewBox만 변하고 path는 그대로라 왼쪽 위로 치우쳐 보임.
- * 원본 크기(146px)로 렌더한 뒤 transform scale로 통째로 조정한다.
- */
-const SPLASH_SCALE = SPLASH_LOGO_WIDTH / LOGIN_LOGO_WIDTH;
+type SplashClientProps = {
+  showAppleLogin: boolean;
+};
 
 const SPLASH_HOLD_MS = 400;
 const SPLASH_FADE_IN_MS = 1500;
-const SPLASH_SHRINK_MS = 700;
+const SPLASH_MOVE_MS = 700;
 
-const SHRINK_TRANSITION = `top ${SPLASH_SHRINK_MS}ms ease-in-out, transform ${SPLASH_SHRINK_MS}ms ease-in-out`;
+const MOVE_TRANSITION = `top ${SPLASH_MOVE_MS}ms ease-in-out`;
 
-function SplashClient() {
+function SplashClient({ showAppleLogin }: SplashClientProps) {
   const router = useRouter();
   const targetRef = useRef<HTMLDivElement>(null);
   const hasNavigatedRef = useRef(false);
-  const shrinkTimeoutRef = useRef(0);
+  const moveTimeoutRef = useRef(0);
   const [isBackgroundShifted, setIsBackgroundShifted] = useState(false);
   const [logoTransform, setLogoTransform] = useState<LogoTransformT>({
     top: '50%',
-    scale: SPLASH_SCALE,
     transition: 'none',
   });
 
@@ -58,7 +50,7 @@ function SplashClient() {
       return;
     }
 
-    const startShrink = () => {
+    const startMove = () => {
       const targetElement = targetRef.current;
       if (!targetElement) {
         navigateToNext();
@@ -67,60 +59,77 @@ function SplashClient() {
 
       const targetRect = targetElement.getBoundingClientRect();
 
-      /** 축소 시작 전 현재 위치에 스냅 — transition 재적용 시 점프 방지 */
-      setLogoTransform({
-        top: '50%',
-        scale: SPLASH_SCALE,
-        transition: 'none',
-      });
+      /** 이동 시작 전 현재 위치에 스냅 — transition 재적용 시 점프 방지 */
+      setLogoTransform({ top: '50%', transition: 'none' });
 
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
           setIsBackgroundShifted(true);
           setLogoTransform({
             top: targetRect.top + targetRect.height / 2,
-            scale: 1,
-            transition: SHRINK_TRANSITION,
+            transition: MOVE_TRANSITION,
           });
-          shrinkTimeoutRef.current = window.setTimeout(navigateToNext, SPLASH_SHRINK_MS);
+          moveTimeoutRef.current = window.setTimeout(navigateToNext, SPLASH_MOVE_MS);
         });
       });
     };
 
     let holdTimeoutId = 0;
 
-    /** 축소 애니메이션은 로그인 페이지의 로고 자리로 착지시켜 화면을 이어붙이는 연출이다 */
+    /** 이동 애니메이션은 로그인 페이지의 로고 자리로 착지시켜 화면을 이어붙이는 연출이다 */
     const fadeInTimeoutId = window.setTimeout(() => {
-      holdTimeoutId = window.setTimeout(startShrink, SPLASH_HOLD_MS);
+      holdTimeoutId = window.setTimeout(startMove, SPLASH_HOLD_MS);
     }, SPLASH_FADE_IN_MS);
 
     return () => {
       window.clearTimeout(fadeInTimeoutId);
       if (holdTimeoutId) window.clearTimeout(holdTimeoutId);
-      if (shrinkTimeoutRef.current) window.clearTimeout(shrinkTimeoutRef.current);
+      if (moveTimeoutRef.current) window.clearTimeout(moveTimeoutRef.current);
     };
   }, [navigateToNext, router]);
 
   return (
     <main
-      className="relative"
+      className="relative overflow-hidden"
       /** FOUC 방지하기 위해 인라인 스타일로 적용 */
-      style={{
-        height: '100dvh',
-        width: '100%',
-        backgroundColor: isBackgroundShifted ? 'var(--color-gray-50)' : '#FAFAFA',
-        transition: isBackgroundShifted ? 'background-color 0.7s ease-in-out' : 'none',
-      }}
+      style={{ height: '100dvh', width: '100%', backgroundColor: '#FAFAFA' }}
     >
+      {/** 착지 시점에 로그인 배경과 이어지도록 같은 그라데이션을 덧입힌다 */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 bg-linear-to-b from-bg-layer-default to-bg-layer-basement transition-opacity duration-700 ease-in-out"
+        style={{ opacity: isBackgroundShifted ? 1 : 0 }}
+      />
+
       {/**
        * 로그인 페이지와 동일한 레이아웃 앵커. 보이지 않지만 로고가 이동할 최종 좌표를 측정한다.
+       * 세로 가운데 정렬이라 콘텐츠 블록 전체 높이가 좌표를 결정한다 — 로그인 화면을 고치면 여기도 같이 고쳐야 한다.
        */}
       <div
         aria-hidden
-        className="pointer-events-none invisible absolute inset-0 flex flex-col items-center px-4 pt-padding-top"
+        /** 낮은 화면에서 로그인처럼 콘텐츠만큼 늘어나야 착지 좌표가 어긋나지 않는다 (inset-0 은 뷰포트에 고정됨) */
+        className="pointer-events-none invisible absolute inset-x-0 top-0 flex min-h-full flex-col items-center justify-center px-5 pt-padding-top pb-10"
       >
-        <div className="mt-15 flex flex-col items-center">
-          <div ref={targetRef} className="h-[106px] w-[146px] shrink-0" />
+        <div className="flex w-full flex-col items-center">
+          <div ref={targetRef} className="h-[86px] w-[117px] shrink-0" />
+
+          <p className="mt-7 text-center heading-1-bold">
+            매일 쌓여만 가던
+            <br />
+            위시리스트가 오늘의 결정으로
+          </p>
+
+          <div className="mt-[110px] w-full">
+            <div className="flex w-full flex-col items-center gap-4">
+              <div className="h-[54px] w-full" />
+              {showAppleLogin && <div className="h-[54px] w-full" />}
+              <div className="h-[54px] w-full" />
+            </div>
+
+            <p className="mt-[26px] text-center caption-1-semibold">
+              가입 시 이용약관 및 개인정보 처리방침에 동의하게 됩니다.
+            </p>
+          </div>
         </div>
       </div>
 
@@ -128,13 +137,13 @@ function SplashClient() {
         className="splash-logo fixed left-1/2 z-10"
         style={{
           top: logoTransform.top,
-          transform: `translate(-50%, -50%) scale(${logoTransform.scale})`,
+          transform: 'translate(-50%, -50%)',
           transition: logoTransform.transition,
         }}
       >
         <PikiLogo
           aria-label="PiKi"
-          className="block h-[106px] w-[146px] shrink-0 text-sky-blue-400"
+          className="block h-[86px] w-[117px] shrink-0 text-sky-blue-400"
         />
       </div>
     </main>

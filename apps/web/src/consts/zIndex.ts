@@ -1,4 +1,6 @@
 export const Z_INDEX = {
+  BASE: 0,
+
   BASE_IMAGE: 10,
 
   /** 게스트 - 로그인 유도 전체 화면 */

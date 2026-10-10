@@ -5,7 +5,13 @@ import type {
   PendingTournamentItemT,
   TournamentMatchT,
 } from '@/app/tournament/[id]/_common/_types/tournamentResponse';
+import type { GetTournamentItemResponseT } from '@/app/tournament/[id]/item/[itemId]/_types/tournamentItem';
 import type {
+  GetGroupResultResponseT,
+  GroupResultParticipantT,
+} from '@/app/tournament/[id]/result/_types/groupResult';
+import type {
+  GetInvitePreviewResponseT,
   GetTournamentListResponseT,
   TournamentItemT,
   TournamentRankingT,
@@ -208,4 +214,106 @@ export const MOCK_TOURNAMENT_GROUP_COMPLETED: GetTournamentCompletedResponseT = 
     ...MOCK_TOURNAMENT_COMPLETED.completed,
     isGroupTournament: true,
   },
+};
+
+/** 초대 코드 프리뷰 (id 1) — joined 가 true 면 RSC 가 준비 화면으로 redirect 하므로 false 고정 */
+export const MOCK_INVITE_PREVIEW: GetInvitePreviewResponseT = {
+  tournamentId: 1,
+  tournamentName: 'E2E 토너먼트',
+  itemCount: 3,
+  participantCount: 4,
+  joined: false,
+};
+
+/**
+ * 참여자(isOwner=false) 시점의 PENDING 토너먼트 (id 5).
+ * 51 은 본인(MOCK_MEMBER_ME) 아이템, 52 는 친구 아이템 — 아이템 편집 권한 분기용.
+ */
+export const MOCK_TOURNAMENT_PENDING_AS_PARTICIPANT: GetTournamentPendingResponseT = {
+  ...MOCK_TOURNAMENT_PENDING,
+  tournamentId: 5,
+  name: 'E2E 참여 토너먼트',
+  isOwner: false,
+  pending: {
+    ...MOCK_TOURNAMENT_PENDING.pending,
+    items: [
+      { ...findItem(11), tournamentItemId: 51, userId: 'e2e-member-id' },
+      { ...findItem(12), tournamentItemId: 52, userId: 'e2e-friend-id' },
+    ],
+    participants: [
+      {
+        userId: 'e2e-friend-id',
+        nickname: '피키친구',
+        itemCount: 1,
+        profileImage: MOCK_IMAGE_URLS.avatar,
+        isHost: true,
+      },
+      {
+        userId: 'e2e-member-id',
+        nickname: '피키회원',
+        itemCount: 1,
+        profileImage: MOCK_IMAGE_URLS.avatar,
+        isHost: false,
+      },
+    ],
+  },
+};
+
+const createReadyTournamentItem = (
+  tournamentItemId: number,
+  source: TournamentItemT & { itemId: number }
+): GetTournamentItemResponseT => ({
+  tournamentItemId,
+  itemId: source.itemId,
+  status: 'READY',
+  name: source.name,
+  imageUrl: source.imageUrl ?? MOCK_IMAGE_URLS.product,
+  price: source.price,
+  ...(source.currency && { currency: source.currency }),
+  sourceUrl: 'https://shop.example/items/101',
+});
+
+/** 주최자 토너먼트(id 1)의 아이템 */
+export const MOCK_TOURNAMENT_ITEM_READY = createReadyTournamentItem(11, findItem(11));
+/** 참여자 토너먼트(id 5)의 친구 아이템 */
+export const MOCK_TOURNAMENT_ITEM_FRIEND = createReadyTournamentItem(52, findItem(12));
+
+const createChooser = (
+  userId: string,
+  nickname: string,
+  isHost: boolean
+): GroupResultParticipantT => ({
+  userId,
+  nickname,
+  profileImage: MOCK_IMAGE_URLS.avatar,
+  isWithdrawn: false,
+  isHost,
+  isMasked: false,
+});
+
+/** 소셜 토너먼트(id 4) 그룹 결과 — 1위는 주최자·친구가 함께 고름 */
+export const MOCK_GROUP_RESULT: GetGroupResultResponseT = {
+  items: [
+    {
+      rank: 1,
+      itemId: 101,
+      name: 'E2E 스니커즈',
+      price: 10000,
+      currency: 'KRW',
+      imageUrl: MOCK_IMAGE_URLS.product,
+      chosenBy: [
+        createChooser('e2e-member-id', '피키회원', true),
+        createChooser('e2e-friend-id', '피키친구', false),
+      ],
+    },
+    {
+      rank: 2,
+      itemId: 102,
+      name: 'E2E 백팩',
+      price: 20000,
+      currency: 'KRW',
+      imageUrl: MOCK_IMAGE_URLS.product,
+      chosenBy: [createChooser('e2e-friend-2-id', '피키친구2', false)],
+    },
+  ],
 };

@@ -10,6 +10,9 @@ export const getPushNotificationRoute = (payload: DeepLinkPayloadT) => {
     case PUSH_NOTIFICATION_TYPE.ITEM_PARSING_COMPLETED:
     case PUSH_NOTIFICATION_TYPE.ITEM_PARSING_INCOMPLETE:
     case PUSH_NOTIFICATION_TYPE.ITEM_PARSING_FAILED:
+    case PUSH_NOTIFICATION_TYPE.ITEM_PARSING_RECOVERED:
+    case PUSH_NOTIFICATION_TYPE.ITEM_REFRESH_COMPLETED:
+    case PUSH_NOTIFICATION_TYPE.ITEM_REFRESH_FAILED:
       if (payload.kind === 'TOURNAMENT' && payload.tournamentId) {
         return ROUTES.TOURNAMENT_CREATE(payload.tournamentId);
       }

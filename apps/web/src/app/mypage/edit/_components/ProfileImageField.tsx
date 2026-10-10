@@ -6,13 +6,18 @@ import { toast } from 'sonner';
 
 import { CameraIconFill } from '@/assets/icons';
 import BaseImage from '@/components/base-image';
+import ImageCropEditor from '@/components/common/image-crop-editor';
+import type {
+  ImageCropEditorImageT,
+  ImageCropResultT,
+} from '@/components/common/image-crop-editor/imageCropEditor.types';
 import Skeleton from '@/components/skeleton';
 import { Z_INDEX } from '@/consts/zIndex';
 import { useImagePicker } from '@/hooks/useImagePicker';
 import type { UserIdentityTypeT } from '@/types/user';
+import { loadImage } from '@/utils/cropImage';
 
-import { loadImage } from '../_utils/cropImage';
-import ProfileImageCropEditor from './ProfileImageCropEditor';
+const CROP_OUTPUT_MAX_SIZE = 1080;
 
 type Props = {
   userIdentityType: UserIdentityTypeT;
@@ -22,8 +27,7 @@ type Props = {
 
 function ProfileImageField({ userIdentityType, profileImage, onImageSelect }: Props) {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  /** 피커에서 고른 원본 object URL — 값이 있으면 크롭 에디터가 열린다 */
-  const [cropImageSrc, setCropImageSrc] = useState<string | null>(null);
+  const [cropTarget, setCropTarget] = useState<ImageCropEditorImageT | null>(null);
 
   const { openPicker, inputRef, handleInputChange, isPending } = useImagePicker({
     maxCount: 1,
@@ -32,18 +36,17 @@ function ProfileImageField({ userIdentityType, profileImage, onImageSelect }: Pr
       if (!file) return;
 
       const url = URL.createObjectURL(file);
+      let size: ImageCropEditorImageT['size'];
       try {
-        await loadImage(url);
+        const { width, height } = await loadImage(url);
+        size = { width, height };
       } catch {
         URL.revokeObjectURL(url);
         toast.error('지원하지 않는 이미지 형식이에요.');
         return;
       }
 
-      setCropImageSrc(prev => {
-        if (prev) URL.revokeObjectURL(prev);
-        return url;
-      });
+      setCropTarget({ id: 'profile', src: url, size });
     },
   });
 
@@ -56,19 +59,17 @@ function ProfileImageField({ userIdentityType, profileImage, onImageSelect }: Pr
 
   useEffect(
     () => () => {
-      if (cropImageSrc) URL.revokeObjectURL(cropImageSrc);
+      if (cropTarget) URL.revokeObjectURL(cropTarget.src);
     },
-    [cropImageSrc]
+    [cropTarget]
   );
 
-  const closeCropEditor = () => {
-    setCropImageSrc(prev => {
-      if (prev) URL.revokeObjectURL(prev);
-      return null;
-    });
-  };
+  const closeCropEditor = () => setCropTarget(null);
 
-  const handleCropConfirm = (blob: Blob) => {
+  const handleCropConfirm = (results: ImageCropResultT[]) => {
+    const blob = results[0]?.blob;
+    if (!blob) return;
+
     setPreviewUrl(prev => {
       if (prev) URL.revokeObjectURL(prev);
       return URL.createObjectURL(blob);
@@ -127,9 +128,13 @@ function ProfileImageField({ userIdentityType, profileImage, onImageSelect }: Pr
         onChange={handleInputChange}
       />
 
-      {cropImageSrc && (
-        <ProfileImageCropEditor
-          imageSrc={cropImageSrc}
+      {cropTarget && (
+        <ImageCropEditor
+          title="프로필 이미지 편집"
+          images={[cropTarget]}
+          aspect={1}
+          cropShape="round"
+          outputMaxSize={CROP_OUTPUT_MAX_SIZE}
           onCancel={closeCropEditor}
           onConfirm={handleCropConfirm}
         />
