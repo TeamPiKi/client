@@ -1,28 +1,86 @@
 /** NOTE: cropper.css 는 레이어 밖이라 Tailwind 유틸리티로는 못 덮음. 같은 레이어 밖에서 뒤에 선언해 이김 */
+
 .image-crop-editor .cropper-view-box {
-  outline-color: var(--color-bg-accent);
+  outline: none;
 }
 
+.image-crop-editor .cropper-crop-box::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border: 1px solid var(--color-base-50);
+  pointer-events: none;
+}
+
+/** 점선 가이드는 크롭 영역을 옮기거나 크기를 바꾸는 동안만 노출 */
+.image-crop-editor .cropper-dashed {
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+.image-crop-editor[data-cropping] .cropper-dashed {
+  opacity: 0.5;
+}
+
+/** 변 선·변 가운데 핸들은 터치 영역만 남김 */
 .image-crop-editor .cropper-line,
-.image-crop-editor .cropper-point,
+.image-crop-editor .cropper-point {
+  opacity: 0;
+}
+
+/** 모서리 핸들은 크롭 박스 바깥에 붙은 ㄱ자 브래킷 */
+.image-crop-editor .cropper-point.point-nw,
+.image-crop-editor .cropper-point.point-ne,
+.image-crop-editor .cropper-point.point-sw,
+.image-crop-editor .cropper-point.point-se {
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  border: 0 solid var(--color-base-50);
+  background-color: transparent;
+  opacity: 1;
+}
+
+.image-crop-editor .cropper-point.point-nw {
+  top: -4px;
+  left: -4px;
+  border-top-width: 4px;
+  border-left-width: 4px;
+}
+
+.image-crop-editor .cropper-point.point-ne {
+  top: -4px;
+  right: -4px;
+  border-top-width: 4px;
+  border-right-width: 4px;
+}
+
+.image-crop-editor .cropper-point.point-sw {
+  bottom: -4px;
+  left: -4px;
+  border-bottom-width: 4px;
+  border-left-width: 4px;
+}
+
+.image-crop-editor .cropper-point.point-se {
+  right: -4px;
+  bottom: -4px;
+  border-right-width: 4px;
+  border-bottom-width: 4px;
+}
+
+/** cropper.css 가 point-se 에만 두는 확대 터치 영역. 다른 모서리와 맞춰 제거 */
 .image-crop-editor .cropper-point.point-se::before {
-  background-color: var(--color-bg-accent);
-}
-
-.image-crop-editor[data-crop-shape='round'] .cropper-view-box,
-.image-crop-editor[data-crop-shape='round'] .cropper-face {
-  border-radius: 50%;
-}
-
-/** 원형은 변 핸들·확대된 모서리 핸들을 숨기고 작은 모서리 점만 남김 */
-.image-crop-editor[data-crop-shape='round'] .cropper-line,
-.image-crop-editor[data-crop-shape='round'] .cropper-point.point-se::before {
   display: none;
 }
 
-.image-crop-editor[data-crop-shape='round'] .cropper-point.point-se {
-  width: 5px;
-  height: 5px;
-  opacity: 0.75;
+.image-crop-editor[data-crop-shape='round'] .cropper-view-box,
+.image-crop-editor[data-crop-shape='round'] .cropper-face,
+.image-crop-editor[data-crop-shape='round'] .cropper-crop-box::after {
+  border-radius: 50%;
 }
 
+/** 원형은 변 핸들을 숨기고 모서리 브래킷만 남김 */
+.image-crop-editor[data-crop-shape='round'] .cropper-line {
+  display: none;
+}
