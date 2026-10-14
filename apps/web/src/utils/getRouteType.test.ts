@@ -28,6 +28,11 @@ describe('getRouteType', () => {
     expect(getRouteType('/tournament/join/result')).toBe('MEMBER_AND_GUEST');
   });
 
+  it('토너먼트 기록은 토너먼트 경로 아래에 있어도 회원 전용이다', () => {
+    expect(getRouteType('/tournament/history')).toBe('MEMBER_ONLY');
+    expect(getRouteType('/tournament/1')).toBeNull();
+  });
+
   it('선택 하위 세그먼트는 정해진 것만 붙는다', () => {
     expect(getRouteType('/tournament/1/create')).toBe('AUTHORIZED');
     expect(getRouteType('/tournament/1/create/by-wish')).toBe('AUTHORIZED');
