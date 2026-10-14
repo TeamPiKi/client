@@ -8,7 +8,7 @@ test('플레이 유형 칩을 누르면 선택 상태와 주소가 함께 바뀐
   api.get(ENDPOINTS.TOURNAMENTS, []);
   api.get(ENDPOINTS.USER, MOCK_GUEST_ME);
 
-  await page.goto('/archive/tournament');
+  await page.goto('/tournament/history');
 
   const allChip = page.getByRole('button', { name: '전체' });
   const soloChip = page.getByRole('button', { name: '솔로플레이' });
@@ -26,7 +26,7 @@ test('플레이 유형을 고르면 playType 을 담아 조회한다', async ({ 
   api.get(ENDPOINTS.TOURNAMENTS, []);
   api.get(ENDPOINTS.USER, MOCK_GUEST_ME);
 
-  await page.goto('/archive/tournament');
+  await page.goto('/tournament/history');
 
   const listRequest = page.waitForRequest(request => {
     const url = new URL(request.url());
@@ -47,7 +47,7 @@ test('토너먼트를 열었다 뒤로 돌아오면 떠날 때의 탭이 그대�
   api.get(ENDPOINTS.USER, MOCK_GUEST_ME);
 
   /** 완료 탭 주소로 진입 후 진행 중으로 전환 — 주소만 바뀌고 RSC 는 완료 탭인 상태 */
-  await page.goto('/archive/tournament?tab=completed&play=all');
+  await page.goto('/tournament/history?tab=completed&play=all');
   await page.getByRole('button', { name: '진행 중' }).click();
 
   await page.getByRole('link', { name: 'E2E 토너먼트' }).click();
@@ -68,7 +68,7 @@ test('탭을 옮기면 플레이 유형 필터가 전체로 초기화된다', as
   api.get(ENDPOINTS.TOURNAMENTS, []);
   api.get(ENDPOINTS.USER, MOCK_GUEST_ME);
 
-  await page.goto('/archive/tournament?tab=ongoing&play=solo');
+  await page.goto('/tournament/history?tab=ongoing&play=solo');
 
   const allChip = page.getByRole('button', { name: '전체' });
   const soloChip = page.getByRole('button', { name: '솔로플레이' });

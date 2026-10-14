@@ -18,7 +18,7 @@ type Props = {
 function TournamentHistoryList({ statuses, playType, statusTab }: Props) {
   const { tournamentListData } = useGetTournamentList({ status: statuses, playType });
 
-  useScrollRestoration({ namespace: SCROLL_NAMESPACE.ARCHIVE_TOURNAMENT, scope: statusTab });
+  useScrollRestoration({ namespace: SCROLL_NAMESPACE.TOURNAMENT_HISTORY, scope: statusTab });
 
   if (tournamentListData.length === 0)
     return (
@@ -38,7 +38,7 @@ function TournamentHistoryList({ statuses, playType, statusTab }: Props) {
           name={tournament.name}
           participantCount={tournament.participantCount}
           playedCount={tournament.playedCount}
-          scrollRestoration={{ namespace: SCROLL_NAMESPACE.ARCHIVE_TOURNAMENT, scope: statusTab }}
+          scrollRestoration={{ namespace: SCROLL_NAMESPACE.TOURNAMENT_HISTORY, scope: statusTab }}
         />
       ))}
     </>

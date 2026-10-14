@@ -26,7 +26,7 @@ test('게스트가 토너먼트 탭에 들어가면 로그인 유도 화면이 �
   api.get(ENDPOINTS.USER, MOCK_GUEST_ME);
   await applyGuestToken(page);
 
-  await page.goto('/archive/tournament');
+  await page.goto('/tournament/history');
 
   await expect(
     page.getByRole('heading', { name: '토너먼트를 만들려면 로그인이 필요해요' })
@@ -35,5 +35,5 @@ test('게스트가 토너먼트 탭에 들어가면 로그인 유도 화면이 �
   await expect(page.getByRole('link', { name: '홈' })).toBeVisible();
 
   await page.getByRole('button', { name: '로그인하기' }).click();
-  await expect(page).toHaveURL(/\/login\?redirect=%2Farchive%2Ftournament/);
+  await expect(page).toHaveURL(/\/login\?redirect=%2Ftournament%2Fhistory/);
 });
