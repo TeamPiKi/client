@@ -85,7 +85,10 @@ function BottomTabBar() {
   const [isPressed, setIsPressed] = useState(false);
   const [isGrabbing, setIsGrabbing] = useState(false);
 
-  const activeIndex = TABS.findIndex(({ href }) => matchesTabPath(pathname, href));
+  const isWishFolderRoute = /^\/wish(?:\/folder\/[^/]+)?$/.test(pathname); // TODO: /wish/folder/:folderId 만 해당되도록 조건 변경 필요. 현재는 /wish, /wish/folder/:folderId 둘 다 해당. 변수명은 이관 이후 기준으로 작성
+  const activeIndex = TABS.findIndex(
+    ({ href }) => matchesTabPath(pathname, href) || (isWishFolderRoute && href === ROUTES.WISHLIST)
+  );
 
   useEffect(
     () => () => {
@@ -95,7 +98,7 @@ function BottomTabBar() {
   );
 
   // 탭 경로와 정확히 일치할 때만 노출 — 하위 상세/편집 라우트에서는 숨김
-  if (!TABS.some(({ href }) => href === pathname)) return null;
+  if (!isWishFolderRoute && !TABS.some(({ href }) => href === pathname)) return null;
 
   const handlePointerDown = (event: React.PointerEvent) => {
     if (event.button !== 0 || isGrabbingRef.current) return;
@@ -289,8 +292,8 @@ function BottomTabBar() {
             </div>
           </div>
         )}
-        {TABS.map(({ label, activeIcon: ActiveIcon, inactiveIcon: InactiveIcon, href }) => {
-          const isActive = matchesTabPath(pathname, href);
+        {TABS.map(({ label, activeIcon: ActiveIcon, inactiveIcon: InactiveIcon, href }, index) => {
+          const isActive = index === activeIndex;
           const Icon = isActive ? ActiveIcon : InactiveIcon;
           return (
             <Link
