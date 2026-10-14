@@ -81,3 +81,12 @@ test('탭을 옮기면 플레이 유형 필터가 전체로 초기화된다', as
   await expect(soloChip).toHaveAttribute('aria-pressed', 'false');
   await expect(page).toHaveURL(/play=all/);
 });
+
+test('구 경로로 들어오면 쿼리를 유지한 채 새 경로로 옮겨진다', async ({ page, api }) => {
+  api.get(ENDPOINTS.TOURNAMENTS, []);
+  api.get(ENDPOINTS.USER, MOCK_GUEST_ME);
+
+  await page.goto('/archive/tournament?tab=completed&play=solo');
+
+  await expect(page).toHaveURL(/\/tournament\/history\?tab=completed&play=solo$/);
+});
