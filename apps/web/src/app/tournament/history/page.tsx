@@ -15,7 +15,7 @@ type Props = {
   searchParams: Promise<{ tab?: string; play?: string }>;
 };
 
-async function ArchiveTournamentPage({ searchParams }: Props) {
+async function TournamentHistoryPage({ searchParams }: Props) {
   const { tab, play } = await searchParams;
 
   const queryClient = getQueryClient();
@@ -41,4 +41,4 @@ async function ArchiveTournamentPage({ searchParams }: Props) {
   );
 }
 
-export default ArchiveTournamentPage;
+export default TournamentHistoryPage;

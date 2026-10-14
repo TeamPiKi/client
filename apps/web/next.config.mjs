@@ -71,8 +71,13 @@ const nextConfig = async () => {
         {
           source: '/archive',
           has: [{ type: 'query', key: 'tab', value: 'tournament' }],
-          destination: '/archive/tournament',
+          destination: '/tournament/history',
           permanent: false,
+        },
+        {
+          source: '/archive/tournament',
+          destination: '/tournament/history',
+          permanent: true,
         },
         {
           source: '/archive',

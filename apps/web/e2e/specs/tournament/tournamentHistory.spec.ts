@@ -1,14 +1,14 @@
 import { ENDPOINTS } from '@/consts/api';
 
 import { expect, test } from '@e2e/fixtures/mockApiFixture';
-import { MOCK_GUEST_ME } from '@e2e/mocks/me';
+import { MOCK_MEMBER_ME } from '@e2e/mocks/me';
 import { MOCK_TOURNAMENT_LIST, MOCK_TOURNAMENT_PENDING } from '@e2e/mocks/tournament';
 
 test('플레이 유형 칩을 누르면 선택 상태와 주소가 함께 바뀐다', async ({ page, api }) => {
   api.get(ENDPOINTS.TOURNAMENTS, []);
-  api.get(ENDPOINTS.USER, MOCK_GUEST_ME);
+  api.get(ENDPOINTS.USER, MOCK_MEMBER_ME);
 
-  await page.goto('/archive/tournament');
+  await page.goto('/tournament/history');
 
   const allChip = page.getByRole('button', { name: '전체' });
   const soloChip = page.getByRole('button', { name: '솔로플레이' });
@@ -24,9 +24,9 @@ test('플레이 유형 칩을 누르면 선택 상태와 주소가 함께 바뀐
 
 test('플레이 유형을 고르면 playType 을 담아 조회한다', async ({ page, api }) => {
   api.get(ENDPOINTS.TOURNAMENTS, []);
-  api.get(ENDPOINTS.USER, MOCK_GUEST_ME);
+  api.get(ENDPOINTS.USER, MOCK_MEMBER_ME);
 
-  await page.goto('/archive/tournament');
+  await page.goto('/tournament/history');
 
   const listRequest = page.waitForRequest(request => {
     const url = new URL(request.url());
@@ -44,10 +44,10 @@ test('플레이 유형을 고르면 playType 을 담아 조회한다', async ({ 
 test('토너먼트를 열었다 뒤로 돌아오면 떠날 때의 탭이 그대로 활성이다', async ({ page, api }) => {
   api.get(ENDPOINTS.TOURNAMENTS, MOCK_TOURNAMENT_LIST);
   api.get(ENDPOINTS.TOURNAMENT(1), MOCK_TOURNAMENT_PENDING);
-  api.get(ENDPOINTS.USER, MOCK_GUEST_ME);
+  api.get(ENDPOINTS.USER, MOCK_MEMBER_ME);
 
   /** 완료 탭 주소로 진입 후 진행 중으로 전환 — 주소만 바뀌고 RSC 는 완료 탭인 상태 */
-  await page.goto('/archive/tournament?tab=completed&play=all');
+  await page.goto('/tournament/history?tab=completed&play=all');
   await page.getByRole('button', { name: '진행 중' }).click();
 
   await page.getByRole('link', { name: 'E2E 토너먼트' }).click();
@@ -66,9 +66,9 @@ test('토너먼트를 열었다 뒤로 돌아오면 떠날 때의 탭이 그대�
 
 test('탭을 옮기면 플레이 유형 필터가 전체로 초기화된다', async ({ page, api }) => {
   api.get(ENDPOINTS.TOURNAMENTS, []);
-  api.get(ENDPOINTS.USER, MOCK_GUEST_ME);
+  api.get(ENDPOINTS.USER, MOCK_MEMBER_ME);
 
-  await page.goto('/archive/tournament?tab=ongoing&play=solo');
+  await page.goto('/tournament/history?tab=ongoing&play=solo');
 
   const allChip = page.getByRole('button', { name: '전체' });
   const soloChip = page.getByRole('button', { name: '솔로플레이' });
@@ -80,4 +80,13 @@ test('탭을 옮기면 플레이 유형 필터가 전체로 초기화된다', as
   await expect(allChip).toHaveAttribute('aria-pressed', 'true');
   await expect(soloChip).toHaveAttribute('aria-pressed', 'false');
   await expect(page).toHaveURL(/play=all/);
+});
+
+test('구 경로로 들어오면 쿼리를 유지한 채 새 경로로 옮겨진다', async ({ page, api }) => {
+  api.get(ENDPOINTS.TOURNAMENTS, []);
+  api.get(ENDPOINTS.USER, MOCK_MEMBER_ME);
+
+  await page.goto('/archive/tournament?tab=completed&play=solo');
+
+  await expect(page).toHaveURL(/\/tournament\/history\?tab=completed&play=solo$/);
 });

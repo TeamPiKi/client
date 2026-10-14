@@ -4,11 +4,11 @@ import { GUEST_BLOCK_LOCATION } from '@/consts/guestBlockLocation';
 import { ROUTES } from '@/consts/route';
 import { getRoleOrRedirect } from '@/utils/getRoleOrRedirect';
 
-type TournamentArchiveLayoutProps = {
+type TournamentHistoryLayoutProps = {
   children: React.ReactNode;
 };
 
-async function TournamentArchiveLayout({ children }: TournamentArchiveLayoutProps) {
+async function TournamentHistoryLayout({ children }: TournamentHistoryLayoutProps) {
   const role = await getRoleOrRedirect();
 
   if (role !== 'MEMBER')
@@ -23,4 +23,4 @@ async function TournamentArchiveLayout({ children }: TournamentArchiveLayoutProp
   return children;
 }
 
-export default TournamentArchiveLayout;
+export default TournamentHistoryLayout;

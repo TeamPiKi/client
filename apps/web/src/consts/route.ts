@@ -25,7 +25,7 @@ export const ROUTES = {
   NOTIFICATION: '/notification',
   MYPAGE_EDIT: '/mypage/edit',
   MYPAGE_WITHDRAW: '/mypage/withdraw',
-  TOURNAMENT_HISTORY: '/archive/tournament',
+  TOURNAMENT_HISTORY: '/tournament/history',
 
   /** 4. Authorized Guest or Member */
   TOURNAMENT_CREATE: (tournamentId: number, highlightItemId?: number) =>

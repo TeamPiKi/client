@@ -9,7 +9,7 @@ export const SCROLL_ANCHOR_ID_ATTR = 'data-scroll-anchor-id';
 
 export const SCROLL_NAMESPACE = {
   ARCHIVE_WISH: 'archiveWish',
-  ARCHIVE_TOURNAMENT: 'archiveTournament',
+  TOURNAMENT_HISTORY: 'tournamentHistory',
 } as const;
 
 type ScrollAnchorT = {
