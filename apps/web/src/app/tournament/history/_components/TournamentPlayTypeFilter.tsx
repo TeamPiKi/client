@@ -5,7 +5,8 @@ import type { ComponentType, SVGProps } from 'react';
 import { GroupIconFill, PersonIconFill } from '@/assets/icons';
 import { cn } from '@/utils/cn';
 
-import { PLAY_TYPE_FILTER, type TournamentPlayTypeFilterT } from '../_consts/tournamentPlayType';
+import { PLAY_TYPE_FILTER } from '../_consts/tournamentPlayType';
+import type { TournamentPlayTypeFilterT } from '../_types/tournamentPlayType';
 
 type Props = {
   activeFilter: TournamentPlayTypeFilterT;

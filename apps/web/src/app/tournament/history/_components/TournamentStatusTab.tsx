@@ -5,7 +5,7 @@ import type { ComponentType, SVGProps } from 'react';
 import { BasketIconOutline, ReceiptIconOutline } from '@/assets/icons';
 import { cn } from '@/utils/cn';
 
-import type { TournamentStatusTabT } from '../_consts/tournamentTab';
+import type { TournamentStatusTabT } from '../_types/tournamentTab';
 
 type Props = {
   activeTab: TournamentStatusTabT;

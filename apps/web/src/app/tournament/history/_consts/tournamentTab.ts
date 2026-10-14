@@ -1,7 +1,7 @@
 import { TOURNAMENT_STATUS } from '@/consts/tournament';
 import type { TournamentStatusT } from '@/types/tournament';
 
-export type TournamentStatusTabT = 'ongoing' | 'completed';
+import type { TournamentStatusTabT } from '../_types/tournamentTab';
 
 /**
  * 탭 → 조회할 토너먼트 상태 매핑

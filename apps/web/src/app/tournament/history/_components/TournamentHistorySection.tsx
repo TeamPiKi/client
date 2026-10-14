@@ -6,9 +6,10 @@ import { Suspense } from 'react';
 import Spacing from '@/components/spacing';
 import { Z_INDEX } from '@/consts/zIndex';
 
-import type { TournamentPlayTypeFilterT } from '../_consts/tournamentPlayType';
 import { PLAY_TYPE_BY_FILTER, PLAY_TYPE_FILTER } from '../_consts/tournamentPlayType';
-import { STATUS_BY_TAB, type TournamentStatusTabT } from '../_consts/tournamentTab';
+import { STATUS_BY_TAB } from '../_consts/tournamentTab';
+import type { TournamentPlayTypeFilterT } from '../_types/tournamentPlayType';
+import type { TournamentStatusTabT } from '../_types/tournamentTab';
 import { parsePlayParam, parseTabParam } from '../_utils/tournamentSearchParams';
 import TournamentHistoryList from './TournamentHistoryList';
 import TournamentHistorySkeleton from './TournamentHistorySkeleton';
