@@ -3,6 +3,8 @@
 import { useCallback, useEffect, useState } from 'react';
 import type { CSSProperties } from 'react';
 
+import { Z_INDEX } from '@/consts/zIndex';
+
 import type { TransitionStageT } from '../_utils/rounds';
 import './RoundTransitionSheet.css';
 
@@ -316,7 +318,8 @@ function RoundTransitionSheet({ stage, onComplete }: RoundTransitionSheetProps) 
     <>
       {/* Backdrop */}
       <div
-        className={`fixed inset-0 z-40 cursor-pointer bg-bg-layer-overlay ${isExiting ? 'rs-dim-exit' : 'rs-dim'}`}
+        className={`fixed inset-0 cursor-pointer bg-bg-layer-overlay ${isExiting ? 'rs-dim-exit' : 'rs-dim'}`}
+        style={{ zIndex: Z_INDEX.DRAWER }}
         aria-hidden
         onClick={handleSkip}
       />
@@ -326,8 +329,9 @@ function RoundTransitionSheet({ stage, onComplete }: RoundTransitionSheetProps) 
         role="dialog"
         aria-modal="true"
         aria-label={title}
-        className={`fixed bottom-0 left-1/2 z-50 w-full max-w-120 -translate-x-1/2 cursor-pointer overflow-hidden ${isExiting ? 'rs-sheet-exit' : 'rs-sheet'}`}
+        className={`fixed bottom-0 left-1/2 w-full max-w-120 -translate-x-1/2 cursor-pointer overflow-hidden ${isExiting ? 'rs-sheet-exit' : 'rs-sheet'}`}
         style={{
+          zIndex: Z_INDEX.DRAWER,
           height: 540,
           borderRadius: '24px 24px 0 0',
           background: 'linear-gradient(180deg, #ECF8FE 0%, #FFF 50%)',

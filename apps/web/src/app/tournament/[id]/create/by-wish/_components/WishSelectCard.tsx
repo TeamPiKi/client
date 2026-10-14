@@ -1,6 +1,7 @@
 import { CheckboxEmptyIconFill, CheckboxSelectedIconFill } from '@/assets/icons';
 import WishCard from '@/components/common/wish-card';
 import { ITEM_STATUS } from '@/consts/item';
+import { Z_INDEX } from '@/consts/zIndex';
 
 type WishSelectCardProps = {
   name: string | null;
@@ -33,7 +34,10 @@ function WishSelectCard({
         imageUrl={imageUrl}
         sourcePlatform={sourcePlatform}
       />
-      <span className="pointer-events-none absolute top-3 left-3 z-10 block size-5">
+      <span
+        className="pointer-events-none absolute top-3 left-3 block size-5"
+        style={{ zIndex: Z_INDEX.BASE_IMAGE + 1 }}
+      >
         {isSelected ? (
           <CheckboxSelectedIconFill className="size-5 text-bg-accent" />
         ) : (

@@ -4,6 +4,7 @@ import { useSearchParams } from 'next/navigation';
 import { Suspense } from 'react';
 
 import Spacing from '@/components/spacing';
+import { Z_INDEX } from '@/consts/zIndex';
 
 import type { TournamentPlayTypeFilterT } from '../_consts/tournamentPlayType';
 import { PLAY_TYPE_BY_FILTER, PLAY_TYPE_FILTER } from '../_consts/tournamentPlayType';
@@ -41,7 +42,10 @@ function TournamentHistorySection() {
 
   return (
     <>
-      <div className="sticky top-0 z-20 flex w-full flex-col bg-bg-layer-basement pt-padding-top pb-2">
+      <div
+        className="sticky top-0 flex w-full flex-col bg-bg-layer-basement pt-padding-top pb-2"
+        style={{ zIndex: Z_INDEX.STICKY_HEADER }}
+      >
         <h1 className="heading-1-bold text-text-neutral-primary">내 토너먼트</h1>
         <Spacing size={16} />
         <TournamentStatusTab activeTab={activeTab} onTabChange={handleTabChange} />

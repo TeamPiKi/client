@@ -4,6 +4,7 @@ import type { MouseEvent } from 'react';
 import { PersonIconFill } from '@/assets/icons';
 import StatusChip from '@/components/status-chip';
 import { ROUTES } from '@/consts/route';
+import { Z_INDEX } from '@/consts/zIndex';
 import type { TournamentStatusT } from '@/types/tournament';
 import { cn } from '@/utils/cn';
 import type { ScrollRestorationTargetT } from '@/utils/scrollRestoration';
@@ -70,7 +71,8 @@ function TournamentCard({
         aria-label={name}
         data-scroll-anchor-id={tournamentId}
         onClick={handleLinkClick}
-        className="absolute inset-0 z-0 rounded-xl"
+        className="absolute inset-0 rounded-xl"
+        style={{ zIndex: Z_INDEX.BASE }}
       />
 
       <ItemImageThumbnails imageUrls={imageUrls} />
@@ -83,7 +85,7 @@ function TournamentCard({
           </div>
 
           {showMorePopover && (
-            <div className="relative z-10">
+            <div className="relative" style={{ zIndex: Z_INDEX.BASE + 1 }}>
               <MorePopover
                 status={status}
                 tournamentId={tournamentId}

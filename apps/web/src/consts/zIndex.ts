@@ -3,6 +3,9 @@ export const Z_INDEX = {
 
   BASE_IMAGE: 10,
 
+  /** 상단 고정 헤더 - 위시리스트, 토너먼트 히스토리 헤더 */
+  STICKY_HEADER: 12,
+
   /** 게스트 - 로그인 유도 전체 화면 */
   LOGIN_REQUIRED_OVERLAY: 15,
 
