@@ -8,7 +8,8 @@ const HISTORY_STATE_KEY = '__pikiScrollKey';
 export const SCROLL_ANCHOR_ID_ATTR = 'data-scroll-anchor-id';
 
 export const SCROLL_NAMESPACE = {
-  ARCHIVE_WISH: 'archiveWish',
+  ARCHIVE_WISH: 'archiveWish', // TODO: 제거 필요
+  WISH: 'wish', // TODO: WISHLIST: 'wishlist'로 변경 예정
   TOURNAMENT_HISTORY: 'tournamentHistory',
 } as const;
 

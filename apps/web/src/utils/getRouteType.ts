@@ -41,6 +41,7 @@ const isMemberOnlyRoute = (pathname: string) => {
   if (pathname === ROUTES.MYPAGE_WITHDRAW) return true;
   if (pathname === ROUTES.MYPAGE_EDIT) return true;
   if (matchesPath(pathname, ROUTES.WISHLIST)) return true;
+  if (matchesPath(pathname, ROUTES.WISH)) return true; // TEMP
   if (matchesPath(pathname, ROUTES.NOTIFICATION)) return true;
   if (matchesPath(pathname, ROUTES.TOURNAMENT_HISTORY)) return true;
 
