@@ -5,6 +5,7 @@ import { Suspense } from 'react';
 
 import Spacing from '@/components/spacing';
 import { Z_INDEX } from '@/consts/zIndex';
+import { replaceUrlKeepingState } from '@/utils/replaceUrlKeepingState';
 
 import { PLAY_TYPE_BY_FILTER, PLAY_TYPE_FILTER } from '../_consts/tournamentPlayType';
 import { STATUS_BY_TAB } from '../_consts/tournamentTab';
@@ -21,15 +22,8 @@ function TournamentHistorySection() {
   const activeTab = parseTabParam(searchParams.get('tab'));
   const activePlayTypeFilter = parsePlayParam(searchParams.get('play'));
 
-  /**
-   * 서버 왕복 없이 주소만 동기화.
-   * 스크롤 복원 키가 history.state 에 저장되므로 기존 state 를 반드시 보존한다.
-   */
   const syncSearchParams = (tab: TournamentStatusTabT, play: TournamentPlayTypeFilterT) => {
-    const { __NA, _N, __PRIVATE_NEXTJS_INTERNALS_TREE, ...customState } =
-      (window.history.state as Record<string, unknown> | null) ?? {};
-
-    window.history.replaceState(customState, '', `?tab=${tab}&play=${play}`);
+    replaceUrlKeepingState(`?tab=${tab}&play=${play}`);
   };
 
   /** 탭을 옮기면 플레이 유형 필터는 항상 '전체'로 초기화 */
