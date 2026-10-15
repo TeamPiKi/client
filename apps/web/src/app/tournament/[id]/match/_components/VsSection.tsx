@@ -1,5 +1,7 @@
 'use client';
 
+import { Z_INDEX } from '@/consts/zIndex';
+
 import type { ProductT } from '../../_common/_types/tournament';
 import useCardSelectionAnimation from '../_hooks/useCardSelectionAnimation';
 import ProductCard from './ProductCard';
@@ -92,8 +94,9 @@ function VsSection({ left, right, isFinal = false, onSelect }: VsSectionProps) {
 
         {/* VS 뱃지 */}
         <div
-          className={`z-10 flex size-8 shrink-0 items-center justify-center rounded-full bg-bg-neutral-secondary text-[12.026px] leading-[17.18px] font-semibold tracking-[-0.515px] text-white ${transition}`}
+          className={`flex size-8 shrink-0 items-center justify-center rounded-full bg-bg-neutral-secondary text-[12.026px] leading-[17.18px] font-semibold tracking-[-0.515px] text-white ${transition}`}
           style={{
+            zIndex: Z_INDEX.BASE_IMAGE + 1,
             marginTop: isFinal ? IMAGE_HEIGHT / 2 - 16 : HOOK_HEIGHT + IMAGE_HEIGHT - 16,
             filter: selectedSide ? 'blur(2px)' : 'none',
             ...duration,

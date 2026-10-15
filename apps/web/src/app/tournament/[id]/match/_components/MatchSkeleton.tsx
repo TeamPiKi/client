@@ -1,4 +1,5 @@
 import Skeleton from '@/components/skeleton';
+import { Z_INDEX } from '@/consts/zIndex';
 
 type MatchSkeletonProps = {
   isFinal?: boolean;
@@ -25,8 +26,8 @@ function MatchSkeleton({ isFinal = false }: MatchSkeletonProps) {
         ))}
 
         <div
-          className="absolute left-1/2 z-10 flex size-8 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-bg-neutral-secondary text-[12.026px] leading-[17.18px] font-semibold tracking-[-0.515px] text-white"
-          style={{ top: isFinal ? 61.5 : 156 }}
+          className="absolute left-1/2 flex size-8 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-bg-neutral-secondary text-[12.026px] leading-[17.18px] font-semibold tracking-[-0.515px] text-white"
+          style={{ zIndex: Z_INDEX.BASE_IMAGE + 1, top: isFinal ? 61.5 : 156 }}
         >
           VS
         </div>

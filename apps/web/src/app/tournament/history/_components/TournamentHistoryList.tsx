@@ -7,7 +7,7 @@ import { useScrollRestoration } from '@/hooks/useScrollRestoration';
 import type { TournamentPlayTypeT, TournamentStatusT } from '@/types/tournament';
 import { SCROLL_NAMESPACE } from '@/utils/scrollRestoration';
 
-import type { TournamentStatusTabT } from '../_consts/tournamentTab';
+import type { TournamentStatusTabT } from '../_types/tournamentTab';
 
 type Props = {
   statuses: TournamentStatusT[];

@@ -1,5 +1,6 @@
-import { PLAY_TYPE_FILTER, type TournamentPlayTypeFilterT } from '../_consts/tournamentPlayType';
-import type { TournamentStatusTabT } from '../_consts/tournamentTab';
+import { PLAY_TYPE_FILTER } from '../_consts/tournamentPlayType';
+import type { TournamentPlayTypeFilterT } from '../_types/tournamentPlayType';
+import type { TournamentStatusTabT } from '../_types/tournamentTab';
 
 export const parseTabParam = (tab?: string | null): TournamentStatusTabT =>
   tab === 'completed' ? 'completed' : 'ongoing';
