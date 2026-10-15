@@ -295,10 +295,11 @@ function BottomTabBar() {
         {TABS.map(({ label, activeIcon: ActiveIcon, inactiveIcon: InactiveIcon, href }, index) => {
           const isActive = index === activeIndex;
           const Icon = isActive ? ActiveIcon : InactiveIcon;
+          const linkHref = isWishFolderRoute && href === ROUTES.WISHLIST ? ROUTES.WISH : href; // TEMP
           return (
             <Link
               key={label}
-              href={href}
+              href={linkHref}
               prefetch={!isActive}
               draggable={false}
               className={cn(
