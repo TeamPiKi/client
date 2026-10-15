@@ -1,3 +1,5 @@
+import Spacing from '@/components/spacing';
+
 import WishGrid from '../_common/_components/WishGrid';
 import { MOCK_WISHES } from '../_common/_consts/wishMock';
 
@@ -16,10 +18,9 @@ function AllWishTabContent() {
           편집 {/* TODO: 위시 편집 동작 연결 */}
         </button>
       </div>
-      <div className="mt-6">
-        {/* TODO: 위시 상세 링크 연결 시 saveScrollAnchor·useScrollRestoration(scope: all) 추가 */}
-        <WishGrid wishes={MOCK_WISHES} />
-      </div>
+      <Spacing size={16} />
+      {/* TODO: 위시 상세 링크 연결 시 saveScrollAnchor·useScrollRestoration(scope: all) 추가 */}
+      <WishGrid wishes={MOCK_WISHES} />
     </>
   );
 }

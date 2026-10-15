@@ -1,5 +1,6 @@
 'use client';
 
+import Spacing from '@/components/spacing';
 import { useScrollRestoration } from '@/hooks/useScrollRestoration';
 import { SCROLL_NAMESPACE } from '@/utils/scrollRestoration';
 
@@ -22,7 +23,8 @@ function FolderTabContent() {
           편집 {/* TODO: 폴더 편집 동작 연결 */}
         </button>
       </div>
-      <ul className="mt-4 grid grid-cols-2">
+      <Spacing size={16} />
+      <ul className="grid grid-cols-2">
         <li>
           <FolderAddCard />
         </li>
