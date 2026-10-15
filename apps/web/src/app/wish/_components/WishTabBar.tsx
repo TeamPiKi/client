@@ -8,7 +8,7 @@ import { ROUTES } from '@/consts/route';
 import { cn } from '@/utils/cn';
 import { replaceUrlKeepingState } from '@/utils/replaceUrlKeepingState';
 
-import { WISH_TAB } from '../_consts/wishTab';
+import { WISH_TAB, WISH_TAB_PANEL_ID } from '../_consts/wishTab';
 import type { WishTabT } from '../_types/wishTab';
 import { parseWishTabParam } from '../_utils/wishSearchParams';
 
@@ -38,9 +38,11 @@ function WishTabBar() {
         return (
           <button
             key={value}
+            id={`wish-tab-${value}`}
             type="button"
             role="tab"
             aria-selected={isActive}
+            aria-controls={WISH_TAB_PANEL_ID}
             onClick={() => !isActive && replaceUrlKeepingState(path)}
             className={cn(
               'flex flex-1 cursor-pointer flex-col items-center gap-3 body-1-semibold transition-colors',

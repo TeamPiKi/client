@@ -5,7 +5,7 @@ import { useEffect, useLayoutEffect, useRef } from 'react';
 
 import { getScrollContainer } from '@/utils/scrollRestoration';
 
-import { WISH_TAB } from '../_consts/wishTab';
+import { WISH_TAB, WISH_TAB_PANEL_ID } from '../_consts/wishTab';
 import type { WishTabT } from '../_types/wishTab';
 import { parseWishTabParam } from '../_utils/wishSearchParams';
 import AllWishTabContent from './AllWishTabContent';
@@ -39,7 +39,11 @@ function WishTabContent() {
     if (scroller) scroller.scrollTop = scrollTopByTabRef.current[activeTab] ?? 0;
   }, [activeTab]);
 
-  return activeTab === WISH_TAB.FOLDER ? <FolderTabContent /> : <AllWishTabContent />;
+  return (
+    <div id={WISH_TAB_PANEL_ID} role="tabpanel" aria-labelledby={`wish-tab-${activeTab}`}>
+      {activeTab === WISH_TAB.FOLDER ? <FolderTabContent /> : <AllWishTabContent />}
+    </div>
+  );
 }
 
 export default WishTabContent;
