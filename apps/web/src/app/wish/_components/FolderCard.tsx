@@ -18,13 +18,7 @@ type FolderCardProps = {
   thumbnailUrls: (string | null)[];
 };
 
-function FolderThumbnail({
-  url,
-  className,
-}: {
-  url: string | null | undefined;
-  className?: string;
-}) {
+function FolderThumbnail({ url, className }: { url: string | null; className?: string }) {
   return (
     <div className={cn('relative bg-gray-75', className)}>
       {url && (
@@ -40,7 +34,7 @@ function FolderThumbnail({
 }
 
 function FolderCard({ folderId, name, wishCount, thumbnailUrls }: FolderCardProps) {
-  const [first, second, third] = thumbnailUrls;
+  const [first = null, second = null, third = null] = thumbnailUrls;
 
   const handleClick = (event: MouseEvent<HTMLAnchorElement>) => {
     if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
