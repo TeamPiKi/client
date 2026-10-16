@@ -1,18 +1,29 @@
 'use client';
 
+import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 
-import { MOCK_FOLDERS, MOCK_WISHES } from '../_common/_consts/wishMock';
+import { ROUTES } from '@/consts/route';
+
+import { MOCK_FOLDERS } from '../_common/_consts/wishMock';
+import { WISH_MODE } from '../_common/_consts/wishMode';
+import type { WishModeT } from '../_common/_types/wishMode';
 import { WISH_TAB } from '../_consts/wishTab';
 import { parseWishTabParam } from '../_utils/wishSearchParams';
 
 const MAX_DISPLAY_COUNT = 999;
 
-function WishTabSummary() {
+type WishTabSummaryProps = {
+  wishCount: number;
+  mode: WishModeT;
+  onEdit: () => void;
+};
+
+function WishTabSummary({ wishCount, mode, onEdit }: WishTabSummaryProps) {
   const searchParams = useSearchParams();
   const isFolderTab = parseWishTabParam(searchParams.get('tab')) === WISH_TAB.FOLDER;
 
-  const wishCount = MOCK_WISHES.length;
+  const editClassName = 'cursor-pointer body-2-medium text-text-neutral-secondary';
 
   return (
     <div className="flex items-center justify-between">
@@ -21,9 +32,16 @@ function WishTabSummary() {
           ? `폴더 ${MOCK_FOLDERS.length}개`
           : `상품 ${wishCount > MAX_DISPLAY_COUNT ? `${MAX_DISPLAY_COUNT}+` : wishCount}`}
       </p>
-      <button type="button" className="cursor-pointer body-2-medium text-text-neutral-secondary">
-        편집 {/* TODO: 위시·폴더 편집 동작 연결 */}
-      </button>
+      {isFolderTab && (
+        <Link href={ROUTES.WISHLIST_FOLDER_EDIT} className={editClassName}>
+          편집
+        </Link>
+      )}
+      {!isFolderTab && mode === WISH_MODE.DEFAULT && (
+        <button type="button" onClick={onEdit} className={editClassName}>
+          편집
+        </button>
+      )}
     </div>
   );
 }

@@ -8,10 +8,10 @@ import { getScrollContainer } from '@/utils/scrollRestoration';
 import { WISH_TAB, WISH_TAB_PANEL_ID } from '../_consts/wishTab';
 import type { WishTabT } from '../_types/wishTab';
 import { parseWishTabParam } from '../_utils/wishSearchParams';
-import AllWishTabContent from './AllWishTabContent';
+import AllWishTabContent, { type AllWishTabContentProps } from './AllWishTabContent';
 import FolderTabContent from './FolderTabContent';
 
-function WishTabContent() {
+function WishTabContent(allWishTabContentProps: AllWishTabContentProps) {
   const searchParams = useSearchParams();
   const activeTab = parseWishTabParam(searchParams.get('tab'));
 
@@ -41,7 +41,11 @@ function WishTabContent() {
 
   return (
     <div id={WISH_TAB_PANEL_ID} role="tabpanel" aria-labelledby={`wish-tab-${activeTab}`}>
-      {activeTab === WISH_TAB.FOLDER ? <FolderTabContent /> : <AllWishTabContent />}
+      {activeTab === WISH_TAB.FOLDER ? (
+        <FolderTabContent />
+      ) : (
+        <AllWishTabContent {...allWishTabContentProps} />
+      )}
     </div>
   );
 }
