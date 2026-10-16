@@ -1,11 +1,5 @@
-<svg width="24" height="24" viewBox="56 16 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-
-<path fill-rule="evenodd" clip-rule="evenodd" d="M19 22C19 21.4477 19.4477 21 20 21H36C36.5523 21 37 21.4477 37 22C37 22.5523 36.5523 23 36 23H20C19.4477 23 19 22.5523 19 22Z" fill="currentColor"/>
-<path fill-rule="evenodd" clip-rule="evenodd" d="M19 26C19 25.4477 19.4477 25 20 25H36C36.5523 25 37 25.4477 37 26C37 26.5523 36.5523 27 36 27H20C19.4477 27 19 26.5523 19 26Z" fill="currentColor"/>
-<path fill-rule="evenodd" clip-rule="evenodd" d="M19 30C19 29.4477 19.4477 29 20 29H36C36.5523 29 37 29.4477 37 30C37 30.5523 36.5523 31 36 31H20C19.4477 31 19 30.5523 19 30Z" fill="currentColor"/>
-<path fill-rule="evenodd" clip-rule="evenodd" d="M19 34C19 33.4477 19.4477 33 20 33H36C36.5523 33 37 33.4477 37 34C37 34.5523 36.5523 35 36 35H20C19.4477 35 19 34.5523 19 34Z" fill="currentColor"/>
-<path fill-rule="evenodd" clip-rule="evenodd" d="M59 22C59 21.4477 59.4477 21 60 21H76C76.5523 21 77 21.4477 77 22C77 22.5523 76.5523 23 76 23H60C59.4477 23 59 22.5523 59 22Z" fill="currentColor"/>
-<path fill-rule="evenodd" clip-rule="evenodd" d="M59 26C59 25.4477 59.4477 25 60 25H76C76.5523 25 77 25.4477 77 26C77 26.5523 76.5523 27 76 27H60C59.4477 27 59 26.5523 59 26Z" fill="currentColor"/>
-<path fill-rule="evenodd" clip-rule="evenodd" d="M59 30C59 29.4477 59.4477 29 60 29H76C76.5523 29 77 29.4477 77 30C77 30.5523 76.5523 31 76 31H60C59.4477 31 59 30.5523 59 30Z" fill="currentColor"/>
-<path fill-rule="evenodd" clip-rule="evenodd" d="M59 34C59 33.4477 59.4477 33 60 33H76C76.5523 33 77 33.4477 77 34C77 34.5523 76.5523 35 76 35H60C59.4477 35 59 34.5523 59 34Z" fill="currentColor"/>
+<svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path fill-rule="evenodd" clip-rule="evenodd" d="M3.75 10C3.75 9.30964 4.30964 8.75 5 8.75H25C25.6904 8.75 26.25 9.30964 26.25 10C26.25 10.6904 25.6904 11.25 25 11.25H5C4.30964 11.25 3.75 10.6904 3.75 10Z" fill="currentColor"/>
+<path fill-rule="evenodd" clip-rule="evenodd" d="M3.75 15C3.75 14.3096 4.30964 13.75 5 13.75H25C25.6904 13.75 26.25 14.3096 26.25 15C26.25 15.6904 25.6904 16.25 25 16.25H5C4.30964 16.25 3.75 15.6904 3.75 15Z" fill="currentColor"/>
+<path fill-rule="evenodd" clip-rule="evenodd" d="M3.75 20C3.75 19.3096 4.30964 18.75 5 18.75H25C25.6904 18.75 26.25 19.3096 26.25 20C26.25 20.6904 25.6904 21.25 25 21.25H5C4.30964 21.25 3.75 20.6904 3.75 20Z" fill="currentColor"/>
 </svg>
