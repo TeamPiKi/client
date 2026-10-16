@@ -55,7 +55,19 @@ function BaseImage({
   useLayoutEffect(() => {
     const img = imgRef.current;
     if (!img) return;
-    setState(getImageStateFromElement(img));
+
+    const nextState = getImageStateFromElement(img);
+    setState(nextState);
+    if (nextState !== 'loading') return;
+
+    /** NOTE: 폴더 편집 드래그에서 이미지 사라지는 오류 수정 */
+    const syncState = () => setState(getImageStateFromElement(img));
+    img.addEventListener('load', syncState);
+    img.addEventListener('error', syncState);
+    return () => {
+      img.removeEventListener('load', syncState);
+      img.removeEventListener('error', syncState);
+    };
   }, [srcKey]);
 
   const handleLoad = (event: ImgEvent) => {
