@@ -1,0 +1,35 @@
+name: Sentry Daily Digest
+
+on:
+  schedule:
+    - cron: '0 1 * * *' # 10:00 KST
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: sentry-daily-digest
+  cancel-in-progress: false
+
+jobs:
+  digest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          sparse-checkout: .github/scripts
+          persist-credentials: false
+
+      - name: Sentry 요약 전송 (허거덩 봇)
+        env:
+          SENTRY_TOKEN: ${{ secrets.SENTRY_READ_TOKEN }}
+          SENTRY_ORG: piki-92
+          SENTRY_PROJECT: piki-web
+          SENTRY_ENV: production
+          DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
+          CHANNEL_ID: ${{ secrets.DISCORD_SENTRY_CHANNEL_ID }}
+        run: bash .github/scripts/sentry-daily-digest.sh
