@@ -159,7 +159,6 @@ MESSAGE=$(jq -r \
   def where:
     ([.culprit | capture("data-sentry-component=\"(?<c>[^\"]+)\"") | .c] | first) as $component
     | if $component then $component
-      elif .func != "" and .file != "" then "\(.func) (\(.file | split("/") | last))"
       elif .func != "" then .func
       elif .file != "" then (.file | split("/") | last)
       else .culprit end;
