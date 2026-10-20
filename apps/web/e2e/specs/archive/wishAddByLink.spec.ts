@@ -30,7 +30,10 @@ test('링크를 입력해 담으면 다이얼로그가 닫히고 목록에 추�
   await page.getByLabel('링크 URL').fill(ADDED_URL);
 
   api.post(ENDPOINTS.WISHLISTS, MOCK_WISH_ADDED_BY_LINK);
-  api.getPage(ENDPOINTS.WISHLISTS, [...MOCK_WISHLIST_ENTRIES, MOCK_WISH_ADDED_BY_LINK]);
+  api.getPage(ENDPOINTS.WISHLISTS, [
+    ...MOCK_WISHLIST_ENTRIES,
+    { ...MOCK_WISH_ADDED_BY_LINK, winnerTournamentIds: [] },
+  ]);
 
   const postRequest = page.waitForRequest(
     request => request.method() === 'POST' && request.url().includes(ENDPOINTS.WISHLISTS)
