@@ -130,4 +130,10 @@ export default withSentryConfig(nextConfig, {
   bundleSizeOptimizations: {
     excludeDebugStatements: true,
   },
+  /** DOM 에 data-sentry-component 를 붙여 Rage Click 등 이슈 선택자에 컴포넌트 이름이 보이게 함 (Turbopack 빌드용) */
+  _experimental: {
+    turbopackReactComponentAnnotation: {
+      enabled: true,
+    },
+  },
 });
