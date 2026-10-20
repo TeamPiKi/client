@@ -82,9 +82,23 @@
   font-weight: 600;
 }
 
+@utility caption-1-medium {
+  font-size: 12px;
+  line-height: 18px;
+  letter-spacing: -0.4px;
+  font-weight: 500;
+}
+
 @utility caption-1-regular {
   font-size: 12px;
   line-height: 18px;
   letter-spacing: -0.4px;
   font-weight: 400;
+}
+
+@utility caption-2-medium {
+  font-size: 10px;
+  line-height: 18px;
+  letter-spacing: -0.4px;
+  font-weight: 500;
 }
