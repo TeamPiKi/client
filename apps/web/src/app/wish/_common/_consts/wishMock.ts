@@ -21,6 +21,7 @@ export const MOCK_WISHES: WishListItemT[] = Array.from({ length: 12 }, (_, index
   },
   refreshNeeded: null,
   reused: null,
+  winnerTournamentIds: index % 4 === 0 ? [index + 100] : [],
 }));
 
 export const MOCK_FOLDERS: WishFolderT[] = [

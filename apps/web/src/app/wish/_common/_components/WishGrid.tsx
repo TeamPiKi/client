@@ -17,7 +17,7 @@ const PRELOAD_COUNT = 6;
 function WishGrid({ wishes, selectedWishIds, onToggleSelect }: WishGridProps) {
   return (
     <ul className="grid grid-cols-3 gap-x-[1.5px] gap-y-6">
-      {wishes.map(({ wish, item }, index) => {
+      {wishes.map(({ wish, item, winnerTournamentIds }, index) => {
         const card = (
           <WishCard
             name={item.name}
@@ -25,6 +25,7 @@ function WishGrid({ wishes, selectedWishIds, onToggleSelect }: WishGridProps) {
             imageUrl={item.imageUrl}
             sourcePlatform={item.sourcePlatform}
             discountRate={item.discountRate}
+            isWinner={winnerTournamentIds.length > 0}
             preload={index < PRELOAD_COUNT}
           />
         );
