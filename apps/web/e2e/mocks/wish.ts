@@ -23,6 +23,7 @@ export const MOCK_WISHLIST_ENTRIES: GetWishlistResponseT[] = MOCK_TOURNAMENT_ITE
     },
     reused: null,
     refreshNeeded: null,
+    winnerTournamentIds: [],
   })
 );
 
