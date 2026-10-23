@@ -12,6 +12,7 @@ type WishCardProps = {
   price: number | null;
   imageUrl: string | null;
   sourcePlatform?: string | null;
+  isWinner?: boolean;
   preload?: boolean;
 };
 

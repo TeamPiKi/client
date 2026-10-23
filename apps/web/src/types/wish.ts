@@ -21,6 +21,10 @@ export type GetWishlistResponseT = {
    * - 링크로 등록한 경우: boolean
    */
   reused: boolean | null;
+  /**
+   * 내가 플레이한 토너먼트 중 이 위시가 우승한 토너먼트 id 목록
+   */
+  winnerTournamentIds: number[];
 };
 
 export type PostWishLinkResponseT = {

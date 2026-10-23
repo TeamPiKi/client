@@ -26,7 +26,7 @@ function WishGrid({ items, isDeleteMode = false, selectedIds, onToggleSelect }: 
 
   return (
     <div className="grid grid-cols-2">
-      {items.map(({ wish, item }, index) => {
+      {items.map(({ wish, item, winnerTournamentIds }, index) => {
         const card = (
           <WishCard
             status={item.status}
@@ -34,6 +34,7 @@ function WishGrid({ items, isDeleteMode = false, selectedIds, onToggleSelect }: 
             price={item.price}
             imageUrl={item.imageUrl}
             sourcePlatform={item.sourcePlatform}
+            isWinner={winnerTournamentIds.length > 0}
             preload={index < 4}
           />
         );
