@@ -25,7 +25,7 @@ export const ROUTES = {
   WISH: '/wish', // TEMP
   WISHLIST_FOLDER_TAB: '/wish?tab=folder',
   WISHLIST_FOLDER: (folderId: number) => `/wish/folder/${folderId}`,
-  WISHLIST_FOLDER_EDIT: '/wish/folder/edit',
+  WISHLIST_FOLDER_ADD: (folderId: number) => `/wish/folder/${folderId}/add`,
   NOTIFICATION: '/notification',
   MYPAGE_EDIT: '/mypage/edit',
   MYPAGE_WITHDRAW: '/mypage/withdraw',

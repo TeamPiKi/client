@@ -26,9 +26,10 @@ export const MOCK_WISHES: WishListItemT[] = Array.from({ length: 12 }, (_, index
 
 export const MOCK_FOLDERS: WishFolderT[] = [
   { id: 1, name: '가방 위시템', wishIds: [4, 1, 2, 3, 5, 6] },
-  { id: 2, name: '위시', wishIds: [1, 7] },
-  { id: 3, name: '여름 코디', wishIds: [5, 8, 9] },
-  { id: 4, name: '빈 폴더', wishIds: [] },
+  { id: 2, name: '여름 코디', wishIds: [5, 8, 9] },
+  { id: 3, name: '신발', wishIds: [1, 7] },
+  { id: 4, name: '원피스', wishIds: [10] },
+  { id: 5, name: '빈 폴더', wishIds: [] },
 ];
 
 export const getMockWishImageUrl = (wishId: number) =>
