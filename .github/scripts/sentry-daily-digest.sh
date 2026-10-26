@@ -20,6 +20,8 @@ LABEL="[${SENTRY_PLATFORM:-WEB}·$STAGE]"
 
 API="https://sentry.io/api/0"
 GH_ISSUE_MAX=10
+# 프론트가 고칠 수 없는 에러 이름 — 쓸데없는 이슈가 생기면 여기에 추가
+GH_ISSUE_EXCLUDE='["ApiError", "AxiosError"]'
 WORK=$(mktemp -d)
 trap 'rm -rf "$WORK"' EXIT
 
@@ -176,7 +178,9 @@ sync_github_issues() {
   local line id found state number url title
 
   jq -c --argjson max "$GH_ISSUE_MAX" \
+    --argjson exclude "$GH_ISSUE_EXCLUDE" \
     '[(.new[] | . + {kind: "new"}), (.regressed[] | . + {kind: "regressed"})]
+      | map(select(.title as $t | $exclude | index($t) | not))
       | .[0:$max] | .[]' \
     "$WORK/classified.json" > "$targets" || return 1
   [ -s "$targets" ] || return 0
