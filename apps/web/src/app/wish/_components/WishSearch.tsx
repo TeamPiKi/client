@@ -78,7 +78,6 @@ function WishSearch({ wishes, onClose }: WishSearchProps) {
         <form role="search" onSubmit={handleSubmit}>
           <Input
             ref={inputRef}
-            type="search"
             enterKeyHint="search"
             aria-label="상품명 검색"
             placeholder="상품명을 입력해주세요."
