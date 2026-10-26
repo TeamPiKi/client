@@ -1,6 +1,6 @@
 'use client';
 
-import { type ChangeEvent, type FormEvent, useState } from 'react';
+import { type FormEvent, useState } from 'react';
 
 import { ChevronBackwardIconFill } from '@/assets/icons';
 import Button from '@/components/button';
@@ -13,8 +13,7 @@ const MAX_FOLDER_NAME_LENGTH = 20;
 const graphemeSegmenter = new Intl.Segmenter('ko', { granularity: 'grapheme' });
 
 /** NOTE: 이모지도 1자로 세야 해서 length 대신 grapheme 단위로 셈 */
-const splitGraphemes = (value: string) =>
-  Array.from(graphemeSegmenter.segment(value), ({ segment }) => segment);
+const countGraphemes = (value: string) => Array.from(graphemeSegmenter.segment(value)).length;
 
 type FolderNameFormProps = {
   title: string;
@@ -25,23 +24,20 @@ type FolderNameFormProps = {
 
 function FolderNameForm({ title, initialName = '', onBack, onSubmit }: FolderNameFormProps) {
   const [name, setName] = useState(initialName);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [isEmptySubmitted, setIsEmptySubmitted] = useState(false);
 
   const trimmedName = name.trim();
   const isUnchanged = initialName !== '' && trimmedName === initialName;
+  const isOverLimit = countGraphemes(trimmedName) > MAX_FOLDER_NAME_LENGTH;
 
-  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const graphemes = splitGraphemes(event.target.value);
-    const isOverLimit = graphemes.length >= MAX_FOLDER_NAME_LENGTH;
-
-    setName(graphemes.slice(0, MAX_FOLDER_NAME_LENGTH).join(''));
-    setErrorMessage(isOverLimit ? `최대 ${MAX_FOLDER_NAME_LENGTH}자까지 입력할 수 있어요.` : null);
-  };
+  let errorMessage: string | null = null;
+  if (isOverLimit) errorMessage = `최대 ${MAX_FOLDER_NAME_LENGTH}자까지 입력할 수 있어요.`;
+  else if (isEmptySubmitted) errorMessage = '폴더 이름을 입력해 주세요.';
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!trimmedName) {
-      setErrorMessage('폴더 이름을 입력해 주세요.');
+      setIsEmptySubmitted(true);
       return;
     }
 
@@ -67,12 +63,15 @@ function FolderNameForm({ title, initialName = '', onBack, onSubmit }: FolderNam
           aria-label="폴더명"
           placeholder="폴더명을 입력해주세요."
           value={name}
-          onChange={handleChange}
+          onChange={event => {
+            setName(event.target.value);
+            setIsEmptySubmitted(false);
+          }}
           aria-invalid={errorMessage !== null}
           {...(errorMessage && { helperText: errorMessage })}
           autoFocus
         />
-        <Button type="submit" size="lg" disabled={name === '' || isUnchanged}>
+        <Button type="submit" size="lg" disabled={name === '' || isUnchanged || isOverLimit}>
           완료
         </Button>
       </div>
