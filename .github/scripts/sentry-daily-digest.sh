@@ -19,6 +19,7 @@ esac
 LABEL="[${SENTRY_PLATFORM:-WEB}·$STAGE]"
 
 API="https://sentry.io/api/0"
+GH_ISSUE_MAX=10
 WORK=$(mktemp -d)
 trap 'rm -rf "$WORK"' EXIT
 
@@ -87,6 +88,18 @@ LIST_URL="https://$SENTRY_ORG.sentry.io/issues/?project=$PROJECT_ID&environment=
 
 jq --argjson now "$(date +%s)" '
   def ts: sub("\\.[0-9]+"; "") | sub("\\+00:00$"; "Z") | fromdateiso8601;
+  def headline:
+    . as $i
+    | if $i.message != "" and ($i.title | contains($i.message) | not)
+      then "\($i.title): \($i.message)" else $i.title end;
+  # API 에러는 axios·인터셉터 내부 함수라 위치 정보가 없다 — 페이지만 보여준다
+  def where:
+    if .title == "ApiError" or .title == "AxiosError" then "" else
+    ([.culprit | capture("data-sentry-component=\"(?<c>[^\"]+)\"") | .c] | first) as $component
+    | if $component then $component
+      elif .func != "" then .func
+      elif .file != "" then (.file | split("/") | last)
+      else .culprit end end;
   ($now - 86400) as $since
   | length as $fetched
   | map({
@@ -103,7 +116,7 @@ jq --argjson now "$(date +%s)" '
       users: (.userCount // 0),
       firstSeen: ((.firstSeen // "1970-01-01T00:00:00Z") | ts),
       substatus: .substatus
-    })
+    } | . + {headline: headline, where: where})
   | sort_by(-.events)
   | {
       now: $now,
@@ -131,7 +144,7 @@ while read -r ISSUE_ID; do
   if [ -n "$PAGE" ]; then
     PAGES=$(jq -c --arg id "$ISSUE_ID" --arg page "$PAGE" '. + {($id): $page}' <<<"$PAGES")
   fi
-done < <(jq -r '[.new[0:5][], .regressed[0:5][], .top[]] | map(.id) | unique | .[]' "$WORK/classified.json")
+done < <(jq -r --argjson max "$GH_ISSUE_MAX" '[.new[0:$max][], .regressed[0:$max][], .top[]] | map(.id) | unique | .[]' "$WORK/classified.json")
 
 if [ "$DRY_RUN" = "1" ]; then
   echo "----- 이슈별 원본 값 (필드 확인용) -----"
@@ -142,35 +155,110 @@ if [ "$DRY_RUN" = "1" ]; then
   echo "발생 페이지: $PAGES"
 fi
 
+# 공개 레포라 본문은 요약만 — 스택·요청 정보는 로그인이 필요한 Sentry 링크로 넘긴다
+GH_JQ_DEFS='
+  def clip($n): if length > $n then .[0:$n - 1] + "…" else . end;
+  def norm: gsub("/[0-9]+(?=$|[/\\s?#])"; "/:id") | gsub("/[0-9a-fA-F]{8}-[0-9a-fA-F-]{27}"; "/:id");
+  def code: "`" + (gsub("[\r\n]+"; " ") | gsub("`"; "\u0027") | gsub("\\|"; "\\|")) + "`";
+  def kst: . + 32400 | strftime("%Y-%m-%d %H:%M");
+  def title: .headline | norm | gsub("[\r\n]+"; " ") | clip(120);
+'
+
+GH_LINKS='{}'
+sync_github_issues() {
+  local targets="$WORK/gh-targets.jsonl" existing="$WORK/gh-existing.json"
+  local line id found state number url title
+
+  jq -c --argjson max "$GH_ISSUE_MAX" \
+    '[(.new[] | . + {kind: "new"}), (.regressed[] | . + {kind: "regressed"})]
+      | .[0:$max] | .[]' \
+    "$WORK/classified.json" > "$targets" || return 1
+  [ -s "$targets" ] || return 0
+
+  if [ "$DRY_RUN" != "1" ]; then
+    gh label create sentry --color D93F0B --description "Sentry 일간 요약이 자동 생성한 에러 이슈" \
+      >/dev/null 2>&1 || true
+  fi
+  gh issue list --label sentry --state all --limit 1000 --json number,state,url,body \
+    | jq 'map({key: ((.body // "") | capture("<!-- sentry-issue-id: (?<id>[0-9]+) -->") | .id),
+               value: {number, state, url}}) | from_entries' > "$existing" || return 1
+
+  while IFS= read -r line; do
+    id=$(jq -r '.id' <<<"$line")
+    found=$(jq -c --arg id "$id" '.[$id] // empty' "$existing")
+    url=""
+    if [ -n "$found" ]; then
+      state=$(jq -r '.state' <<<"$found")
+      number=$(jq -r '.number' <<<"$found")
+      url=$(jq -r '.url' <<<"$found")
+      if [ "$state" = "CLOSED" ]; then
+        if [ "$DRY_RUN" = "1" ]; then
+          echo "[GitHub] #$number 다시 열기 (Sentry $id)"
+        elif ! gh issue reopen "$number" --comment "$(jq -r \
+          '"Sentry 재발 감지: 지난 24시간 \(.events)회 · 유저 \(.users)명 · [Sentry](\(.link))"' <<<"$line")" >/dev/null; then
+          echo "::warning::GitHub 이슈 #$number 다시 열기 실패"
+        fi
+      fi
+    else
+      title=$(jq -r "$GH_JQ_DEFS title" <<<"$line")
+      jq -r --arg label "$LABEL" --argjson pages "$PAGES" "$GH_JQ_DEFS"'
+        ($pages[.id] // "" | norm) as $page
+        | [
+            "## Sentry 에러",
+            "",
+            "| 항목 | 값 |",
+            "|---|---|",
+            "| 프로젝트 | \($label) |",
+            "| 에러 | \(.headline | norm | clip(300) | code) |",
+            "| 페이지 | \(if $page != "" then ($page | code) else "없음" end) |",
+            "| 위치 | \(if .where != "" then (.where | clip(120) | code) else "없음" end) |",
+            "| 처음 발생 | \(.firstSeen | kst) KST |",
+            "| 지난 24시간 | \(.events)회 · 유저 \(.users)명 |",
+            "| Sentry | [이슈 열기](\(.link)) |",
+            "",
+            "- 스택 트레이스·요청 정보는 Sentry 링크에서 확인 (팀 계정 로그인 필요)",
+            "- Sentry 일간 요약 워크플로우가 자동 생성한 이슈",
+            "",
+            "<!-- sentry-issue-id: \(.id) -->"
+          ] | join("\n")
+      ' <<<"$line" > "$WORK/gh-body.md"
+      if [ "$DRY_RUN" = "1" ]; then
+        printf '%s\n%s\n%s\n' "----- [GitHub] 새 이슈: $title -----" "$(cat "$WORK/gh-body.md")" "-----"
+      elif url=$(gh issue create --title "$title" --body-file "$WORK/gh-body.md" --label sentry); then
+        number="${url##*/}"
+      else
+        echo "::warning::GitHub 이슈 생성 실패 (Sentry $id)"
+        url=""
+      fi
+    fi
+    if [ -n "$url" ]; then
+      GH_LINKS=$(jq -c --arg id "$id" --arg url "$url" --arg n "$number" \
+        '. + {($id): {url: $url, number: $n}}' <<<"$GH_LINKS")
+    fi
+  done < "$targets"
+}
+
+if [ -n "${GH_REPO:-}" ]; then
+  sync_github_issues || echo "::warning::GitHub 이슈 동기화 실패 — Discord 요약만 전송"
+fi
+
 MESSAGE=$(jq -r \
   --arg label "$LABEL" \
   --arg unresolved "$UNRESOLVED" \
   --arg listUrl "$LIST_URL" \
-  --argjson pages "$PAGES" '
+  --argjson pages "$PAGES" \
+  --argjson gh "$GH_LINKS" '
   def kst: . + 32400 | strftime("%m/%d %H:%M");
   def clip($n): if length > $n then .[0:$n - 1] + "…" else . end;
   # 이슈 제목·메시지는 외부 입력 — 링크 라벨 탈출과 서식 깨짐을 이스케이프로 막는다
   def esc: gsub("(?<c>[\\[\\]\\\\`*_~|<>])"; "\\\(.c)");
 
-  def headline:
-    . as $i
-    | if $i.message != "" and ($i.title | contains($i.message) | not)
-      then "\($i.title): \($i.message)" else $i.title end;
-
-  # API 에러는 axios·인터셉터 내부 함수라 위치 정보가 없다 — 페이지만 보여준다
-  def where:
-    if .title == "ApiError" or .title == "AxiosError" then "" else
-    ([.culprit | capture("data-sentry-component=\"(?<c>[^\"]+)\"") | .c] | first) as $component
-    | if $component then $component
-      elif .func != "" then .func
-      elif .file != "" then (.file | split("/") | last)
-      else .culprit end end;
-
   def itemLine:
-    ([($pages[.id] // "" | clip(60)), (where | clip(80))] | map(select(. != "") | esc)) as $loc
-    | "• \(headline | clip(100) | esc)"
+    ([($pages[.id] // "" | clip(60)), (.where | clip(80))] | map(select(. != "") | esc)) as $loc
+    | "• \(.headline | clip(100) | esc)"
       + (if ($loc | length) > 0 then "\n  📍 \($loc | join(" · "))" else "" end)
-      + "\n  \(.events)회 · 유저 \(.users)명 · [Sentry](<\(.link)>)";
+      + "\n  \(.events)회 · 유저 \(.users)명 · [Sentry](<\(.link)>)"
+      + (if $gh[.id] then " · [#\($gh[.id].number)](<\($gh[.id].url)>)" else "" end);
 
   def section($title; $items; $max):
     if ($items | length) == 0 then empty
@@ -186,7 +274,7 @@ MESSAGE=$(jq -r \
       (["🔥 24시간 최다 발생"]
         + ($items | to_entries | map(
             ($pages[.value.id] // "") as $page
-            | "\(.key + 1). \(.value | headline | clip(60) | esc)"
+            | "\(.key + 1). \(.value.headline | clip(60) | esc)"
               + (if $page != "" then " · \($page | clip(40) | esc)" else "" end)
               + " · \(.value.events)회 · [Sentry](<\(.value.link)>)")))
       | join("\n")
