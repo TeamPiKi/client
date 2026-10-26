@@ -24,11 +24,24 @@ jobs:
           sparse-checkout: .github/scripts
           persist-credentials: false
 
-      - name: Sentry 요약 전송 (허거덩 봇)
+      - name: 웹 Sentry 요약 전송 (허거덩 봇)
         env:
           SENTRY_TOKEN: ${{ secrets.SENTRY_READ_TOKEN }}
           SENTRY_ORG: piki-92
           SENTRY_PROJECT: piki-web
+          SENTRY_PLATFORM: WEB
+          SENTRY_ENV: production
+          DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
+          CHANNEL_ID: ${{ secrets.DISCORD_SENTRY_CHANNEL_ID }}
+        run: bash .github/scripts/sentry-daily-digest.sh
+
+      - name: 앱 Sentry 요약 전송 (허거덩 봇)
+        if: ${{ !cancelled() }}
+        env:
+          SENTRY_TOKEN: ${{ secrets.SENTRY_READ_TOKEN }}
+          SENTRY_ORG: piki-92
+          SENTRY_PROJECT: piki-app
+          SENTRY_PLATFORM: APP
           SENTRY_ENV: production
           DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
           CHANNEL_ID: ${{ secrets.DISCORD_SENTRY_CHANNEL_ID }}
