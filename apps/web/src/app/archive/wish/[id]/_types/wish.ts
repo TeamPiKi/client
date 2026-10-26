@@ -8,6 +8,7 @@ type ItemT = {
   sourcePlatform: string | null;
   method: ItemExtractMethodT | null;
   userInput: boolean;
+  refreshing: boolean;
 } & (
   | {
       id: null;

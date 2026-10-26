@@ -14,6 +14,8 @@ export type ItemT = {
   sourcePlatform: string | null;
   method: ItemExtractMethodT | null;
   userInput: boolean;
+  /** 새로고침 중에도 값과 상태는 새로고침 전 것이 유지됨 */
+  refreshing: boolean;
 };
 
 export type ItemStatusT<K extends keyof typeof ITEM_STATUS = keyof typeof ITEM_STATUS> =
