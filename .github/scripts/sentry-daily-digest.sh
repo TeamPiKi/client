@@ -169,8 +169,8 @@ GH_JQ_DEFS='
     elif $page != "" then $page
     else "" end;
   def title($page):
-    ([place($page), .title] | map(select(. != "")) | join(" ")) + " 수정"
-    | gsub("[\r\n]+"; " ") | clip(70);
+    "fix: " + (([place($page), .title] | map(select(. != "")) | join(" ")) + " 수정"
+      | gsub("[\r\n]+"; " ") | clip(65));
 '
 
 GH_LINKS='{}'
