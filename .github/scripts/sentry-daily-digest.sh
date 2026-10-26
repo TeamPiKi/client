@@ -157,12 +157,14 @@ MESSAGE=$(jq -r \
     | if $i.message != "" and ($i.title | contains($i.message) | not)
       then "\($i.title): \($i.message)" else $i.title end;
 
+  # API 에러는 axios·인터셉터 내부 함수라 위치 정보가 없다 — 페이지만 보여준다
   def where:
+    if .title == "ApiError" or .title == "AxiosError" then "" else
     ([.culprit | capture("data-sentry-component=\"(?<c>[^\"]+)\"") | .c] | first) as $component
     | if $component then $component
       elif .func != "" then .func
       elif .file != "" then (.file | split("/") | last)
-      else .culprit end;
+      else .culprit end end;
 
   def itemLine:
     ([($pages[.id] // "" | clip(60)), (where | clip(80))] | map(select(. != "") | esc)) as $loc
