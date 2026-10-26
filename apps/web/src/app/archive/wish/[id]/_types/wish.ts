@@ -10,10 +10,7 @@ type ItemT = {
   sourcePlatform: string | null;
 } & (
   | {
-      status:
-        | (typeof ITEM_STATUS)['PENDING']
-        | (typeof ITEM_STATUS)['PROCESSING']
-        | (typeof ITEM_STATUS)['FAILED'];
+      status: (typeof ITEM_STATUS)['PARSING'] | (typeof ITEM_STATUS)['FAILED'];
       name: null;
       imageUrl: null;
       price: null;

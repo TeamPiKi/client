@@ -2,10 +2,10 @@
 
 import { useEffect, useRef } from 'react';
 
+import { ITEM_STATUS } from '@/consts/item';
 import { useGetWishlist } from '@/hooks/useGetWishlist';
 import { useSSEFallback } from '@/hooks/useSSEFallback';
 import { useScrollRestoration } from '@/hooks/useScrollRestoration';
-import { hasParsingItems } from '@/utils/item';
 import { SCROLL_NAMESPACE } from '@/utils/scrollRestoration';
 
 import WishCardSkeleton from './WishCardSkeleton';
@@ -21,7 +21,7 @@ function WishlistList({ isDeleteMode, selectedIds, onToggleSelect }: WishlistLis
   const sentinelRef = useRef<HTMLDivElement>(null);
 
   const { wishlistData, fetchNextPage, hasNextPage, isFetchingNextPage } = useGetWishlist();
-  const hasPendingItem = hasParsingItems(wishlistData.map(({ item }) => item));
+  const hasPendingItem = wishlistData.some(({ item }) => item.status === ITEM_STATUS.PARSING);
 
   useSSEFallback(['wishlists'], hasPendingItem);
   useScrollRestoration({ namespace: SCROLL_NAMESPACE.ARCHIVE_WISH });
