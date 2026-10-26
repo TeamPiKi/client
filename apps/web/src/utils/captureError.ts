@@ -6,6 +6,7 @@ type CaptureErrorContextT = {
   tags?: Record<string, string>;
   /** 디버깅용 부가 정보 (요청 URL, status 등) */
   extra?: Record<string, unknown>;
+  fingerprint?: string[];
 };
 
 /** 잡은(caught) 에러를 Sentry에 수동 리포트 — 태그/컨텍스트를 일관되게 부착 */
@@ -13,6 +14,7 @@ export const captureError = (error: unknown, context?: CaptureErrorContextT) => 
   Sentry.captureException(error, {
     tags: context?.tags,
     extra: context?.extra,
+    fingerprint: context?.fingerprint,
   });
 };
 
@@ -21,3 +23,6 @@ export const captureNonApiError = (error: unknown) => {
   if (!isAxiosError(error)) Sentry.captureException(error);
 };
 
+/** fingerprint 용 — 리소스 ID 가 달라도 같은 엔드포인트면 한 이슈로 묶는다 */
+export const normalizeApiPath = (path: string) =>
+  path.replace(/\/\d+(?=\/|$)/g, '/:id').replace(/\/[0-9a-f]{8}-[0-9a-f-]{27}(?=\/|$)/gi, '/:id');

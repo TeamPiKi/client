@@ -6,7 +6,7 @@ import { ENDPOINTS } from '@/consts/api';
 import { QUERY_ACTION } from '@/consts/queryAction';
 import { CLIENT_TYPE } from '@/consts/webBridge';
 import type { ApiErrorResponseT } from '@/types/api';
-import { captureError } from '@/utils/captureError';
+import { captureError, normalizeApiPath } from '@/utils/captureError';
 import { getLoginPath } from '@/utils/loginRedirect';
 import { isWebview } from '@/utils/webBridge';
 
@@ -73,7 +73,8 @@ serverApi.interceptors.response.use(
       apiError.name = 'ApiError';
 
       captureError(apiError, {
-        tags: { source: 'api-server' },
+        tags: { source: 'api-server', errorType: status ? 'server' : 'network' },
+        fingerprint: ['api', method, String(status ?? error.code), normalizeApiPath(path)],
         extra: {
           url: error.config?.url,
           method: error.config?.method,

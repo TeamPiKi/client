@@ -8,7 +8,7 @@ import { QUERY_ACTION } from '@/consts/queryAction';
 import { ROUTES } from '@/consts/route';
 import { CLIENT_TYPE } from '@/consts/webBridge';
 import type { ApiErrorResponseT } from '@/types/api';
-import { captureError } from '@/utils/captureError';
+import { captureError, normalizeApiPath } from '@/utils/captureError';
 import { deleteCookie, getCookie } from '@/utils/cookie';
 import { handleSessionExpired } from '@/utils/handleSessionExpired';
 import { getLoginPath } from '@/utils/loginRedirect';
@@ -97,7 +97,8 @@ clientApi.interceptors.response.use(
       apiError.name = 'ApiError';
 
       captureError(apiError, {
-        tags: { source: 'api-client' },
+        tags: { source: 'api-client', errorType: status ? 'server' : 'network' },
+        fingerprint: ['api', method, String(status ?? error.code), normalizeApiPath(path)],
         extra: {
           url: originalRequest?.url,
           method: originalRequest?.method,
