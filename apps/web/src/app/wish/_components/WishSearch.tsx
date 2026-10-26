@@ -87,11 +87,11 @@ function WishSearch({ wishes, onClose }: WishSearchProps) {
             onBlur={() => setIsFocused(false)}
             autoFocus
             right={
-              keyword &&
-              !isFocused && (
+              keyword && (
                 <button
                   type="button"
                   aria-label="검색어 지우기"
+                  onMouseDown={event => event.preventDefault()}
                   onClick={handleClear}
                   className="flex cursor-pointer"
                 >
