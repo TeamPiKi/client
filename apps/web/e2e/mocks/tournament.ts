@@ -84,7 +84,7 @@ export const MOCK_TOURNAMENT_PENDING: GetTournamentPendingResponseT = {
     inviteCode: 'E2ECODE',
     /** 미래 시각으로 고정해 초대 만료 카운트다운이 항상 유효하도록 */
     inviteExpiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
-    /** status 가 PENDING/PROCESSING 인 아이템을 두지 않아 SSE 폴백 폴링이 돌지 않게 함 */
+    /** status 가 PARSING 인 아이템을 두지 않아 SSE 폴백 폴링이 돌지 않게 함 */
     items: [],
     participants: [
       {

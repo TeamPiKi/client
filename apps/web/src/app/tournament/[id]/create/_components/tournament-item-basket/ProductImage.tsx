@@ -34,7 +34,7 @@ const errorFallback = (status: ItemStatusT<'FAILED' | 'INCOMPLETE'> = 'FAILED') 
 );
 
 function ProductImage({ src, alt, status, className }: ProductImageProps) {
-  const isProcessing = status === ITEM_STATUS.PENDING || status === ITEM_STATUS.PROCESSING;
+  const isParsing = status === ITEM_STATUS.PARSING;
   const isError = status === ITEM_STATUS.FAILED || status === ITEM_STATUS.INCOMPLETE;
 
   return (
@@ -44,9 +44,9 @@ function ProductImage({ src, alt, status, className }: ProductImageProps) {
         className
       )}
     >
-      {isProcessing && loadingFallback}
+      {isParsing && loadingFallback}
       {isError && errorFallback(status)}
-      {!isProcessing && !isError && src && (
+      {!isParsing && !isError && src && (
         <BaseImage
           src={src}
           alt={alt}

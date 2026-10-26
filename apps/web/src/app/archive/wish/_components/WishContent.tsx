@@ -38,12 +38,7 @@ function WishContent() {
 
   const { wishlistData } = useGetWishlist();
   const selectableIds = wishlistData
-    .filter(
-      ({ item }) =>
-        item.status !== ITEM_STATUS.FAILED &&
-        item.status !== ITEM_STATUS.PENDING &&
-        item.status !== ITEM_STATUS.PROCESSING
-    )
+    .filter(({ item }) => item.status !== ITEM_STATUS.FAILED && item.status !== ITEM_STATUS.PARSING)
     .map(({ wish }) => wish.id);
   const isAllSelected = selectableIds.length > 0 && selectableIds.every(id => selectedIds.has(id));
 

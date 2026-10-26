@@ -43,11 +43,8 @@ async function TournamentItemLayout({ children, params }: TournamentItemLayoutPr
       queryClient.ensureQueryData({ queryKey: ['me'], queryFn: getMe }),
     ]);
 
-    /** 아직 PROCESSING 상태인 경우에는 접근 불가 */
-    if (
-      tournamentItemData.status === ITEM_STATUS.PROCESSING ||
-      tournamentItemData.status === ITEM_STATUS.PENDING
-    )
+    /** 아직 PARSING 상태인 경우에는 접근 불가 */
+    if (tournamentItemData.status === ITEM_STATUS.PARSING)
       redirect(ROUTES.TOURNAMENT_CREATE(tournamentId));
 
     /** FAILED·INCOMPLETE 상태인 경우 주최자나 등록한 본인만 접근 가능 */
