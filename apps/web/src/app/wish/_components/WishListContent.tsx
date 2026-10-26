@@ -1,11 +1,12 @@
 'use client';
 
 import { useSearchParams } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
 import { Z_INDEX } from '@/consts/zIndex';
 import { cn } from '@/utils/cn';
+import { getScrollContainer } from '@/utils/scrollRestoration';
 
 import WishEditActionBar from '../_common/_components/WishEditActionBar';
 import WishEditHeader from '../_common/_components/WishEditHeader';
@@ -20,6 +21,8 @@ import WishTabBar from './WishTabBar';
 import WishTabContent from './WishTabContent';
 import WishTabSummary from './WishTabSummary';
 
+const TITLE_HEIGHT_WITH_GAP = 52;
+
 function WishListContent() {
   const searchParams = useSearchParams();
   const isFolderTab = parseWishTabParam(searchParams.get('tab')) === WISH_TAB.FOLDER;
@@ -29,6 +32,7 @@ function WishListContent() {
   /** TEMP: API 연동 시 폴더 목록 조회·생성·수정·삭제 API 로 교체 */
   const [folders, setFolders] = useState(MOCK_FOLDERS);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isTitleHidden, setIsTitleHidden] = useState(false);
   const {
     mode,
     selectedWishIds,
@@ -60,6 +64,19 @@ function WishListContent() {
   const handleDeleteFolder = (folderId: number) =>
     setFolders(prev => prev.filter(({ id }) => id !== folderId));
 
+  /** 스크롤 시 제목 부분을 숨김/노출 처리 함 */
+  useEffect(() => {
+    const scroller = getScrollContainer();
+    if (!scroller) return;
+
+    const handleScroll = () => {
+      if (scroller.scrollTop > TITLE_HEIGHT_WITH_GAP) setIsTitleHidden(true);
+      else if (scroller.scrollTop <= 0) setIsTitleHidden(false);
+    };
+    scroller.addEventListener('scroll', handleScroll, { passive: true });
+    return () => scroller.removeEventListener('scroll', handleScroll);
+  }, []);
+
   return (
     <>
       <div
@@ -73,7 +90,16 @@ function WishListContent() {
           <WishEditHeader selectedCount={selectedWishIds.size} onDone={handleExitEditMode} />
         ) : (
           <>
-            <h1 className="heading-1-bold text-text-neutral-primary">내 위시리스트</h1>
+            <div
+              className={cn(
+                'grid transition-all duration-100',
+                isTitleHidden ? '-mb-6 grid-rows-[0fr] opacity-0' : 'grid-rows-[1fr]'
+              )}
+            >
+              <h1 className="min-h-0 overflow-hidden heading-1-bold text-text-neutral-primary">
+                내 위시리스트
+              </h1>
+            </div>
             <WishTabBar />
           </>
         )}
