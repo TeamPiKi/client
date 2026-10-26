@@ -7,6 +7,7 @@ import Button from '@/components/button';
 import { DrawerTitle } from '@/components/drawer';
 import { Header } from '@/components/header';
 import Input from '@/components/input';
+import { cn } from '@/utils/cn';
 
 const MAX_FOLDER_NAME_LENGTH = 20;
 
@@ -45,7 +46,7 @@ function FolderNameForm({ title, initialName = '', onBack, onSubmit }: FolderNam
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+    <form onSubmit={handleSubmit} className="-mt-2 flex flex-col gap-6">
       <Header
         left={
           <button type="button" aria-label="뒤로가기" onClick={onBack} className="cursor-pointer">
@@ -58,7 +59,7 @@ function FolderNameForm({ title, initialName = '', onBack, onSubmit }: FolderNam
           </DrawerTitle>
         }
       />
-      <div className="flex flex-col gap-9 pb-1.5">
+      <div className={cn('flex flex-col pb-1.5', errorMessage ? 'gap-2' : 'gap-9')}>
         <Input
           aria-label="폴더명"
           placeholder="폴더명을 입력해주세요."
