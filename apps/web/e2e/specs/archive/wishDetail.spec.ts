@@ -47,8 +47,6 @@ test('상세 정보를 확인하고 상품명을 수정해 저장하면 조회 �
   api.patch(ENDPOINTS.WISHLIST(WISH_ID), {
     wish: MOCK_WISH_DETAIL.wish,
     item: updatedItem,
-    refreshNeeded: null,
-    reused: null,
   });
   api.get(ENDPOINTS.WISHLIST(WISH_ID), { ...MOCK_WISH_DETAIL, item: updatedItem });
 

@@ -2,7 +2,7 @@ import type { ITEM_STATUS } from '@/consts/item';
 
 export type GetTournamentItemResponseT = {
   tournamentItemId: number;
-  itemId: number;
+  itemId: number | null;
   /** 이미지로 등록한 경우 undefined */
   sourceUrl?: string;
   currency?: string;

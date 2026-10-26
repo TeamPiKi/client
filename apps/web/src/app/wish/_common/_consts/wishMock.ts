@@ -18,10 +18,10 @@ export const MOCK_WISHES: WishListItemT[] = Array.from({ length: 12 }, (_, index
     imageUrl: MOCK_IMAGE_URLS[index % MOCK_IMAGE_URLS.length] ?? null,
     sourceUrl: null,
     sourcePlatform: 'BRAND',
+    method: 'STRUCTURED',
+    userInput: false,
     discountRate: index % 4 === 3 ? null : 99,
   },
-  refreshNeeded: null,
-  reused: null,
   winnerTournamentIds: index % 4 === 0 ? [index + 100] : [],
 }));
 
