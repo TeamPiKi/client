@@ -1,3 +1,5 @@
+import type { ReactNode } from 'react';
+
 import { CheckboxEmptyIconFill, CheckboxSelectedIconFill } from '@/assets/icons';
 import { Z_INDEX } from '@/consts/zIndex';
 
@@ -8,15 +10,17 @@ type WishGridProps = {
   wishes: WishListItemT[];
   selectedWishIds?: Set<number>;
   onToggleSelect?: (wishId: number) => void;
+  leadingItem?: ReactNode;
 };
 
 /** 이미지 preload 개수 */
 const PRELOAD_COUNT = 6;
 
 /** 위시 3열 그리드 **/
-function WishGrid({ wishes, selectedWishIds, onToggleSelect }: WishGridProps) {
+function WishGrid({ wishes, selectedWishIds, onToggleSelect, leadingItem }: WishGridProps) {
   return (
     <ul className="grid grid-cols-3 gap-x-[1.5px] gap-y-6">
+      {leadingItem && <li>{leadingItem}</li>}
       {wishes.map(({ wish, item, winnerTournamentIds }, index) => {
         const card = (
           <WishCard

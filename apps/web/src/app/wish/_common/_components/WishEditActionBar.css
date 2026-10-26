@@ -1,0 +1,4 @@
+/** 탭바가 루트 레이아웃에 있어 편집 중에도 렌더되므로 액션바가 떠 있는 동안 숨김 */
+body:has([data-hide-bottom-tab-bar]) [data-bottom-tab-bar] {
+  display: none;
+}

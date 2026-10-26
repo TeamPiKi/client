@@ -14,11 +14,13 @@ import { useBackWithFallback } from '@/hooks/useBackWithFallback';
 import WishEditActionBar from '../../../_common/_components/WishEditActionBar';
 import WishEditHeader from '../../../_common/_components/WishEditHeader';
 import WishGrid from '../../../_common/_components/WishGrid';
-import WishSearchLink from '../../../_common/_components/WishSearchLink';
 import { MOCK_FOLDERS, MOCK_WISHES } from '../../../_common/_consts/wishMock';
 import { WISH_MODE } from '../../../_common/_consts/wishMode';
 import { useWishEditMode } from '../../../_common/_hooks/useWishEditMode';
 import type { WishFolderT } from '../../../_common/_types/wish';
+import FolderWishAddDialog from './FolderWishAddDialog';
+
+const MAX_DISPLAY_COUNT = 999;
 
 type FolderDetailContentProps = {
   folderId: number | null;
@@ -34,11 +36,13 @@ function FolderDetailContent({ folderId }: FolderDetailContentProps) {
   const [wishes, setWishes] = useState(() =>
     MOCK_WISHES.filter(({ wish }) => folder?.wishIds.includes(wish.id))
   );
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const {
     mode,
     selectedWishIds,
     handleToggleSelect,
     handleClearSelection,
+    handleSelectAll,
     handleEnterEditMode,
     handleExitEditMode,
   } = useWishEditMode();
@@ -60,7 +64,7 @@ function FolderDetailContent({ folderId }: FolderDetailContentProps) {
     toast.success(`상품을 '${targetFolder.name}' 폴더로 이동했어요.`);
   };
 
-  /** TODO: 폴더에서 빼기·위시 삭제 중 동작 확정 후 API 연결 */
+  /** TODO: 폴더에서 빼기 API 연결 */
   const handleDelete = () => {
     setWishes(prev => prev.filter(({ wish }) => !selectedWishIds.has(wish.id)));
     handleClearSelection();
@@ -70,7 +74,7 @@ function FolderDetailContent({ folderId }: FolderDetailContentProps) {
   return (
     <>
       <div
-        className="sticky top-0 bg-bg-layer-basement pt-padding-top"
+        className="sticky top-0 bg-bg-layer-default pt-padding-top"
         style={{ zIndex: Z_INDEX.STICKY_HEADER }}
       >
         {mode === WISH_MODE.EDIT ? (
@@ -87,7 +91,7 @@ function FolderDetailContent({ folderId }: FolderDetailContentProps) {
                   onClick={() => backWithFallback(ROUTES.WISHLIST_FOLDER_TAB)}
                   className="cursor-pointer"
                 >
-                  <ChevronBackwardIconFill className="size-7.5 text-text-neutral-primary" />
+                  <ChevronBackwardIconFill className="size-7.5 text-icon-neutral-primary" />
                 </button>
               }
               center={
@@ -95,31 +99,51 @@ function FolderDetailContent({ folderId }: FolderDetailContentProps) {
                   {folder.name}
                 </h1>
               }
-              right={<WishSearchLink />}
             />
           </div>
         )}
         <Spacing size={24} />
-        <div className="flex items-center justify-between px-5">
-          <p className="flex items-center gap-2 body-2-medium text-text-neutral-tertiary">
-            {folder.name}
-            <span aria-hidden className="h-[12.6px] w-px bg-gray-300" />
-            전체({wishes.length})
-          </p>
-          {mode === WISH_MODE.DEFAULT && (
-            <button
-              type="button"
-              onClick={handleEnterEditMode}
-              className="cursor-pointer body-2-medium text-text-neutral-secondary"
-            >
-              편집
-            </button>
+        <div className="flex items-center justify-between px-5 body-2-medium">
+          {mode === WISH_MODE.EDIT ? (
+            <>
+              <p className="flex items-center gap-2 text-text-neutral-tertiary">
+                {folder.name}
+                <span aria-hidden className="h-[12.6px] w-px bg-gray-300" />
+                전체({wishes.length})
+              </p>
+              <button
+                type="button"
+                onClick={() => handleSelectAll(wishes.map(({ wish }) => wish.id))}
+                className="cursor-pointer text-text-neutral-secondary"
+              >
+                전체 선택
+              </button>
+            </>
+          ) : (
+            <>
+              <p className="text-text-neutral-tertiary">
+                상품 {wishes.length > MAX_DISPLAY_COUNT ? `${MAX_DISPLAY_COUNT}+` : wishes.length}
+              </p>
+              <div className="flex items-center gap-3 text-text-neutral-secondary">
+                <button
+                  type="button"
+                  onClick={() => setIsAddDialogOpen(true)}
+                  className="cursor-pointer"
+                >
+                  추가
+                </button>
+                <span aria-hidden className="h-3.5 w-[1.4px] bg-gray-300" />
+                <button type="button" onClick={handleEnterEditMode} className="cursor-pointer">
+                  편집
+                </button>
+              </div>
+            </>
           )}
         </div>
         <Spacing size={24} />
       </div>
 
-      {/* TODO: 위시 상세 링크 연결 시 saveScrollAnchor·useScrollRestoration(scope: folderId) 추가 */}
+      {/** TODO: 위시 상세 링크 연결 시 saveScrollAnchor·useScrollRestoration(scope: folderId) 추가 */}
       <WishGrid
         wishes={wishes}
         {...(mode === WISH_MODE.EDIT && { selectedWishIds, onToggleSelect: handleToggleSelect })}
@@ -131,8 +155,19 @@ function FolderDetailContent({ folderId }: FolderDetailContentProps) {
           currentFolderId={folder.id}
           onMove={handleMove}
           onDelete={handleDelete}
+          deleteConfirm={{
+            title: `선택한 상품 ${selectedWishIds.size}개를 삭제할까요?`,
+            description: '폴더에서만 삭제되며, 전체 위시에는 남아있어요.',
+            icon: null,
+          }}
         />
       )}
+
+      <FolderWishAddDialog
+        folderId={folder.id}
+        open={isAddDialogOpen}
+        onOpenChange={setIsAddDialogOpen}
+      />
     </>
   );
 }
