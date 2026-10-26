@@ -21,7 +21,7 @@ LABEL="[${SENTRY_PLATFORM:-WEB}·$STAGE]"
 API="https://sentry.io/api/0"
 GH_ISSUE_MAX=10
 # 프론트가 고칠 수 없는 에러 이름 — 쓸데없는 이슈가 생기면 여기에 추가
-GH_ISSUE_EXCLUDE='["ApiError", "AxiosError"]'
+GH_ISSUE_EXCLUDE='["ApiError", "AxiosError", "ChunkLoadError"]'
 WORK=$(mktemp -d)
 trap 'rm -rf "$WORK"' EXIT
 
@@ -117,7 +117,8 @@ jq --argjson now "$(date +%s)" '
         else ((.count // "0") | tonumber) end),
       users: (.userCount // 0),
       firstSeen: ((.firstSeen // "1970-01-01T00:00:00Z") | ts),
-      substatus: .substatus
+      substatus: .substatus,
+      level: (.level // "error")
     } | . + {headline: headline, where: where})
   | sort_by(-.events)
   | {
@@ -180,7 +181,7 @@ sync_github_issues() {
   jq -c --argjson max "$GH_ISSUE_MAX" \
     --argjson exclude "$GH_ISSUE_EXCLUDE" \
     '[(.new[] | . + {kind: "new"}), (.regressed[] | . + {kind: "regressed"})]
-      | map(select(.title as $t | $exclude | index($t) | not))
+      | map(select((.level == "error" or .level == "fatal") and (.title as $t | $exclude | index($t) | not)))
       | .[0:$max] | .[]' \
     "$WORK/classified.json" > "$targets" || return 1
   [ -s "$targets" ] || return 0
