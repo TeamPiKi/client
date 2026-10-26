@@ -50,7 +50,7 @@ function FolderNameForm({ title, initialName = '', onBack, onSubmit }: FolderNam
       <Header
         left={
           <button type="button" aria-label="뒤로가기" onClick={onBack} className="cursor-pointer">
-            <ChevronBackwardIconFill className="size-7.5 text-text-neutral-primary" />
+            <ChevronBackwardIconFill className="size-7.5 text-icon-neutral-primary" />
           </button>
         }
         center={

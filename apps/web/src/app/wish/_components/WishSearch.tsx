@@ -70,7 +70,7 @@ function WishSearch({ wishes, onClose }: WishSearchProps) {
               onClick={onClose}
               className="cursor-pointer"
             >
-              <ChevronBackwardIconFill className="size-7.5 text-text-neutral-primary" />
+              <ChevronBackwardIconFill className="size-7.5 text-icon-neutral-secondary" />
             </button>
           }
           center={<h1 className="heading-1-bold text-text-neutral-primary">내 위시 검색</h1>}

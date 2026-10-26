@@ -91,7 +91,7 @@ function FolderDetailContent({ folderId }: FolderDetailContentProps) {
                   onClick={() => backWithFallback(ROUTES.WISHLIST_FOLDER_TAB)}
                   className="cursor-pointer"
                 >
-                  <ChevronBackwardIconFill className="size-7.5 text-text-neutral-primary" />
+                  <ChevronBackwardIconFill className="size-7.5 text-icon-neutral-primary" />
                 </button>
               }
               center={
