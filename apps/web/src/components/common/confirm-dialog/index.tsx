@@ -45,11 +45,14 @@ function ConfirmDialog({
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent showCloseButton={false} className={cn('text-center', !icon && 'pt-9')}>
+      <DialogContent
+        showCloseButton={false}
+        className={cn('w-[calc(min(100vw,480px)-72px)] max-w-none text-center', !icon && 'pt-8')}
+      >
         {icon && <div className="flex justify-center">{icon}</div>}
         <DialogHeader className={cn('gap-1', icon && 'mt-4')}>
-          <DialogTitle className="heading-1-bold">{title}</DialogTitle>
-          <DialogDescription className="body-1-medium text-text-neutral-tertiary">
+          <DialogTitle className="heading-2-semibold">{title}</DialogTitle>
+          <DialogDescription className="body-2-medium text-text-neutral-tertiary">
             {description}
           </DialogDescription>
         </DialogHeader>
