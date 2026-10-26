@@ -190,9 +190,9 @@ sync_github_issues() {
     gh label create sentry --color D93F0B --description "Sentry 일간 요약이 자동 생성한 에러 이슈" \
       >/dev/null 2>&1 || true
   fi
-  gh issue list --label sentry --state all --limit 1000 --json number,state,url,body \
+  gh issue list --label sentry --state all --limit 1000 --json number,state,stateReason,url,body \
     | jq 'map({key: ((.body // "") | capture("<!-- sentry-issue-id: (?<id>[0-9]+) -->") | .id),
-               value: {number, state, url}}) | from_entries' > "$existing" || return 1
+               value: {number, state, stateReason, url}}) | from_entries' > "$existing" || return 1
 
   while IFS= read -r line; do
     id=$(jq -r '.id' <<<"$line")
@@ -202,7 +202,10 @@ sync_github_issues() {
       state=$(jq -r '.state' <<<"$found")
       number=$(jq -r '.number' <<<"$found")
       url=$(jq -r '.url' <<<"$found")
-      if [ "$state" = "CLOSED" ]; then
+      # "not planned" 로 닫은 이슈는 고칠 수 없다고 판단한 것 — 재발해도 다시 열지 않는다
+      if [ "$state" = "CLOSED" ] && [ "$(jq -r '.stateReason' <<<"$found")" = "NOT_PLANNED" ]; then
+        continue
+      elif [ "$state" = "CLOSED" ]; then
         if [ "$DRY_RUN" = "1" ]; then
           echo "[GitHub] #$number 다시 열기 (Sentry $id)"
         elif ! gh issue reopen "$number" --comment "$(jq -r \
