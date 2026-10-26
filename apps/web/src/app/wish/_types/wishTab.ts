@@ -1,4 +1,6 @@
-import type { WishFolderT, WishListItemT } from '../_common/_types/wish';
+import type { WishListItemT } from '@/types/wish';
+
+import type { WishFolderT } from '../_common/_types/wish';
 import type { WISH_TAB } from '../_consts/wishTab';
 
 export type WishTabT = (typeof WISH_TAB)[keyof typeof WISH_TAB];

@@ -7,12 +7,12 @@ import { toast } from 'sonner';
 import { CloseIconFill } from '@/assets/icons';
 import BottomCta from '@/components/bottom-cta';
 import Button from '@/components/button';
+import WishGrid from '@/components/common/wish-grid';
 import { Header } from '@/components/header';
 import { ROUTES } from '@/consts/route';
 import { Z_INDEX } from '@/consts/zIndex';
 import { useBackWithFallback } from '@/hooks/useBackWithFallback';
 
-import WishGrid from '../../../../_common/_components/WishGrid';
 import { MOCK_FOLDERS, MOCK_WISHES } from '../../../../_common/_consts/wishMock';
 import { useWishEditMode } from '../../../../_common/_hooks/useWishEditMode';
 

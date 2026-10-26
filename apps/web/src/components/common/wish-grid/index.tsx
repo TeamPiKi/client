@@ -2,8 +2,8 @@ import type { ReactNode } from 'react';
 
 import { CheckboxEmptyIconFill, CheckboxSelectedIconFill } from '@/assets/icons';
 import { Z_INDEX } from '@/consts/zIndex';
+import type { WishListItemT } from '@/types/wish';
 
-import type { WishListItemT } from '../_types/wish';
 import WishCard from './WishCard';
 
 type WishGridProps = {
