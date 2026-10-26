@@ -21,7 +21,9 @@ function WishlistList({ isDeleteMode, selectedIds, onToggleSelect }: WishlistLis
   const sentinelRef = useRef<HTMLDivElement>(null);
 
   const { wishlistData, fetchNextPage, hasNextPage, isFetchingNextPage } = useGetWishlist();
-  const hasPendingItem = wishlistData.some(({ item }) => item.status === ITEM_STATUS.PARSING);
+  const hasPendingItem = wishlistData.some(
+    ({ item }) => item.status === ITEM_STATUS.PARSING || item.refreshing
+  );
 
   useSSEFallback(['wishlists'], hasPendingItem);
   useScrollRestoration({ namespace: SCROLL_NAMESPACE.ARCHIVE_WISH });

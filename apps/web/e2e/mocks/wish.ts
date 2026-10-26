@@ -22,6 +22,7 @@ export const MOCK_WISHLIST_ENTRIES: GetWishlistResponseT[] = MOCK_TOURNAMENT_ITE
       sourcePlatform: null,
       method: 'STRUCTURED',
       userInput: false,
+      refreshing: false,
     },
     winnerTournamentIds: [],
   })
@@ -43,6 +44,7 @@ export const MOCK_WISH_DETAIL: GetWishResponseT = {
     sourcePlatform: 'E2E몰',
     method: 'STRUCTURED',
     userInput: false,
+    refreshing: false,
   },
   priceHistory: [],
 };
@@ -60,5 +62,6 @@ export const MOCK_WISH_ADDED_BY_LINK: PostWishLinkResponseT = {
     sourcePlatform: 'E2E몰',
     method: 'STRUCTURED',
     userInput: false,
+    refreshing: false,
   },
 };
