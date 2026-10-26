@@ -161,7 +161,13 @@ GH_JQ_DEFS='
   def norm: gsub("/[0-9]+(?=$|[/\\s?#])"; "/:id") | gsub("/[0-9a-fA-F]{8}-[0-9a-fA-F-]{27}"; "/:id");
   def code: "`" + (gsub("[\r\n]+"; " ") | gsub("`"; "\u0027") | gsub("\\|"; "\\|")) + "`";
   def kst: . + 32400 | strftime("%Y-%m-%d %H:%M");
-  def title: .headline | norm | gsub("[\r\n]+"; " ") | clip(120);
+  def place($page):
+    if .where != "" and (.where | test("^[A-Za-z_$][\\w$.]*$")) then .where
+    elif $page != "" then $page
+    else "" end;
+  def title($page):
+    ([place($page), .title] | map(select(. != "")) | join(" ")) + " 수정"
+    | gsub("[\r\n]+"; " ") | clip(70);
 '
 
 GH_LINKS='{}'
@@ -200,7 +206,7 @@ sync_github_issues() {
         fi
       fi
     else
-      title=$(jq -r "$GH_JQ_DEFS title" <<<"$line")
+      title=$(jq -r --argjson pages "$PAGES" "$GH_JQ_DEFS"' title($pages[.id] // "" | norm)' <<<"$line")
       jq -r --arg label "$LABEL" --argjson pages "$PAGES" "$GH_JQ_DEFS"'
         ($pages[.id] // "" | norm) as $page
         | [
@@ -224,7 +230,7 @@ sync_github_issues() {
       ' <<<"$line" > "$WORK/gh-body.md"
       if [ "$DRY_RUN" = "1" ]; then
         printf '%s\n%s\n%s\n' "----- [GitHub] 새 이슈: $title -----" "$(cat "$WORK/gh-body.md")" "-----"
-      elif url=$(gh issue create --title "$title" --body-file "$WORK/gh-body.md" --label sentry); then
+      elif url=$(gh issue create --title "$title" --body-file "$WORK/gh-body.md" --label fix --label "${SENTRY_PLATFORM:-WEB}" --label sentry); then
         number="${url##*/}"
       else
         echo "::warning::GitHub 이슈 생성 실패 (Sentry $id)"
