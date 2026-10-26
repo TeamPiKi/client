@@ -21,7 +21,9 @@ function FolderTabContent({ folders, onCreate, onRename, onDelete }: FolderTabCo
 
   const [isCreateSheetOpen, setIsCreateSheetOpen] = useState(false);
   const [renameTarget, setRenameTarget] = useState<WishFolderT | null>(null);
+  const [isRenameSheetOpen, setIsRenameSheetOpen] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<WishFolderT | null>(null);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   const handleCreate = (name: string) => {
     onCreate(name);
@@ -30,12 +32,12 @@ function FolderTabContent({ folders, onCreate, onRename, onDelete }: FolderTabCo
 
   const handleRename = (name: string) => {
     if (renameTarget) onRename(renameTarget.id, name);
-    setRenameTarget(null);
+    setIsRenameSheetOpen(false);
   };
 
   const handleDelete = () => {
     if (deleteTarget) onDelete(deleteTarget.id);
-    setDeleteTarget(null);
+    setIsDeleteDialogOpen(false);
   };
 
   return (
@@ -54,8 +56,14 @@ function FolderTabContent({ folders, onCreate, onRename, onDelete }: FolderTabCo
                 name={folder.name}
                 wishCount={folder.wishIds.length}
                 thumbnailUrls={folder.wishIds.slice(0, 3).map(getMockWishImageUrl)}
-                onRename={() => setRenameTarget(folder)}
-                onDelete={() => setDeleteTarget(folder)}
+                onRename={() => {
+                  setRenameTarget(folder);
+                  setIsRenameSheetOpen(true);
+                }}
+                onDelete={() => {
+                  setDeleteTarget(folder);
+                  setIsDeleteDialogOpen(true);
+                }}
               />
             </li>
           ))}
@@ -70,15 +78,15 @@ function FolderTabContent({ folders, onCreate, onRename, onDelete }: FolderTabCo
       />
       <FolderNameSheet
         key={renameTarget?.id}
-        open={renameTarget !== null}
-        onOpenChange={isOpen => !isOpen && setRenameTarget(null)}
+        open={isRenameSheetOpen}
+        onOpenChange={setIsRenameSheetOpen}
         title="폴더명 변경"
         {...(renameTarget && { initialName: renameTarget.name })}
         onSubmit={handleRename}
       />
       <ConfirmDialog
-        open={deleteTarget !== null}
-        onOpenChange={isOpen => !isOpen && setDeleteTarget(null)}
+        open={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
         title={`‘${deleteTarget?.name}’${josa.pick(deleteTarget?.name ?? '', '을/를')} 삭제할까요?`}
         description="폴더를 삭제해도 담아둔 위시는 그대로 유지돼요."
         confirmLabel="삭제하기"
