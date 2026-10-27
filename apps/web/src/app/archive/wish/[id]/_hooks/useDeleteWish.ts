@@ -4,7 +4,7 @@ import { toast } from 'sonner';
 import { deleteWish } from '@/apis/deleteWish';
 import { ROUTES } from '@/consts/route';
 import { useBackWithFallback } from '@/hooks/useBackWithFallback';
-import { isGlobalNetError } from '@/utils/apiError';
+import { getApiErrorStatus, isGlobalNetError } from '@/utils/apiError';
 import { getApiErrorMessage } from '@/utils/getApiErrorMessage';
 
 /** 위시 단건 삭제 */
@@ -27,6 +27,8 @@ export const useDeleteWish = (wishId: number) => {
        * 404: 위시 존재하지 않음
        */
       toast.error(getApiErrorMessage(error));
+
+      if (getApiErrorStatus(error) === 404) backWithFallback(ROUTES.WISHLIST);
     },
   });
 
