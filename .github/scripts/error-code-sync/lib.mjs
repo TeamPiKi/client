@@ -135,7 +135,7 @@ export const parseRegistry = src => {
   return entries;
 };
 
-const unescapeKotlin = s => s.replace(/\\(.)/g, (_, c) => ({ n: '\n', t: '\t' })[c] ?? c);
+const unescapeKotlin = s => s.replace(/\\(.)/g, (_, c) => ({ n: '\n', r: '\r', t: '\t' })[c] ?? c);
 
 export const parseEnumEntries = src => {
   const code = stripKotlinComments(src);
@@ -272,7 +272,13 @@ export const suggestConstantName = (entry, constants) => {
   return [...head, ...(own.length > 0 ? own : entry.name.split('_'))].join('_');
 };
 
-const escapeTs = s => s.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+const escapeTs = s =>
+  s
+    .replace(/\\/g, '\\\\')
+    .replace(/'/g, "\\'")
+    .replace(/\n/g, '\\n')
+    .replace(/\r/g, '\\r')
+    .replace(/\t/g, '\\t');
 
 const insertEntry = (lines, kind, code, newLine) => {
   const { start, end } = blockRange(lines, kind);

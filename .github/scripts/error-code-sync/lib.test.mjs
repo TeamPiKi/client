@@ -283,6 +283,16 @@ test('새 코드는 같은 묶음 안 코드 순서 자리에 넣고 묶음이 �
   );
 });
 
+test('문구 속 줄바꿈·캐리지 리턴·탭은 TS 문자열 이스케이프로 넣는다', () => {
+  const [[, entry]] = parseEnumEntries(`enum class XErrorCode {
+    MULTI_LINE("WISH-005", ErrorCategory.CONFLICT, "첫 줄\\n둘째\\r줄\\t탭"),
+}`).map(e => [e.code, e]);
+  assert.equal(entry.message, '첫 줄\n둘째\r줄\t탭');
+
+  const { source } = applyCatalogChanges(CLIENT, { added: [entry], removed: [] });
+  assert.match(source, /'WISH-005': '첫 줄\\n둘째\\r줄\\t탭',\n/);
+});
+
 test('참조 없는 코드는 맵과 상수에서 지우고 비게 된 묶음 주석도 지운다', () => {
   const { source, applied } = applyCatalogChanges(CLIENT, {
     added: [],
