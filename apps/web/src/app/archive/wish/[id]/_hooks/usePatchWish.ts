@@ -24,14 +24,10 @@ export const usePatchWish = (wishId: number) => {
     },
     onSuccess: ({ wish }) => {
       queryClient.invalidateQueries({ queryKey: ['wishlists'] });
+      queryClient.invalidateQueries({ queryKey: ['wish', wish.id] });
 
       /** 같은 상품을 가진 다른 위시에 합쳐진 경우 */
-      if (wish.id !== wishId) {
-        router.replace(ROUTES.WISH_EDIT(wish.id));
-        return;
-      }
-
-      queryClient.invalidateQueries({ queryKey: ['wish', wishId] });
+      if (wish.id !== wishId) router.replace(ROUTES.WISH_EDIT(wish.id));
     },
     onError: error => {
       if (isGlobalNetError(error)) return;
