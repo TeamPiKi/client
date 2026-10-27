@@ -1,0 +1,176 @@
+/* 피그마 → 깃 동기화 플러그인이 생성한 파일이에요. 직접 수정하지 마세요. */
+
+@theme {
+  --color-base-50: #ffffff;
+  --color-base-950: #000000;
+  --color-bg-accent: var(--sky-blue-500);
+  --color-bg-warning: var(--yellow-50);
+  --color-bg-error: var(--red-50);
+  --color-bg-success: var(--green-50);
+  --color-bg-informative: var(--blue-50);
+  --color-bg-neutral-primary: var(--gray-900);
+  --color-bg-neutral-secondary: var(--gray-800);
+  --color-bg-neutral-tertiary: var(--gray-75);
+  --color-bg-layer-default: var(--color-base-50);
+  --color-bg-layer-basement: var(--gray-50);
+  --color-bg-layer-floating: var(--color-base-50);
+  --color-bg-layer-overlay-40: #00000066;
+  --color-bg-layer-overlay-20: #00000033;
+  --color-bg-layer-overlay-12: #0000001f;
+  --color-bg-layer-overlay-8: #00000014;
+  --color-bg-layer-overlay-4: #0000000a;
+  --color-text-accent: var(--sky-blue-600);
+  --color-text-warning: var(--yellow-900);
+  --color-text-error: var(--red-600);
+  --color-text-success: var(--green-600);
+  --color-text-informative: var(--blue-600);
+  --color-text-neutral-primary: var(--gray-900);
+  --color-text-neutral-secondary: var(--gray-600);
+  --color-text-neutral-tertiary: var(--gray-300);
+  --color-text-neutral-inverse: var(--color-base-50);
+  --color-border-accent: var(--sky-blue-400);
+  --color-border-warning: var(--yellow-400);
+  --color-border-error: var(--red-400);
+  --color-border-success: var(--green-400);
+  --color-border-informative: var(--blue-400);
+  --color-border-neutral-primary: var(--gray-700);
+  --color-border-neutral-secondary: var(--gray-500);
+  --color-border-neutral-tertiary: var(--gray-300);
+  --color-border-neutral-muted: var(--gray-75);
+  --color-icon-accent: var(--sky-blue-500);
+  --color-icon-warning: var(--yellow-500);
+  --color-icon-error: var(--red-300);
+  --color-icon-success: var(--green-400);
+  --color-icon-informative: var(--blue-600);
+  --color-icon-neutral-primary: var(--gray-600);
+  --color-icon-neutral-secondary: var(--gray-300);
+  --color-icon-neutral-inverse: var(--color-base-50);
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --text-title-1: 24px;
+  --text-heading-1: 20px;
+  --text-heading-2: 18px;
+  --text-body-1: 16px;
+  --text-body-2: 14px;
+  --text-caption-1: 12px;
+  --leading-title-1: 32px;
+  --leading-heading-1: 28px;
+  --leading-heading-2: 26px;
+  --leading-body-1: 22px;
+  --leading-body-2: 20px;
+  --leading-caption-1: 18px;
+  --tracking-default: -0.6px;
+  --tracking-2: -0.4px;
+  --text: "String value";
+  --radius-r1: 4px;
+  --radius-r2: 8px;
+  --radius-r3: 12px;
+  --radius-r4: 16px;
+  --radius-r5: 20px;
+  --radius-r6: 24px;
+  --radius-r7: 28px;
+  --spacing-x1: 4px;
+  --spacing-x2: 8px;
+  --spacing-x3: 12px;
+  --spacing-x4: 16px;
+  --spacing-x5: 20px;
+  --spacing-x6: 24px;
+  --spacing-x7: 28px;
+  --spacing-x8: 32px;
+  --spacing-x9: 36px;
+  --shadow-image-card: 0px 0px 8px 0px #00000029;
+  --shadow-tournament-card: 0px 1px 8px 0px #0000001a;
+}
+
+@utility title-1-bold {
+  font-weight: 700;
+  font-size: var(--text-title-1);
+  line-height: var(--leading-title-1);
+  letter-spacing: var(--tracking-default);
+}
+
+@utility heading-1-bold {
+  font-weight: 700;
+  font-size: var(--text-heading-1);
+  line-height: var(--leading-heading-1);
+  letter-spacing: var(--tracking-default);
+}
+
+@utility heading-1-semibold {
+  font-weight: 600;
+  font-size: var(--text-heading-1);
+  line-height: var(--leading-heading-1);
+  letter-spacing: var(--tracking-default);
+}
+
+@utility heading-2-semibold {
+  font-weight: 600;
+  font-size: var(--text-heading-2);
+  line-height: var(--leading-heading-2);
+  letter-spacing: var(--tracking-default);
+}
+
+@utility heading-2-medium {
+  font-weight: 500;
+  font-size: var(--text-heading-2);
+  line-height: var(--leading-heading-2);
+  letter-spacing: var(--tracking-default);
+}
+
+@utility body-1-bold {
+  font-weight: 700;
+  font-size: var(--text-body-1);
+  line-height: var(--leading-body-1);
+  letter-spacing: var(--tracking-default);
+}
+
+@utility body-1-semibold {
+  font-weight: 600;
+  font-size: var(--text-body-1);
+  line-height: var(--leading-body-1);
+  letter-spacing: var(--tracking-default);
+}
+
+@utility body-1-medium {
+  font-weight: 500;
+  font-size: var(--text-body-1);
+  line-height: var(--leading-body-1);
+  letter-spacing: var(--tracking-default);
+}
+
+@utility body-2-semibold {
+  font-weight: 600;
+  font-size: var(--text-body-2);
+  line-height: var(--leading-body-2);
+  letter-spacing: var(--tracking-default);
+}
+
+@utility body-2-medium {
+  font-weight: 500;
+  font-size: var(--text-body-2);
+  line-height: var(--leading-body-2);
+  letter-spacing: var(--tracking-default);
+}
+
+@utility body-2-regular {
+  font-weight: 400;
+  font-size: var(--text-body-2);
+  line-height: var(--leading-body-2);
+  letter-spacing: var(--tracking-default);
+}
+
+@utility caption-1-semibold {
+  font-weight: 600;
+  font-size: var(--text-caption-1);
+  line-height: var(--leading-caption-1);
+  letter-spacing: var(--tracking-2);
+}
+
+@utility caption-1-regular {
+  font-weight: 400;
+  font-size: var(--text-caption-1);
+  line-height: var(--leading-caption-1);
+  letter-spacing: var(--tracking-2);
+}
