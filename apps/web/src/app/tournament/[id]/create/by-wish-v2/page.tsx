@@ -16,8 +16,8 @@ async function ByWishV2Page({ params }: ByWishV2PageProps) {
   const tournamentId = Number(id);
 
   return (
-    <div className="flex h-full flex-col bg-bg-layer-basement">
-      <div className="bg-bg-layer-default px-5 pt-padding-top">
+    <div className="flex h-full flex-col bg-bg-layer-default">
+      <div className="px-5 pt-padding-top">
         <Header
           left={<HeaderIcon name="BACK" />}
           center={

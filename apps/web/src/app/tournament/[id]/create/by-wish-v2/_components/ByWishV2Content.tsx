@@ -73,7 +73,7 @@ function ByWishV2Content({ tournamentId }: ByWishV2ContentProps) {
         </p>
       </div>
 
-      <main className="hide-scrollbar flex flex-1 flex-col overflow-y-auto pb-32">
+      <main className="hide-scrollbar flex flex-1 flex-col overflow-y-auto bg-bg-layer-basement pb-32">
         <WishGrid
           wishes={visibleItems}
           selectedWishIds={selectedWishIds}
