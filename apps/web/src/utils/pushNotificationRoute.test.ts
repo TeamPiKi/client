@@ -13,6 +13,7 @@ describe('getPushNotificationRoute', () => {
     { type: 'ITEM_PARSING_INCOMPLETE', refId: 4, kind: 'TOURNAMENT', tournamentId: 8 },
     { type: 'ITEM_PARSING_FAILED', refId: 5, kind: 'TOURNAMENT', tournamentId: 9 },
     { type: 'ITEM_PARSING_RECOVERED', refId: 6, kind: 'TOURNAMENT', tournamentId: 10 },
+    { type: 'ITEM_PARSING_MERGED', refId: 9, kind: 'WISH' },
     { type: 'ITEM_REFRESH_COMPLETED', refId: 7, kind: 'WISH' },
     { type: 'ITEM_REFRESH_FAILED', refId: 8, kind: 'WISH' },
   ];
