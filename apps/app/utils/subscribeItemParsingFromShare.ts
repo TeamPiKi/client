@@ -6,23 +6,33 @@ import type { ShareItemStatusT } from './postWishLinkFromShare';
  * SSE 구독 결과. `FALLBACK` 은 타임아웃·연결 실패·abort 등 —
  * 저장은 이미 성공한 상태라 호출부는 기존 성공 화면으로 조용히 폴백한다.
  */
-export type ItemParsingSseResultT =
+type ItemParsingSseStatusT =
   | Extract<ShareItemStatusT, 'READY' | 'INCOMPLETE' | 'FAILED'>
+  | 'MERGED'
   | 'FALLBACK';
+
+type ItemParsingSseResultT = {
+  status: ItemParsingSseStatusT;
+  /** 결과 화면에 보여 줄 위시. MERGED인 경우, 살아남은 기존 wishId */
+  wishId: number;
+};
 
 /** 시트가 로딩에 고착되지 않도록 이벤트가 없으면 성공 화면으로 폴백 */
 const SSE_TIMEOUT_MS = 10_000;
 
-const PARSING_EVENT_TO_RESULT: Record<string, ItemParsingSseResultT> = {
+const PARSING_EVENT_TO_STATUS: Record<string, ItemParsingSseStatusT> = {
   ITEM_PARSING_COMPLETED: 'READY',
   ITEM_PARSING_INCOMPLETE: 'INCOMPLETE',
   ITEM_PARSING_FAILED: 'FAILED',
+  ITEM_PARSING_MERGED: 'MERGED',
 };
 
 type NotificationSsePayloadT = {
   type?: string;
   kind?: string;
   wishId?: number | null;
+  /** TODO: 서버 필드명 확정되면 맞춰야 함 */
+  mergedFromWishId?: number | null;
 };
 
 const NEW_LINE = 0x0a;
@@ -125,6 +135,8 @@ export const subscribeItemParsingFromShare = async ({
   signal,
   timeoutMs = SSE_TIMEOUT_MS,
 }: SubscribeItemParsingParamsT): Promise<ItemParsingSseResultT> => {
+  const fallback: ItemParsingSseResultT = { status: 'FALLBACK', wishId };
+
   const controller = new AbortController();
   const abortConnection = () => controller.abort();
 
@@ -144,14 +156,14 @@ export const subscribeItemParsingFromShare = async ({
       }
     );
 
-    if (!response.ok || !response.body) return 'FALLBACK';
+    if (!response.ok || !response.body) return fallback;
 
     const reader = response.body.getReader();
     let buffer: Uint8Array = new Uint8Array(0);
 
     while (true) {
       const { done, value } = await reader.read();
-      if (done) return 'FALLBACK';
+      if (done) return fallback;
 
       buffer = concatBytes(buffer, value);
       const { frames, rest } = extractFrames(buffer);
@@ -163,9 +175,17 @@ export const subscribeItemParsingFromShare = async ({
 
         try {
           const payload = JSON.parse(data) as NotificationSsePayloadT;
-          const result = payload.type ? PARSING_EVENT_TO_RESULT[payload.type] : null;
+          const status = payload.type ? PARSING_EVENT_TO_STATUS[payload.type] : null;
+          /** 합침 알림의 wishId 는 남는 위시라 요청한 위시는 따로 실려 옴 */
+          const requestedWishId = status === 'MERGED' ? payload.mergedFromWishId : payload.wishId;
 
-          if (result && payload.kind === 'WISH' && payload.wishId === wishId) return result;
+          if (
+            status &&
+            payload.kind === 'WISH' &&
+            requestedWishId === wishId &&
+            typeof payload.wishId === 'number'
+          )
+            return { status, wishId: payload.wishId };
         } catch {
           /** malformed JSON — 다음 이벤트를 기다린다 */
         }
@@ -173,7 +193,7 @@ export const subscribeItemParsingFromShare = async ({
     }
   } catch {
     /** 연결 실패·타임아웃·abort — 저장 성공은 이미 확정이라 조용히 폴백 */
-    return 'FALLBACK';
+    return fallback;
   } finally {
     clearTimeout(timeoutId);
     signal?.removeEventListener('abort', abortConnection);

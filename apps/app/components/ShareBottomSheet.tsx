@@ -125,7 +125,7 @@ function ShareBottomSheetContent({ url, text }: ShareExtensionProps) {
       }
 
       /** PARSING — 로딩을 유지한 채 파싱 결과를 기다린다 */
-      const sseResult = await subscribeItemParsingFromShare({
+      const { status: sseStatus, wishId: resultWishId } = await subscribeItemParsingFromShare({
         wishId: wish.id,
         accessToken,
         signal: abortController.signal,
@@ -133,30 +133,30 @@ function ShareBottomSheetContent({ url, text }: ShareExtensionProps) {
 
       if (!isMounted) return;
 
-      if (sseResult === 'READY') {
+      if (sseStatus === 'READY' || sseStatus === 'MERGED') {
         /** SSE payload 에는 상품명·가격이 없어 상세를 재조회해 카드를 채운다 */
-        const detailItem = await getWishFromShare(wish.id, accessToken);
+        const detailItem = await getWishFromShare(resultWishId, accessToken);
 
         if (!isMounted) return;
 
-        if (detailItem && applyParsedItem(detailItem, wish.id)) return;
+        if (detailItem && applyParsedItem(detailItem, resultWishId)) return;
         /** 재조회 실패 — 저장은 확정이므로 기존 성공 화면으로 폴백 */
-        setSheetState({ status: 'success', wishId: wish.id });
+        setSheetState({ status: 'success', wishId: resultWishId });
         return;
       }
 
-      if (sseResult === 'INCOMPLETE') {
-        setSheetState({ status: 'incomplete', wishId: wish.id });
+      if (sseStatus === 'INCOMPLETE') {
+        setSheetState({ status: 'incomplete', wishId: resultWishId });
         return;
       }
 
-      if (sseResult === 'FAILED') {
-        setSheetState({ status: 'failed', wishId: wish.id });
+      if (sseStatus === 'FAILED') {
+        setSheetState({ status: 'failed', wishId: resultWishId });
         return;
       }
 
       /** 타임아웃·연결 실패 — 기존 성공 화면 폴백 */
-      setSheetState({ status: 'success', wishId: wish.id });
+      setSheetState({ status: 'success', wishId: resultWishId });
     };
 
     void registerWish();
