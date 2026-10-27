@@ -31,8 +31,8 @@ type NotificationSsePayloadT = {
   type?: string;
   kind?: string;
   wishId?: number | null;
-  /** TODO: 서버 필드명 확정되면 맞춰야 함 */
-  mergedFromWishId?: number | null;
+  /** MERGED 에서는 합쳐져 사라진 요청 위시 id */
+  refId?: number;
 };
 
 const NEW_LINE = 0x0a;
@@ -177,7 +177,7 @@ export const subscribeItemParsingFromShare = async ({
           const payload = JSON.parse(data) as NotificationSsePayloadT;
           const status = payload.type ? PARSING_EVENT_TO_STATUS[payload.type] : null;
           /** 합침 알림의 wishId 는 남는 위시라 요청한 위시는 따로 실려 옴 */
-          const requestedWishId = status === 'MERGED' ? payload.mergedFromWishId : payload.wishId;
+          const requestedWishId = status === 'MERGED' ? payload.refId : payload.wishId;
 
           if (
             status &&
