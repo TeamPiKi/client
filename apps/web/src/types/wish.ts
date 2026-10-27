@@ -27,6 +27,14 @@ export type GetWishlistResponseT = {
   winnerTournamentIds: number[];
 };
 
+// TODO: API 연동 시 GetWishlistResponseT 로 교체 — discountRate 는 아직 API 에 없음
+export type WishListItemT = Omit<GetWishlistResponseT, 'item'> & {
+  item: ItemT & {
+    /** 할인율(%) — 할인이 없으면 null */
+    discountRate: number | null;
+  };
+};
+
 export type PostWishLinkResponseT = {
   wish: WishT;
   item: ItemT;

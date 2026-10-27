@@ -4,13 +4,12 @@ import { type FormEvent, useRef, useState } from 'react';
 
 import { ChevronBackwardIconFill, CloseCircularIconFill } from '@/assets/icons';
 import BasketGuestIcon from '@/assets/images/basket-guest.svg';
+import WishGrid from '@/components/common/wish-grid';
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/dialog';
 import { Header } from '@/components/header';
 import Input from '@/components/input';
+import type { WishListItemT } from '@/types/wish';
 import { cn } from '@/utils/cn';
-
-import WishGrid from '../_common/_components/WishGrid';
-import type { WishListItemT } from '../_common/_types/wish';
 
 type WishSearchProps = {
   wishes: WishListItemT[];

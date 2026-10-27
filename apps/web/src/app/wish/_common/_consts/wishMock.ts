@@ -1,6 +1,7 @@
 import { ITEM_STATUS } from '@/consts/item';
+import type { WishListItemT } from '@/types/wish';
 
-import type { WishFolderT, WishListItemT } from '../_types/wish';
+import type { WishFolderT } from '../_types/wish';
 
 // TEMP: API 연동 시 public/mock/wish 이미지와 함께 제거
 const MOCK_IMAGE_URLS = [1, 2, 3, 4, 5, 6].map(index => `/mock/wish/wish-${index}.jpg`);
