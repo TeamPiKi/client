@@ -94,7 +94,7 @@ test('가격 새로고침에 실패하면 안내 후 직접 수정으로 이어�
   await gotoWishDetail(page, api);
   api.error('POST', ENDPOINTS.WISHLIST_REFRESH(WISH_ID), {
     status: 400,
-    code: ERROR_CODE.WISH_NOT_REFRESHABLE,
+    code: ERROR_CODE.ITEM_NOT_REFRESHABLE,
   });
 
   await page.getByRole('button', { name: '가격 정보 새로고침' }).click();

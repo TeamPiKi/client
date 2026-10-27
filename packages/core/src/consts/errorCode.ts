@@ -82,7 +82,6 @@ export const ERROR_MESSAGE_MAP = {
   'TOURNAMENT-034': '지금 대결할 수 있는 조합이 아니에요.',
   'TOURNAMENT-035': '이미 결과가 기록된 대결이에요.',
   'TOURNAMENT-036': '토너먼트 만들기는 회원만 이용할 수 있어요.',
-  'TOURNAMENT-037': '이 토너먼트에는 지금 아이템을 추가할 수 없어요. 잠시 후 다시 시도해 주세요.',
   'TOURNAMENT-038': '플레이 링크로 만든 토너먼트에서는 아이템을 수정하거나 삭제할 수 없어요.',
   'TOURNAMENT-039': '정보가 비어 있는 상품이에요. 내용을 채운 뒤 담아 주세요.',
   'TOURNAMENT-040': '정보가 비어 있는 상품이 있어요. 모두 채워야 시작할 수 있어요.',
@@ -94,15 +93,17 @@ export const ERROR_MESSAGE_MAP = {
   'WISH-004': '이미 삭제된 아이템이에요.',
   'WISH-005': '이미지는 1~5장만 올릴 수 있어요.',
   'WISH-006': '한 번에 최대 100개까지 삭제할 수 있어요.',
-  'WISH-007': '링크가 없는 항목은 새로고침할 수 없습니다.',
   'WISH-008': '추출에 실패한 항목은 새로고침 대신 정보를 직접 입력해 복구해 주세요.',
   'WISH-009': '이미 위시리스트에 등록된 상품이에요.',
-  'WISH-010': '지금은 더 담을 수 없어요. 잠시 후 다시 시도해 주세요.',
 
   /** ITEM */
   'ITEM-003': '상품 이름을 입력해 주세요.',
   'ITEM-004': '상품 가격을 입력해 주세요.',
   'ITEM-005': '상품 이미지를 등록해 주세요.',
+  'ITEM-006': '지금은 추가할 수 없어요. 잠시 후 다시 시도해 주세요.',
+  'ITEM-007': '링크로 등록한 상품만 새로고침할 수 있어요.',
+  'ITEM-008': '아직 정보를 가져오는 중인 상품이에요. 끝난 뒤 다시 입력해 주세요.',
+  'ITEM-009': '수정할 정보를 입력해 주세요.',
 
   /** LINK */
   'LINK-001': '올바른 링크 형식이 아니에요. 다시 확인해 주세요.',
@@ -219,7 +220,6 @@ export const ERROR_CODE = {
   TOURNAMENT_INVALID_MATCH_PAIR: 'TOURNAMENT-034',
   TOURNAMENT_MATCH_ALREADY_RECORDED: 'TOURNAMENT-035',
   TOURNAMENT_GUEST_CANNOT_CREATE: 'TOURNAMENT-036',
-  TOURNAMENT_ITEM_ADD_RATE_LIMITED: 'TOURNAMENT-037',
   TOURNAMENT_CLONED_CANNOT_MODIFY_ITEMS: 'TOURNAMENT-038',
   TOURNAMENT_INCOMPLETE_ITEM_CANNOT_ADD: 'TOURNAMENT-039',
   TOURNAMENT_ITEM_INCOMPLETE: 'TOURNAMENT-040',
@@ -231,15 +231,17 @@ export const ERROR_CODE = {
   WISH_NOT_FOUND: 'WISH-004',
   WISH_INVALID_IMAGE_COUNT: 'WISH-005',
   WISH_INVALID_ID_COUNT: 'WISH-006',
-  WISH_NOT_REFRESHABLE: 'WISH-007',
   WISH_FAILED_NOT_REFRESHABLE: 'WISH-008',
   WISH_ALREADY_EXISTS: 'WISH-009',
-  WISH_RATE_LIMITED: 'WISH-010',
 
   /** 상품 */
   ITEM_NAME_REQUIRED_FOR_READY: 'ITEM-003',
   ITEM_PRICE_REQUIRED_FOR_READY: 'ITEM-004',
   ITEM_IMAGE_REQUIRED_FOR_READY: 'ITEM-005',
+  ITEM_QUOTA_EXCEEDED: 'ITEM-006',
+  ITEM_NOT_REFRESHABLE: 'ITEM-007',
+  ITEM_PARSING_IN_PROGRESS: 'ITEM-008',
+  ITEM_EMPTY_USER_INPUT: 'ITEM-009',
 
   /** 상품 링크 */
   LINK_INVALID_FORMAT: 'LINK-001',
