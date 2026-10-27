@@ -18,9 +18,13 @@ export const captureError = (error: unknown, context?: CaptureErrorContextT) => 
   });
 };
 
+const isServerOriginError = (error: unknown) =>
+  error instanceof Error && 'digest' in error && typeof error.digest === 'string';
+
 /** API(axios) 에러는 인터셉터(apis/client.ts·server.ts)가 5xx·네트워크만 단독 수집 — 여기선 그 외 에러만 보낸다 */
 export const captureNonApiError = (error: unknown) => {
-  if (!isAxiosError(error)) Sentry.captureException(error);
+  if (isAxiosError(error) || isServerOriginError(error)) return;
+  Sentry.captureException(error);
 };
 
 /** fingerprint 용 — 리소스 ID 가 달라도 같은 엔드포인트면 한 이슈로 묶는다 */

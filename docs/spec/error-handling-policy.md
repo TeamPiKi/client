@@ -332,6 +332,9 @@ const makeQueryClient = () =>
 | API 5xx · 네트워크                         | 인터셉터 ① (`apis/client.ts` · `apis/server.ts`)                | `ApiError: API 500 GET /경로` |
 | API 4xx                                    | 수집 안 함 — 화면에서 처리 (토스트·이동·인라인)                 | 없음                          |
 | API 외 에러 (렌더 오류, S3 업로드 실패 등) | `captureNonApiError` — QueryCache·MutationCache·에러 바운더리 ⑤ | 원래 에러 이름                |
+| 서버(RSC·SSR)에서 난 API 외 에러           | `onRequestError` (`instrumentation.ts`) — axios 에러는 건너뜀   | 원래 에러 이름                |
+
+서버에서 난 에러는 Next 가 직렬화해 `digest` 를 붙여 브라우저 에러 바운더리로 넘긴다. axios 에러인지 알 수 없는 형태라 `captureNonApiError` 는 `digest` 가 있으면 건너뛴다 — 서버 `onRequestError` 가 이미 수집했기 때문이다.
 
 인터셉터는 모든 API 에러를 같은 줄에서 만들어 스택 트레이스가 같다. 그래서 `fingerprint: ['api', method, status, 정규화 경로]` 를 지정해 엔드포인트·status 별로 이슈를 나눈다. 경로의 숫자·UUID 세그먼트는 `:id` 로 바꿔 리소스 ID 별로 갈라지지 않게 한다. `errorType` 태그(`server` · `network`)로 서버 장애와 네트워크 단절을 구분해 검색한다.
 
