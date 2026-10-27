@@ -215,6 +215,16 @@ export const useNotificationSSE = (enabled: boolean) => {
                 case 'TOURNAMENT_ITEM_PARSED':
                   queryClient.invalidateQueries({ queryKey: ['tournament', payload.tournamentId] });
                   break;
+                case 'TOURNAMENT_ITEM_MERGED':
+                  queryClient.invalidateQueries({ queryKey: ['tournament', payload.tournamentId] });
+                  queryClient.invalidateQueries({
+                    queryKey: [
+                      'tournamentItem',
+                      payload.tournamentId,
+                      payload.mergedIntoTournamentItemId,
+                    ],
+                  });
+                  break;
                 case 'UNREAD_COUNT_CHANGED':
                   void queryClient.refetchQueries({
                     queryKey: QUERY_KEYS.NOTIFICATION.LIST,
@@ -254,6 +264,7 @@ export const useNotificationSSE = (enabled: boolean) => {
                 case 'ITEM_REFRESH_COMPLETED':
                 case 'ITEM_PARSING_COMPLETED':
                 case 'ITEM_PARSING_RECOVERED':
+                case 'ITEM_PARSING_MERGED':
                   if (payload.kind === 'TOURNAMENT' && payload.tournamentId != null) {
                     queryClient.invalidateQueries({
                       queryKey: ['tournament', payload.tournamentId],
