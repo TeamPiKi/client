@@ -54,6 +54,12 @@ export type SilentSyncSsePayloadT =
         | (typeof ITEM_STATUS)['FAILED'];
     }
   | {
+      type: 'TOURNAMENT_ITEM_MERGED';
+      tournamentId: number;
+      tournamentItemId: number;
+      mergedIntoTournamentItemId: number;
+    }
+  | {
       type: 'UNREAD_COUNT_CHANGED';
       unreadCount: number;
     };
