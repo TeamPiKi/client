@@ -22,7 +22,7 @@ const PARSING_EVENT_TO_RESULT: Record<string, ItemParsingSseResultT> = {
 type NotificationSsePayloadT = {
   type?: string;
   kind?: string;
-  refId?: number;
+  wishId?: number | null;
 };
 
 const NEW_LINE = 0x0a;
@@ -106,8 +106,8 @@ const concatBytes = (left: Uint8Array, right: Uint8Array): Uint8Array => {
 };
 
 type SubscribeItemParsingParamsT = {
-  /** 이 아이템의 ITEM_PARSING_* 알림만 소비한다 (refId === itemId) */
-  itemId: number;
+  /** 이 위시의 ITEM_PARSING_* 알림만 소비한다 */
+  wishId: number;
   /** postWishLinkFromShare 가 refresh 까지 끝낸 시점의 토큰 */
   accessToken: string;
   /** 시트 close·호스트 앱 이동 시 연결을 즉시 끊기 위한 신호 */
@@ -120,7 +120,7 @@ type SubscribeItemParsingParamsT = {
  * SSE 는 보조 채널 — 어떤 오류(연결 실패·401·타임아웃·abort)든 throw 없이 FALLBACK 을 반환한다.
  */
 export const subscribeItemParsingFromShare = async ({
-  itemId,
+  wishId,
   accessToken,
   signal,
   timeoutMs = SSE_TIMEOUT_MS,
@@ -165,7 +165,7 @@ export const subscribeItemParsingFromShare = async ({
           const payload = JSON.parse(data) as NotificationSsePayloadT;
           const result = payload.type ? PARSING_EVENT_TO_RESULT[payload.type] : null;
 
-          if (result && payload.kind === 'WISH' && payload.refId === itemId) return result;
+          if (result && payload.kind === 'WISH' && payload.wishId === wishId) return result;
         } catch {
           /** malformed JSON — 다음 이벤트를 기다린다 */
         }

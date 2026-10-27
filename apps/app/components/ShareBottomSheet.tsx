@@ -116,20 +116,17 @@ function ShareBottomSheetContent({ url, text }: ShareExtensionProps) {
         return;
       }
 
-      const { wish, item, accessToken } = result;
+      const { wish, accessToken } = result;
 
       /** 응답 body 를 못 읽으면 파싱 안내 없이 기존 성공 화면 */
-      if (!wish || !item) {
+      if (!wish) {
         setSheetState({ status: 'success' });
         return;
       }
 
-      /** reused 등으로 이미 종결된 아이템 — SSE 생략 */
-      if (applyParsedItem(item, wish.id)) return;
-
-      /** PENDING·PROCESSING — 로딩을 유지한 채 파싱 결과를 기다린다 */
+      /** PARSING — 로딩을 유지한 채 파싱 결과를 기다린다 */
       const sseResult = await subscribeItemParsingFromShare({
-        itemId: item.id,
+        wishId: wish.id,
         accessToken,
         signal: abortController.signal,
       });

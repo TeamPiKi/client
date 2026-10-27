@@ -11,7 +11,7 @@ import { TokenStorage } from './tokenStorage';
  */
 export type ShareFailureReasonT = 'unauthenticated' | 'sessionExpired' | 'network' | 'server';
 
-const SHARE_ITEM_STATUSES = ['PENDING', 'PROCESSING', 'READY', 'INCOMPLETE', 'FAILED'] as const;
+const SHARE_ITEM_STATUSES = ['PARSING', 'READY', 'INCOMPLETE', 'FAILED'] as const;
 
 export type ShareItemStatusT = (typeof SHARE_ITEM_STATUSES)[number];
 
@@ -24,7 +24,7 @@ export type ShareWishT = {
 };
 
 export type ShareItemT = {
-  id: number;
+  id: number | null;
   status: ShareItemStatusT;
   name: string | null;
   price: number | null;
@@ -37,7 +37,6 @@ export type PostWishLinkFromShareResultT =
       ok: true;
       /** 응답 body 를 못 읽으면 null — 저장은 성공이므로 시트는 기존 성공 화면으로 폴백 */
       wish: ShareWishT | null;
-      item: ShareItemT | null;
       /** refresh 까지 끝난 시점의 토큰 — SSE 구독·위시 재조회에 재사용 */
       accessToken: string;
     }
@@ -76,24 +75,15 @@ const readErrorCode = async (response: Response): Promise<string | null> => {
 };
 
 /**
- * 성공 응답에서 wish·item 을 뽑는다. 모양이 어긋나면 null —
+ * 성공 응답에서 wish 를 뽑는다. 모양이 어긋나면 null —
  * 저장 자체는 성공이므로 호출부는 파싱 안내 없이 기존 성공 화면으로 폴백한다.
  */
-const readSuccessBody = async (
-  response: Response
-): Promise<{ wish: ShareWishT; item: ShareItemT } | null> => {
+const readSuccessBody = async (response: Response): Promise<ShareWishT | null> => {
   try {
-    const body = (await response.json()) as {
-      data?: { wish?: ShareWishT | null; item?: ShareItemT | null } | null;
-    };
+    const body = (await response.json()) as { data?: { wish?: ShareWishT | null } | null };
     const wish = body.data?.wish;
-    const item = body.data?.item;
 
-    if (typeof wish?.id !== 'number' || typeof item?.id !== 'number') return null;
-    /** 모르는 status 는 종결 여부를 판단할 수 없다 — SSE 로 넘기지 않고 성공 폴백 */
-    if (!isShareItemStatus(item.status)) return null;
-
-    return { wish, item };
+    return typeof wish?.id === 'number' ? wish : null;
   } catch {
     return null;
   }
@@ -146,14 +136,9 @@ export const postWishLinkFromShare = async (
       return { ok: false, reason, retryable: reason === 'server', ...(code ? { code } : {}) };
     }
 
-    const successBody = await readSuccessBody(postWishResponse);
+    const wish = await readSuccessBody(postWishResponse);
 
-    return {
-      ok: true,
-      wish: successBody?.wish ?? null,
-      item: successBody?.item ?? null,
-      accessToken: activeToken,
-    };
+    return { ok: true, wish, accessToken: activeToken };
   } catch {
     return { ok: false, reason: 'network', retryable: true };
   }
