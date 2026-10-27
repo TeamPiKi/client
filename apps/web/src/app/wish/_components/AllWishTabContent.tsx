@@ -1,4 +1,5 @@
-import WishGrid from '../_common/_components/WishGrid';
+import WishGrid from '@/components/common/wish-grid';
+
 import type { AllWishTabContentProps } from '../_types/wishTab';
 import WishAddCard from './WishAddCard';
 

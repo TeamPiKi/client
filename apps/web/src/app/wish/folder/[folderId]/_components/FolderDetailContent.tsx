@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
 import { ChevronBackwardIconFill } from '@/assets/icons';
+import WishGrid from '@/components/common/wish-grid';
 import { Header } from '@/components/header';
 import Spacing from '@/components/spacing';
 import { ROUTES } from '@/consts/route';
@@ -13,7 +14,6 @@ import { useBackWithFallback } from '@/hooks/useBackWithFallback';
 
 import WishEditActionBar from '../../../_common/_components/WishEditActionBar';
 import WishEditHeader from '../../../_common/_components/WishEditHeader';
-import WishGrid from '../../../_common/_components/WishGrid';
 import { MOCK_FOLDERS, MOCK_WISHES } from '../../../_common/_consts/wishMock';
 import { WISH_MODE } from '../../../_common/_consts/wishMode';
 import { useWishEditMode } from '../../../_common/_hooks/useWishEditMode';

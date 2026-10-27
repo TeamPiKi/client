@@ -38,6 +38,9 @@ export const ROUTES = {
       : `/tournament/${tournamentId}/create`,
   TOURNAMENT_ADD_ITEM_BY_WISH: (tournamentId: number) =>
     `/tournament/${tournamentId}/create/by-wish`,
+  /** TEMP: 폴더 칩 작업 완료 후 TOURNAMENT_ADD_ITEM_BY_WISH 로 합침 */
+  TOURNAMENT_ADD_ITEM_BY_WISH_V2: (tournamentId: number) =>
+    `/tournament/${tournamentId}/create/by-wish-v2`,
   TOURNAMENT_ITEM_EDIT: (tournamentId: number, itemId: number) =>
     `/tournament/${tournamentId}/item/${itemId}`,
   TOURNAMENT_LOADING: (tournamentId: number) => `/tournament/${tournamentId}/loading`,
