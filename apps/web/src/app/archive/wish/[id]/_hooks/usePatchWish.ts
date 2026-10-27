@@ -1,4 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
 import { ROUTES } from '@/consts/route';
@@ -10,6 +11,7 @@ import { patchWish } from '../_apis/patchWish';
 import type { PatchWishRequestT } from '../_types/wish';
 
 export const usePatchWish = (wishId: number) => {
+  const router = useRouter();
   const backWithFallback = useBackWithFallback();
   const queryClient = useQueryClient();
 
