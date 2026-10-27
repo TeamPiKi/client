@@ -73,18 +73,29 @@ const fetchServerCodes = ref => {
 
 const findReferences = (code, constantNames) => {
   const patterns = [...constantNames.map(n => `ERROR_CODE.${n}`), `'${code}'`, `"${code}"`];
-  const out = tryRun('git', [
-    'grep',
-    '-n',
-    '-F',
-    '-w',
-    ...patterns.flatMap(p => ['-e', p]),
-    '--',
-    'apps',
-    'packages',
-    `:(exclude)${CATALOG}`,
-  ]);
-  return out ? out.split('\n').map(line => line.split(':').slice(0, 2).join(':')) : [];
+  const r = spawnSync(
+    'git',
+    [
+      'grep',
+      '-n',
+      '-F',
+      '-w',
+      ...patterns.flatMap(p => ['-e', p]),
+      '--',
+      'apps',
+      'packages',
+      `:(exclude)${CATALOG}`,
+    ],
+    { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 }
+  );
+  if (r.status === 1) return [];
+  if (r.status !== 0) {
+    throw new Error(`${code} 참조 검색 실패: ${r.error?.message ?? r.stderr.trim()}`);
+  }
+  return r.stdout
+    .trim()
+    .split('\n')
+    .map(line => line.split(':').slice(0, 2).join(':'));
 };
 
 const formatCatalog = text =>
