@@ -28,7 +28,6 @@ async function WishEditLayout({ children, params }: WishEditLayoutProps) {
     queryClient.setQueryData(['wish', wishId], wishData);
 
     /** 아직 PARSING 상태인 경우에는 접근 불가 */
-    /** 아직 PARSING 상태인 경우에는 접근 불가 */
     if (wishData.item.status === ITEM_STATUS.PARSING) redirect(ROUTES.WISHLIST);
   } catch (error) {
     if (!isAxiosError<ApiErrorResponseT>(error)) throw error;
