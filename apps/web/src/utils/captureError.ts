@@ -1,5 +1,8 @@
 import * as Sentry from '@sentry/nextjs';
+import type { AxiosError } from 'axios';
 import { isAxiosError } from 'axios';
+
+import type { ApiErrorResponseT } from '@/types/api';
 
 type CaptureErrorContextT = {
   /** 검색/그룹핑용 태그 (예: { source: 'api-client' }) */
@@ -30,3 +33,28 @@ export const captureNonApiError = (error: unknown) => {
 /** fingerprint 용 — 리소스 ID 가 달라도 같은 엔드포인트면 한 이슈로 묶는다 */
 export const normalizeApiPath = (path: string) =>
   path.replace(/\/\d+(?=\/|$)/g, '/:id').replace(/\/[0-9a-f]{8}-[0-9a-f-]{27}(?=\/|$)/gi, '/:id');
+
+/** 5xx 와 응답 없는 네트워크 오류만 수집 */
+export const captureApiError = (error: AxiosError<ApiErrorResponseT>, source: string) => {
+  const status = error.response?.status;
+  if (error.code === 'ERR_CANCELED' || (typeof status === 'number' && status < 500)) return;
+
+  const method = error.config?.method?.toUpperCase() ?? 'UNKNOWN';
+  const path = error.config?.url?.split('?')[0] ?? 'unknown';
+  const reason = String(status ?? error.code ?? 'NETWORK');
+
+  const apiError = new Error(`API ${reason} ${method} ${path}`);
+  apiError.name = 'ApiError';
+
+  captureError(apiError, {
+    tags: { source, errorType: status ? 'server' : 'network' },
+    fingerprint: ['api', method, reason, normalizeApiPath(path)],
+    extra: {
+      url: error.config?.url,
+      method: error.config?.method,
+      status,
+      code: error.code,
+      apiCode: error.response?.data?.code,
+    },
+  });
+};

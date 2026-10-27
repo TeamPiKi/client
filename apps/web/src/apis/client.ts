@@ -8,7 +8,7 @@ import { QUERY_ACTION } from '@/consts/queryAction';
 import { ROUTES } from '@/consts/route';
 import { CLIENT_TYPE } from '@/consts/webBridge';
 import type { ApiErrorResponseT } from '@/types/api';
-import { captureError, normalizeApiPath } from '@/utils/captureError';
+import { captureApiError } from '@/utils/captureError';
 import { deleteCookie, getCookie } from '@/utils/cookie';
 import { handleSessionExpired } from '@/utils/handleSessionExpired';
 import { getLoginPath } from '@/utils/loginRedirect';
@@ -82,32 +82,7 @@ clientApi.interceptors.response.use(
       return Promise.reject(error);
     }
 
-    /** 5xx·네트워크 오류만 수집 (4xx는 예상된 흐름이라 제외) */
-    const status = error.response?.status;
-    const shouldReport =
-      error.code !== 'ERR_CANCELED' &&
-      (error.code === 'ERR_NETWORK' || (typeof status === 'number' && status >= 500));
-
-    if (shouldReport) {
-      const method = originalRequest?.method?.toUpperCase() ?? 'UNKNOWN';
-      const path = originalRequest?.url?.split('?')[0] ?? 'unknown';
-
-      /** 디코/대시보드 제목을 알아보기 쉽게 (원본 axios 정보는 extra 유지) */
-      const apiError = new Error(`API ${status ?? error.code} ${method} ${path}`);
-      apiError.name = 'ApiError';
-
-      captureError(apiError, {
-        tags: { source: 'api-client', errorType: status ? 'server' : 'network' },
-        fingerprint: ['api', method, String(status ?? error.code), normalizeApiPath(path)],
-        extra: {
-          url: originalRequest?.url,
-          method: originalRequest?.method,
-          status,
-          code: error.code,
-          apiCode: error.response?.data?.code,
-        },
-      });
-    }
+    captureApiError(error, 'api-client');
 
     return Promise.reject(error);
   }

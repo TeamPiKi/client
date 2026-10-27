@@ -327,12 +327,12 @@ const makeQueryClient = () =>
 
 한 에러는 한 곳에서만 수집한다. 여러 곳에서 보내면 제목이 다른 이슈로 갈라져 횟수가 이중 집계된다.
 
-| 에러                                       | 수집 지점                                                       | Sentry 제목 예시              |
-| ------------------------------------------ | --------------------------------------------------------------- | ----------------------------- |
-| API 5xx · 네트워크                         | 인터셉터 ① (`apis/client.ts` · `apis/server.ts`)                | `ApiError: API 500 GET /경로` |
-| API 4xx                                    | 수집 안 함 — 화면에서 처리 (토스트·이동·인라인)                 | 없음                          |
-| API 외 에러 (렌더 오류, S3 업로드 실패 등) | `captureNonApiError` — QueryCache·MutationCache·에러 바운더리 ⑤ | 원래 에러 이름                |
-| 서버(RSC·SSR)에서 난 API 외 에러           | `onRequestError` (`instrumentation.ts`) — axios 에러는 건너뜀   | 원래 에러 이름                |
+| 에러                                       | 수집 지점                                                                             | Sentry 제목 예시              |
+| ------------------------------------------ | ------------------------------------------------------------------------------------- | ----------------------------- |
+| API 5xx · 응답 없는 네트워크 오류          | `captureApiError` — 인터셉터 ① (`apis/client.ts` · `apis/server.ts`) · 토큰 갱신 실패 | `ApiError: API 500 GET /경로` |
+| API 4xx                                    | 수집 안 함 — 화면에서 처리 (토스트·이동·인라인)                                       | 없음                          |
+| API 외 에러 (렌더 오류, S3 업로드 실패 등) | `captureNonApiError` — QueryCache·MutationCache·에러 바운더리 ⑤                       | 원래 에러 이름                |
+| 서버(RSC·SSR)에서 난 API 외 에러           | `onRequestError` (`instrumentation.ts`) — axios 에러는 건너뜀                         | 원래 에러 이름                |
 
 서버에서 난 에러는 Next 가 직렬화해 `digest` 를 붙여 브라우저 에러 바운더리로 넘긴다. axios 에러인지 알 수 없는 형태라 `captureNonApiError` 는 `digest` 가 있으면 건너뛴다 — 서버 `onRequestError` 가 이미 수집했기 때문이다.
 
