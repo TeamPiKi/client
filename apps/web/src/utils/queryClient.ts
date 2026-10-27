@@ -1,4 +1,3 @@
-import * as Sentry from '@sentry/nextjs';
 import {
   MutationCache,
   QueryCache,
@@ -15,13 +14,14 @@ import {
   isServerOrNetworkError,
   isWithdrawnAccountError,
 } from '@/utils/apiError';
+import { captureNonApiError } from '@/utils/captureError';
 import { getApiErrorMessage } from '@/utils/getApiErrorMessage';
 
 /** REF: https://tanstack.com/query/latest/docs/framework/react/guides/advanced-ssr */
 
 const makeQueryClient = () => {
   return new QueryClient({
-    /** mutation — 사용자 액션 실패: 토스트 + (Sentry) 로깅 */
+    /** mutation — 사용자 액션 실패: 토스트 + (API 외 에러만) Sentry 로깅 */
     mutationCache: new MutationCache({
       onError: (error, _variables, _context, mutation) => {
         /** 401·탈퇴 계정은 전역 인터셉터(apis/client.ts)가 refresh·redirect로 처리 → 이중 토스트 방지 */
@@ -30,7 +30,7 @@ const makeQueryClient = () => {
         /** 5xx·네트워크는 전역이 단독 처리 (개별 onError는 5xx를 건드리지 않음) */
         if (isServerOrNetworkError(error)) {
           toast.error(getApiErrorMessage(error));
-          Sentry.captureException(error);
+          captureNonApiError(error);
           return;
         }
 
@@ -39,11 +39,9 @@ const makeQueryClient = () => {
         toast.error(getApiErrorMessage(error));
       },
     }),
-    /** query — 데이터 fetch 실패: 토스트 X, 로깅만 (표시는 boundary/isError가 담당) */
+    /** query — 데이터 fetch 실패: 토스트 X, API 외 에러만 로깅 (표시는 boundary/isError가 담당) */
     queryCache: new QueryCache({
-      onError: _error => {
-        Sentry.captureException(_error);
-      },
+      onError: captureNonApiError,
     }),
     defaultOptions: {
       queries: {

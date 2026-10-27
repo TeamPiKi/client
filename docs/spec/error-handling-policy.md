@@ -7,7 +7,7 @@
 ## TL;DR
 
 - **4xx (클라이언트/비즈니스 오류)** → **개별(호출부) 처리.** 원인별로 사용자 행동이 달라지므로 맞춤 UX.
-- **5xx · 네트워크 오류** → **전역 처리.** 사용자가 할 수 있는 게 없으므로 공통 "일시적 오류" 토스트 + Sentry.
+- **5xx · 네트워크 오류** → **전역 처리.** 사용자가 할 수 있는 게 없으므로 공통 "일시적 오류" 토스트 + Sentry(인터셉터 단독 수집).
 - **401 (인증 만료)** → **전역 인터셉터**가 토큰 refresh 후 자동 재시도, 실패 시 로그인 redirect.
 - **인증/권한 게이팅** → **layout 가드(SSR)** 가 진입 시점에 차단.
 - **조용히 실패 금지** → 개별 onError가 없어도 **전역 안전망**이 최소 토스트를 보장.
@@ -19,9 +19,10 @@
 
 ```text
 ① 전역 인터셉터   apis/client.ts            → 401 자동 refresh / 재시도 / 로그인 redirect
+                                            → 5xx·네트워크 Sentry 수집 (API 에러의 유일한 수집 창구)
 ② Layout 가드     app/**/layout.tsx (SSR)   → 진입 시점 인증·권한 차단 (getMe 등)
 ③ 전역 MutationCache onError  utils/queryClient.ts
-                                            → 5xx·네트워크 공통 처리 (+ Sentry)
+                                            → 5xx·네트워크 공통 토스트
                                             → 4xx인데 개별 처리 없으면 generic 토스트
 ④ 개별 onError    각 use*Mutation 훅         → 4xx 맞춤 UX (토스트/이동/롤백/전용 다이얼로그)
 ⑤ Error boundary  app/error.tsx / global-error.tsx
@@ -44,7 +45,7 @@
 | **404**            | 리소스 없음               | **layout ② or 개별 ④**   | 진입 게이팅은 layout · 액션 실패는 개별                               |
 | **409**            | 충돌(만료/중복/이미 시작) | **개별**                 | 전용 다이얼로그/안내 (원인별 UX가 갈리면 `code` 2차 분기 — 아래 참고) |
 | **413**            | 용량 초과                 | **개별 (+ 사전검증)**    | 업로드 전 클라 용량 체크 우선                                         |
-| **5xx · 네트워크** | 서버/통신 오류            | **전역 MutationCache ③** | 공통 "일시적 오류" 토스트 + Sentry                                    |
+| **5xx · 네트워크** | 서버/통신 오류            | **전역 MutationCache ③** | 공통 "일시적 오류" 토스트 (Sentry 는 인터셉터 ①)                      |
 
 ---
 
@@ -76,7 +77,7 @@
 ### ③ 5xx · 네트워크 — 전역 MutationCache onError (`utils/queryClient.ts`)
 
 - **5xx(500/502/503…)와 네트워크 오류(`error.response` 없음)는 전역이 단독으로 처리한다.**
-  - `getApiErrorMessage` 토스트 + `Sentry.captureException`
+  - `getApiErrorMessage` 토스트. Sentry 수집은 인터셉터가 하므로 여기선 API 외 에러만 `captureNonApiError` 로 보낸다
   - 5xx도 문구는 code로 갈린다 — `COMMON-RETRYABLE`(502) / `COMMON-SERVER-BUSY`(503) / `COMMON-SERVER-ERROR`(500).
     에러 바운더리(`app/error.tsx`)도 같은 카탈로그를 쓴다 (code 없으면 `SERVER_ERROR_MESSAGE`)
 - **개별 onError는 5xx를 건드리지 않는다** (아래 개발 규칙 참고) → 토스트 중복 방지
@@ -121,7 +122,7 @@
 | ---------------------------------------------- | ------------------------------------------------------------- | --------------- |
 | **suspense query** (`useSuspenseQuery` 등)     | throw → `app/error.tsx` 에러바운더리 (이미 있음)              | 추가 작업 없음  |
 | **일반 query** (`useQuery`/`useInfiniteQuery`) | 컴포넌트에서 **`isError` 분기** → "불러오기 실패 + 재시도" UI | 해당 컴포넌트만 |
-| **전역 `QueryCache.onError`**                  | **Sentry 로깅만** (토스트 X)                                  | 설정 1곳        |
+| **전역 `QueryCache.onError`**                  | **API 외 에러만 Sentry 로깅** (토스트 X)                      | 설정 1곳        |
 
 - 일반 query는 **"빈 상태(데이터 없음)"와 "불러오기 실패"를 반드시 구분**해 표시할 것 (예: 알림 목록)
 - 예외: **react-query 밖 수동 재조회**(예: `useTournament` 라운드 동기화)는 배경 refetch 스팸이 없고 재시도 액션이 유일한 복구 수단이라 토스트 허용
@@ -286,11 +287,12 @@ import {
   isServerOrNetworkError,
   isWithdrawnAccountError,
 } from '@/utils/apiError';
+import { captureNonApiError } from '@/utils/captureError';
 import { getApiErrorMessage } from '@/utils/getApiErrorMessage';
 
 const makeQueryClient = () =>
   new QueryClient({
-    // mutation — 사용자 액션 실패: 토스트 + 로깅
+    // mutation — 사용자 액션 실패: 토스트 + (API 외 에러만) 로깅
     mutationCache: new MutationCache({
       onError: (error, _vars, _ctx, mutation) => {
         // 401·탈퇴 계정은 인터셉터가 refresh·redirect 로 처리 → 이중 토스트 방지
@@ -298,7 +300,7 @@ const makeQueryClient = () =>
 
         if (isServerOrNetworkError(error)) {
           toast.error(getApiErrorMessage(error));
-          // Sentry.captureException(error);
+          captureNonApiError(error); // API 5xx 는 인터셉터가 이미 수집
           return; // 5xx는 전역 독점 → 개별은 5xx 토스트 금지
         }
         // 4xx: 개별 onError 있으면 양보, 없으면 generic fallback
@@ -306,11 +308,9 @@ const makeQueryClient = () =>
         toast.error(getApiErrorMessage(error));
       },
     }),
-    // query — 데이터 fetch 실패: 토스트 X, 로깅만 (표시는 boundary/isError)
+    // query — 데이터 fetch 실패: 토스트 X, API 외 에러만 로깅 (표시는 boundary/isError)
     queryCache: new QueryCache({
-      onError: _error => {
-        // Sentry.captureException(_error); // 로깅만! 토스트 금지
-      },
+      onError: captureNonApiError,
     }),
     defaultOptions: {
       queries: { retry: 1, staleTime: 60_000, refetchOnWindowFocus: false },
@@ -323,12 +323,29 @@ const makeQueryClient = () =>
 
 ---
 
+## Sentry 수집 기준
+
+한 에러는 한 곳에서만 수집한다. 여러 곳에서 보내면 제목이 다른 이슈로 갈라져 횟수가 이중 집계된다.
+
+| 에러                                       | 수집 지점                                                                             | Sentry 제목 예시              |
+| ------------------------------------------ | ------------------------------------------------------------------------------------- | ----------------------------- |
+| API 5xx · 응답 없는 네트워크 오류          | `captureApiError` — 인터셉터 ① (`apis/client.ts` · `apis/server.ts`) · 토큰 갱신 실패 | `ApiError: API 500 GET /경로` |
+| API 4xx                                    | 수집 안 함 — 화면에서 처리 (토스트·이동·인라인)                                       | 없음                          |
+| API 외 에러 (렌더 오류, S3 업로드 실패 등) | `captureNonApiError` — QueryCache·MutationCache·에러 바운더리 ⑤                       | 원래 에러 이름                |
+| 서버(RSC·SSR)에서 난 API 외 에러           | `onRequestError` (`instrumentation.ts`) — axios 에러는 건너뜀                         | 원래 에러 이름                |
+
+서버에서 난 에러는 Next 가 직렬화해 `digest` 를 붙여 브라우저 에러 바운더리로 넘긴다. axios 에러인지 알 수 없는 형태라 `captureNonApiError` 는 `digest` 가 있으면 건너뛴다 — 서버 `onRequestError` 가 이미 수집했기 때문이다.
+
+인터셉터는 모든 API 에러를 같은 줄에서 만들어 스택 트레이스가 같다. 그래서 `fingerprint: ['api', method, status, 정규화 경로]` 를 지정해 엔드포인트·status 별로 이슈를 나눈다. 경로의 숫자·UUID 세그먼트는 `:id` 로 바꿔 리소스 ID 별로 갈라지지 않게 한다. `errorType` 태그(`server` · `network`)로 서버 장애와 네트워크 단절을 구분해 검색한다.
+
+---
+
 ## "도달 불가" 케이스는 어떻게?
 
 정상 UI 흐름에선 발생할 수 없는 status(예: 남의 위시 403)는:
 
 - **개별 전용 UX를 만들지 않는다** (죽은 코드 방지)
-- 대신 **전역 안전망 + Sentry**로 덮어 "조용히 실패/크래시"만 막는다
-- 만약 Sentry에 실제로 찍히면 → "불가능하다던 가정이 깨졌다"는 신호로 삼아 원인 추적
+- 대신 **전역 안전망**(generic 토스트)으로 덮어 "조용히 실패/크래시"만 막는다
+- 4xx 는 Sentry 수집 대상이 아니다. 가정이 깨졌는지 꼭 알아야 하는 지점이면 그 자리에서 `captureError(error, { tags: { source: '...' } })` 로 명시적으로 보고한다
 
 원칙 한 줄: **명시적 처리는 "도달 가능 + 사용자 행동이 바뀌는 것"만. 그 외 전부는 전역 안전망으로 "조용히 실패 금지".**

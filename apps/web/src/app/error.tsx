@@ -1,6 +1,5 @@
 'use client';
 
-import * as Sentry from '@sentry/nextjs';
 import Link from 'next/link';
 import { useEffect } from 'react';
 
@@ -8,6 +7,7 @@ import { WarningIconFill } from '@/assets/icons';
 import { buttonStyles } from '@/components/button/button.style';
 import ErrorScreen from '@/components/common/error-screen';
 import { ROUTES } from '@/consts/route';
+import { captureNonApiError } from '@/utils/captureError';
 import { getApiErrorMessage } from '@/utils/getApiErrorMessage';
 
 type Props = {
@@ -17,7 +17,7 @@ type Props = {
 
 function Error({ error, reset }: Props) {
   useEffect(() => {
-    Sentry.captureException(error);
+    captureNonApiError(error);
   }, [error]);
 
   const description = getApiErrorMessage(error);

@@ -1,8 +1,9 @@
 import { type AuthTokensT, WEBBRIDGE_MESSAGE_TYPE } from '@piki/core';
-import axios from 'axios';
+import axios, { isAxiosError } from 'axios';
 
 import { ENDPOINTS } from '@/consts/api';
 import { CLIENT_TYPE } from '@/consts/webBridge';
+import { captureApiError } from '@/utils/captureError';
 
 import { setCookie } from './cookie';
 import { WebBridge, isWebview } from './webBridge';
@@ -60,9 +61,14 @@ const performRefresh = async (): Promise<void> => {
 export const refreshClientToken = (): Promise<void> => {
   if (inflightRefresh) return inflightRefresh;
 
-  inflightRefresh = performRefresh().finally(() => {
-    inflightRefresh = null;
-  });
+  inflightRefresh = performRefresh()
+    .catch(error => {
+      if (isAxiosError(error)) captureApiError(error, 'api-client');
+      throw error;
+    })
+    .finally(() => {
+      inflightRefresh = null;
+    });
 
   return inflightRefresh;
 };
