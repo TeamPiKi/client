@@ -18,7 +18,6 @@ function WishInfoScreen({ wishId }: WishInfoScreenProps) {
   const { item } = wishData;
 
   const {
-    wishItem,
     refreshWish,
     isPostWishRefreshPending,
     isPostWishRefreshFailed,
@@ -32,11 +31,11 @@ function WishInfoScreen({ wishId }: WishInfoScreenProps) {
     <ItemInfoScreen
       itemType="wish"
       item={{
-        status: wishItem.status,
-        imageUrl: wishItem.imageUrl,
-        name: wishItem.name,
-        price: wishItem.price,
-        sourceUrl: wishItem.sourceUrl,
+        status: item.status,
+        imageUrl: item.imageUrl,
+        name: item.name,
+        price: item.price,
+        sourceUrl: item.sourceUrl,
       }}
       onSave={(data, onSuccess) => patchWishMutation(data, { onSuccess })}
       isSavePending={isPatchWishPending}

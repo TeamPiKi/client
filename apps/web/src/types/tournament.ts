@@ -8,7 +8,8 @@ export type TournamentPlayTypeT = (typeof TOURNAMENT_PLAY_TYPE)[keyof typeof TOU
 
 export type TournamentItemT = {
   tournamentItemId: number;
-  itemId?: number;
+  /** 상품 정보가 정해지기 전에는 null */
+  itemId?: number | null;
   name: string;
   price: number;
   currency: string;

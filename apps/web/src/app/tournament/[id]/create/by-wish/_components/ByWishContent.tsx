@@ -38,10 +38,7 @@ function ByWishContent({ tournamentId }: ByWishContentProps) {
   const existingItemIds = new Set(pending?.items.map(i => i.itemId) ?? []);
   const items = wishlistData.filter(
     ({ item }) =>
-      item.status !== ITEM_STATUS.FAILED &&
-      item.status !== ITEM_STATUS.PROCESSING &&
-      item.status !== ITEM_STATUS.INCOMPLETE &&
-      !existingItemIds.has(item.id)
+      item.status === ITEM_STATUS.READY && item.id !== null && !existingItemIds.has(item.id)
   );
 
   const isWishlistLoaded = !hasNextPage && !isFetchingNextPage;
@@ -64,7 +61,7 @@ function ByWishContent({ tournamentId }: ByWishContentProps) {
   const handleNext = () => {
     const itemIds = items
       .filter(({ wish }) => selectedIds.includes(wish.id))
-      .map(({ item }) => item.id);
+      .flatMap(({ item }) => item.id ?? []);
     postTournamentItemsByWishMutation(itemIds);
   };
 
