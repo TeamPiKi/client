@@ -454,6 +454,3 @@ export const renderPrBody = ({
 };
 
 export const stableBody = body => body.replace(/### 기준[\s\S]*?(?=\n## |$)/, '');
-
-export const renderDiscordMessage = ({ url, action, applied, manual }) =>
-  `🔄 서버 에러 코드 카탈로그 동기화 PR ${action === 'created' ? '생성' : '갱신'} · 추가 ${applied.added.length} · 삭제 ${applied.removed.length} · 직접 처리 ${manual.length}\n<${url}>`;

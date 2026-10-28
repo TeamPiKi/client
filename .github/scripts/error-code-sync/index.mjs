@@ -11,7 +11,6 @@ import {
   parseCategoryStatuses,
   parseClientCatalog,
   parseRegistry,
-  renderDiscordMessage,
   renderPrBody,
   stableBody,
 } from './lib.mjs';
@@ -22,8 +21,8 @@ const BOT_BRANCH = process.env.BOT_BRANCH ?? 'chore/error-code-sync';
 const CATALOG = 'packages/core/src/consts/errorCode.ts';
 const DRY_RUN = process.env.DRY_RUN === '1';
 const PR_TITLE = 'chore: 서버 에러 코드 카탈로그 동기화';
-const BOT_NAME = 'github-actions[bot]';
-const BOT_EMAIL = '41898282+github-actions[bot]@users.noreply.github.com';
+const BOT_NAME = 'TeamPiki-bot';
+const BOT_EMAIL = '349097567+TeamPiki-bot@users.noreply.github.com';
 const PAUSED_MARKER = '<!-- error-code-sync:paused -->';
 
 const run = (cmd, args, options = {}) =>
@@ -105,21 +104,6 @@ const writeTemp = (name, text) => {
   const path = join(mkdtempSync(join(tmpdir(), 'error-code-sync-')), name);
   writeFileSync(path, text);
   return path;
-};
-
-const notifyDiscord = async text => {
-  const token = process.env.DISCORD_BOT_TOKEN;
-  const channel = process.env.DISCORD_CHANNEL_ID;
-  if (!token || !channel) {
-    console.log('::warning::Discord 시크릿이 없어 알림 생략');
-    return;
-  }
-  const res = await fetch(`https://discord.com/api/v10/channels/${channel}/messages`, {
-    method: 'POST',
-    headers: { Authorization: `Bot ${token}`, 'Content-Type': 'application/json; charset=utf-8' },
-    body: JSON.stringify({ content: text, allowed_mentions: { parse: [] } }),
-  });
-  if (!res.ok) console.log(`::warning::Discord 전송 실패 (HTTP ${res.status})`);
 };
 
 const findOpenBotPr = () =>
@@ -279,7 +263,4 @@ if (openPr) {
   action = 'created';
 }
 
-// GITHUB_TOKEN 으로 만든 PR 은 pull_request 워크플로우를 깨우지 않아 필수 체크를 수동 실행으로 채움
-gh('workflow', 'run', 'ci.yml', '--ref', BOT_BRANCH);
-await notifyDiscord(renderDiscordMessage({ url, action, ...result }));
 console.log(`봇 PR ${action === 'created' ? '생성' : '갱신'}: ${url}`);

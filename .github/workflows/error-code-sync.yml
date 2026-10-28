@@ -16,15 +16,14 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
-      contents: write
-      pull-requests: write
-      actions: write
+      contents: read
     steps:
       - name: Checkout
         uses: actions/checkout@v7
         with:
           ref: dev
           fetch-depth: 0
+          token: ${{ secrets.ERROR_CODE_SYNC_TOKEN }}
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v6
@@ -53,7 +52,5 @@ jobs:
 
       - name: 서버 에러 코드 대조
         env:
-          GH_TOKEN: ${{ github.token }}
-          DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
-          DISCORD_CHANNEL_ID: ${{ secrets.DISCORD_PR_CHANNEL_ID }}
+          GH_TOKEN: ${{ secrets.ERROR_CODE_SYNC_TOKEN }}
         run: node .github/scripts/error-code-sync/index.mjs
