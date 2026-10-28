@@ -1,0 +1,75 @@
+name: Error Code Sync
+
+on:
+  schedule:
+    - cron: '0 1 * * 1' # 월요일 10:00 KST
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: error-code-sync
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          ref: dev
+          fetch-depth: 0
+          token: ${{ secrets.ERROR_CODE_SYNC_TOKEN }}
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        run: echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+      - name: Cache pnpm store
+        uses: actions/cache@v6
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: ${{ runner.os }}-pnpm-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Unit test
+        run: node --test .github/scripts/error-code-sync/lib.test.mjs
+
+      - name: 서버 에러 코드 대조
+        env:
+          GH_TOKEN: ${{ secrets.ERROR_CODE_SYNC_TOKEN }}
+        run: node .github/scripts/error-code-sync/index.mjs
+
+  notify-failure:
+    needs: sync
+    if: ${{ always() && (needs.sync.result == 'failure' || needs.sync.result == 'cancelled') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    permissions: {}
+    steps:
+      - name: 실패 알림 (허거덩 봇)
+        env:
+          DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
+          CHANNEL_ID: ${{ secrets.DISCORD_PR_CHANNEL_ID }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          curl -sS --fail-with-body --max-time 10 -o /dev/null \
+            -X POST "https://discord.com/api/v10/channels/$CHANNEL_ID/messages" \
+            -H "Authorization: Bot $DISCORD_BOT_TOKEN" \
+            -H "Content-Type: application/json; charset=utf-8" \
+            --data "$(jq -n --arg url "$RUN_URL" '{content: "⚠️ 서버 에러 코드 카탈로그 동기화 실패 · <\($url)>", allowed_mentions: {parse: []}}')"

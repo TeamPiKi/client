@@ -20,6 +20,7 @@ jobs:
         with:
           script: |
             const FALLBACK_REVIEWER = 'iOdiO89';
+            const BOT_LOGIN = 'TeamPiki-bot';
 
             const owner = context.repo.owner;
             const repo = context.repo.repo;
@@ -144,17 +145,22 @@ jobs:
               reviewer = FALLBACK_REVIEWER;
             }
 
-            try {
-              await github.rest.issues.addAssignees({
-                owner,
-                repo,
-                issue_number: pullNumber,
-                assignees: [author],
-              });
-            } catch (error) {
-              core.warning(`Failed to assign author ${author}: ${error.message}`);
-            }
+            const assign = async assignee => {
+              try {
+                await github.rest.issues.addAssignees({
+                  owner,
+                  repo,
+                  issue_number: pullNumber,
+                  assignees: [assignee],
+                });
+              } catch (error) {
+                core.warning(`Failed to assign ${assignee}: ${error.message}`);
+              }
+            };
 
+            if (author !== BOT_LOGIN) await assign(author);
+
+            let requestedReviewer = null;
             if (reviewer) {
               try {
                 await github.rest.pulls.requestReviewers({
@@ -163,6 +169,7 @@ jobs:
                   pull_number: pullNumber,
                   reviewers: [reviewer],
                 });
+                requestedReviewer = reviewer;
               } catch (error) {
                 // blame 대상자가 콜라보레이터가 아닌 경우(팀 탈퇴 등) fallback 리뷰어로 재시도
                 core.warning(`Failed to request review from ${reviewer}: ${error.message}`);
@@ -174,6 +181,7 @@ jobs:
                       pull_number: pullNumber,
                       reviewers: [FALLBACK_REVIEWER],
                     });
+                    requestedReviewer = FALLBACK_REVIEWER;
                   } catch (fallbackError) {
                     core.warning(
                       `Failed to request review from fallback reviewer ${FALLBACK_REVIEWER}: ${fallbackError.message}`
@@ -182,3 +190,5 @@ jobs:
                 }
               }
             }
+
+            if (author === BOT_LOGIN && requestedReviewer) await assign(requestedReviewer);
