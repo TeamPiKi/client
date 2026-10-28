@@ -12,10 +12,11 @@ if [ "$DRY_RUN" != "1" ]; then
 fi
 
 case "$SENTRY_ENV" in
-  production) LABEL="[WEB·PROD]" ;;
-  staging) LABEL="[WEB·STG]" ;;
-  *) LABEL="[WEB·$(printf '%s' "$SENTRY_ENV" | tr '[:lower:]' '[:upper:]')]" ;;
+  production) STAGE="PROD" ;;
+  staging) STAGE="STG" ;;
+  *) STAGE=$(printf '%s' "$SENTRY_ENV" | tr '[:lower:]' '[:upper:]') ;;
 esac
+LABEL="[${SENTRY_PLATFORM:-WEB}·$STAGE]"
 
 API="https://sentry.io/api/0"
 WORK=$(mktemp -d)

@@ -5,7 +5,7 @@ import { useCallback, useEffect } from 'react';
 
 import { postFcmToken } from '@/apis/postFcmToken';
 import { useWebBridgeMessage } from '@/hooks/useWebBridgeMessage';
-import { captureError } from '@/utils/captureError';
+import { captureNonApiError } from '@/utils/captureError';
 import { getCookie } from '@/utils/cookie';
 import { WebBridge, isWebview as isWebviewFn } from '@/utils/webBridge';
 
@@ -24,15 +24,11 @@ export const useFcmTokenSync = () => {
         message.type === WEBBRIDGE_MESSAGE_TYPE.APP_RES_PUSH_PERMISSION_STATUS &&
         message.payload.token
       ) {
-        postFcmToken(message.payload.token, message.payload.deviceId).catch(error =>
-          captureError(error, { tags: { source: 'fcm-token-sync' } })
-        );
+        postFcmToken(message.payload.token, message.payload.deviceId).catch(captureNonApiError);
       }
 
       if (message.type === WEBBRIDGE_MESSAGE_TYPE.APP_RES_FCM_TOKEN) {
-        postFcmToken(message.payload.token, message.payload.deviceId).catch(error =>
-          captureError(error, { tags: { source: 'fcm-token-sync' } })
-        );
+        postFcmToken(message.payload.token, message.payload.deviceId).catch(captureNonApiError);
       }
     }, [])
   );

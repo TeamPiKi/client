@@ -39,9 +39,8 @@ function WishGrid({ items, isDeleteMode = false, selectedIds, onToggleSelect }: 
           />
         );
 
-        /** 파싱 중인 위시는 진입할 곳이 없다 */
-        if (item.status === ITEM_STATUS.PENDING || item.status === ITEM_STATUS.PROCESSING)
-          return <div key={wish.id}>{card}</div>;
+        /** 파싱 중인 위시는 위시 상세 페이지 진입 불가능 */
+        if (item.status === ITEM_STATUS.PARSING) return <div key={wish.id}>{card}</div>;
 
         /** 삭제 모드는 READY 만 선택 가능 */
         if (isDeleteMode && item.status === ITEM_STATUS.READY) {

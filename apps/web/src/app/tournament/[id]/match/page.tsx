@@ -8,7 +8,6 @@ import { QUERY_ACTION } from '@/consts/queryAction';
 import { ROUTES } from '@/consts/route';
 import { MIN_TOURNAMENT_ITEM_COUNT, TOURNAMENT_STATUS } from '@/consts/tournament';
 import { getApiErrorCode, getApiErrorStatus } from '@/utils/apiError';
-import { hasParsingItems } from '@/utils/item';
 import { getQueryClient } from '@/utils/queryClient';
 
 import { getTournament } from '../_common/_apis/getTournament';
@@ -51,10 +50,9 @@ const isNotStartableError = (error: unknown) => {
 const notStartablePath = (tournamentId: number) =>
   `${ROUTES.TOURNAMENT_CREATE(tournamentId)}?${QUERY_ACTION.KEY}=${QUERY_ACTION.VALUE.TOURNAMENT_NOT_STARTABLE}`;
 
-/** 대기실 시작 버튼(hasPendingItem · hasUnfinishedItem)과 동일한 기준 */
 const isStartable = (items: PendingTournamentItemT[]) =>
   items.length >= MIN_TOURNAMENT_ITEM_COUNT &&
-  !hasParsingItems(items) &&
+  !items.some(item => item.status === ITEM_STATUS.PARSING) &&
   !items.some(item => item.status === ITEM_STATUS.FAILED || item.status === ITEM_STATUS.INCOMPLETE);
 
 async function TournamentPage({ params }: TournamentPageProps) {

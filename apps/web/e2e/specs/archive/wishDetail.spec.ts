@@ -47,8 +47,6 @@ test('상세 정보를 확인하고 상품명을 수정해 저장하면 조회 �
   api.patch(ENDPOINTS.WISHLIST(WISH_ID), {
     wish: MOCK_WISH_DETAIL.wish,
     item: updatedItem,
-    refreshNeeded: null,
-    reused: null,
   });
   api.get(ENDPOINTS.WISHLIST(WISH_ID), { ...MOCK_WISH_DETAIL, item: updatedItem });
 
@@ -96,7 +94,7 @@ test('가격 새로고침에 실패하면 안내 후 직접 수정으로 이어�
   await gotoWishDetail(page, api);
   api.error('POST', ENDPOINTS.WISHLIST_REFRESH(WISH_ID), {
     status: 400,
-    code: ERROR_CODE.WISH_NOT_REFRESHABLE,
+    code: ERROR_CODE.ITEM_NOT_REFRESHABLE,
   });
 
   await page.getByRole('button', { name: '가격 정보 새로고침' }).click();
