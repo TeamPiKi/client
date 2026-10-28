@@ -2,8 +2,7 @@ import Spinner from '@/components/spinner';
 
 import WishStatusFrame from './WishStatusFrame';
 
-/** PENDING·PROCESSING 위시 카드 */
-function WishProcessingCard() {
+function WishParsingCard() {
   return (
     <WishStatusFrame>
       <Spinner size={32} />
@@ -12,4 +11,4 @@ function WishProcessingCard() {
   );
 }
 
-export default WishProcessingCard;
+export default WishParsingCard;

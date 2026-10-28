@@ -92,9 +92,7 @@ test('여러 장을 고르면 에디터가 열리고, 편집한 장만 JPEG 로 
       { imageKey: 'key-2', uploadUrl: `${MOCK_UPLOAD_URL_PREFIX}2`, contentType: 'image/svg+xml' },
     ],
   });
-  api.post(ENDPOINTS.WISH_IMAGE_CONFIRM, [
-    { ...MOCK_WISH_ADDED_BY_LINK, refreshNeeded: null, reused: null },
-  ]);
+  api.post(ENDPOINTS.WISH_IMAGE_CONFIRM, [MOCK_WISH_ADDED_BY_LINK]);
 
   const putBodies: Record<string, { contentType?: string; body?: Buffer | null }> = {};
   await page.route(`${MOCK_UPLOAD_URL_PREFIX}*`, async route => {
@@ -167,9 +165,7 @@ test('크롭 박스 모서리를 끌어 줄이면 그 영역만 JPEG 로 업로�
       { imageKey: 'key-1', uploadUrl: `${MOCK_UPLOAD_URL_PREFIX}1`, contentType: 'image/jpeg' },
     ],
   });
-  api.post(ENDPOINTS.WISH_IMAGE_CONFIRM, [
-    { ...MOCK_WISH_ADDED_BY_LINK, refreshNeeded: null, reused: null },
-  ]);
+  api.post(ENDPOINTS.WISH_IMAGE_CONFIRM, [MOCK_WISH_ADDED_BY_LINK]);
 
   let putBody: Buffer | null | undefined;
   await page.route(`${MOCK_UPLOAD_URL_PREFIX}*`, async route => {
@@ -236,9 +232,7 @@ test('브라우저가 디코드하지 못하는 이미지는 편집 불가 안�
       { imageKey: 'key-1', uploadUrl: `${MOCK_UPLOAD_URL_PREFIX}1`, contentType: 'image/heic' },
     ],
   });
-  api.post(ENDPOINTS.WISH_IMAGE_CONFIRM, [
-    { ...MOCK_WISH_ADDED_BY_LINK, refreshNeeded: null, reused: null },
-  ]);
+  api.post(ENDPOINTS.WISH_IMAGE_CONFIRM, [MOCK_WISH_ADDED_BY_LINK]);
   await page.route(`${MOCK_UPLOAD_URL_PREFIX}*`, route => route.fulfill({ status: 200, body: '' }));
 
   const presignRequestPromise = page.waitForRequest(

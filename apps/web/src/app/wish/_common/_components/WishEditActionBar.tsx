@@ -1,21 +1,23 @@
 'use client';
 
-import { type ComponentType, type SVGProps, useState } from 'react';
+import { type ComponentProps, type ComponentType, type SVGProps, useState } from 'react';
 
 import { FolderIconFill, TrashIconFill } from '@/assets/icons';
+import ConfirmDialog from '@/components/common/confirm-dialog';
 import { Z_INDEX } from '@/consts/zIndex';
 import { cn } from '@/utils/cn';
 
 import { MOCK_FOLDERS } from '../_consts/wishMock';
 import type { WishFolderT } from '../_types/wish';
 import FolderSelectSheet from './FolderSelectSheet';
-import WishDeleteSheet from './WishDeleteSheet';
+import './WishEditActionBar.css';
 
 type WishEditActionBarProps = {
   selectedCount: number;
   currentFolderId?: number;
   onMove: (folder: WishFolderT) => void;
   onDelete: () => void;
+  deleteConfirm: Pick<ComponentProps<typeof ConfirmDialog>, 'title' | 'description' | 'icon'>;
 };
 
 function ActionButton({
@@ -35,13 +37,13 @@ function ActionButton({
       disabled={disabled}
       onClick={onClick}
       className={cn(
-        'flex cursor-pointer flex-col items-center gap-[7px] body-2-semibold disabled:cursor-not-allowed',
+        'flex w-25 cursor-pointer items-center justify-center gap-[7px] body-2-semibold disabled:cursor-not-allowed',
         disabled ? 'text-text-neutral-tertiary' : 'text-text-neutral-secondary'
       )}
     >
       <Icon
         className={cn(
-          'size-6',
+          'size-5',
           disabled ? 'text-icon-neutral-secondary' : 'text-icon-neutral-primary'
         )}
       />
@@ -55,9 +57,10 @@ function WishEditActionBar({
   currentFolderId,
   onMove,
   onDelete,
+  deleteConfirm,
 }: WishEditActionBarProps) {
   const [isFolderSheetOpen, setIsFolderSheetOpen] = useState(false);
-  const [isDeleteSheetOpen, setIsDeleteSheetOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   /** TEMP: API 연동 시 폴더 목록 조회·생성 API 로 교체 */
   const [folders, setFolders] = useState(() =>
     MOCK_FOLDERS.filter(({ id }) => id !== currentFolderId)
@@ -75,7 +78,7 @@ function WishEditActionBar({
   };
 
   const handleConfirmDelete = () => {
-    setIsDeleteSheetOpen(false);
+    setIsDeleteDialogOpen(false);
     onDelete();
   };
 
@@ -83,7 +86,8 @@ function WishEditActionBar({
     <>
       <div
         data-bottom-cta
-        className="fixed right-0 bottom-0 left-0 mx-auto flex w-full max-w-120 justify-center gap-[82px] rounded-t-2xl bg-white pt-4 pb-[34px]"
+        data-hide-bottom-tab-bar
+        className="fixed right-0 bottom-0 left-0 mx-auto flex w-full max-w-120 items-center justify-center gap-10 rounded-t-2xl bg-white px-2.5 pt-6 pb-9"
         style={{ zIndex: Z_INDEX.BOTTOM_CTA }}
       >
         <ActionButton
@@ -92,11 +96,12 @@ function WishEditActionBar({
           disabled={isDisabled}
           onClick={() => setIsFolderSheetOpen(true)}
         />
+        <span aria-hidden className="h-5.5 w-[1.4px] bg-gray-75" />
         <ActionButton
           label="삭제"
           Icon={TrashIconFill}
           disabled={isDisabled}
-          onClick={() => setIsDeleteSheetOpen(true)}
+          onClick={() => setIsDeleteDialogOpen(true)}
         />
       </div>
 
@@ -107,10 +112,11 @@ function WishEditActionBar({
         onSelect={handleSelectFolder}
         onAddFolder={handleAddFolder}
       />
-      <WishDeleteSheet
-        open={isDeleteSheetOpen}
-        onOpenChange={setIsDeleteSheetOpen}
-        selectedCount={selectedCount}
+      <ConfirmDialog
+        {...deleteConfirm}
+        open={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+        confirmLabel="삭제하기"
         onConfirm={handleConfirmDelete}
       />
     </>

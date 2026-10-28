@@ -3,7 +3,7 @@ import type { ItemStatusT } from '@/types/item';
 
 import WishFailedCard from './WishFailedCard';
 import WishIncompleteCard from './WishIncompleteCard';
-import WishProcessingCard from './WishProcessingCard';
+import WishParsingCard from './WishParsingCard';
 import WishReadyCard from './WishReadyCard';
 
 type WishCardProps = {
@@ -12,15 +12,15 @@ type WishCardProps = {
   price: number | null;
   imageUrl: string | null;
   sourcePlatform?: string | null;
+  isWinner?: boolean;
   preload?: boolean;
 };
 
 /** 위시 카드 — 파싱 상태에 맞는 카드를 고른다 */
 function WishCard({ status, ...readyProps }: WishCardProps) {
   switch (status) {
-    case ITEM_STATUS.PENDING:
-    case ITEM_STATUS.PROCESSING:
-      return <WishProcessingCard />;
+    case ITEM_STATUS.PARSING:
+      return <WishParsingCard />;
     case ITEM_STATUS.FAILED:
       return <WishFailedCard />;
     case ITEM_STATUS.INCOMPLETE:

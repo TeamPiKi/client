@@ -6,7 +6,7 @@ import { ENDPOINTS } from '@/consts/api';
 import { QUERY_ACTION } from '@/consts/queryAction';
 import { CLIENT_TYPE } from '@/consts/webBridge';
 import type { ApiErrorResponseT } from '@/types/api';
-import { captureError } from '@/utils/captureError';
+import { captureApiError } from '@/utils/captureError';
 import { getLoginPath } from '@/utils/loginRedirect';
 import { isWebview } from '@/utils/webBridge';
 
@@ -59,30 +59,7 @@ serverApi.interceptors.response.use(
       redirect(getLoginPath(null, QUERY_ACTION.VALUE.WITHDRAWN_ACCOUNT));
     }
 
-    /** 5xx·네트워크 오류만 수집 (4xx는 예상된 흐름이라 제외) */
-    const status = error.response?.status;
-    const shouldReport =
-      error.code !== 'ERR_CANCELED' &&
-      (error.code === 'ERR_NETWORK' || (typeof status === 'number' && status >= 500));
-
-    if (shouldReport) {
-      const method = error.config?.method?.toUpperCase() ?? 'UNKNOWN';
-      const path = error.config?.url?.split('?')[0] ?? 'unknown';
-
-      const apiError = new Error(`API ${status ?? error.code} ${method} ${path}`);
-      apiError.name = 'ApiError';
-
-      captureError(apiError, {
-        tags: { source: 'api-server' },
-        extra: {
-          url: error.config?.url,
-          method: error.config?.method,
-          status,
-          code: error.code,
-          apiCode: error.response?.data?.code,
-        },
-      });
-    }
+    captureApiError(error, 'api-server');
 
     return Promise.reject(error);
   }

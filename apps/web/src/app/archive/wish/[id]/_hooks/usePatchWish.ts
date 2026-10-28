@@ -3,6 +3,7 @@ import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
 import { ROUTES } from '@/consts/route';
+import { useBackWithFallback } from '@/hooks/useBackWithFallback';
 import { getApiErrorStatus, isGlobalNetError } from '@/utils/apiError';
 import { getApiErrorMessage } from '@/utils/getApiErrorMessage';
 
@@ -11,6 +12,7 @@ import type { PatchWishRequestT } from '../_types/wish';
 
 export const usePatchWish = (wishId: number) => {
   const router = useRouter();
+  const backWithFallback = useBackWithFallback();
   const queryClient = useQueryClient();
 
   const { mutate: patchWishMutation, isPending: isPatchWishPending } = useMutation({
@@ -22,9 +24,12 @@ export const usePatchWish = (wishId: number) => {
       if (typeof body.memo === 'string') formData.append('memo', body.memo);
       return patchWish(wishId, formData);
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['wish', wishId] });
+    onSuccess: ({ wish }) => {
       queryClient.invalidateQueries({ queryKey: ['wishlists'] });
+      queryClient.invalidateQueries({ queryKey: ['wish', wish.id] });
+
+      /** 같은 상품을 가진 다른 위시에 합쳐진 경우 */
+      if (wish.id !== wishId) router.replace(ROUTES.WISH_EDIT(wish.id));
     },
     onError: error => {
       if (isGlobalNetError(error)) return;
@@ -36,7 +41,7 @@ export const usePatchWish = (wishId: number) => {
        * 404: 위시 존재하지 않음
        */
       const status = getApiErrorStatus(error);
-      if (status === 403 || status === 404) router.replace(ROUTES.WISHLIST);
+      if (status === 403 || status === 404) backWithFallback(ROUTES.WISHLIST);
     },
   });
 

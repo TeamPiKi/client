@@ -1,6 +1,8 @@
+import { BadgeIconFill } from '@/assets/icons';
 import ImageIconOutline from '@/assets/icons/outline/image.svg';
 import BaseImage from '@/components/base-image';
 import Skeleton from '@/components/skeleton';
+import { Z_INDEX } from '@/consts/zIndex';
 import formatPrice from '@/utils/formatPrice';
 
 type WishCardProps = {
@@ -9,6 +11,8 @@ type WishCardProps = {
   imageUrl: string | null;
   sourcePlatform: string | null;
   discountRate: number | null;
+  /** 내가 플레이한 토너먼트에서 우승한 적 있는지 */
+  isWinner?: boolean;
   preload?: boolean;
 };
 
@@ -18,13 +22,14 @@ const imageFallback = (
   </div>
 );
 
-/** 3열 그리드용 위시 카드 — 이미지·상품명·할인율·가격·커머스 칩 */
+/** 3열 그리드용 위시 카드 */
 function WishCard({
   name,
   price,
   imageUrl,
   sourcePlatform,
   discountRate,
+  isWinner = false,
   preload = false,
 }: WishCardProps) {
   return (
@@ -42,6 +47,15 @@ function WishCard({
           />
         ) : (
           imageFallback
+        )}
+        {isWinner && (
+          <span
+            style={{ zIndex: Z_INDEX.BASE_IMAGE + 1 }}
+            className="absolute bottom-0 left-0 flex items-center gap-0.5 bg-bg-neutral-primary py-0.5 pr-1.5 pl-1 caption-2-medium text-text-neutral-inverse"
+          >
+            <BadgeIconFill className="size-3" />
+            1위
+          </span>
         )}
       </div>
 

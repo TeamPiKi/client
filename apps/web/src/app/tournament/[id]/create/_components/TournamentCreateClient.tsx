@@ -12,7 +12,6 @@ import { useQueryAction } from '@/hooks/useQueryAction';
 import { useQueryParamOnce } from '@/hooks/useQueryParamOnce';
 import { useSSEFallback } from '@/hooks/useSSEFallback';
 import { hasSentInvite } from '@/utils/inviteSentSession';
-import { hasParsingItems } from '@/utils/item';
 import { parseIdParam } from '@/utils/parseIdParam';
 
 import { useGetTournament } from '../../_common/_hooks/useGetTournament';
@@ -80,7 +79,7 @@ function TournamentCreateClient({ tournamentId }: TournamentCreateClientProps) {
   const pending = 'pending' in tournamentData ? tournamentData.pending : null;
 
   // 아이템 파싱 중이면 SSE 로 실시간 업데이트 (연결 실패 시 polling fallback).
-  const hasPendingItem = hasParsingItems(pending?.items ?? []);
+  const hasPendingItem = (pending?.items ?? []).some(item => item.status === ITEM_STATUS.PARSING);
   useSSEFallback(['tournament', tournamentId], hasPendingItem);
 
   const hasUnfinishedItem = (pending?.items ?? []).some(

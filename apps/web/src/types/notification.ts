@@ -12,6 +12,7 @@ export type NotificationTypeT =
   | 'ITEM_PARSING_INCOMPLETE'
   | 'ITEM_PARSING_FAILED'
   | 'ITEM_PARSING_RECOVERED'
+  | 'ITEM_PARSING_MERGED'
   | 'ITEM_REFRESH_COMPLETED'
   | 'ITEM_REFRESH_FAILED'
   | 'ANNOUNCEMENT';
@@ -51,6 +52,12 @@ export type SilentSyncSsePayloadT =
         | (typeof ITEM_STATUS)['READY']
         | (typeof ITEM_STATUS)['INCOMPLETE']
         | (typeof ITEM_STATUS)['FAILED'];
+    }
+  | {
+      type: 'TOURNAMENT_ITEM_MERGED';
+      tournamentId: number;
+      tournamentItemId: number;
+      mergedIntoTournamentItemId: number;
     }
   | {
       type: 'UNREAD_COUNT_CHANGED';

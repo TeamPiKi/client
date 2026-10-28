@@ -18,6 +18,8 @@ export const useWishEditMode = () => {
 
   const handleClearSelection = () => setSelectedWishIds(new Set());
 
+  const handleSelectAll = (wishIds: number[]) => setSelectedWishIds(new Set(wishIds));
+
   const handleEnterEditMode = () => setMode(WISH_MODE.EDIT);
 
   const handleExitEditMode = () => {
@@ -30,6 +32,7 @@ export const useWishEditMode = () => {
     selectedWishIds,
     handleToggleSelect,
     handleClearSelection,
+    handleSelectAll,
     handleEnterEditMode,
     handleExitEditMode,
   };

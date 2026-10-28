@@ -1,9 +1,7 @@
 'use client';
 
 import { useSearchParams } from 'next/navigation';
-import type { ComponentType, SVGProps } from 'react';
 
-import { FolderIconOutline, HeartIconOutline } from '@/assets/icons';
 import { ROUTES } from '@/consts/route';
 import { cn } from '@/utils/cn';
 import { replaceUrlKeepingState } from '@/utils/replaceUrlKeepingState';
@@ -12,19 +10,9 @@ import { WISH_TAB, WISH_TAB_PANEL_ID } from '../_consts/wishTab';
 import type { WishTabT } from '../_types/wishTab';
 import { parseWishTabParam } from '../_utils/wishSearchParams';
 
-const TABS: {
-  value: WishTabT;
-  label: string;
-  Icon: ComponentType<SVGProps<SVGSVGElement>>;
-  path: string;
-}[] = [
-  { value: WISH_TAB.ALL, label: '전체 위시', Icon: HeartIconOutline, path: ROUTES.WISH },
-  {
-    value: WISH_TAB.FOLDER,
-    label: '폴더',
-    Icon: FolderIconOutline,
-    path: ROUTES.WISHLIST_FOLDER_TAB,
-  },
+const TABS: { value: WishTabT; label: string; path: string }[] = [
+  { value: WISH_TAB.ALL, label: '전체 위시', path: ROUTES.WISH },
+  { value: WISH_TAB.FOLDER, label: '폴더', path: ROUTES.WISHLIST_FOLDER_TAB },
 ];
 
 function WishTabBar() {
@@ -33,7 +21,7 @@ function WishTabBar() {
 
   return (
     <div role="tablist" className="flex w-full gap-0.5">
-      {TABS.map(({ value, label, Icon, path }) => {
+      {TABS.map(({ value, label, path }) => {
         const isActive = activeTab === value;
         return (
           <button
@@ -49,10 +37,7 @@ function WishTabBar() {
               isActive ? 'text-text-neutral-primary' : 'text-text-neutral-tertiary'
             )}
           >
-            <span className="flex items-center gap-1">
-              <Icon className="size-5" />
-              {label}
-            </span>
+            {label}
             <span
               className={cn('h-0.5 w-full rounded-full', isActive && 'bg-gray-700')}
               aria-hidden

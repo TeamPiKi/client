@@ -1,6 +1,7 @@
 import { ITEM_STATUS } from '@/consts/item';
+import type { WishListItemT } from '@/types/wish';
 
-import type { WishFolderT, WishListItemT } from '../_types/wish';
+import type { WishFolderT } from '../_types/wish';
 
 // TEMP: API 연동 시 public/mock/wish 이미지와 함께 제거
 const MOCK_IMAGE_URLS = [1, 2, 3, 4, 5, 6].map(index => `/mock/wish/wish-${index}.jpg`);
@@ -17,17 +18,20 @@ export const MOCK_WISHES: WishListItemT[] = Array.from({ length: 12 }, (_, index
     imageUrl: MOCK_IMAGE_URLS[index % MOCK_IMAGE_URLS.length] ?? null,
     sourceUrl: null,
     sourcePlatform: 'BRAND',
+    method: 'STRUCTURED',
+    userInput: false,
+    refreshing: false,
     discountRate: index % 4 === 3 ? null : 99,
   },
-  refreshNeeded: null,
-  reused: null,
+  winnerTournamentIds: index % 4 === 0 ? [index + 100] : [],
 }));
 
 export const MOCK_FOLDERS: WishFolderT[] = [
   { id: 1, name: '가방 위시템', wishIds: [4, 1, 2, 3, 5, 6] },
-  { id: 2, name: '위시', wishIds: [1, 7] },
-  { id: 3, name: '여름 코디', wishIds: [5, 8, 9] },
-  { id: 4, name: '빈 폴더', wishIds: [] },
+  { id: 2, name: '여름 코디', wishIds: [5, 8, 9] },
+  { id: 3, name: '신발', wishIds: [1, 7] },
+  { id: 4, name: '원피스', wishIds: [10] },
+  { id: 5, name: '빈 폴더', wishIds: [] },
 ];
 
 export const getMockWishImageUrl = (wishId: number) =>

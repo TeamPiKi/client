@@ -26,7 +26,7 @@ function WishGrid({ items, isDeleteMode = false, selectedIds, onToggleSelect }: 
 
   return (
     <div className="grid grid-cols-2">
-      {items.map(({ wish, item }, index) => {
+      {items.map(({ wish, item, winnerTournamentIds }, index) => {
         const card = (
           <WishCard
             status={item.status}
@@ -34,13 +34,13 @@ function WishGrid({ items, isDeleteMode = false, selectedIds, onToggleSelect }: 
             price={item.price}
             imageUrl={item.imageUrl}
             sourcePlatform={item.sourcePlatform}
+            isWinner={winnerTournamentIds.length > 0}
             preload={index < 4}
           />
         );
 
-        /** 파싱 중인 위시는 진입할 곳이 없다 */
-        if (item.status === ITEM_STATUS.PENDING || item.status === ITEM_STATUS.PROCESSING)
-          return <div key={wish.id}>{card}</div>;
+        /** 파싱 중인 위시는 위시 상세 페이지 진입 불가능 */
+        if (item.status === ITEM_STATUS.PARSING) return <div key={wish.id}>{card}</div>;
 
         /** 삭제 모드는 READY 만 선택 가능 */
         if (isDeleteMode && item.status === ITEM_STATUS.READY) {

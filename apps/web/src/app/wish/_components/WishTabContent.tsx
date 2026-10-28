@@ -6,12 +6,17 @@ import { useEffect, useLayoutEffect, useRef } from 'react';
 import { getScrollContainer } from '@/utils/scrollRestoration';
 
 import { WISH_TAB, WISH_TAB_PANEL_ID } from '../_consts/wishTab';
-import type { WishTabT } from '../_types/wishTab';
+import type { AllWishTabContentProps, FolderTabContentProps, WishTabT } from '../_types/wishTab';
 import { parseWishTabParam } from '../_utils/wishSearchParams';
-import AllWishTabContent, { type AllWishTabContentProps } from './AllWishTabContent';
+import AllWishTabContent from './AllWishTabContent';
 import FolderTabContent from './FolderTabContent';
 
-function WishTabContent(allWishTabContentProps: AllWishTabContentProps) {
+type WishTabContentProps = {
+  allWishTabContentProps: AllWishTabContentProps;
+  folderTabContentProps: FolderTabContentProps;
+};
+
+function WishTabContent({ allWishTabContentProps, folderTabContentProps }: WishTabContentProps) {
   const searchParams = useSearchParams();
   const activeTab = parseWishTabParam(searchParams.get('tab'));
 
@@ -42,7 +47,7 @@ function WishTabContent(allWishTabContentProps: AllWishTabContentProps) {
   return (
     <div id={WISH_TAB_PANEL_ID} role="tabpanel" aria-labelledby={`wish-tab-${activeTab}`}>
       {activeTab === WISH_TAB.FOLDER ? (
-        <FolderTabContent />
+        <FolderTabContent {...folderTabContentProps} />
       ) : (
         <AllWishTabContent {...allWishTabContentProps} />
       )}

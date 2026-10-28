@@ -1,25 +1,25 @@
 import type { ITEM_STATUS } from '@/consts/item';
-import type { PatchItemRequestT, PriceHistorySourceT, PriceHistoryT } from '@/types/item';
+import type { ItemExtractMethodT, PatchItemRequestT, PriceHistoryT } from '@/types/item';
 import type { WishT } from '@/types/wish';
 
 type ItemT = {
-  id: number;
-  source: PriceHistorySourceT | null;
   /** 이미지로 등록한 항목은 원본 URL 이 없어 null */
   sourceUrl: string | null;
   sourcePlatform: string | null;
+  method: ItemExtractMethodT | null;
+  userInput: boolean;
+  refreshing: boolean;
 } & (
   | {
-      status:
-        | (typeof ITEM_STATUS)['PENDING']
-        | (typeof ITEM_STATUS)['PROCESSING']
-        | (typeof ITEM_STATUS)['FAILED'];
+      id: null;
+      status: (typeof ITEM_STATUS)['PARSING'] | (typeof ITEM_STATUS)['FAILED'];
       name: null;
       imageUrl: null;
       price: null;
       currency: null;
     }
   | {
+      id: number;
       status: (typeof ITEM_STATUS)['INCOMPLETE'];
       name: string | null;
       imageUrl: string | null;
@@ -27,6 +27,7 @@ type ItemT = {
       currency: string | null;
     }
   | {
+      id: number;
       status: (typeof ITEM_STATUS)['READY'];
       name: string;
       imageUrl: string;
@@ -55,6 +56,4 @@ export type GetWishResponseT = {
 export type PatchWishResponseT = {
   wish: WishT;
   item: ItemT;
-  refreshNeeded: null;
-  reused: null;
 };

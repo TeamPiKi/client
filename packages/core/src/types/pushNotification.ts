@@ -58,6 +58,7 @@ export type DeepLinkPayloadT =
         | 'ITEM_PARSING_INCOMPLETE'
         | 'ITEM_PARSING_FAILED'
         | 'ITEM_PARSING_RECOVERED'
+        | 'ITEM_PARSING_MERGED'
         | 'ITEM_REFRESH_COMPLETED'
         | 'ITEM_REFRESH_FAILED';
       refId: number;

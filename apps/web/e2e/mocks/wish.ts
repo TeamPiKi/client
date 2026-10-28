@@ -20,9 +20,11 @@ export const MOCK_WISHLIST_ENTRIES: GetWishlistResponseT[] = MOCK_TOURNAMENT_ITE
       imageUrl: MOCK_IMAGE_URLS.product,
       sourceUrl: null,
       sourcePlatform: null,
+      method: 'STRUCTURED',
+      userInput: false,
+      refreshing: false,
     },
-    reused: null,
-    refreshNeeded: null,
+    winnerTournamentIds: [],
   })
 );
 
@@ -40,7 +42,9 @@ export const MOCK_WISH_DETAIL: GetWishResponseT = {
     imageUrl: MOCK_IMAGE_URLS.product,
     sourceUrl: MOCK_WISH_SOURCE_URL,
     sourcePlatform: 'E2E몰',
-    source: 'SERVER',
+    method: 'STRUCTURED',
+    userInput: false,
+    refreshing: false,
   },
   priceHistory: [],
 };
@@ -56,7 +60,8 @@ export const MOCK_WISH_ADDED_BY_LINK: PostWishLinkResponseT = {
     imageUrl: MOCK_IMAGE_URLS.product,
     sourceUrl: 'https://shop.example/items/105',
     sourcePlatform: 'E2E몰',
+    method: 'STRUCTURED',
+    userInput: false,
+    refreshing: false,
   },
-  refreshNeeded: false,
-  reused: false,
 };

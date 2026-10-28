@@ -24,7 +24,7 @@ export type TournamentMatchT = {
  */
 export type PendingTournamentItemT = Partial<TournamentItemT> & {
   tournamentItemId: number;
-  itemId: number;
+  itemId: number | null;
   userId?: string;
 };
 

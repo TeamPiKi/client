@@ -40,6 +40,7 @@ describe('getRouteType', () => {
   it('선택 하위 세그먼트는 정해진 것만 붙는다', () => {
     expect(getRouteType('/tournament/1/create')).toBe('AUTHORIZED');
     expect(getRouteType('/tournament/1/create/by-wish')).toBe('AUTHORIZED');
+    expect(getRouteType('/tournament/1/create/by-wish-v2')).toBe('AUTHORIZED');
     expect(getRouteType('/tournament/1/create/other')).toBeNull();
 
     expect(getRouteType('/tournament/1/result')).toBe('AUTHORIZED');
