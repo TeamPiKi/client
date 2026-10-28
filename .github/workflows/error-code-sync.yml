@@ -54,3 +54,16 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.ERROR_CODE_SYNC_TOKEN }}
         run: node .github/scripts/error-code-sync/index.mjs
+
+      - name: 실패 알림 (허거덩 봇)
+        if: failure()
+        env:
+          DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
+          CHANNEL_ID: ${{ secrets.DISCORD_PR_CHANNEL_ID }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          curl -sS --fail-with-body --max-time 10 -o /dev/null \
+            -X POST "https://discord.com/api/v10/channels/$CHANNEL_ID/messages" \
+            -H "Authorization: Bot $DISCORD_BOT_TOKEN" \
+            -H "Content-Type: application/json; charset=utf-8" \
+            --data "$(jq -n --arg url "$RUN_URL" '{content: "⚠️ 서버 에러 코드 카탈로그 동기화 실패 · <\($url)>", allowed_mentions: {parse: []}}')"
