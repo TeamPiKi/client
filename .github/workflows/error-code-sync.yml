@@ -2,7 +2,7 @@ name: Error Code Sync
 
 on:
   schedule:
-    - cron: '23 1 * * *' # 10:23 KST
+    - cron: '0 1 * * 1' # 월요일 10:00 KST
   workflow_dispatch:
 
 permissions: {}
