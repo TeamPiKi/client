@@ -145,6 +145,21 @@ jobs:
               reviewer = FALLBACK_REVIEWER;
             }
 
+            const assign = async assignee => {
+              try {
+                await github.rest.issues.addAssignees({
+                  owner,
+                  repo,
+                  issue_number: pullNumber,
+                  assignees: [assignee],
+                });
+              } catch (error) {
+                core.warning(`Failed to assign ${assignee}: ${error.message}`);
+              }
+            };
+
+            if (author !== BOT_LOGIN) await assign(author);
+
             let requestedReviewer = null;
             if (reviewer) {
               try {
@@ -176,16 +191,4 @@ jobs:
               }
             }
 
-            const assignee = author === BOT_LOGIN ? requestedReviewer : author;
-            if (assignee) {
-              try {
-                await github.rest.issues.addAssignees({
-                  owner,
-                  repo,
-                  issue_number: pullNumber,
-                  assignees: [assignee],
-                });
-              } catch (error) {
-                core.warning(`Failed to assign ${assignee}: ${error.message}`);
-              }
-            }
+            if (author === BOT_LOGIN && requestedReviewer) await assign(requestedReviewer);
