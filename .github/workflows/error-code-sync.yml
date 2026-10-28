@@ -55,8 +55,14 @@ jobs:
           GH_TOKEN: ${{ secrets.ERROR_CODE_SYNC_TOKEN }}
         run: node .github/scripts/error-code-sync/index.mjs
 
+  notify-failure:
+    needs: sync
+    if: ${{ always() && (needs.sync.result == 'failure' || needs.sync.result == 'cancelled') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    permissions: {}
+    steps:
       - name: 실패 알림 (허거덩 봇)
-        if: failure()
         env:
           DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
           CHANNEL_ID: ${{ secrets.DISCORD_PR_CHANNEL_ID }}
