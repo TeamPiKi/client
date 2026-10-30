@@ -3,15 +3,17 @@
 import { useState } from 'react';
 import { toast } from 'sonner';
 
-import { MOCK_FOLDERS, MOCK_WISHES } from '@/app/wish/_common/_consts/wishMock';
 import BottomCta from '@/components/bottom-cta';
 import Button from '@/components/button';
 import WishGrid from '@/components/common/wish-grid';
 import { ROUTES } from '@/consts/route';
 import { useBackWithFallback } from '@/hooks/useBackWithFallback';
+import { useGetFolders } from '@/hooks/useGetFolders';
+import useIntersectionObserver from '@/hooks/useIntersectionObserver';
 
 import { useGetTournament } from '../../../_common/_hooks/useGetTournament';
 import { MAX_SELECT } from '../../by-wish/_consts/selectLimits';
+import { useFolderWishes } from '../_hooks/useFolderWishes';
 import FolderChipFilter from './FolderChipFilter';
 import NoWishDialog from './NoWishDialog';
 
@@ -29,15 +31,12 @@ function ByWishV2Content({ tournamentId }: ByWishV2ContentProps) {
   const addableCount = Math.max(MAX_SELECT - (pending?.items.length ?? 0), 0);
   const isOverSelectionLimit = selectedWishIds.size > addableCount;
 
-  /** TEMP: 위시·폴더 API 연동 전까지 목 데이터 사용함 */
-  const items = MOCK_WISHES;
-  const folders = MOCK_FOLDERS;
-  const activeFolder = folders.find(({ id }) => id === activeFolderId);
-  const visibleItems = activeFolder
-    ? items.filter(({ wish }) => activeFolder.wishIds.includes(wish.id))
-    : items;
+  const { foldersData } = useGetFolders();
+  const { allWishesData, wishesData, fetchNextPage, hasNextPage, isFetchingNextPage } =
+    useFolderWishes(activeFolderId);
+  const bottomRef = useIntersectionObserver(fetchNextPage, hasNextPage && !isFetchingNextPage);
 
-  const hasNoWish = items.length === 0;
+  const hasNoWish = allWishesData.length === 0;
 
   const handleToggleSelect = (wishId: number) => {
     const isSelected = selectedWishIds.has(wishId);
@@ -61,9 +60,9 @@ function ByWishV2Content({ tournamentId }: ByWishV2ContentProps) {
   return (
     <>
       <div className="flex flex-col gap-6 bg-bg-layer-default py-6">
-        {folders.length > 0 && (
+        {foldersData.length > 0 && (
           <FolderChipFilter
-            folders={folders}
+            folders={foldersData}
             activeFolderId={activeFolderId}
             onFolderChange={setActiveFolderId}
           />
@@ -75,10 +74,11 @@ function ByWishV2Content({ tournamentId }: ByWishV2ContentProps) {
 
       <main className="hide-scrollbar flex flex-1 flex-col overflow-y-auto bg-bg-layer-basement pb-32">
         <WishGrid
-          wishes={visibleItems}
+          wishes={wishesData}
           selectedWishIds={selectedWishIds}
           onToggleSelect={handleToggleSelect}
         />
+        <div ref={bottomRef} />
       </main>
 
       <BottomCta hasGradient>
