@@ -18,9 +18,10 @@ type ByLinkProps = {
   type: ItemTypeT;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  folderId?: number;
 };
 
-function ByLinkDialog({ type, open, onOpenChange }: ByLinkProps) {
+function ByLinkDialog({ type, open, onOpenChange, folderId }: ByLinkProps) {
   const { id: tournamentId } = useParams<{ id: string }>();
 
   const [url, setUrl] = useState('');
@@ -28,6 +29,7 @@ function ByLinkDialog({ type, open, onOpenChange }: ByLinkProps) {
 
   const { postWishLinkMutation, isPostWishLinkPending } = usePostWishLink({
     onErrorMessage: setErrorMessage,
+    ...(typeof folderId === 'number' && { folderId }),
   });
   const { postTournamentItemLinkMutation, isPostTournamentItemLinkPending } =
     usePostTournamentItemLink(Number(tournamentId), { onErrorMessage: setErrorMessage });

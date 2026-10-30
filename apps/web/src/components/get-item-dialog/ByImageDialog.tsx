@@ -49,11 +49,14 @@ type Props = {
   type: ItemTypeT;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  folderId?: number;
 };
 
-function ByImageDialog({ type, open, onOpenChange }: Props) {
+function ByImageDialog({ type, open, onOpenChange, folderId }: Props) {
   const { id: tournamentId } = useParams<{ id: string }>();
-  const { postWishOCRMutation, isPostWishOCRPending, resetPostWishOCRMutation } = usePostWishOCR();
+  const { postWishOCRMutation, isPostWishOCRPending, resetPostWishOCRMutation } = usePostWishOCR(
+    typeof folderId === 'number' ? { folderId } : {}
+  );
   const { postTournamentOCRMutation, isPostTournamentOCRPending, resetPostTournamentOCRMutation } =
     usePostTournamentOCR(Number(tournamentId));
 
