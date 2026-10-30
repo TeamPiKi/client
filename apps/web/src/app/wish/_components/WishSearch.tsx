@@ -8,29 +8,35 @@ import WishGrid from '@/components/common/wish-grid';
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/dialog';
 import { Header } from '@/components/header';
 import Input from '@/components/input';
-import type { WishListItemT } from '@/types/wish';
+import useIntersectionObserver from '@/hooks/useIntersectionObserver';
 import { cn } from '@/utils/cn';
 
+import { useSearchWishes } from '../_hooks/useSearchWishes';
+
 type WishSearchProps = {
-  wishes: WishListItemT[];
   onClose: () => void;
 };
 
-function WishSearch({ wishes, onClose }: WishSearchProps) {
+function WishSearch({ onClose }: WishSearchProps) {
   const inputRef = useRef<HTMLInputElement>(null);
 
   const [keyword, setKeyword] = useState('');
   const [submittedKeyword, setSubmittedKeyword] = useState<string | null>(null);
   const [isFocused, setIsFocused] = useState(true);
 
-  /** TODO: API 연동 시 위시 검색 API 로 교체 */
-  const results =
-    submittedKeyword === null
-      ? []
-      : wishes.filter(({ item }) =>
-          item.name?.toLowerCase().includes(submittedKeyword.toLowerCase())
-        );
+  const {
+    searchWishesData,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isSearchWishesPending,
+  } = useSearchWishes(submittedKeyword);
+  const bottomRef = useIntersectionObserver(fetchNextPage, hasNextPage && !isFetchingNextPage);
+
   const isSearching = isFocused || submittedKeyword === null;
+  const resultCountLabel = hasNextPage
+    ? `${searchWishesData.length}+`
+    : String(searchWishesData.length);
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -118,18 +124,22 @@ function WishSearch({ wishes, onClose }: WishSearchProps) {
           </form>
         </div>
 
-        {isSearching ? (
+        {isSearching && (
           <div aria-hidden className="fixed inset-0 -z-10 bg-black/20" onClick={onClose} />
-        ) : (
+        )}
+        {!isSearching && !isSearchWishesPending && (
           <section
             aria-live="polite"
             className="mx-auto flex w-full max-w-120 flex-col gap-6 pt-1 pb-10"
           >
             <p className="px-5 body-2-medium text-text-neutral-tertiary">
-              검색 결과 {results.length}개
+              검색 결과 {resultCountLabel}개
             </p>
-            {results.length > 0 ? (
-              <WishGrid wishes={results} />
+            {searchWishesData.length > 0 ? (
+              <>
+                <WishGrid wishes={searchWishesData} />
+                <div ref={bottomRef} />
+              </>
             ) : (
               <div className="flex flex-col items-center gap-4 pt-12.5">
                 <BasketGuestIcon width={60} height={60} aria-hidden />
