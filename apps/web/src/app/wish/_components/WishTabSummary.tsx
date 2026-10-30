@@ -7,10 +7,9 @@ import { useGetFolders } from '@/hooks/useGetFolders';
 
 import { WISH_MODE } from '../_common/_consts/wishMode';
 import type { WishModeT } from '../_common/_types/wishMode';
+import { formatWishCount } from '../_common/_utils/formatWishCount';
 import { WISH_TAB } from '../_consts/wishTab';
 import { parseWishTabParam } from '../_utils/wishSearchParams';
-
-const MAX_DISPLAY_COUNT = 999;
 
 type WishTabSummaryProps = {
   wishCount: number;
@@ -36,9 +35,7 @@ function WishTabSummary({ wishCount, mode, onEdit, onSearch }: WishTabSummaryPro
 
   return (
     <div className="flex items-center justify-between">
-      <p className="body-2-medium text-text-neutral-tertiary">
-        상품 {wishCount > MAX_DISPLAY_COUNT ? `${MAX_DISPLAY_COUNT}+` : wishCount}
-      </p>
+      <p className="body-2-medium text-text-neutral-tertiary">상품 {formatWishCount(wishCount)}</p>
       {mode === WISH_MODE.DEFAULT && (
         <div className="flex items-center gap-3 body-2-medium text-text-neutral-secondary">
           <button
