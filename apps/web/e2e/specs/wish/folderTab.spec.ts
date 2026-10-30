@@ -6,6 +6,7 @@ import { expect, test } from '@e2e/fixtures/mockApiFixture';
 import { setSsrEmpty } from '@e2e/helpers/ssrEmpty';
 import { MOCK_FOLDER, MOCK_FOLDERS } from '@e2e/mocks/folder';
 import { MOCK_MEMBER_ME } from '@e2e/mocks/me';
+import { MOCK_WISHLIST_ENTRIES } from '@e2e/mocks/wish';
 
 test('폴더 탭에 폴더 이름과 위시 개수가 보인다', async ({ page, api }) => {
   api.get(ENDPOINTS.USER, MOCK_MEMBER_ME);
@@ -84,6 +85,7 @@ test('폴더를 삭제하면 삭제 요청을 보내고 확인창이 닫힌다',
   api.get(ENDPOINTS.USER, MOCK_MEMBER_ME);
   api.get(ENDPOINTS.FOLDERS, MOCK_FOLDERS);
   api.delete(ENDPOINTS.FOLDER(MOCK_FOLDER.id), null);
+  api.getPage(ENDPOINTS.WISHLISTS, MOCK_WISHLIST_ENTRIES);
 
   await page.goto('/wish?tab=folder');
   await page.getByRole('button', { name: `${MOCK_FOLDER.name} 폴더 메뉴` }).click();
