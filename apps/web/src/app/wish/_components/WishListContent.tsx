@@ -5,12 +5,13 @@ import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
 import { Z_INDEX } from '@/consts/zIndex';
+import { useGetFolders } from '@/hooks/useGetFolders';
 import { cn } from '@/utils/cn';
 import { getScrollContainer } from '@/utils/scrollRestoration';
 
 import WishEditActionBar from '../_common/_components/WishEditActionBar';
 import WishEditHeader from '../_common/_components/WishEditHeader';
-import { MOCK_FOLDERS, MOCK_WISHES } from '../_common/_consts/wishMock';
+import { MOCK_WISHES } from '../_common/_consts/wishMock';
 import { WISH_MODE } from '../_common/_consts/wishMode';
 import { useWishEditMode } from '../_common/_hooks/useWishEditMode';
 import type { WishFolderT } from '../_common/_types/wish';
@@ -29,8 +30,7 @@ function WishListContent() {
 
   /** TEMP: API 연동 시 위시 목록 조회 응답으로 교체 */
   const [wishes, setWishes] = useState(MOCK_WISHES);
-  /** TEMP: API 연동 시 폴더 목록 조회·생성·수정·삭제 API 로 교체 */
-  const [folders, setFolders] = useState(MOCK_FOLDERS);
+  const { foldersData } = useGetFolders();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isTitleHidden, setIsTitleHidden] = useState(false);
   const {
@@ -54,15 +54,6 @@ function WishListContent() {
     handleClearSelection();
     toast.success(`상품 ${selectedWishIds.size}개를 삭제했어요.`);
   };
-
-  const handleCreateFolder = (name: string) =>
-    setFolders(prev => [...prev, { id: Date.now(), name, wishIds: [] }]);
-
-  const handleRenameFolder = (folderId: number, name: string) =>
-    setFolders(prev => prev.map(folder => (folder.id === folderId ? { ...folder, name } : folder)));
-
-  const handleDeleteFolder = (folderId: number) =>
-    setFolders(prev => prev.filter(({ id }) => id !== folderId));
 
   /** 스크롤 시 제목 부분을 숨김/노출 처리 함 */
   useEffect(() => {
@@ -105,7 +96,7 @@ function WishListContent() {
         )}
         <WishTabSummary
           wishCount={wishes.length}
-          folderCount={folders.length}
+          folderCount={foldersData.length}
           mode={mode}
           onEdit={handleEnterEditMode}
           onSearch={() => setIsSearchOpen(true)}
@@ -115,12 +106,6 @@ function WishListContent() {
         allWishTabContentProps={{
           wishes,
           ...(mode === WISH_MODE.EDIT && { selectedWishIds, onToggleSelect: handleToggleSelect }),
-        }}
-        folderTabContentProps={{
-          folders,
-          onCreate: handleCreateFolder,
-          onRename: handleRenameFolder,
-          onDelete: handleDeleteFolder,
         }}
       />
 

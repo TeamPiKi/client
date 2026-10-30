@@ -96,6 +96,13 @@ export const ERROR_MESSAGE_MAP = {
   'WISH-008': '추출에 실패한 항목은 새로고침 대신 정보를 직접 입력해 복구해 주세요.',
   'WISH-009': '이미 위시리스트에 등록된 상품이에요.',
 
+  /** FOLDER */
+  'FOLDER-001': '폴더를 찾을 수 없어요.',
+  'FOLDER-002': '같은 이름의 폴더가 이미 있어요.',
+  'FOLDER-003': '폴더 이름은 1에서 20자로 입력해 주세요.',
+  'FOLDER-004': '한 번에 최대 100개까지 선택할 수 있어요.',
+  'FOLDER-005': '다른 폴더를 선택해 주세요.',
+
   /** ITEM */
   'ITEM-003': '상품 이름을 입력해 주세요.',
   'ITEM-004': '상품 가격을 입력해 주세요.',
@@ -233,6 +240,13 @@ export const ERROR_CODE = {
   WISH_INVALID_ID_COUNT: 'WISH-006',
   WISH_FAILED_NOT_REFRESHABLE: 'WISH-008',
   WISH_ALREADY_EXISTS: 'WISH-009',
+
+  /** 폴더 */
+  FOLDER_NOT_FOUND: 'FOLDER-001',
+  FOLDER_DUPLICATE_NAME: 'FOLDER-002',
+  FOLDER_INVALID_NAME: 'FOLDER-003',
+  FOLDER_INVALID_WISH_COUNT: 'FOLDER-004',
+  FOLDER_SAME_TARGET: 'FOLDER-005',
 
   /** 상품 */
   ITEM_NAME_REQUIRED_FOR_READY: 'ITEM-003',
