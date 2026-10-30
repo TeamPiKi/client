@@ -2,18 +2,19 @@
 
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { toast } from 'sonner';
 
 import { Z_INDEX } from '@/consts/zIndex';
+import { useGetWishes } from '@/hooks/useGetWishes';
+import type { FolderT } from '@/types/folder';
 import { cn } from '@/utils/cn';
 import { getScrollContainer } from '@/utils/scrollRestoration';
 
 import WishEditActionBar from '../_common/_components/WishEditActionBar';
 import WishEditHeader from '../_common/_components/WishEditHeader';
-import { MOCK_WISHES } from '../_common/_consts/wishMock';
 import { WISH_MODE } from '../_common/_consts/wishMode';
+import { useDeleteWishes } from '../_common/_hooks/useDeleteWishes';
+import { usePostFolderWishes } from '../_common/_hooks/usePostFolderWishes';
 import { useWishEditMode } from '../_common/_hooks/useWishEditMode';
-import type { WishFolderT } from '../_common/_types/wish';
 import { WISH_TAB } from '../_consts/wishTab';
 import { parseWishTabParam } from '../_utils/wishSearchParams';
 import WishSearch from './WishSearch';
@@ -27,8 +28,7 @@ function WishListContent() {
   const searchParams = useSearchParams();
   const isFolderTab = parseWishTabParam(searchParams.get('tab')) === WISH_TAB.FOLDER;
 
-  /** TEMP: API 연동 시 위시 목록 조회 응답으로 교체 */
-  const [wishes, setWishes] = useState(MOCK_WISHES);
+  const { wishesData, hasNextPage } = useGetWishes();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isTitleHidden, setIsTitleHidden] = useState(false);
   const {
@@ -40,18 +40,14 @@ function WishListContent() {
     handleExitEditMode,
   } = useWishEditMode();
 
-  /** TODO: 폴더 추가 API 연결. 기존 소속 폴더는 유지됨 */
-  const handleMove = (folder: WishFolderT) => {
-    handleClearSelection();
-    toast.success(`상품을 '${folder.name}' 폴더로 이동했어요.`);
-  };
+  const { postFolderWishesMutation } = usePostFolderWishes({ onSuccess: handleClearSelection });
+  const { deleteWishesMutation } = useDeleteWishes({ onSuccess: handleClearSelection });
 
-  /** TODO: 위시 삭제 API 연결 */
-  const handleDelete = () => {
-    setWishes(prev => prev.filter(({ wish }) => !selectedWishIds.has(wish.id)));
-    handleClearSelection();
-    toast.success(`상품 ${selectedWishIds.size}개를 삭제했어요.`);
-  };
+  /** 전체 위시에서는 기존 소속 폴더를 유지한 채 대상 폴더에 추가 */
+  const handleMove = (folder: FolderT) =>
+    postFolderWishesMutation({ folder, wishIds: Array.from(selectedWishIds) });
+
+  const handleDelete = () => deleteWishesMutation(Array.from(selectedWishIds));
 
   /** 스크롤 시 제목 부분을 숨김/노출 처리 함 */
   useEffect(() => {
@@ -93,7 +89,8 @@ function WishListContent() {
           </>
         )}
         <WishTabSummary
-          wishCount={wishes.length}
+          wishCount={wishesData.length}
+          hasMoreWishes={hasNextPage}
           mode={mode}
           onEdit={handleEnterEditMode}
           onSearch={() => setIsSearchOpen(true)}
@@ -101,7 +98,6 @@ function WishListContent() {
       </div>
       <WishTabContent
         allWishTabContentProps={{
-          wishes,
           ...(mode === WISH_MODE.EDIT && { selectedWishIds, onToggleSelect: handleToggleSelect }),
         }}
       />
@@ -118,7 +114,7 @@ function WishListContent() {
         />
       )}
 
-      {isSearchOpen && <WishSearch wishes={wishes} onClose={() => setIsSearchOpen(false)} />}
+      {isSearchOpen && <WishSearch onClose={() => setIsSearchOpen(false)} />}
     </>
   );
 }
