@@ -22,11 +22,14 @@ type UsePostWishLinkOptionsT = {
   isExternalShare?: boolean;
   /** 4xx 문구를 그릴 곳 — 입력 폼처럼 화면 안에서 안내할 때 넘긴다. 생략하면 토스트 */
   onErrorMessage?: (message: string) => void;
+  /** 주면 등록과 함께 폴더에 넣고 현재 화면에 머문다 */
+  folderId?: number;
 };
 
 export const usePostWishLink = ({
   isExternalShare,
   onErrorMessage,
+  folderId,
 }: UsePostWishLinkOptionsT = {}) => {
   const showErrorMessage = onErrorMessage ?? toast.error;
 
@@ -39,10 +42,15 @@ export const usePostWishLink = ({
     isPending: isPostWishLinkPending,
     reset: resetPostWishLinkMutation,
   } = useMutation({
-    mutationFn: (url: string) => postWishLink(url, isExternalShare),
+    mutationFn: (url: string) => postWishLink(url, isExternalShare, folderId),
     onSuccess: () => {
       logAnalyticsEvent(ANALYTICS_EVENT.WISH_ADD_COMPLETE, { source: 'link' });
       queryClient.invalidateQueries({ queryKey: ['wishlists'] });
+
+      if (typeof folderId === 'number') {
+        queryClient.invalidateQueries({ queryKey: ['folders'] });
+        return;
+      }
       if (pathname !== ROUTES.WISHLIST) router.push(ROUTES.WISHLIST);
     },
     onError: error => {

@@ -49,6 +49,7 @@ export type PostWishPresignedUrlResponseT = {
 
 export type PostWishImagesRequestT = {
   imageKeys: string[];
+  folderId?: number;
 };
 
 export type PostWishImagesResponseT = {
