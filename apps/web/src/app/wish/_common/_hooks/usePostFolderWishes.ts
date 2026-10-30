@@ -13,7 +13,11 @@ type PostFolderWishesVariablesT = {
   wishIds: number[];
 };
 
-export const usePostFolderWishes = ({ onSuccess }: { onSuccess?: () => void } = {}) => {
+type UsePostFolderWishesOptionsT = {
+  onSuccess?: (folder: PostFolderWishesVariablesT['folder']) => void;
+};
+
+export const usePostFolderWishes = ({ onSuccess }: UsePostFolderWishesOptionsT = {}) => {
   const queryClient = useQueryClient();
 
   const { mutate: postFolderWishesMutation, isPending: isPostFolderWishesPending } = useMutation({
@@ -22,8 +26,7 @@ export const usePostFolderWishes = ({ onSuccess }: { onSuccess?: () => void } = 
     onSuccess: (_, { folder }) => {
       queryClient.invalidateQueries({ queryKey: ['wishlists'] });
       queryClient.invalidateQueries({ queryKey: ['folders'] });
-      toast.success(`상품을 '${folder.name}' 폴더로 이동했어요.`);
-      onSuccess?.();
+      onSuccess?.(folder);
     },
     onError: error => {
       if (isGlobalNetError(error)) return;
