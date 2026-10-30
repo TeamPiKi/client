@@ -11,13 +11,13 @@ import Spacing from '@/components/spacing';
 import { ROUTES } from '@/consts/route';
 import { Z_INDEX } from '@/consts/zIndex';
 import { useBackWithFallback } from '@/hooks/useBackWithFallback';
+import type { FolderT } from '@/types/folder';
 
 import WishEditActionBar from '../../../_common/_components/WishEditActionBar';
 import WishEditHeader from '../../../_common/_components/WishEditHeader';
 import { MOCK_FOLDERS, MOCK_WISHES } from '../../../_common/_consts/wishMock';
 import { WISH_MODE } from '../../../_common/_consts/wishMode';
 import { useWishEditMode } from '../../../_common/_hooks/useWishEditMode';
-import type { WishFolderT } from '../../../_common/_types/wish';
 import FolderWishAddDialog from './FolderWishAddDialog';
 
 const MAX_DISPLAY_COUNT = 999;
@@ -58,7 +58,7 @@ function FolderDetailContent({ folderId }: FolderDetailContentProps) {
   if (!folder) return null;
 
   /** TODO: 폴더 이동 API 연결 */
-  const handleMove = (targetFolder: WishFolderT) => {
+  const handleMove = (targetFolder: FolderT) => {
     setWishes(prev => prev.filter(({ wish }) => !selectedWishIds.has(wish.id)));
     handleClearSelection();
     toast.success(`상품을 '${targetFolder.name}' 폴더로 이동했어요.`);

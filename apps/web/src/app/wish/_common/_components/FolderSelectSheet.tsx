@@ -1,21 +1,23 @@
 'use client';
 
-import { useState } from 'react';
-
 import { FolderAddIconFill } from '@/assets/icons';
 import { Drawer, DrawerContent, DrawerDescription, DrawerTitle } from '@/components/drawer';
 import { Header } from '@/components/header';
+import type { FolderT } from '@/types/folder';
 
-import { getMockWishImageUrl } from '../_consts/wishMock';
-import type { WishFolderT } from '../_types/wish';
 import FolderListThumbnail from './FolderListThumbnail';
 import FolderNameForm from './FolderNameForm';
 
 type FolderSelectSheetProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  folders: WishFolderT[];
-  onSelect: (folder: WishFolderT) => void;
+  folders: FolderT[];
+  isAddView: boolean;
+  onAddViewChange: (isAddView: boolean) => void;
+  addErrorMessage: string | null;
+  isAddPending: boolean;
+  onAddNameChange: () => void;
+  onSelect: (folder: FolderT) => void;
   onAddFolder: (name: string) => void;
 };
 
@@ -23,19 +25,17 @@ function FolderSelectSheet({
   open,
   onOpenChange,
   folders,
+  isAddView,
+  onAddViewChange,
+  addErrorMessage,
+  isAddPending,
+  onAddNameChange,
   onSelect,
   onAddFolder,
 }: FolderSelectSheetProps) {
-  const [isAddView, setIsAddView] = useState(false);
-
   const handleOpenChange = (isOpen: boolean) => {
-    if (!isOpen) setIsAddView(false);
+    if (!isOpen) onAddViewChange(false);
     onOpenChange(isOpen);
-  };
-
-  const handleAddSubmit = (name: string) => {
-    onAddFolder(name);
-    setIsAddView(false);
   };
 
   return (
@@ -47,8 +47,11 @@ function FolderSelectSheet({
         {isAddView ? (
           <FolderNameForm
             title="폴더 추가"
-            onBack={() => setIsAddView(false)}
-            onSubmit={handleAddSubmit}
+            submitErrorMessage={addErrorMessage}
+            isPending={isAddPending}
+            onBack={() => onAddViewChange(false)}
+            onNameChange={onAddNameChange}
+            onSubmit={onAddFolder}
           />
         ) : (
           <div className="flex flex-col gap-3">
@@ -62,7 +65,7 @@ function FolderSelectSheet({
                 <button
                   type="button"
                   aria-label="폴더 추가"
-                  onClick={() => setIsAddView(true)}
+                  onClick={() => onAddViewChange(true)}
                   className="cursor-pointer"
                 >
                   <FolderAddIconFill className="size-6 text-icon-neutral-primary" />
@@ -77,13 +80,11 @@ function FolderSelectSheet({
                     onClick={() => onSelect(folder)}
                     className="flex h-15 w-full cursor-pointer items-center gap-[13px] text-left"
                   >
-                    <FolderListThumbnail
-                      url={folder.wishIds[0] ? getMockWishImageUrl(folder.wishIds[0]) : null}
-                    />
+                    <FolderListThumbnail url={folder.coverImageUrls[0] ?? null} />
                     <span className="flex min-w-0 items-center gap-[5px] body-1-medium">
                       <span className="truncate text-text-neutral-primary">{folder.name}</span>
                       <span className="shrink-0 text-text-neutral-tertiary">
-                        ({folder.wishIds.length})
+                        ({folder.wishCount})
                       </span>
                     </span>
                   </button>
