@@ -11,31 +11,32 @@ import Spacing from '@/components/spacing';
 import { ROUTES } from '@/consts/route';
 import { Z_INDEX } from '@/consts/zIndex';
 import { useBackWithFallback } from '@/hooks/useBackWithFallback';
+import { useGetFolders } from '@/hooks/useGetFolders';
+import { useGetWishes } from '@/hooks/useGetWishes';
+import useIntersectionObserver from '@/hooks/useIntersectionObserver';
 import type { FolderT } from '@/types/folder';
 
 import WishEditActionBar from '../../../_common/_components/WishEditActionBar';
 import WishEditHeader from '../../../_common/_components/WishEditHeader';
-import { MOCK_FOLDERS, MOCK_WISHES } from '../../../_common/_consts/wishMock';
 import { WISH_MODE } from '../../../_common/_consts/wishMode';
 import { useWishEditMode } from '../../../_common/_hooks/useWishEditMode';
+import { formatWishCount } from '../../../_common/_utils/formatWishCount';
+import { useDeleteFolderWishes } from '../_hooks/useDeleteFolderWishes';
+import { usePostFolderWishesMove } from '../_hooks/usePostFolderWishesMove';
 import FolderWishAddDialog from './FolderWishAddDialog';
-
-const MAX_DISPLAY_COUNT = 999;
 
 type FolderDetailContentProps = {
   folderId: number | null;
 };
 
-function FolderDetailContent({ folderId }: FolderDetailContentProps) {
-  const router = useRouter();
+function FolderDetailView({ folder }: { folder: FolderT }) {
   const backWithFallback = useBackWithFallback();
 
-  const folder = MOCK_FOLDERS.find(({ id }) => id === folderId);
+  const { wishesData, fetchNextPage, hasNextPage, isFetchingNextPage } = useGetWishes({
+    folderId: folder.id,
+  });
+  const bottomRef = useIntersectionObserver(fetchNextPage, hasNextPage && !isFetchingNextPage);
 
-  /** TEMP: API 연동 시 폴더 위시 조회 응답으로 교체 */
-  const [wishes, setWishes] = useState(() =>
-    MOCK_WISHES.filter(({ wish }) => folder?.wishIds.includes(wish.id))
-  );
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const {
     mode,
@@ -47,29 +48,17 @@ function FolderDetailContent({ folderId }: FolderDetailContentProps) {
     handleExitEditMode,
   } = useWishEditMode();
 
-  /** 없는 폴더는 안내 후 폴더 탭으로 — 기록에 남기지 않는다 */
-  useEffect(() => {
-    if (folder) return;
+  const { postFolderWishesMoveMutation } = usePostFolderWishesMove(folder.id, {
+    onSuccess: handleClearSelection,
+  });
+  const { deleteFolderWishesMutation } = useDeleteFolderWishes(folder.id, {
+    onSuccess: handleClearSelection,
+  });
 
-    toast.error('폴더를 찾을 수 없어요.');
-    router.replace(ROUTES.WISHLIST_FOLDER_TAB);
-  }, [folder, router]);
+  const handleMove = (targetFolder: FolderT) =>
+    postFolderWishesMoveMutation({ targetFolder, wishIds: Array.from(selectedWishIds) });
 
-  if (!folder) return null;
-
-  /** TODO: 폴더 이동 API 연결 */
-  const handleMove = (targetFolder: FolderT) => {
-    setWishes(prev => prev.filter(({ wish }) => !selectedWishIds.has(wish.id)));
-    handleClearSelection();
-    toast.success(`상품을 '${targetFolder.name}' 폴더로 이동했어요.`);
-  };
-
-  /** TODO: 폴더에서 빼기 API 연결 */
-  const handleDelete = () => {
-    setWishes(prev => prev.filter(({ wish }) => !selectedWishIds.has(wish.id)));
-    handleClearSelection();
-    toast.success(`폴더에서 상품 ${selectedWishIds.size}개를 삭제했어요.`);
-  };
+  const handleDelete = () => deleteFolderWishesMutation(Array.from(selectedWishIds));
 
   return (
     <>
@@ -109,11 +98,11 @@ function FolderDetailContent({ folderId }: FolderDetailContentProps) {
               <p className="flex items-center gap-2 text-text-neutral-tertiary">
                 {folder.name}
                 <span aria-hidden className="h-[12.6px] w-px bg-gray-300" />
-                전체({wishes.length})
+                전체({folder.wishCount})
               </p>
               <button
                 type="button"
-                onClick={() => handleSelectAll(wishes.map(({ wish }) => wish.id))}
+                onClick={() => handleSelectAll(wishesData.map(({ wish }) => wish.id))}
                 className="cursor-pointer text-text-neutral-secondary"
               >
                 전체 선택
@@ -121,9 +110,7 @@ function FolderDetailContent({ folderId }: FolderDetailContentProps) {
             </>
           ) : (
             <>
-              <p className="text-text-neutral-tertiary">
-                상품 {wishes.length > MAX_DISPLAY_COUNT ? `${MAX_DISPLAY_COUNT}+` : wishes.length}
-              </p>
+              <p className="text-text-neutral-tertiary">상품 {formatWishCount(folder.wishCount)}</p>
               <div className="flex items-center gap-3 text-text-neutral-secondary">
                 <button
                   type="button"
@@ -145,9 +132,10 @@ function FolderDetailContent({ folderId }: FolderDetailContentProps) {
 
       {/** TODO: 위시 상세 링크 연결 시 saveScrollAnchor·useScrollRestoration(scope: folderId) 추가 */}
       <WishGrid
-        wishes={wishes}
+        wishes={wishesData}
         {...(mode === WISH_MODE.EDIT && { selectedWishIds, onToggleSelect: handleToggleSelect })}
       />
+      <div ref={bottomRef} />
 
       {mode === WISH_MODE.EDIT && (
         <WishEditActionBar
@@ -170,6 +158,25 @@ function FolderDetailContent({ folderId }: FolderDetailContentProps) {
       />
     </>
   );
+}
+
+function FolderDetailContent({ folderId }: FolderDetailContentProps) {
+  const router = useRouter();
+  const { foldersData } = useGetFolders();
+
+  const folder = foldersData.find(({ id }) => id === folderId);
+
+  /** 없는 폴더는 안내 후 폴더 탭으로 — 기록에 남기지 않는다 */
+  useEffect(() => {
+    if (folder) return;
+
+    toast.error('폴더를 찾을 수 없어요.');
+    router.replace(ROUTES.WISHLIST_FOLDER_TAB);
+  }, [folder, router]);
+
+  if (!folder) return null;
+
+  return <FolderDetailView folder={folder} />;
 }
 
 export default FolderDetailContent;
