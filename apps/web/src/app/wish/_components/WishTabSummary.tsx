@@ -6,10 +6,9 @@ import { SearchIconOutline } from '@/assets/icons';
 
 import { WISH_MODE } from '../_common/_consts/wishMode';
 import type { WishModeT } from '../_common/_types/wishMode';
+import { formatWishCount } from '../_common/_utils/formatWishCount';
 import { WISH_TAB } from '../_consts/wishTab';
 import { parseWishTabParam } from '../_utils/wishSearchParams';
-
-const MAX_DISPLAY_COUNT = 999;
 
 type WishTabSummaryProps = {
   wishCount: number;
@@ -18,11 +17,6 @@ type WishTabSummaryProps = {
   mode: WishModeT;
   onEdit: () => void;
   onSearch: () => void;
-};
-
-const formatWishCount = (count: number, hasMore: boolean) => {
-  if (count > MAX_DISPLAY_COUNT) return `${MAX_DISPLAY_COUNT}+`;
-  return hasMore ? `${count}+` : String(count);
 };
 
 function WishTabSummary({
