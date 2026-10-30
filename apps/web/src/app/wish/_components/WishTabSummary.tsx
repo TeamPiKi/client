@@ -13,13 +13,26 @@ const MAX_DISPLAY_COUNT = 999;
 
 type WishTabSummaryProps = {
   wishCount: number;
+  hasMoreWishes: boolean;
   folderCount: number;
   mode: WishModeT;
   onEdit: () => void;
   onSearch: () => void;
 };
 
-function WishTabSummary({ wishCount, folderCount, mode, onEdit, onSearch }: WishTabSummaryProps) {
+const formatWishCount = (count: number, hasMore: boolean) => {
+  if (count > MAX_DISPLAY_COUNT) return `${MAX_DISPLAY_COUNT}+`;
+  return hasMore ? `${count}+` : String(count);
+};
+
+function WishTabSummary({
+  wishCount,
+  hasMoreWishes,
+  folderCount,
+  mode,
+  onEdit,
+  onSearch,
+}: WishTabSummaryProps) {
   const searchParams = useSearchParams();
   const isFolderTab = parseWishTabParam(searchParams.get('tab')) === WISH_TAB.FOLDER;
 
@@ -30,7 +43,7 @@ function WishTabSummary({ wishCount, folderCount, mode, onEdit, onSearch }: Wish
       <p className="body-2-medium text-text-neutral-tertiary">
         {isFolderTab
           ? `폴더 ${folderCount}개`
-          : `상품 ${wishCount > MAX_DISPLAY_COUNT ? `${MAX_DISPLAY_COUNT}+` : wishCount}`}
+          : `상품 ${formatWishCount(wishCount, hasMoreWishes)}`}
       </p>
       {!isFolderTab && mode === WISH_MODE.DEFAULT && (
         <div className="flex items-center gap-3 body-2-medium text-text-neutral-secondary">
