@@ -1,5 +1,6 @@
 'use client';
 
+import { ERROR_CODE, ERROR_MESSAGE_MAP } from '@piki/core';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { toast } from 'sonner';
@@ -12,37 +13,47 @@ import { Header } from '@/components/header';
 import { ROUTES } from '@/consts/route';
 import { Z_INDEX } from '@/consts/zIndex';
 import { useBackWithFallback } from '@/hooks/useBackWithFallback';
+import { useGetFolders } from '@/hooks/useGetFolders';
+import { useGetWishes } from '@/hooks/useGetWishes';
+import useIntersectionObserver from '@/hooks/useIntersectionObserver';
+import type { FolderT } from '@/types/folder';
 
-import { MOCK_FOLDERS, MOCK_WISHES } from '../../../../_common/_consts/wishMock';
+import { MAX_FOLDER_WISH_SELECT_COUNT } from '../../../../_common/_consts/folder';
+import { usePostFolderWishes } from '../../../../_common/_hooks/usePostFolderWishes';
 import { useWishEditMode } from '../../../../_common/_hooks/useWishEditMode';
-
-const MAX_DISPLAY_COUNT = 999;
+import { formatWishCount } from '../../../../_common/_utils/formatWishCount';
 
 type FolderWishSelectContentProps = {
   folderId: number | null;
 };
 
-function FolderWishSelectContent({ folderId }: FolderWishSelectContentProps) {
-  const router = useRouter();
+function FolderWishSelectView({ folder }: { folder: FolderT }) {
   const backWithFallback = useBackWithFallback();
 
-  const folder = MOCK_FOLDERS.find(({ id }) => id === folderId);
-  /** TEMP: API 연동 시 위시 목록 조회 응답으로 교체 */
-  const candidates = MOCK_WISHES.filter(({ wish }) => !folder?.wishIds.includes(wish.id));
+  const { wishesData, fetchNextPage, hasNextPage, isFetchingNextPage } = useGetWishes({
+    excludeFolderId: folder.id,
+  });
+  const bottomRef = useIntersectionObserver(fetchNextPage, hasNextPage && !isFetchingNextPage);
 
   const { selectedWishIds, handleToggleSelect } = useWishEditMode();
 
-  useEffect(() => {
-    if (folder) return;
+  const handleBack = () => backWithFallback(ROUTES.WISHLIST_FOLDER(folder.id));
 
-    toast.error('폴더를 찾을 수 없어요.');
-    router.replace(ROUTES.WISHLIST_FOLDER_TAB);
-  }, [folder, router]);
+  const { postFolderWishesMutation, isPostFolderWishesPending } = usePostFolderWishes({
+    onSuccess: handleBack,
+  });
 
-  if (!folder) return null;
+  const handleToggle = (wishId: number) => {
+    if (!selectedWishIds.has(wishId) && selectedWishIds.size >= MAX_FOLDER_WISH_SELECT_COUNT) {
+      toast.error(ERROR_MESSAGE_MAP[ERROR_CODE.FOLDER_INVALID_WISH_COUNT]);
+      return;
+    }
 
-  /** TODO: 폴더에 위시 추가 API 연결 */
-  const handleSubmit = () => backWithFallback(ROUTES.WISHLIST_FOLDER(folder.id));
+    handleToggleSelect(wishId);
+  };
+
+  const handleSubmit = () =>
+    postFolderWishesMutation({ folder, wishIds: Array.from(selectedWishIds) });
 
   return (
     <>
@@ -53,34 +64,53 @@ function FolderWishSelectContent({ folderId }: FolderWishSelectContentProps) {
         <Header
           center={<h1 className="heading-1-bold text-text-neutral-primary">폴더에 위시 추가</h1>}
           right={
-            <button
-              type="button"
-              aria-label="닫기"
-              onClick={() => backWithFallback(ROUTES.WISHLIST_FOLDER(folder.id))}
-              className="cursor-pointer"
-            >
+            <button type="button" aria-label="닫기" onClick={handleBack} className="cursor-pointer">
               <CloseIconFill className="size-6 text-icon-neutral-primary" />
             </button>
           }
         />
         <p className="body-2-medium text-text-neutral-tertiary">
-          상품 {candidates.length > MAX_DISPLAY_COUNT ? `${MAX_DISPLAY_COUNT}+` : candidates.length}
+          상품 {formatWishCount(wishesData.length, hasNextPage)}
         </p>
       </div>
 
       <WishGrid
-        wishes={candidates}
+        wishes={wishesData}
         selectedWishIds={selectedWishIds}
-        onToggleSelect={handleToggleSelect}
+        onToggleSelect={handleToggle}
       />
+      <div ref={bottomRef} />
 
       <BottomCta hasGradient>
-        <Button size="lg" disabled={selectedWishIds.size === 0} onClick={handleSubmit}>
+        <Button
+          size="lg"
+          disabled={selectedWishIds.size === 0}
+          isLoading={isPostFolderWishesPending}
+          onClick={handleSubmit}
+        >
           선택한 {selectedWishIds.size}개의 상품 추가
         </Button>
       </BottomCta>
     </>
   );
+}
+
+function FolderWishSelectContent({ folderId }: FolderWishSelectContentProps) {
+  const router = useRouter();
+  const { foldersData } = useGetFolders();
+
+  const folder = foldersData.find(({ id }) => id === folderId);
+
+  useEffect(() => {
+    if (folder) return;
+
+    toast.error('폴더를 찾을 수 없어요.');
+    router.replace(ROUTES.WISHLIST_FOLDER_TAB);
+  }, [folder, router]);
+
+  if (!folder) return null;
+
+  return <FolderWishSelectView folder={folder} />;
 }
 
 export default FolderWishSelectContent;
