@@ -4,6 +4,13 @@ import type { ItemT } from './item';
 export type WishT = {
   id: number;
   createdAt: string;
+  folderIds?: number[];
+};
+
+export type GetWishesRequestT = {
+  folderId?: number;
+  excludeFolderId?: number;
+  q?: string;
 };
 
 export type GetWishlistResponseT = {

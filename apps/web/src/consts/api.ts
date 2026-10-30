@@ -19,6 +19,12 @@ export const ENDPOINTS = {
   WISH_IMAGE_CONFIRM: '/api/v1/wishlists/images/confirm',
   WISHLIST_REFRESH: (id: number) => `/api/v1/wishlists/${id}/refresh`,
 
+  /** 위시 폴더 */
+  FOLDERS: '/api/v1/folders',
+  FOLDER: (id: number) => `/api/v1/folders/${id}`,
+  FOLDER_WISHES: (id: number) => `/api/v1/folders/${id}/wishes`,
+  FOLDER_WISHES_MOVE: (id: number) => `/api/v1/folders/${id}/wishes/move`,
+
   /** 토너먼트 */
   TOURNAMENTS: '/api/v1/tournaments',
   TOURNAMENT: (id: number) => `/api/v1/tournaments/${id}`,
