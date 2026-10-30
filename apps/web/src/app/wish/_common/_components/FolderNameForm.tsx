@@ -19,11 +19,22 @@ const countGraphemes = (value: string) => Array.from(graphemeSegmenter.segment(v
 type FolderNameFormProps = {
   title: string;
   initialName?: string;
+  submitErrorMessage?: string | null;
+  isPending?: boolean;
   onBack: () => void;
+  onNameChange?: () => void;
   onSubmit: (name: string) => void;
 };
 
-function FolderNameForm({ title, initialName = '', onBack, onSubmit }: FolderNameFormProps) {
+function FolderNameForm({
+  title,
+  initialName = '',
+  submitErrorMessage = null,
+  isPending = false,
+  onBack,
+  onNameChange,
+  onSubmit,
+}: FolderNameFormProps) {
   const [name, setName] = useState(initialName);
   const [isEmptySubmitted, setIsEmptySubmitted] = useState(false);
 
@@ -31,7 +42,7 @@ function FolderNameForm({ title, initialName = '', onBack, onSubmit }: FolderNam
   const isUnchanged = initialName !== '' && trimmedName === initialName;
   const isOverLimit = countGraphemes(trimmedName) > MAX_FOLDER_NAME_LENGTH;
 
-  let errorMessage: string | null = null;
+  let errorMessage: string | null = submitErrorMessage;
   if (isOverLimit) errorMessage = `최대 ${MAX_FOLDER_NAME_LENGTH}자까지 입력할 수 있어요.`;
   else if (isEmptySubmitted) errorMessage = '폴더 이름을 입력해 주세요.';
 
@@ -67,12 +78,17 @@ function FolderNameForm({ title, initialName = '', onBack, onSubmit }: FolderNam
           onChange={event => {
             setName(event.target.value);
             setIsEmptySubmitted(false);
+            onNameChange?.();
           }}
           aria-invalid={errorMessage !== null}
           {...(errorMessage && { helperText: errorMessage })}
           autoFocus
         />
-        <Button type="submit" size="lg" disabled={name === '' || isUnchanged || isOverLimit}>
+        <Button
+          type="submit"
+          size="lg"
+          disabled={name === '' || isUnchanged || isOverLimit || isPending}
+        >
           완료
         </Button>
       </div>

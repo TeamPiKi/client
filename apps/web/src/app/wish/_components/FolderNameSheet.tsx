@@ -9,6 +9,9 @@ type FolderNameSheetProps = {
   onOpenChange: (open: boolean) => void;
   title: string;
   initialName?: string;
+  submitErrorMessage?: string | null;
+  isPending?: boolean;
+  onNameChange?: () => void;
   onSubmit: (name: string) => void;
 };
 
@@ -17,6 +20,9 @@ function FolderNameSheet({
   onOpenChange,
   title,
   initialName,
+  submitErrorMessage = null,
+  isPending = false,
+  onNameChange,
   onSubmit,
 }: FolderNameSheetProps) {
   return (
@@ -26,6 +32,9 @@ function FolderNameSheet({
         <FolderNameForm
           title={title}
           {...(initialName && { initialName })}
+          submitErrorMessage={submitErrorMessage}
+          isPending={isPending}
+          {...(onNameChange && { onNameChange })}
           onBack={() => onOpenChange(false)}
           onSubmit={onSubmit}
         />
