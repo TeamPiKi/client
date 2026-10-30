@@ -2,6 +2,7 @@
 
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
 
 import { Z_INDEX } from '@/consts/zIndex';
 import { useGetFolders } from '@/hooks/useGetFolders';
@@ -42,7 +43,12 @@ function WishListContent() {
     handleExitEditMode,
   } = useWishEditMode();
 
-  const { postFolderWishesMutation } = usePostFolderWishes({ onSuccess: handleClearSelection });
+  const { postFolderWishesMutation } = usePostFolderWishes({
+    onSuccess: folder => {
+      handleClearSelection();
+      toast.success(`상품을 '${folder.name}' 폴더로 이동했어요.`);
+    },
+  });
   const { deleteWishesMutation } = useDeleteWishes({ onSuccess: handleClearSelection });
 
   /** 전체 위시에서는 기존 소속 폴더를 유지한 채 대상 폴더에 추가 */
