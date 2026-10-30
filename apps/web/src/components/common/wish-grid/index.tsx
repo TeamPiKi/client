@@ -2,12 +2,12 @@ import type { ReactNode } from 'react';
 
 import { CheckboxEmptyIconFill, CheckboxSelectedIconFill } from '@/assets/icons';
 import { Z_INDEX } from '@/consts/zIndex';
-import type { WishListItemT } from '@/types/wish';
+import type { GetWishlistResponseT } from '@/types/wish';
 
 import WishCard from './WishCard';
 
 type WishGridProps = {
-  wishes: WishListItemT[];
+  wishes: GetWishlistResponseT[];
   selectedWishIds?: Set<number>;
   onToggleSelect?: (wishId: number) => void;
   leadingItem?: ReactNode;
@@ -28,7 +28,6 @@ function WishGrid({ wishes, selectedWishIds, onToggleSelect, leadingItem }: Wish
             price={item.price}
             imageUrl={item.imageUrl}
             sourcePlatform={item.sourcePlatform}
-            discountRate={item.discountRate}
             isWinner={winnerTournamentIds.length > 0}
             preload={index < PRELOAD_COUNT}
           />

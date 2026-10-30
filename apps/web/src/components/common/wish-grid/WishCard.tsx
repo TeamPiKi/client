@@ -10,7 +10,7 @@ type WishCardProps = {
   price: number | null;
   imageUrl: string | null;
   sourcePlatform: string | null;
-  discountRate: number | null;
+  discountRate?: number | null;
   /** 내가 플레이한 토너먼트에서 우승한 적 있는지 */
   isWinner?: boolean;
   preload?: boolean;
@@ -28,7 +28,7 @@ function WishCard({
   price,
   imageUrl,
   sourcePlatform,
-  discountRate,
+  discountRate = null,
   isWinner = false,
   preload = false,
 }: WishCardProps) {
