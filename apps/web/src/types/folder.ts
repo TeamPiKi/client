@@ -29,12 +29,13 @@ export type PostFolderWishesResponseT = {
   wishCount: number;
 };
 
-export type DeleteFolderWishesRequestT = PostFolderWishesRequestT;
+export type FolderWishSelectionT = { wishIds: number[] } | { all: true };
+
+export type DeleteFolderWishesRequestT = FolderWishSelectionT;
 
 export type DeleteFolderWishesResponseT = PostFolderWishesResponseT;
 
-export type PostFolderWishesMoveRequestT = {
-  wishIds: number[];
+export type PostFolderWishesMoveRequestT = FolderWishSelectionT & {
   targetFolderId: number;
 };
 

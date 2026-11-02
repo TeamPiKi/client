@@ -14,6 +14,7 @@ export const ENDPOINTS = {
 
   /** 위시리스트 */
   WISHLISTS: '/api/v1/wishlists',
+  WISHLISTS_COUNT: '/api/v1/wishlists/count',
   WISHLIST: (id: number) => `/api/v1/wishlists/${id}`,
   WISH_IMAGE_PRESIGNED: '/api/v1/wishlists/images/presigned',
   WISH_IMAGE_CONFIRM: '/api/v1/wishlists/images/confirm',

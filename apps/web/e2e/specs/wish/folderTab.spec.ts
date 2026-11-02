@@ -47,17 +47,17 @@ test('새 폴더 이름을 입력하면 생성 요청을 보내고 시트가 닫
   await expect(page.getByRole('textbox', { name: '폴더명' })).toBeHidden();
 });
 
-test('같은 이름의 폴더가 있으면 시트 안에 안내 문구가 보인다', async ({ page, api }) => {
+test('서버가 이름 규칙 위반을 알리면 시트 안에 안내 문구가 보인다', async ({ page, api }) => {
   api.get(ENDPOINTS.USER, MOCK_MEMBER_ME);
   api.get(ENDPOINTS.FOLDERS, MOCK_FOLDERS);
-  api.error('POST', ENDPOINTS.FOLDERS, { status: 409, code: ERROR_CODE.FOLDER_DUPLICATE_NAME });
+  api.error('POST', ENDPOINTS.FOLDERS, { status: 400, code: ERROR_CODE.FOLDER_INVALID_NAME });
 
   await page.goto('/wish?tab=folder');
   await page.getByText('폴더 추가하기').click();
   await page.getByRole('textbox', { name: '폴더명' }).fill(MOCK_FOLDER.name);
   await page.getByRole('button', { name: '완료' }).click();
 
-  await expect(page.getByText('같은 이름의 폴더가 이미 있어요.')).toBeVisible();
+  await expect(page.getByText('폴더 이름은 1에서 20자로 입력해 주세요.')).toBeVisible();
   await expect(page.getByRole('textbox', { name: '폴더명' })).toBeVisible();
 });
 

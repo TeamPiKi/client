@@ -13,6 +13,10 @@ export type GetWishesRequestT = {
   q?: string;
 };
 
+export type GetWishesCountResponseT = {
+  count: number;
+};
+
 export type GetWishlistResponseT = {
   wish: WishT;
   item: ItemT;
