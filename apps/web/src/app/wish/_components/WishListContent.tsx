@@ -5,7 +5,6 @@ import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
 import { Z_INDEX } from '@/consts/zIndex';
-import { useGetFolders } from '@/hooks/useGetFolders';
 import { cn } from '@/utils/cn';
 import { getScrollContainer } from '@/utils/scrollRestoration';
 
@@ -30,7 +29,6 @@ function WishListContent() {
 
   /** TEMP: API 연동 시 위시 목록 조회 응답으로 교체 */
   const [wishes, setWishes] = useState(MOCK_WISHES);
-  const { foldersData } = useGetFolders();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isTitleHidden, setIsTitleHidden] = useState(false);
   const {
@@ -96,7 +94,6 @@ function WishListContent() {
         )}
         <WishTabSummary
           wishCount={wishes.length}
-          folderCount={foldersData.length}
           mode={mode}
           onEdit={handleEnterEditMode}
           onSearch={() => setIsSearchOpen(true)}

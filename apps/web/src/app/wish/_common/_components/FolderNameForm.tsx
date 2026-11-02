@@ -81,6 +81,7 @@ function FolderNameForm({
             onNameChange?.();
           }}
           aria-invalid={errorMessage !== null}
+          readOnly={isPending}
           {...(errorMessage && { helperText: errorMessage })}
           autoFocus
         />

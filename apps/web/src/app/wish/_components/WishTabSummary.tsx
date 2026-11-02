@@ -3,6 +3,7 @@
 import { useSearchParams } from 'next/navigation';
 
 import { SearchIconOutline } from '@/assets/icons';
+import { useGetFolders } from '@/hooks/useGetFolders';
 
 import { WISH_MODE } from '../_common/_consts/wishMode';
 import type { WishModeT } from '../_common/_types/wishMode';
@@ -13,26 +14,32 @@ const MAX_DISPLAY_COUNT = 999;
 
 type WishTabSummaryProps = {
   wishCount: number;
-  folderCount: number;
   mode: WishModeT;
   onEdit: () => void;
   onSearch: () => void;
 };
 
-function WishTabSummary({ wishCount, folderCount, mode, onEdit, onSearch }: WishTabSummaryProps) {
+/** 폴더 탭에서만 폴더를 조회해 폴더 조회 실패가 전체 위시 탭에 번지지 않게 함 */
+function FolderTabSummary() {
+  const { foldersData } = useGetFolders();
+
+  if (foldersData.length === 0) return null;
+
+  return <p className="body-2-medium text-text-neutral-tertiary">폴더 {foldersData.length}개</p>;
+}
+
+function WishTabSummary({ wishCount, mode, onEdit, onSearch }: WishTabSummaryProps) {
   const searchParams = useSearchParams();
   const isFolderTab = parseWishTabParam(searchParams.get('tab')) === WISH_TAB.FOLDER;
 
-  if (isFolderTab && folderCount === 0) return null;
+  if (isFolderTab) return <FolderTabSummary />;
 
   return (
     <div className="flex items-center justify-between">
       <p className="body-2-medium text-text-neutral-tertiary">
-        {isFolderTab
-          ? `폴더 ${folderCount}개`
-          : `상품 ${wishCount > MAX_DISPLAY_COUNT ? `${MAX_DISPLAY_COUNT}+` : wishCount}`}
+        상품 {wishCount > MAX_DISPLAY_COUNT ? `${MAX_DISPLAY_COUNT}+` : wishCount}
       </p>
-      {!isFolderTab && mode === WISH_MODE.DEFAULT && (
+      {mode === WISH_MODE.DEFAULT && (
         <div className="flex items-center gap-3 body-2-medium text-text-neutral-secondary">
           <button
             type="button"

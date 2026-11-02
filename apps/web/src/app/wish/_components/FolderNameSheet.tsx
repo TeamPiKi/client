@@ -25,8 +25,13 @@ function FolderNameSheet({
   onNameChange,
   onSubmit,
 }: FolderNameSheetProps) {
+  const handleOpenChange = (isOpen: boolean) => {
+    if (!isOpen && isPending) return;
+    onOpenChange(isOpen);
+  };
+
   return (
-    <Drawer open={open} onOpenChange={onOpenChange}>
+    <Drawer open={open} onOpenChange={handleOpenChange}>
       <DrawerContent>
         <DrawerDescription className="sr-only">폴더 이름을 입력하세요.</DrawerDescription>
         <FolderNameForm
@@ -35,7 +40,7 @@ function FolderNameSheet({
           submitErrorMessage={submitErrorMessage}
           isPending={isPending}
           {...(onNameChange && { onNameChange })}
-          onBack={() => onOpenChange(false)}
+          onBack={() => handleOpenChange(false)}
           onSubmit={onSubmit}
         />
       </DrawerContent>
