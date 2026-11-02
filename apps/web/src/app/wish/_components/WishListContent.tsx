@@ -28,7 +28,7 @@ function WishListContent() {
   const searchParams = useSearchParams();
   const isFolderTab = parseWishTabParam(searchParams.get('tab')) === WISH_TAB.FOLDER;
 
-  const { wishesCountData = 0 } = useGetWishesCount();
+  const { wishesCountData } = useGetWishesCount();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isTitleHidden, setIsTitleHidden] = useState(false);
   const {
