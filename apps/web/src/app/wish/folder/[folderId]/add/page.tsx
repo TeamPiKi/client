@@ -2,6 +2,7 @@ import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
 
 import { foldersQueryOptions } from '@/apis/getFolders';
 import { wishesInfiniteQueryOptions } from '@/apis/getWishes';
+import { wishesCountQueryOptions } from '@/apis/getWishesCount';
 import { parseIdParam } from '@/utils/parseIdParam';
 import { getQueryClient } from '@/utils/queryClient';
 import { serverPrefetch } from '@/utils/serverPrefetch';
@@ -21,6 +22,10 @@ async function FolderWishAddPage({ params }: FolderWishAddPageProps) {
     folderId !== null &&
       serverPrefetch(() =>
         queryClient.fetchInfiniteQuery(wishesInfiniteQueryOptions({ excludeFolderId: folderId }))
+      ),
+    folderId !== null &&
+      serverPrefetch(() =>
+        queryClient.fetchQuery(wishesCountQueryOptions({ excludeFolderId: folderId }))
       ),
   ]);
 

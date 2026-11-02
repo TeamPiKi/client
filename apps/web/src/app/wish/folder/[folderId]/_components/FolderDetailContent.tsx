@@ -14,7 +14,7 @@ import { useBackWithFallback } from '@/hooks/useBackWithFallback';
 import { useGetFolders } from '@/hooks/useGetFolders';
 import { useGetWishes } from '@/hooks/useGetWishes';
 import useIntersectionObserver from '@/hooks/useIntersectionObserver';
-import type { FolderT } from '@/types/folder';
+import type { FolderT, FolderWishSelectionT } from '@/types/folder';
 
 import WishEditActionBar from '../../../_common/_components/WishEditActionBar';
 import WishEditHeader from '../../../_common/_components/WishEditHeader';
@@ -38,6 +38,7 @@ function FolderDetailView({ folder }: { folder: FolderT }) {
   const bottomRef = useIntersectionObserver(fetchNextPage, hasNextPage && !isFetchingNextPage);
 
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [isAllSelected, setIsAllSelected] = useState(false);
   const {
     mode,
     selectedWishIds,
@@ -48,17 +49,46 @@ function FolderDetailView({ folder }: { folder: FolderT }) {
     handleExitEditMode,
   } = useWishEditMode();
 
+  /** 전체 선택은 아직 불러오지 않은 위시까지 포함해 서버에 all 로 보냄 */
+  const visibleSelectedWishIds = isAllSelected
+    ? new Set(wishesData.map(({ wish }) => wish.id))
+    : selectedWishIds;
+  const selectedCount = isAllSelected ? folder.wishCount : selectedWishIds.size;
+  const selection: FolderWishSelectionT = isAllSelected
+    ? { all: true }
+    : { wishIds: Array.from(selectedWishIds) };
+
+  const handleClear = () => {
+    setIsAllSelected(false);
+    handleClearSelection();
+  };
+
+  const handleExit = () => {
+    setIsAllSelected(false);
+    handleExitEditMode();
+  };
+
+  const handleToggle = (wishId: number) => {
+    if (!isAllSelected) {
+      handleToggleSelect(wishId);
+      return;
+    }
+
+    setIsAllSelected(false);
+    handleSelectAll(wishesData.map(({ wish }) => wish.id).filter(id => id !== wishId));
+  };
+
   const { postFolderWishesMoveMutation } = usePostFolderWishesMove(folder.id, {
-    onSuccess: handleClearSelection,
+    onSuccess: handleClear,
   });
   const { deleteFolderWishesMutation } = useDeleteFolderWishes(folder.id, {
-    onSuccess: handleClearSelection,
+    onSuccess: handleClear,
   });
 
   const handleMove = (targetFolder: FolderT) =>
-    postFolderWishesMoveMutation({ targetFolder, wishIds: Array.from(selectedWishIds) });
+    postFolderWishesMoveMutation({ targetFolder, selection });
 
-  const handleDelete = () => deleteFolderWishesMutation(Array.from(selectedWishIds));
+  const handleDelete = () => deleteFolderWishesMutation({ selection, count: selectedCount });
 
   return (
     <>
@@ -68,7 +98,7 @@ function FolderDetailView({ folder }: { folder: FolderT }) {
       >
         {mode === WISH_MODE.EDIT ? (
           <div className="px-5">
-            <WishEditHeader selectedCount={selectedWishIds.size} onDone={handleExitEditMode} />
+            <WishEditHeader selectedCount={selectedCount} onDone={handleExit} />
           </div>
         ) : (
           <div className="pr-5 pl-2.5">
@@ -102,7 +132,7 @@ function FolderDetailView({ folder }: { folder: FolderT }) {
               </p>
               <button
                 type="button"
-                onClick={() => handleSelectAll(wishesData.map(({ wish }) => wish.id))}
+                onClick={() => setIsAllSelected(true)}
                 className="cursor-pointer text-text-neutral-secondary"
               >
                 전체 선택
@@ -133,18 +163,21 @@ function FolderDetailView({ folder }: { folder: FolderT }) {
       {/** TODO: 위시 상세 링크 연결 시 saveScrollAnchor·useScrollRestoration(scope: folderId) 추가 */}
       <WishGrid
         wishes={wishesData}
-        {...(mode === WISH_MODE.EDIT && { selectedWishIds, onToggleSelect: handleToggleSelect })}
+        {...(mode === WISH_MODE.EDIT && {
+          selectedWishIds: visibleSelectedWishIds,
+          onToggleSelect: handleToggle,
+        })}
       />
       <div ref={bottomRef} />
 
       {mode === WISH_MODE.EDIT && (
         <WishEditActionBar
-          selectedCount={selectedWishIds.size}
+          selectedCount={selectedCount}
           currentFolderId={folder.id}
           onMove={handleMove}
           onDelete={handleDelete}
           deleteConfirm={{
-            title: `선택한 상품 ${selectedWishIds.size}개를 삭제할까요?`,
+            title: `선택한 상품 ${selectedCount}개를 삭제할까요?`,
             description: '폴더에서만 삭제되며, 전체 위시에는 남아있어요.',
             icon: null,
           }}

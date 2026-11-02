@@ -2,7 +2,7 @@ import { ERROR_CODE } from '@piki/core';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
-import type { FolderT } from '@/types/folder';
+import type { FolderT, FolderWishSelectionT } from '@/types/folder';
 import { getApiErrorCode, isGlobalNetError } from '@/utils/apiError';
 import { getApiErrorMessage } from '@/utils/getApiErrorMessage';
 
@@ -10,7 +10,7 @@ import { postFolderWishesMove } from '../../../_common/_apis/postFolderWishesMov
 
 type PostFolderWishesMoveVariablesT = {
   targetFolder: Pick<FolderT, 'id' | 'name'>;
-  wishIds: number[];
+  selection: FolderWishSelectionT;
 };
 
 export const usePostFolderWishesMove = (
@@ -21,8 +21,8 @@ export const usePostFolderWishesMove = (
 
   const { mutate: postFolderWishesMoveMutation, isPending: isPostFolderWishesMovePending } =
     useMutation({
-      mutationFn: ({ targetFolder, wishIds }: PostFolderWishesMoveVariablesT) =>
-        postFolderWishesMove(folderId, { wishIds, targetFolderId: targetFolder.id }),
+      mutationFn: ({ targetFolder, selection }: PostFolderWishesMoveVariablesT) =>
+        postFolderWishesMove(folderId, { ...selection, targetFolderId: targetFolder.id }),
       onSuccess: (_, { targetFolder }) => {
         queryClient.invalidateQueries({ queryKey: ['wishlists'] });
         queryClient.invalidateQueries({ queryKey: ['folders'] });

@@ -15,6 +15,7 @@ import { Z_INDEX } from '@/consts/zIndex';
 import { useBackWithFallback } from '@/hooks/useBackWithFallback';
 import { useGetFolders } from '@/hooks/useGetFolders';
 import { useGetWishes } from '@/hooks/useGetWishes';
+import { useGetWishesCount } from '@/hooks/useGetWishesCount';
 import useIntersectionObserver from '@/hooks/useIntersectionObserver';
 import type { FolderT } from '@/types/folder';
 
@@ -33,6 +34,7 @@ function FolderWishSelectView({ folder }: { folder: FolderT }) {
   const { wishesData, fetchNextPage, hasNextPage, isFetchingNextPage } = useGetWishes({
     excludeFolderId: folder.id,
   });
+  const { wishesCountData = 0 } = useGetWishesCount({ excludeFolderId: folder.id });
   const bottomRef = useIntersectionObserver(fetchNextPage, hasNextPage && !isFetchingNextPage);
 
   const { selectedWishIds, handleToggleSelect } = useWishEditMode();
@@ -70,7 +72,7 @@ function FolderWishSelectView({ folder }: { folder: FolderT }) {
           }
         />
         <p className="body-2-medium text-text-neutral-tertiary">
-          상품 {formatWishCount(wishesData.length, hasNextPage)}
+          상품 {formatWishCount(wishesCountData)}
         </p>
       </div>
 
