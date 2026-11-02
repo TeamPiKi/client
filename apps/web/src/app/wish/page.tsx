@@ -2,6 +2,7 @@ import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
 
 import { foldersQueryOptions } from '@/apis/getFolders';
 import { wishesInfiniteQueryOptions } from '@/apis/getWishes';
+import { wishesCountQueryOptions } from '@/apis/getWishesCount';
 import { getQueryClient } from '@/utils/queryClient';
 import { serverPrefetch } from '@/utils/serverPrefetch';
 
@@ -13,6 +14,7 @@ async function WishPage() {
   await Promise.all([
     serverPrefetch(() => queryClient.fetchQuery(foldersQueryOptions)),
     serverPrefetch(() => queryClient.fetchInfiniteQuery(wishesInfiniteQueryOptions())),
+    serverPrefetch(() => queryClient.fetchQuery(wishesCountQueryOptions())),
   ]);
 
   return (

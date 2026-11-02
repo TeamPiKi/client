@@ -4,7 +4,7 @@ import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 import { Z_INDEX } from '@/consts/zIndex';
-import { useGetWishes } from '@/hooks/useGetWishes';
+import { useGetWishesCount } from '@/hooks/useGetWishesCount';
 import type { FolderT } from '@/types/folder';
 import { cn } from '@/utils/cn';
 import { getScrollContainer } from '@/utils/scrollRestoration';
@@ -28,7 +28,7 @@ function WishListContent() {
   const searchParams = useSearchParams();
   const isFolderTab = parseWishTabParam(searchParams.get('tab')) === WISH_TAB.FOLDER;
 
-  const { wishesData, hasNextPage } = useGetWishes();
+  const { wishesCountData = 0 } = useGetWishesCount();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isTitleHidden, setIsTitleHidden] = useState(false);
   const {
@@ -89,8 +89,7 @@ function WishListContent() {
           </>
         )}
         <WishTabSummary
-          wishCount={wishesData.length}
-          hasMoreWishes={hasNextPage}
+          wishCount={wishesCountData}
           mode={mode}
           onEdit={handleEnterEditMode}
           onSearch={() => setIsSearchOpen(true)}

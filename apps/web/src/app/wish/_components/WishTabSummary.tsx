@@ -14,15 +14,9 @@ const MAX_DISPLAY_COUNT = 999;
 
 type WishTabSummaryProps = {
   wishCount: number;
-  hasMoreWishes: boolean;
   mode: WishModeT;
   onEdit: () => void;
   onSearch: () => void;
-};
-
-const formatWishCount = (count: number, hasMore: boolean) => {
-  if (count > MAX_DISPLAY_COUNT) return `${MAX_DISPLAY_COUNT}+`;
-  return hasMore ? `${count}+` : String(count);
 };
 
 /** 폴더 탭에서만 폴더를 조회해 폴더 조회 실패가 전체 위시 탭에 번지지 않게 함 */
@@ -34,7 +28,7 @@ function FolderTabSummary() {
   return <p className="body-2-medium text-text-neutral-tertiary">폴더 {foldersData.length}개</p>;
 }
 
-function WishTabSummary({ wishCount, hasMoreWishes, mode, onEdit, onSearch }: WishTabSummaryProps) {
+function WishTabSummary({ wishCount, mode, onEdit, onSearch }: WishTabSummaryProps) {
   const searchParams = useSearchParams();
   const isFolderTab = parseWishTabParam(searchParams.get('tab')) === WISH_TAB.FOLDER;
 
@@ -43,7 +37,7 @@ function WishTabSummary({ wishCount, hasMoreWishes, mode, onEdit, onSearch }: Wi
   return (
     <div className="flex items-center justify-between">
       <p className="body-2-medium text-text-neutral-tertiary">
-        상품 {formatWishCount(wishCount, hasMoreWishes)}
+        상품 {wishCount > MAX_DISPLAY_COUNT ? `${MAX_DISPLAY_COUNT}+` : wishCount}
       </p>
       {mode === WISH_MODE.DEFAULT && (
         <div className="flex items-center gap-3 body-2-medium text-text-neutral-secondary">

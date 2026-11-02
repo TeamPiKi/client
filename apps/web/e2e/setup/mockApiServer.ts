@@ -63,6 +63,7 @@ const SSR_MOCK_ROUTES: Record<string, unknown> = {
   [`GET ${ENDPOINTS.WISHLISTS}`]: createApiSuccess(MOCK_WISHLIST_ENTRIES),
   [`GET ${ENDPOINTS.WISHLIST(1)}`]: createApiSuccess(MOCK_WISH_DETAIL),
   [`GET ${ENDPOINTS.FOLDERS}`]: createApiSuccess(MOCK_FOLDERS),
+  [`GET ${ENDPOINTS.WISHLISTS_COUNT}`]: createApiSuccess({ count: MOCK_WISHLIST_ENTRIES.length }),
 };
 
 const readCookie = (req: http.IncomingMessage, name: string) =>

@@ -86,6 +86,7 @@ test('폴더를 삭제하면 삭제 요청을 보내고 확인창이 닫힌다',
   api.get(ENDPOINTS.FOLDERS, MOCK_FOLDERS);
   api.delete(ENDPOINTS.FOLDER(MOCK_FOLDER.id), null);
   api.getPage(ENDPOINTS.WISHLISTS, MOCK_WISHLIST_ENTRIES);
+  api.get(ENDPOINTS.WISHLISTS_COUNT, { count: MOCK_WISHLIST_ENTRIES.length });
 
   await page.goto('/wish?tab=folder');
   await page.getByRole('button', { name: `${MOCK_FOLDER.name} 폴더 메뉴` }).click();

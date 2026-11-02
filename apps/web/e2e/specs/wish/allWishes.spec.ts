@@ -24,6 +24,7 @@ test('편집 모드에서 위시를 골라 삭제하면 삭제 요청을 보낸�
   api.get(ENDPOINTS.USER, MOCK_MEMBER_ME);
   api.delete(ENDPOINTS.WISHLISTS, null);
   api.getPage(ENDPOINTS.WISHLISTS, MOCK_WISHLIST_ENTRIES);
+  api.get(ENDPOINTS.WISHLISTS_COUNT, { count: MOCK_WISHLIST_ENTRIES.length });
   api.get(ENDPOINTS.FOLDERS, MOCK_FOLDERS);
 
   await page.goto('/wish');
@@ -44,6 +45,7 @@ test('편집 모드에서 폴더를 고르면 그 폴더에 위시를 담는다'
   api.get(ENDPOINTS.USER, MOCK_MEMBER_ME);
   api.post(ENDPOINTS.FOLDER_WISHES(MOCK_FOLDER.id), { folderId: MOCK_FOLDER.id, wishCount: 8 });
   api.getPage(ENDPOINTS.WISHLISTS, MOCK_WISHLIST_ENTRIES);
+  api.get(ENDPOINTS.WISHLISTS_COUNT, { count: MOCK_WISHLIST_ENTRIES.length });
   api.get(ENDPOINTS.FOLDERS, MOCK_FOLDERS);
 
   await page.goto('/wish');
@@ -64,6 +66,7 @@ test('편집 모드에서 폴더를 고르면 그 폴더에 위시를 담는다'
 test('검색어를 입력하면 검색어로 위시를 조회해 결과를 보여준다', async ({ page, api }) => {
   api.get(ENDPOINTS.USER, MOCK_MEMBER_ME);
   api.getPage(ENDPOINTS.WISHLISTS, [FIRST_ENTRY]);
+  api.get(ENDPOINTS.WISHLISTS_COUNT, { count: 1 });
 
   await page.goto('/wish');
   await page.getByRole('button', { name: '검색' }).click();

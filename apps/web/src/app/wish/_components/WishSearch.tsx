@@ -8,6 +8,7 @@ import WishGrid from '@/components/common/wish-grid';
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/dialog';
 import { Header } from '@/components/header';
 import Input from '@/components/input';
+import { useGetWishesCount } from '@/hooks/useGetWishesCount';
 import useIntersectionObserver from '@/hooks/useIntersectionObserver';
 import { cn } from '@/utils/cn';
 
@@ -34,9 +35,10 @@ function WishSearch({ onClose }: WishSearchProps) {
   const bottomRef = useIntersectionObserver(fetchNextPage, hasNextPage && !isFetchingNextPage);
 
   const isSearching = isFocused || submittedKeyword === null;
-  const resultCountLabel = hasNextPage
-    ? `${searchWishesData.length}+`
-    : String(searchWishesData.length);
+  const { wishesCountData: searchCount } = useGetWishesCount(
+    { q: submittedKeyword ?? '' },
+    submittedKeyword !== null
+  );
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -133,7 +135,7 @@ function WishSearch({ onClose }: WishSearchProps) {
             className="mx-auto flex w-full max-w-120 flex-col gap-6 pt-1 pb-10"
           >
             <p className="px-5 body-2-medium text-text-neutral-tertiary">
-              검색 결과 {resultCountLabel}개
+              검색 결과 {searchCount ?? searchWishesData.length}개
             </p>
             {searchWishesData.length > 0 ? (
               <>

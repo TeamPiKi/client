@@ -33,7 +33,7 @@ export const usePostFolderWishes = ({ onSuccess }: { onSuccess?: () => void } = 
       const code = getApiErrorCode(error);
       if (code === ERROR_CODE.FOLDER_NOT_FOUND)
         queryClient.invalidateQueries({ queryKey: ['folders'] });
-      if (code === ERROR_CODE.WISH_NOT_FOUND)
+      if (code === ERROR_CODE.WISH_FORBIDDEN_ITEMS)
         queryClient.invalidateQueries({ queryKey: ['wishlists'] });
     },
   });
