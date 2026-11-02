@@ -3,8 +3,7 @@ import type { RouteTypeT } from '@/types/route';
 
 /** 토너먼트 참여 권한이 필요한 동적 라우트 패턴 */
 const AUTHORIZED_ROUTE_PATTERNS = [
-  /** TEMP: by-wish-v2 는 폴더 칩 작업용 */
-  /^\/tournament\/[^/]+\/create(?:\/by-wish(?:-v2)?)?$/,
+  /^\/tournament\/[^/]+\/create(?:\/by-wish)?$/,
   /^\/tournament\/[^/]+\/item\/[^/]+$/,
   /^\/tournament\/[^/]+\/loading$/,
   /^\/tournament\/[^/]+\/match$/,

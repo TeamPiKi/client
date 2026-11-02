@@ -1,6 +1,7 @@
 import { ENDPOINTS } from '@/consts/api';
 
 import { expect, test } from '@e2e/fixtures/mockApiFixture';
+import { MOCK_FOLDER, MOCK_FOLDERS } from '@e2e/mocks/folder';
 import { MOCK_MEMBER_ME } from '@e2e/mocks/me';
 import {
   MOCK_TOURNAMENT_ITEMS,
@@ -48,6 +49,7 @@ test('위시에서 상품 4개를 가져오면 장바구니에 담긴다', async
   api.get(ENDPOINTS.USER, MOCK_MEMBER_ME);
   api.get(ENDPOINTS.TOURNAMENT(1), MOCK_TOURNAMENT_PENDING);
   api.getPage(ENDPOINTS.WISHLISTS, MOCK_WISHLIST_ENTRIES);
+  api.get(ENDPOINTS.FOLDERS, MOCK_FOLDERS);
   api.post(ENDPOINTS.TOURNAMENT_ITEMS_FROM_WISH(1), {
     tournamentItemIds: MOCK_TOURNAMENT_ITEMS.map(item => item.tournamentItemId),
   });
@@ -83,6 +85,57 @@ test('위시에서 상품 4개를 가져오면 장바구니에 담긴다', async
   await expect(page).toHaveURL(/\/tournament\/1\/create/);
   await expect(page.getByText('4/32')).toBeVisible();
   await expect(page.getByAltText('토너먼트 아이템 4')).toBeVisible();
+});
+
+test('폴더 칩을 오가며 고른 위시를 함께 후보로 담는다', async ({ page, api }) => {
+  const [FIRST_ENTRY, SECOND_ENTRY] = MOCK_WISHLIST_ENTRIES;
+
+  api.get(ENDPOINTS.USER, MOCK_MEMBER_ME);
+  api.get(ENDPOINTS.TOURNAMENT(1), MOCK_TOURNAMENT_PENDING);
+  api.getPage(ENDPOINTS.WISHLISTS, MOCK_WISHLIST_ENTRIES);
+  api.get(ENDPOINTS.FOLDERS, MOCK_FOLDERS);
+  api.post(ENDPOINTS.TOURNAMENT_ITEMS_FROM_WISH(1), { tournamentItemIds: [11, 12] });
+
+  await page.goto('/tournament/1/create/by-wish');
+  await page.getByRole('button', { name: FIRST_ENTRY?.item.name ?? '' }).click();
+
+  const folderRequest = page.waitForRequest(
+    request =>
+      request.url().includes(ENDPOINTS.WISHLISTS) &&
+      new URL(request.url()).searchParams.get('folderId') === String(MOCK_FOLDER.id)
+  );
+  await page
+    .getByRole('group', { name: '폴더 필터' })
+    .getByRole('button', { name: MOCK_FOLDER.name })
+    .click();
+  await folderRequest;
+  await page.getByRole('button', { name: SECOND_ENTRY?.item.name ?? '' }).click();
+  await expect(page.getByText('2/32개 선택')).toBeVisible();
+
+  const addRequest = page.waitForRequest(
+    request =>
+      request.method() === 'POST' && request.url().includes(ENDPOINTS.TOURNAMENT_ITEMS_FROM_WISH(1))
+  );
+  await page.getByRole('button', { name: '다음' }).click();
+
+  const { itemIds } = (await addRequest).postDataJSON() as { itemIds: number[] };
+  expect([...itemIds].sort()).toEqual([FIRST_ENTRY?.item.id, SECOND_ENTRY?.item.id].sort());
+});
+
+test('이미 후보에 담긴 상품은 위시 목록에서 빠진다', async ({ page, api }) => {
+  const [ALREADY_ADDED, ...REST] = MOCK_WISHLIST_ENTRIES;
+
+  api.get(ENDPOINTS.USER, MOCK_MEMBER_ME);
+  api.getPage(ENDPOINTS.WISHLISTS, MOCK_WISHLIST_ENTRIES);
+  api.get(ENDPOINTS.FOLDERS, MOCK_FOLDERS);
+
+  await page.goto('/tournament/11/create/by-wish');
+
+  await expect(page.getByText('0/31개 선택')).toBeVisible();
+  await expect(page.getByText(ALREADY_ADDED?.item.name ?? '', { exact: true })).toHaveCount(0);
+  for (const { item } of REST) {
+    await expect(page.getByText(item.name ?? '', { exact: true })).toBeVisible();
+  }
 });
 
 /**
