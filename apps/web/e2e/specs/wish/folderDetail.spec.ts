@@ -189,3 +189,28 @@ test('전체 선택 후 다른 폴더로 옮기면 all 로 옮긴다', async ({ 
     targetFolderId: OTHER_FOLDER?.id,
   });
 });
+
+for (const { folderResult, message } of [
+  { folderResult: 'ADDED', message: '이미 담은 상품을 폴더에 추가했어요.' },
+  { folderResult: 'ALREADY_IN_FOLDER', message: '이미 이 폴더에 있는 상품이에요.' },
+] as const) {
+  test(`이미 담은 링크를 폴더에서 담으면 ${folderResult} 결과를 안내한다`, async ({
+    page,
+    api,
+  }) => {
+    api.get(ENDPOINTS.USER, MOCK_MEMBER_ME);
+    api.post(ENDPOINTS.WISHLISTS, { ...MOCK_WISH_ADDED_BY_LINK, folderResult });
+    api.getPage(ENDPOINTS.WISHLISTS, MOCK_WISHLIST_ENTRIES);
+    api.get(ENDPOINTS.WISHLISTS_COUNT, { count: MOCK_WISHLIST_ENTRIES.length });
+    api.get(ENDPOINTS.FOLDERS, MOCK_FOLDERS);
+
+    await page.goto(FOLDER_PATH);
+    await page.getByRole('button', { name: '추가', exact: true }).click();
+    await page.getByRole('button', { name: /링크로 담기/ }).click();
+    await page.getByLabel('링크 URL').fill('https://shop.example/items/105');
+    await page.getByRole('button', { name: '위시리스트에 담기' }).click();
+
+    await expect(page.getByText(message)).toBeVisible();
+    await expect(page).toHaveURL(new RegExp(`${FOLDER_PATH}$`));
+  });
+}
