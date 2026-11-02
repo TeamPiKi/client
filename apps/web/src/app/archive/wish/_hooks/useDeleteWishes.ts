@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
-import { deleteWishes } from '../_apis/deleteWishes';
+import { deleteWishes } from '@/apis/deleteWishes';
 
 export const useDeleteWishes = (options?: { onSuccess?: () => void }) => {
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());

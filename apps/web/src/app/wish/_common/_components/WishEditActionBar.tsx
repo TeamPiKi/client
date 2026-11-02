@@ -5,17 +5,18 @@ import { type ComponentProps, type ComponentType, type SVGProps, useState } from
 import { FolderIconFill, TrashIconFill } from '@/assets/icons';
 import ConfirmDialog from '@/components/common/confirm-dialog';
 import { Z_INDEX } from '@/consts/zIndex';
+import { useGetFolders } from '@/hooks/useGetFolders';
+import type { FolderT } from '@/types/folder';
 import { cn } from '@/utils/cn';
 
-import { MOCK_FOLDERS } from '../_consts/wishMock';
-import type { WishFolderT } from '../_types/wish';
+import { usePostFolder } from '../_hooks/usePostFolder';
 import FolderSelectSheet from './FolderSelectSheet';
 import './WishEditActionBar.css';
 
 type WishEditActionBarProps = {
   selectedCount: number;
   currentFolderId?: number;
-  onMove: (folder: WishFolderT) => void;
+  onMove: (folder: FolderT) => void;
   onDelete: () => void;
   deleteConfirm: Pick<ComponentProps<typeof ConfirmDialog>, 'title' | 'description' | 'icon'>;
 };
@@ -60,19 +61,26 @@ function WishEditActionBar({
   deleteConfirm,
 }: WishEditActionBarProps) {
   const [isFolderSheetOpen, setIsFolderSheetOpen] = useState(false);
+  const [isAddFolderView, setIsAddFolderView] = useState(false);
+  const [addFolderErrorMessage, setAddFolderErrorMessage] = useState<string | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  /** TEMP: API 연동 시 폴더 목록 조회·생성 API 로 교체 */
-  const [folders, setFolders] = useState(() =>
-    MOCK_FOLDERS.filter(({ id }) => id !== currentFolderId)
-  );
+
+  const { foldersData } = useGetFolders();
+  const folders = foldersData.filter(({ id }) => id !== currentFolderId);
+
+  const { postFolderMutation, isPostFolderPending } = usePostFolder({
+    onSuccess: () => setIsAddFolderView(false),
+    onNameError: setAddFolderErrorMessage,
+  });
 
   const isDisabled = selectedCount === 0;
 
-  const handleAddFolder = (name: string) => {
-    setFolders(prev => [{ id: Date.now(), name, wishIds: [] }, ...prev]);
+  const handleAddFolderViewChange = (isAddView: boolean) => {
+    setAddFolderErrorMessage(null);
+    setIsAddFolderView(isAddView);
   };
 
-  const handleSelectFolder = (folder: WishFolderT) => {
+  const handleSelectFolder = (folder: FolderT) => {
     setIsFolderSheetOpen(false);
     onMove(folder);
   };
@@ -109,8 +117,13 @@ function WishEditActionBar({
         open={isFolderSheetOpen}
         onOpenChange={setIsFolderSheetOpen}
         folders={folders}
+        isAddView={isAddFolderView}
+        onAddViewChange={handleAddFolderViewChange}
+        addErrorMessage={addFolderErrorMessage}
+        isAddPending={isPostFolderPending}
+        onAddNameChange={() => setAddFolderErrorMessage(null)}
         onSelect={handleSelectFolder}
-        onAddFolder={handleAddFolder}
+        onAddFolder={postFolderMutation}
       />
       <ConfirmDialog
         {...deleteConfirm}
