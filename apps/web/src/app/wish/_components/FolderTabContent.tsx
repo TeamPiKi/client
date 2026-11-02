@@ -4,60 +4,77 @@ import { josa } from 'es-hangul';
 import { useState } from 'react';
 
 import ConfirmDialog from '@/components/common/confirm-dialog';
+import { useGetFolders } from '@/hooks/useGetFolders';
 import { useScrollRestoration } from '@/hooks/useScrollRestoration';
+import type { FolderT } from '@/types/folder';
 import { SCROLL_NAMESPACE } from '@/utils/scrollRestoration';
 
-import { getMockWishImageUrl } from '../_common/_consts/wishMock';
-import type { WishFolderT } from '../_common/_types/wish';
+import { useDeleteFolder } from '../_common/_hooks/useDeleteFolder';
+import { usePatchFolder } from '../_common/_hooks/usePatchFolder';
+import { usePostFolder } from '../_common/_hooks/usePostFolder';
 import { WISH_TAB } from '../_consts/wishTab';
-import type { FolderTabContentProps } from '../_types/wishTab';
 import FolderAddCard from './FolderAddCard';
 import FolderCard from './FolderCard';
 import FolderEmptyState from './FolderEmptyState';
 import FolderNameSheet from './FolderNameSheet';
 
-function FolderTabContent({ folders, onCreate, onRename, onDelete }: FolderTabContentProps) {
+function FolderTabContent() {
   useScrollRestoration({ namespace: SCROLL_NAMESPACE.WISH, scope: WISH_TAB.FOLDER });
 
+  const { foldersData } = useGetFolders();
+
   const [isCreateSheetOpen, setIsCreateSheetOpen] = useState(false);
-  const [renameTarget, setRenameTarget] = useState<WishFolderT | null>(null);
+  const [createErrorMessage, setCreateErrorMessage] = useState<string | null>(null);
+  const [renameTarget, setRenameTarget] = useState<FolderT | null>(null);
   const [isRenameSheetOpen, setIsRenameSheetOpen] = useState(false);
-  const [deleteTarget, setDeleteTarget] = useState<WishFolderT | null>(null);
+  const [renameErrorMessage, setRenameErrorMessage] = useState<string | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<FolderT | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
-  const handleCreate = (name: string) => {
-    onCreate(name);
-    setIsCreateSheetOpen(false);
+  const { postFolderMutation, isPostFolderPending } = usePostFolder({
+    onSuccess: () => setIsCreateSheetOpen(false),
+    onNameError: setCreateErrorMessage,
+  });
+  const { patchFolderMutation, isPatchFolderPending } = usePatchFolder({
+    onSuccess: () => setIsRenameSheetOpen(false),
+    onNameError: setRenameErrorMessage,
+  });
+  const { deleteFolderMutation, isDeleteFolderPending } = useDeleteFolder({
+    onSuccess: () => setIsDeleteDialogOpen(false),
+  });
+
+  const handleOpenCreateSheet = () => {
+    setCreateErrorMessage(null);
+    setIsCreateSheetOpen(true);
   };
 
   const handleRename = (name: string) => {
-    if (renameTarget) onRename(renameTarget.id, name);
-    setIsRenameSheetOpen(false);
+    if (renameTarget) patchFolderMutation({ folderId: renameTarget.id, name });
   };
 
   const handleDelete = () => {
-    if (deleteTarget) onDelete(deleteTarget.id);
-    setIsDeleteDialogOpen(false);
+    if (deleteTarget) deleteFolderMutation(deleteTarget.id);
   };
 
   return (
     <>
-      {folders.length === 0 ? (
-        <FolderEmptyState onAdd={() => setIsCreateSheetOpen(true)} />
+      {foldersData.length === 0 ? (
+        <FolderEmptyState onAdd={handleOpenCreateSheet} />
       ) : (
         <ul className="grid grid-cols-2">
           <li>
-            <FolderAddCard onClick={() => setIsCreateSheetOpen(true)} />
+            <FolderAddCard onClick={handleOpenCreateSheet} />
           </li>
-          {folders.map(folder => (
+          {foldersData.map(folder => (
             <li key={folder.id}>
               <FolderCard
                 folderId={folder.id}
                 name={folder.name}
-                wishCount={folder.wishIds.length}
-                thumbnailUrls={folder.wishIds.slice(0, 3).map(getMockWishImageUrl)}
+                wishCount={folder.wishCount}
+                thumbnailUrls={folder.coverImageUrls}
                 onRename={() => {
                   setRenameTarget(folder);
+                  setRenameErrorMessage(null);
                   setIsRenameSheetOpen(true);
                 }}
                 onDelete={() => {
@@ -74,7 +91,10 @@ function FolderTabContent({ folders, onCreate, onRename, onDelete }: FolderTabCo
         open={isCreateSheetOpen}
         onOpenChange={setIsCreateSheetOpen}
         title="새 폴더 추가"
-        onSubmit={handleCreate}
+        submitErrorMessage={createErrorMessage}
+        isPending={isPostFolderPending}
+        onNameChange={() => setCreateErrorMessage(null)}
+        onSubmit={postFolderMutation}
       />
       <FolderNameSheet
         key={renameTarget?.id}
@@ -82,6 +102,9 @@ function FolderTabContent({ folders, onCreate, onRename, onDelete }: FolderTabCo
         onOpenChange={setIsRenameSheetOpen}
         title="폴더명 변경"
         {...(renameTarget && { initialName: renameTarget.name })}
+        submitErrorMessage={renameErrorMessage}
+        isPending={isPatchFolderPending}
+        onNameChange={() => setRenameErrorMessage(null)}
         onSubmit={handleRename}
       />
       <ConfirmDialog
@@ -91,6 +114,7 @@ function FolderTabContent({ folders, onCreate, onRename, onDelete }: FolderTabCo
         description="폴더를 삭제해도 담아둔 위시는 그대로 유지돼요."
         confirmLabel="삭제하기"
         icon={null}
+        isPending={isDeleteFolderPending}
         onConfirm={handleDelete}
       />
     </>

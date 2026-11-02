@@ -14,10 +14,17 @@ export const ENDPOINTS = {
 
   /** 위시리스트 */
   WISHLISTS: '/api/v1/wishlists',
+  WISHLISTS_COUNT: '/api/v1/wishlists/count',
   WISHLIST: (id: number) => `/api/v1/wishlists/${id}`,
   WISH_IMAGE_PRESIGNED: '/api/v1/wishlists/images/presigned',
   WISH_IMAGE_CONFIRM: '/api/v1/wishlists/images/confirm',
   WISHLIST_REFRESH: (id: number) => `/api/v1/wishlists/${id}/refresh`,
+
+  /** 위시 폴더 */
+  FOLDERS: '/api/v1/folders',
+  FOLDER: (id: number) => `/api/v1/folders/${id}`,
+  FOLDER_WISHES: (id: number) => `/api/v1/folders/${id}/wishes`,
+  FOLDER_WISHES_MOVE: (id: number) => `/api/v1/folders/${id}/wishes/move`,
 
   /** 토너먼트 */
   TOURNAMENTS: '/api/v1/tournaments',
