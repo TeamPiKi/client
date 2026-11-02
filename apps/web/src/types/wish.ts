@@ -1,3 +1,4 @@
+import type { FolderResultT } from './folder';
 import type { PresignedImageRequestT, PresignedImageResponseT } from './image';
 import type { ItemT } from './item';
 
@@ -37,6 +38,8 @@ export type WishListItemT = Omit<GetWishlistResponseT, 'item'> & {
 export type PostWishLinkResponseT = {
   wish: WishT;
   item: ItemT;
+  /** folderId 로 등록했을 때 이미 담은 링크였는지. 새 위시면 null */
+  folderResult?: FolderResultT | null;
 };
 
 export type PostWishPresignedUrlRequestT = {
@@ -49,6 +52,7 @@ export type PostWishPresignedUrlResponseT = {
 
 export type PostWishImagesRequestT = {
   imageKeys: string[];
+  folderId?: number;
 };
 
 export type PostWishImagesResponseT = {

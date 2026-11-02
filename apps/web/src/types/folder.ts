@@ -1,3 +1,5 @@
+import type { FOLDER_RESULT } from '@/consts/folder';
+
 export type FolderT = {
   id: number;
   name: string;
@@ -45,3 +47,5 @@ export type PostFolderWishesMoveResponseT = {
   targetFolderId: number;
   targetWishCount: number;
 };
+
+export type FolderResultT = (typeof FOLDER_RESULT)[keyof typeof FOLDER_RESULT];

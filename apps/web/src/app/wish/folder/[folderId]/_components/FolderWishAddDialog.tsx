@@ -54,11 +54,13 @@ function FolderWishAddDialog({ folderId, open, onOpenChange }: FolderWishAddDial
 
       <ByLinkDialog
         type="wish"
+        folderId={folderId}
         open={subDialog === 'link'}
         onOpenChange={isOpen => setSubDialog(isOpen ? 'link' : null)}
       />
       <ByImageDialog
         type="wish"
+        folderId={folderId}
         open={subDialog === 'image'}
         onOpenChange={isOpen => setSubDialog(isOpen ? 'image' : null)}
       />

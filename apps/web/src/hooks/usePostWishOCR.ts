@@ -12,7 +12,7 @@ import { createS3UploadError, getApiErrorStatus, isGlobalNetError } from '@/util
 import { getApiErrorMessage } from '@/utils/getApiErrorMessage';
 import { getLoginPath } from '@/utils/loginRedirect';
 
-export const usePostWishOCR = () => {
+export const usePostWishOCR = ({ folderId }: { folderId?: number } = {}) => {
   const router = useRouter();
   const pathname = usePathname();
   const queryClient = useQueryClient();
@@ -39,11 +39,19 @@ export const usePostWishOCR = () => {
         })
       );
 
-      return postWishImages({ imageKeys: uploads.map(upload => upload.imageKey) });
+      return postWishImages({
+        imageKeys: uploads.map(upload => upload.imageKey),
+        ...(typeof folderId === 'number' && { folderId }),
+      });
     },
     onSuccess: () => {
       logAnalyticsEvent(ANALYTICS_EVENT.WISH_ADD_COMPLETE, { source: 'ocr' });
       queryClient.invalidateQueries({ queryKey: ['wishlists'] });
+
+      if (typeof folderId === 'number') {
+        queryClient.invalidateQueries({ queryKey: ['folders'] });
+        return;
+      }
       if (pathname !== ROUTES.WISHLIST) router.push(ROUTES.WISHLIST);
     },
     onError: error => {
