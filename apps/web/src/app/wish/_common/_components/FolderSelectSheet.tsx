@@ -34,6 +34,7 @@ function FolderSelectSheet({
   onAddFolder,
 }: FolderSelectSheetProps) {
   const handleOpenChange = (isOpen: boolean) => {
+    if (!isOpen && isAddPending) return;
     if (!isOpen) onAddViewChange(false);
     onOpenChange(isOpen);
   };
@@ -49,7 +50,7 @@ function FolderSelectSheet({
             title="폴더 추가"
             submitErrorMessage={addErrorMessage}
             isPending={isAddPending}
-            onBack={() => onAddViewChange(false)}
+            onBack={() => !isAddPending && onAddViewChange(false)}
             onNameChange={onAddNameChange}
             onSubmit={onAddFolder}
           />
