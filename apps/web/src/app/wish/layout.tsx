@@ -1,5 +1,3 @@
-import { notFound } from 'next/navigation';
-
 import LoginRequiredPage from '@/components/common/login-required/LoginRequiredPage';
 import { LOGIN_REQUIRED_TITLE } from '@/components/common/login-required/loginRequired.const';
 import { GUEST_BLOCK_LOCATION } from '@/consts/guestBlockLocation';
@@ -11,8 +9,6 @@ type WishLayoutProps = {
 };
 
 async function WishLayout({ children }: WishLayoutProps) {
-  if (process.env.NEXT_PUBLIC_STAGE === 'production') notFound(); // TEMP
-
   const role = await getRoleOrRedirect();
 
   if (role !== 'MEMBER')
