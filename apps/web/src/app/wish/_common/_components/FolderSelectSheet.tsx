@@ -81,7 +81,7 @@ function FolderSelectSheet({
                     onClick={() => onSelect(folder)}
                     className="flex h-15 w-full cursor-pointer items-center gap-[13px] text-left"
                   >
-                    <FolderListThumbnail url={folder.coverImageUrls[0] ?? null} />
+                    <FolderListThumbnail coverImageUrls={folder.coverImageUrls} />
                     <span className="flex min-w-0 items-center gap-[5px] body-1-medium">
                       <span className="truncate text-text-neutral-primary">{folder.name}</span>
                       <span className="shrink-0 text-text-neutral-tertiary">

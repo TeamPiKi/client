@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import type { MouseEvent } from 'react';
 
+import ImageIconOutline from '@/assets/icons/outline/image.svg';
 import BaseImage from '@/components/base-image';
 import { ROUTES } from '@/consts/route';
 import { cn } from '@/utils/cn';
@@ -25,13 +26,17 @@ type FolderCardProps = {
 function FolderThumbnail({ url, className }: { url: string | null; className?: string }) {
   return (
     <div className={cn('relative bg-gray-75', className)}>
-      {url && (
+      {url ? (
         <BaseImage
           src={url}
           alt=""
           sizes="(max-width: 480px) 50vw, 240px"
           className="object-cover"
         />
+      ) : (
+        <div className="absolute inset-0 flex items-center justify-center text-gray-200">
+          <ImageIconOutline width={32} height={32} aria-hidden />
+        </div>
       )}
     </div>
   );

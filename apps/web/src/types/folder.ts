@@ -4,7 +4,8 @@ export type FolderT = {
   id: number;
   name: string;
   wishCount: number;
-  coverImageUrls: string[];
+  /** 최근 넣은 위시 최대 3개 순서. 이미지 없는 위시 칸은 null */
+  coverImageUrls: (string | null)[];
   createdAt: string;
 };
 
