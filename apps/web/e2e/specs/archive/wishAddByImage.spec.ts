@@ -56,13 +56,23 @@ test('여러 장을 고르면 에디터가 열리고, 편집한 장만 JPEG 로 
 
   const editor = page.getByRole('dialog', { name: '이미지 편집' });
   await expect(editor).toBeVisible();
+
+  /** 가이드 화면에서 시작하고, 모든 장을 띄워보기 전엔 완료할 수 없다 */
+  await expect(editor.getByRole('button', { name: '자르기 가이드 보기' })).toHaveAttribute(
+    'aria-current',
+    'true'
+  );
+  await expect(editor.getByRole('button', { name: '완료' })).toBeDisabled();
+
+  await editor.getByRole('button', { name: '1번째 사진 편집' }).click();
   await expect(editor.getByRole('button', { name: '1번째 사진 편집' })).toHaveAttribute(
     'aria-current',
     'true'
   );
+  await expect(editor.getByRole('button', { name: '완료' })).toBeDisabled();
 
   /** 첫 장만 크롭 — 손대지 않은 둘째 장은 원본 그대로 가야 한다 */
-  await expect(editor.getByRole('button', { name: '완료' })).toBeEnabled();
+  await expect(editor.locator('.cropper-point.point-se')).toBeVisible();
   const handleBox = await editor.locator('.cropper-point.point-se').boundingBox();
   if (!handleBox) throw new Error('crop handle not found');
   await page.mouse.move(handleBox.x + handleBox.width / 2, handleBox.y + handleBox.height / 2);
@@ -71,7 +81,7 @@ test('여러 장을 고르면 에디터가 열리고, 편집한 장만 JPEG 로 
   await page.mouse.up();
   const croppedBox = await editor.locator('.cropper-crop-box').boundingBox();
 
-  /** 하단 썸네일로 장 이동 */
+  /** 하단 썸네일로 장 이동 — 마지막 장까지 띄우면 완료가 열린다 */
   await editor.getByRole('button', { name: '2번째 사진 편집' }).click();
   await expect(editor.getByRole('button', { name: '2번째 사진 편집' })).toHaveAttribute(
     'aria-current',
@@ -147,10 +157,16 @@ test('크롭 박스 모서리를 끌어 줄이면 그 영역만 JPEG 로 업로�
   await page.locator('input[type="file"]').setInputFiles(PICKED_FILES[0] ?? []);
 
   const editor = page.getByRole('dialog', { name: '이미지 편집' });
+  await expect(editor).toBeVisible();
+
+  /** 한 장이어도 가이드에서 시작한다. 띄워야 완료가 열린다 */
+  await expect(editor.getByRole('button', { name: '완료' })).toBeDisabled();
+  await editor.getByRole('button', { name: '1번째 사진 편집' }).click();
   await expect(editor.getByRole('button', { name: '완료' })).toBeEnabled();
 
   /** 오른쪽 아래 핸들을 안쪽으로 끌어 크롭 박스를 절반 가까이 줄인다 */
   const handle = editor.locator('.cropper-point.point-se');
+  await expect(handle).toBeVisible();
   const handleBox = await handle.boundingBox();
   if (!handleBox) throw new Error('crop handle not found');
   const startX = handleBox.x + handleBox.width / 2;
@@ -225,7 +241,12 @@ test('브라우저가 디코드하지 못하는 이미지는 편집 불가 안�
 
   const editor = page.getByRole('dialog', { name: '이미지 편집' });
   await expect(editor).toBeVisible();
+
+  /** 편집 불가 장도 가이드에서 띄워야 확인으로 친다 */
+  await expect(editor.getByRole('button', { name: '완료' })).toBeDisabled();
+  await editor.getByRole('button', { name: '1번째 사진 편집' }).click();
   await expect(editor.getByText('이 이미지는 편집할 수 없어요.')).toBeVisible();
+  await expect(editor.getByRole('button', { name: '완료' })).toBeEnabled();
 
   api.post(ENDPOINTS.WISH_IMAGE_PRESIGNED, {
     uploads: [
