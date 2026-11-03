@@ -119,6 +119,9 @@ function ImageCropEditor({
   }, [imageElement, activeImage, aspect, cropShape]);
 
   const handleSelectImage = (index: number) => {
+    /** 같은 장을 다시 누르면 Cropper effect 가 안 돌아 ready 가 영영 안 옴 */
+    if (index === activeIndex) return;
+
     setActiveIndex(index);
     /** 새 장의 원본이 Cropper 캔버스로 바뀌기 전에 한 프레임 노출되는 걸 막음 */
     setIsCropperReady(false);
