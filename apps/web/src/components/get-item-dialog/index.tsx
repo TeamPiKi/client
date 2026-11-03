@@ -3,15 +3,14 @@
 import { useParams } from 'next/navigation';
 import { useState } from 'react';
 
-import { HeartIconFill, ImageIconFill, LinkIconFill } from '@/assets/icons';
+import { ImageIconFill, LinkIconFill } from '@/assets/icons';
 import { DialogContent, DialogDescription, DialogTitle } from '@/components/dialog';
-import { ROUTES } from '@/consts/route';
-import { useGetMe } from '@/hooks/useGetMe';
 import type { ItemTypeT } from '@/types/item';
 import { parseIdParam } from '@/utils/parseIdParam';
 
 import ByImageDialog from './ByImageDialog';
 import ByLinkDialog from './ByLinkDialog';
+import FromWishOptionButton from './FromWishOptionButton';
 import OptionButton from './OptionButton';
 
 type GetItemDialogContentProps = {
@@ -19,12 +18,10 @@ type GetItemDialogContentProps = {
 };
 
 function GetItemDialogContent({ type }: GetItemDialogContentProps) {
-  const { userData } = useGetMe();
   const [isSubDialogOpen, setIsSubDialogOpen] = useState<'link' | 'image' | null>(null);
 
   const { id } = useParams<{ id: string }>();
   const tournamentId = parseIdParam(id);
-  const isWishOptionVisible = type === 'tournament' && userData.identityType === 'MEMBER';
 
   if (type === 'tournament' && !tournamentId) return null;
 
@@ -39,13 +36,8 @@ function GetItemDialogContent({ type }: GetItemDialogContentProps) {
         </DialogDescription>
 
         <ul className="flex w-full flex-col gap-2">
-          {isWishOptionVisible && (
-            <OptionButton
-              href={ROUTES.TOURNAMENT_ADD_ITEM_BY_WISH(tournamentId ?? -1)}
-              label="위시에서 가져오기"
-              description="내 위시리스트에서 상품을 가져와요"
-              Icon={HeartIconFill}
-            />
+          {type === 'tournament' && tournamentId && (
+            <FromWishOptionButton tournamentId={tournamentId} />
           )}
           <OptionButton
             label="링크로 담기"

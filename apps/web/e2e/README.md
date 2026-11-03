@@ -29,7 +29,7 @@ e2e/
 ```
 
 - **새 테스트 위치**: 검증하려는 페이지의 라우트 폴더 → `specs/<라우트>/<이름>.spec.ts`
-  - 예: 보관함 테스트 → `specs/archive/archiveList.spec.ts` (폴더 없으면 생성)
+  - 예: 위시 목록 테스트 → `specs/wish/wishList.spec.ts` (폴더 없으면 생성)
   - 홈에서 출발해 토너먼트 페이지를 검증하면? → **검증 대상** 기준으로 `tournament/`
 
 ## 1. 새 테스트 추가하기
@@ -129,7 +129,7 @@ import { setSsrStatus } from '@e2e/helpers/ssrStatus';
 
 await applyExpiredAccessToken(page);
 await setSsrStatus(page, `POST ${ENDPOINTS.AUTH_TOKEN_REFRESH}`, 401); // 생략하면 갱신 성공
-await page.goto('/archive/wish');
+await page.goto('/wish');
 ```
 
 라우트 키는 `SSR_MOCK_ROUTES` 와 같은 `"METHOD /path"` 형식이고, 등록되지 않은 경로에도 적용됩니다. 화면이 `code` 로 분기하면 네 번째 인자로 넘기세요: `setSsrStatus(page, key, 409, ERROR_CODE.TOURNAMENT_NOT_PENDING)`.

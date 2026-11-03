@@ -5,7 +5,7 @@ import isSafeInternalPath from './isSafeInternalPath';
 describe('isSafeInternalPath', () => {
   it('슬래시로 시작하는 내부 경로는 통과한다', () => {
     expect(isSafeInternalPath('/')).toBe(true);
-    expect(isSafeInternalPath('/archive/wish?tab=1')).toBe(true);
+    expect(isSafeInternalPath('/wish?tab=folder')).toBe(true);
   });
 
   it('프로토콜 상대 URL 은 외부로 나가므로 차단한다', () => {
@@ -23,7 +23,7 @@ describe('isSafeInternalPath', () => {
 
   it('문자열이 아니거나 비어 있으면 차단한다', () => {
     const { to: missingParam } = {} as { to?: string };
-    const repeatedParam = ['/home', '/archive/wish'];
+    const repeatedParam = ['/home', '/wish'];
 
     expect(isSafeInternalPath('')).toBe(false);
     expect(isSafeInternalPath(null)).toBe(false);

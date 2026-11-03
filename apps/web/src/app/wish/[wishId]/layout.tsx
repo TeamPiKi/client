@@ -12,12 +12,11 @@ import { getWish } from './_apis/getWish';
 
 type WishEditLayoutProps = {
   children: React.ReactNode;
-  params: Promise<{ id: string }>;
+  params: Promise<{ wishId: string }>;
 };
 
 async function WishEditLayout({ children, params }: WishEditLayoutProps) {
-  const { id } = await params;
-  const wishId = parseIdParam(id);
+  const wishId = parseIdParam((await params).wishId);
   if (!wishId) notFound();
 
   const queryClient = getQueryClient();

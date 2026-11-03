@@ -17,6 +17,7 @@ import { useDeleteWishes } from '../_common/_hooks/useDeleteWishes';
 import { usePostFolderWishes } from '../_common/_hooks/usePostFolderWishes';
 import { useWishEditMode } from '../_common/_hooks/useWishEditMode';
 import { WISH_TAB } from '../_consts/wishTab';
+import { useShareIntentWish } from '../_hooks/useShareIntentWish';
 import { parseWishTabParam } from '../_utils/wishSearchParams';
 import WishSearch from './WishSearch';
 import WishTabBar from './WishTabBar';
@@ -28,6 +29,8 @@ const TITLE_HEIGHT_WITH_GAP = 52;
 function WishListContent() {
   const searchParams = useSearchParams();
   const isFolderTab = parseWishTabParam(searchParams.get('tab')) === WISH_TAB.FOLDER;
+
+  useShareIntentWish();
 
   const { wishesCountData } = useGetWishesCount();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
