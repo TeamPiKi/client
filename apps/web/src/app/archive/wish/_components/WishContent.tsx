@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 
+import { useShareIntentWish } from '@/app/wish/_hooks/useShareIntentWish';
 import CheckboxSelectedIconFill from '@/assets/icons/fill/checkbox-selected.svg';
 import TrashIconFill from '@/assets/icons/fill/trash.svg';
 import ConfirmDialog from '@/components/common/confirm-dialog';
@@ -9,7 +10,6 @@ import { ITEM_STATUS } from '@/consts/item';
 import { useGetWishlist } from '@/hooks/useGetWishlist';
 
 import { useDeleteWishes } from '../_hooks/useDeleteWishes';
-import { useShareIntentWish } from '../_hooks/useShareIntentWish';
 import WishAddDialog from './WishAddDialog';
 import WishlistBottomBar from './WishlistBottomBar';
 import WishlistFabArea from './WishlistFabArea';

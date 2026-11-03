@@ -14,7 +14,9 @@ import { useBackWithFallback } from '@/hooks/useBackWithFallback';
 import { useGetFolders } from '@/hooks/useGetFolders';
 import { useGetWishes } from '@/hooks/useGetWishes';
 import useIntersectionObserver from '@/hooks/useIntersectionObserver';
+import { useScrollRestoration } from '@/hooks/useScrollRestoration';
 import type { FolderT, FolderWishSelectionT } from '@/types/folder';
+import { SCROLL_NAMESPACE } from '@/utils/scrollRestoration';
 
 import WishEditActionBar from '../../../_common/_components/WishEditActionBar';
 import WishEditHeader from '../../../_common/_components/WishEditHeader';
@@ -36,6 +38,9 @@ function FolderDetailView({ folder }: { folder: FolderT }) {
     folderId: folder.id,
   });
   const bottomRef = useIntersectionObserver(fetchNextPage, hasNextPage && !isFetchingNextPage);
+
+  const scrollRestoration = { namespace: SCROLL_NAMESPACE.WISH_FOLDER, scope: String(folder.id) };
+  useScrollRestoration(scrollRestoration);
 
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isAllSelected, setIsAllSelected] = useState(false);
@@ -160,9 +165,9 @@ function FolderDetailView({ folder }: { folder: FolderT }) {
         <Spacing size={24} />
       </div>
 
-      {/** TODO: 위시 상세 링크 연결 시 saveScrollAnchor·useScrollRestoration(scope: folderId) 추가 */}
       <WishGrid
         wishes={wishesData}
+        scrollRestoration={scrollRestoration}
         {...(mode === WISH_MODE.EDIT && {
           selectedWishIds: visibleSelectedWishIds,
           onToggleSelect: handleToggle,
