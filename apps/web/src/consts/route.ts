@@ -21,7 +21,7 @@ export const ROUTES = {
 
   /** 3. Member Only */
   WISHLIST: '/archive/wish', // TODO: /wish 경로로 변경 필요
-  WISH_EDIT: (wishId: number) => `/archive/wish/${wishId}`,
+  WISH_EDIT: (wishId: number) => `/wish/${wishId}`,
   WISH: '/wish', // TEMP
   WISHLIST_FOLDER_TAB: '/wish?tab=folder',
   WISHLIST_FOLDER: (folderId: number) => `/wish/folder/${folderId}`,

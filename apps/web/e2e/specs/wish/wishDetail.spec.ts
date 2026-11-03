@@ -16,7 +16,7 @@ const gotoWishDetail = async (page: Page, api: ApiMockT) => {
   api.get(ENDPOINTS.WISHLIST(WISH_ID), MOCK_WISH_DETAIL);
   api.getPage(ENDPOINTS.WISHLISTS, MOCK_WISHLIST_ENTRIES);
 
-  await page.goto(`/archive/wish/${WISH_ID}`);
+  await page.goto(`/wish/${WISH_ID}`);
 };
 
 test('상세 정보를 확인하고 상품명을 수정해 저장하면 조회 화면에 반영된다', async ({
