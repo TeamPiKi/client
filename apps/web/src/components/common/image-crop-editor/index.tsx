@@ -5,12 +5,13 @@ import 'cropperjs/dist/cropper.css';
 import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 
-import { HelpIconFill, ImageIconFill } from '@/assets/icons';
+import { CheckCircledIconFill, HelpIconFill, ImageIconFill } from '@/assets/icons';
 import BaseImage from '@/components/base-image';
 import BottomCta from '@/components/bottom-cta';
 import Button from '@/components/button';
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/dialog';
 import { Header, HeaderIcon } from '@/components/header';
+import { Z_INDEX } from '@/consts/zIndex';
 import { cn } from '@/utils/cn';
 import { type CropAreaT, cropImage } from '@/utils/cropImage';
 
@@ -56,6 +57,10 @@ function ImageCropEditor({
   const { title, aspect, cropShape, outputMaxSize } = IMAGE_CROP_EDITOR_MODE_CONFIG[mode];
   /** -1이면 가이드 */
   const [activeIndex, setActiveIndex] = useState(mode === 'item' ? -1 : 0);
+  /** 화면에 한 번이라도 띄운 이미지. 전부 띄워야 완료 가능 */
+  const [viewedIds, setViewedIds] = useState<Set<string>>(
+    () => new Set(mode === 'item' ? [] : images.slice(0, 1).map(image => image.id))
+  );
   /** NOTE: crop 이벤트가 드래그 중 매 프레임 발생해 state 로 두면 에디터 전체가 계속 리렌더됨 */
   const cropAreasRef = useRef<Record<string, CropAreaT>>({});
   const [isCropperReady, setIsCropperReady] = useState(false);
@@ -68,6 +73,7 @@ function ImageCropEditor({
 
   const activeImage = images[activeIndex];
   const isBusy = isProcessing || isPending;
+  const isAllViewed = images.every(image => viewedIds.has(image.id));
 
   useEffect(() => {
     if (!imageElement?.isConnected || !activeImage?.size) return;
@@ -116,6 +122,10 @@ function ImageCropEditor({
     setActiveIndex(index);
     /** 새 장의 원본이 Cropper 캔버스로 바뀌기 전에 한 프레임 노출되는 걸 막음 */
     setIsCropperReady(false);
+
+    const image = images[index];
+    if (!image) return;
+    setViewedIds(prev => (prev.has(image.id) ? prev : new Set(prev).add(image.id)));
   };
 
   /** NOTE: 처리 중 취소를 막음. 에디터가 먼저 닫히면 뒤늦게 완료된 onConfirm 이 취소한 이미지를 적용해버림 */
@@ -244,6 +254,7 @@ function ImageCropEditor({
                 )}
                 {images.map((image, index) => {
                   const isActive = index === activeIndex;
+                  const isChecked = viewedIds.has(image.id);
                   return (
                     <li key={image.id} className="shrink-0">
                       <button
@@ -256,7 +267,8 @@ function ImageCropEditor({
                           'relative size-13.5 cursor-pointer overflow-hidden rounded-xl bg-bg-layer-default',
                           isActive
                             ? 'border-2 border-border-accent'
-                            : 'border-[1.5px] border-base-50'
+                            : 'border-[1.5px] border-base-50',
+                          !isActive && !isChecked && 'opacity-50'
                         )}
                       >
                         {image.size ? (
@@ -269,6 +281,14 @@ function ImageCropEditor({
                         ) : (
                           <span className="flex size-full items-center justify-center">
                             <ImageIconFill className="size-5 text-icon-neutral-secondary" />
+                          </span>
+                        )}
+                        {isChecked && (
+                          <span
+                            className="absolute inset-0 flex items-center justify-center bg-black/40"
+                            style={{ zIndex: Z_INDEX.BASE_IMAGE + 1 }}
+                          >
+                            <CheckCircledIconFill className="size-6 text-icon-accent" />
                           </span>
                         )}
                       </button>
@@ -287,7 +307,7 @@ function ImageCropEditor({
               className="w-full"
               onClick={handleConfirm}
               isLoading={isBusy}
-              disabled={isBusy || (!!activeImage?.size && !isCropperReady)}
+              disabled={isBusy || !isAllViewed || (!!activeImage?.size && !isCropperReady)}
             >
               완료
             </Button>
