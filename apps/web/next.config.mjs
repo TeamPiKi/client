@@ -67,7 +67,7 @@ const nextConfig = async () => {
           destination: '/?utm_source=instagram',
           permanent: false,
         },
-        /** 구버전 앱 공유 시트·기존 딥링크의 /archive(?tab=) 경로 호환 */
+        /** 구버전 앱 공유 시트·기존 딥링크의 /archive 경로 호환. 구버전 앱이 지원 기준 아래로 내려가면 제거 */
         {
           source: '/archive',
           has: [{ type: 'query', key: 'tab', value: 'tournament' }],
@@ -81,8 +81,18 @@ const nextConfig = async () => {
         },
         {
           source: '/archive',
-          destination: '/archive/wish',
+          destination: '/wish',
           permanent: false,
+        },
+        {
+          source: '/archive/wish',
+          destination: '/wish',
+          permanent: true,
+        },
+        {
+          source: '/archive/wish/:id',
+          destination: '/wish/:id',
+          permanent: true,
         },
       ];
     },

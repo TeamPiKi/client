@@ -3,7 +3,7 @@ import { ENDPOINTS } from '@/consts/api';
 import { expect, test } from '@e2e/fixtures/mockApiFixture';
 import { MOCK_FOLDER, MOCK_FOLDERS } from '@e2e/mocks/folder';
 import { MOCK_MEMBER_ME } from '@e2e/mocks/me';
-import { MOCK_WISHLIST_ENTRIES } from '@e2e/mocks/wish';
+import { MOCK_WISHLIST_ENTRIES, MOCK_WISH_DETAIL } from '@e2e/mocks/wish';
 
 const [FIRST_ENTRY] = MOCK_WISHLIST_ENTRIES;
 const FIRST_WISH_NAME = FIRST_ENTRY?.item.name ?? '';
@@ -18,6 +18,17 @@ test('전체 위시 탭에 위시 카드가 보인다', async ({ page, api }) =>
     await expect(page.getByText(item.name ?? '', { exact: true })).toBeVisible();
   }
   await expect(page.getByText(`상품 ${MOCK_WISHLIST_ENTRIES.length}`)).toBeVisible();
+});
+
+test('위시 카드를 누르면 상세로 이동한다', async ({ page, api }) => {
+  api.get(ENDPOINTS.USER, MOCK_MEMBER_ME);
+  api.get(ENDPOINTS.WISHLIST(FIRST_WISH_ID), MOCK_WISH_DETAIL);
+
+  await page.goto('/wish');
+  await page.getByRole('link', { name: FIRST_WISH_NAME }).click();
+
+  await expect(page).toHaveURL(new RegExp(`/wish/${FIRST_WISH_ID}$`));
+  await expect(page.getByRole('heading', { name: MOCK_WISH_DETAIL.item.name ?? '' })).toBeVisible();
 });
 
 test('편집 모드에서 위시를 골라 삭제하면 삭제 요청을 보낸다', async ({ page, api }) => {

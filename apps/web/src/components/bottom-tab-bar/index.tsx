@@ -85,10 +85,9 @@ function BottomTabBar() {
   const [isPressed, setIsPressed] = useState(false);
   const [isGrabbing, setIsGrabbing] = useState(false);
 
-  const isWishFolderRoute = /^\/wish(?:\/folder\/\d+)?$/.test(pathname); // TODO: /wish/folder/:folderId 만 해당되도록 조건 변경 필요. 현재는 /wish, /wish/folder/:folderId 둘 다 해당. 변수명은 이관 이후 기준으로 작성
-  const activeIndex = TABS.findIndex(
-    ({ href }) => matchesTabPath(pathname, href) || (isWishFolderRoute && href === ROUTES.WISHLIST)
-  );
+  /** 폴더 상세는 위시 탭의 하위 화면이라 탭바 유지 */
+  const isWishFolderRoute = /^\/wish\/folder\/\d+$/.test(pathname);
+  const activeIndex = TABS.findIndex(({ href }) => matchesTabPath(pathname, href));
 
   useEffect(
     () => () => {
@@ -295,11 +294,10 @@ function BottomTabBar() {
         {TABS.map(({ label, activeIcon: ActiveIcon, inactiveIcon: InactiveIcon, href }, index) => {
           const isActive = index === activeIndex;
           const Icon = isActive ? ActiveIcon : InactiveIcon;
-          const linkHref = isWishFolderRoute && href === ROUTES.WISHLIST ? ROUTES.WISH : href; // TEMP
           return (
             <Link
               key={label}
-              href={linkHref}
+              href={href}
               prefetch={!isActive}
               draggable={false}
               className={cn(

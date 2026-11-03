@@ -11,7 +11,7 @@ import type { WishTabT } from '../_types/wishTab';
 import { parseWishTabParam } from '../_utils/wishSearchParams';
 
 const TABS: { value: WishTabT; label: string; path: string }[] = [
-  { value: WISH_TAB.ALL, label: '전체 위시', path: ROUTES.WISH },
+  { value: WISH_TAB.ALL, label: '전체 위시', path: ROUTES.WISHLIST },
   { value: WISH_TAB.FOLDER, label: '폴더', path: ROUTES.WISHLIST_FOLDER_TAB },
 ];
 

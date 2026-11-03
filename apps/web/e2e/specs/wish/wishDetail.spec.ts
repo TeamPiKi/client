@@ -16,7 +16,7 @@ const gotoWishDetail = async (page: Page, api: ApiMockT) => {
   api.get(ENDPOINTS.WISHLIST(WISH_ID), MOCK_WISH_DETAIL);
   api.getPage(ENDPOINTS.WISHLISTS, MOCK_WISHLIST_ENTRIES);
 
-  await page.goto(`/archive/wish/${WISH_ID}`);
+  await page.goto(`/wish/${WISH_ID}`);
 };
 
 test('상세 정보를 확인하고 상품명을 수정해 저장하면 조회 화면에 반영된다', async ({
@@ -74,7 +74,7 @@ test('삭제를 확정하면 목록으로 돌아간다', async ({ page, api }) =
   await page.getByRole('dialog').getByRole('button', { name: '삭제하기' }).click();
 
   await expect(page.getByText('위시 상품이 삭제되었습니다.')).toBeVisible();
-  await expect(page).toHaveURL(/\/archive\/wish$/);
+  await expect(page).toHaveURL(/\/wish$/);
 });
 
 test('가격 새로고침에 성공하면 새 가격이 표시된다', async ({ page, api }) => {

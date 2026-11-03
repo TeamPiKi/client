@@ -6,7 +6,7 @@ import { getLoginPath, getLoginRedirectPath } from './loginRedirect';
 
 describe('getLoginPath', () => {
   it('내부 경로는 redirect 로 실어 보낸다', () => {
-    expect(getLoginPath('/archive/wish')).toBe('/login?redirect=%2Farchive%2Fwish');
+    expect(getLoginPath('/wish')).toBe('/login?redirect=%2Fwish');
   });
 
   it('외부로 나가는 경로는 redirect 에서 뺀다', () => {

@@ -1,4 +1,4 @@
-import type { GetWishResponseT } from '@/app/archive/wish/[id]/_types/wish';
+import type { GetWishResponseT } from '@/app/wish/[wishId]/_types/wish';
 import type { GetWishlistResponseT, PostWishLinkResponseT } from '@/types/wish';
 
 import { MOCK_IMAGE_URLS } from './images';
