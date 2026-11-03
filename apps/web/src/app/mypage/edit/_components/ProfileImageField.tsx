@@ -17,8 +17,6 @@ import { useImagePicker } from '@/hooks/useImagePicker';
 import type { UserIdentityTypeT } from '@/types/user';
 import { loadImage } from '@/utils/cropImage';
 
-const CROP_OUTPUT_MAX_SIZE = 1080;
-
 type Props = {
   userIdentityType: UserIdentityTypeT;
   profileImage: string;
@@ -130,11 +128,8 @@ function ProfileImageField({ userIdentityType, profileImage, onImageSelect }: Pr
 
       {cropTarget && (
         <ImageCropEditor
-          title="프로필 이미지 편집"
+          mode="profile"
           images={[cropTarget]}
-          aspect={1}
-          cropShape="round"
-          outputMaxSize={CROP_OUTPUT_MAX_SIZE}
           onCancel={closeCropEditor}
           onConfirm={handleCropConfirm}
         />
