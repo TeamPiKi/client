@@ -8,7 +8,7 @@ test('게스트가 위시 탭에 들어가면 로그인 유도 화면이 뜬다'
   api.get(ENDPOINTS.USER, MOCK_GUEST_ME);
   await applyGuestToken(page);
 
-  await page.goto('/archive/wish');
+  await page.goto('/wish');
 
   await expect(
     page.getByRole('heading', { name: '위시를 담으려면 로그인이 필요해요' })
@@ -19,7 +19,7 @@ test('게스트가 위시 탭에 들어가면 로그인 유도 화면이 뜬다'
 
   /** 로그인 후 차단당한 맥락으로 복귀하도록 redirect 파라미터를 싣는다 */
   await page.getByRole('button', { name: '로그인하기' }).click();
-  await expect(page).toHaveURL(/\/login\?redirect=%2Farchive%2Fwish/);
+  await expect(page).toHaveURL(/\/login\?redirect=%2Fwish/);
 });
 
 test('게스트가 토너먼트 탭에 들어가면 로그인 유도 화면이 뜬다', async ({ page, api }) => {

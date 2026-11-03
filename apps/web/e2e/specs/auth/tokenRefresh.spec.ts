@@ -79,9 +79,9 @@ test('refresh 가 401 이면 원래 경로를 담아 로그인으로 보내고 �
   await applyExpiredAccessToken(page);
   await setSsrStatus(page, REFRESH_ROUTE_KEY, 401);
 
-  await page.goto('/archive/wish');
+  await page.goto('/wish');
 
-  await expect(page).toHaveURL(/\/login\?redirect=%2Farchive%2Fwish$/);
+  await expect(page).toHaveURL(/\/login\?redirect=%2Fwish$/);
   await expect(page.getByRole('button', { name: '카카오로 시작하기' })).toBeVisible();
 
   const { access, refresh } = await readTokenPayloads(page);
@@ -93,9 +93,9 @@ test('refresh 가 500 이면 로그인으로 보내되 토큰 쿠키는 유지�
   await applyExpiredAccessToken(page);
   await setSsrStatus(page, REFRESH_ROUTE_KEY, 500);
 
-  await page.goto('/archive/wish');
+  await page.goto('/wish');
 
-  await expect(page).toHaveURL(/\/login\?redirect=%2Farchive%2Fwish$/);
+  await expect(page).toHaveURL(/\/login\?redirect=%2Fwish$/);
   await expect(page.getByRole('button', { name: '카카오로 시작하기' })).toBeVisible();
 
   /** 5xx 는 토큰이 죽었다는 증거가 아니라 폐기하지 않는다 */

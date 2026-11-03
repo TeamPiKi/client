@@ -20,9 +20,8 @@ export const ROUTES = {
   PLAY_FROM_LINK: (sourceTournamentId: number) => `/play/${sourceTournamentId}`,
 
   /** 3. Member Only */
-  WISHLIST: '/archive/wish', // TODO: /wish 경로로 변경 필요
+  WISHLIST: '/wish',
   WISH_EDIT: (wishId: number) => `/wish/${wishId}`,
-  WISH: '/wish', // TEMP
   WISHLIST_FOLDER_TAB: '/wish?tab=folder',
   WISHLIST_FOLDER: (folderId: number) => `/wish/folder/${folderId}`,
   WISHLIST_FOLDER_ADD: (folderId: number) => `/wish/folder/${folderId}/add`,

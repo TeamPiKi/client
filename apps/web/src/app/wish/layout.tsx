@@ -19,7 +19,7 @@ async function WishLayout({ children }: WishLayoutProps) {
     return (
       <LoginRequiredPage
         title={LOGIN_REQUIRED_TITLE.WISH}
-        redirectPath={ROUTES.WISH}
+        redirectPath={ROUTES.WISHLIST}
         location={GUEST_BLOCK_LOCATION.WISH_TAB}
       />
     );

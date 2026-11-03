@@ -39,8 +39,8 @@ const openImageDialog = async (page: Page, api: ApiMockT) => {
   api.get(ENDPOINTS.USER, MOCK_MEMBER_ME);
   api.getPage(ENDPOINTS.WISHLISTS, MOCK_WISHLIST_ENTRIES);
 
-  await page.goto('/archive/wish');
-  await page.getByRole('button', { name: '아이템 추가하기' }).click();
+  await page.goto('/wish');
+  await page.getByRole('button', { name: /상품 추가하기/ }).click();
   await expect(page.getByRole('dialog', { name: '위시 담기' })).toBeVisible();
   await page.getByRole('button', { name: /이미지로 담기/ }).click();
   await expect(page.getByRole('dialog', { name: '이미지로 담기' })).toBeVisible();
