@@ -22,7 +22,6 @@ import { loadImage } from '@/utils/cropImage';
 import Spacing from '../spacing';
 
 const MAX_IMAGE_COUNT = 5;
-const CROP_OUTPUT_MAX_SIZE = 2048;
 
 type PickedImageT = ImageCropEditorImageT & { file: File };
 
@@ -186,9 +185,8 @@ function ByImageDialog({ type, open, onOpenChange, folderId }: Props) {
 
       {open && picked && (
         <ImageCropEditor
-          title="이미지 편집"
+          mode="item"
           images={picked.images}
-          outputMaxSize={CROP_OUTPUT_MAX_SIZE}
           isPending={isOCRPending}
           onCancel={() => setPicked(null)}
           onConfirm={handleCropConfirm}
