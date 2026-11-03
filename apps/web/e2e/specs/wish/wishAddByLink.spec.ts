@@ -13,6 +13,7 @@ const ADDED_URL = MOCK_WISH_ADDED_BY_LINK.item.sourceUrl ?? '';
 const openLinkDialog = async (page: Page, api: ApiMockT) => {
   api.get(ENDPOINTS.USER, MOCK_MEMBER_ME);
   api.getPage(ENDPOINTS.WISHLISTS, MOCK_WISHLIST_ENTRIES);
+  api.get(ENDPOINTS.WISHLISTS_COUNT, { count: MOCK_WISHLIST_ENTRIES.length });
 
   await page.goto('/wish');
   await page.getByRole('button', { name: /상품 추가하기/ }).click();
