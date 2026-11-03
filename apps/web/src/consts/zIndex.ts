@@ -26,6 +26,6 @@ export const Z_INDEX = {
   /** 인앱 브라우저 탈출 스플래시 — 튕기는 동안 모든 UI 를 덮는다 */
   IN_APP_BROWSER_ESCAPE: 1000,
 
-  /** dev·local 표시 */
+  /** dev·local 표시. 클릭을 안 막으니 스플래시·모달 위에도 무조건 보임 */
   STAGE_BADGE: 10000,
 };
