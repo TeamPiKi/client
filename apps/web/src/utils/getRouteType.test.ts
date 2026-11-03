@@ -8,11 +8,8 @@ describe('getRouteType', () => {
     expect(getRouteType('/home/anything')).toBe('MEMBER_AND_GUEST');
     expect(getRouteType('/homework')).toBeNull();
 
-    expect(getRouteType('/archive/wish')).toBe('MEMBER_ONLY'); // TODO: 위시 경로 이관 시 제거
-    expect(getRouteType('/archive/wish/3')).toBe('MEMBER_ONLY');
-    expect(getRouteType('/archive/wishlist')).toBeNull();
-
     expect(getRouteType('/wish')).toBe('MEMBER_ONLY');
+    expect(getRouteType('/wish/3')).toBe('MEMBER_ONLY');
     expect(getRouteType('/wish/folder/3')).toBe('MEMBER_ONLY');
     expect(getRouteType('/wishlist')).toBeNull(); // 올바르지 않은 경로 테스트
   });

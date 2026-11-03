@@ -1,14 +1,13 @@
 import WishInfoScreen from './_components/WishInfoScreen';
 
 type WishInfoPageProps = {
-  params: Promise<{ id: string }>;
+  params: Promise<{ wishId: string }>;
 };
 
 async function WishInfoPage({ params }: WishInfoPageProps) {
-  const { id } = await params;
-  const wishId = Number(id);
+  const { wishId } = await params;
 
-  return <WishInfoScreen wishId={wishId} />;
+  return <WishInfoScreen wishId={Number(wishId)} />;
 }
 
 export default WishInfoPage;
