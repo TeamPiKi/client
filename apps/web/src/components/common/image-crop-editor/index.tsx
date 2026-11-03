@@ -264,7 +264,7 @@ function ImageCropEditor({
                         type="button"
                         onClick={() => handleSelectImage(index)}
                         disabled={isBusy}
-                        aria-label={`${index + 1}번째 사진 편집`}
+                        aria-label={`${index + 1}번째 사진 편집${isChecked ? ', 확인함' : ''}`}
                         aria-current={isActive}
                         className={cn(
                           'relative size-13.5 cursor-pointer overflow-hidden rounded-xl bg-bg-layer-default',
