@@ -19,7 +19,7 @@ import FolderEmptyState from './FolderEmptyState';
 import FolderNameSheet from './FolderNameSheet';
 
 function FolderTabContent() {
-  useScrollRestoration({ namespace: SCROLL_NAMESPACE.WISH, scope: WISH_TAB.FOLDER });
+  useScrollRestoration({ namespace: SCROLL_NAMESPACE.WISHLIST, scope: WISH_TAB.FOLDER });
 
   const { foldersData } = useGetFolders();
 

@@ -80,7 +80,7 @@ function FolderCard({
     if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
 
     saveScrollAnchor(
-      { namespace: SCROLL_NAMESPACE.WISH, scope: WISH_TAB.FOLDER },
+      { namespace: SCROLL_NAMESPACE.WISHLIST, scope: WISH_TAB.FOLDER },
       event.currentTarget,
       folderId
     );

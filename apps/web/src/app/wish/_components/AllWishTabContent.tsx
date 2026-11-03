@@ -12,7 +12,7 @@ import { WISH_TAB } from '../_consts/wishTab';
 import type { AllWishTabContentProps } from '../_types/wishTab';
 import WishAddCard from './WishAddCard';
 
-const SCROLL_RESTORATION = { namespace: SCROLL_NAMESPACE.WISH, scope: WISH_TAB.ALL };
+const SCROLL_RESTORATION = { namespace: SCROLL_NAMESPACE.WISHLIST, scope: WISH_TAB.ALL };
 
 function AllWishTabContent(props: AllWishTabContentProps) {
   const isEditMode = Boolean(props.selectedWishIds);

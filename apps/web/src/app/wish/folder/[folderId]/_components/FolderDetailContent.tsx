@@ -39,7 +39,10 @@ function FolderDetailView({ folder }: { folder: FolderT }) {
   });
   const bottomRef = useIntersectionObserver(fetchNextPage, hasNextPage && !isFetchingNextPage);
 
-  const scrollRestoration = { namespace: SCROLL_NAMESPACE.WISH_FOLDER, scope: String(folder.id) };
+  const scrollRestoration = {
+    namespace: SCROLL_NAMESPACE.WISHLIST_FOLDER,
+    scope: String(folder.id),
+  };
   useScrollRestoration(scrollRestoration);
 
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
