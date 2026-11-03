@@ -26,7 +26,7 @@ const LOGIN_REQUIRED_REASONS: ShareFailureReasonT[] = ['unauthenticated', 'sessi
 /** 재시도는 1회까지. 또 실패하면 확인 버튼만 남긴다. */
 const MAX_RETRY_COUNT = 1;
 
-export type SheetStateT =
+type SheetStateT =
   /** POST 진행 중 + 파싱 대기(SSE) — 화면은 동일한 로딩 */
   | { status: 'loading' }
   /** 파싱 결과를 못 받은 폴백 — 저장 성공은 POST 응답으로 이미 확정 */
@@ -199,8 +199,7 @@ type ShareBottomSheetViewProps = {
   onOpenWishEdit: (wishId: number) => void;
 };
 
-/** 상태별 렌더만 담당 — dev 프리뷰(dev/share-sheet-preview)에서 mock 상태로 재사용한다 */
-export function ShareBottomSheetView({
+function ShareBottomSheetView({
   state: sheetState,
   canRetry,
   onClose,
