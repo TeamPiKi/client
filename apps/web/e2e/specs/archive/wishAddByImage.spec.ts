@@ -62,17 +62,24 @@ test('여러 장을 고르면 에디터가 열리고, 편집한 장만 JPEG 로 
     'aria-current',
     'true'
   );
+  await expect(editor.getByText('이미지, 이름, 가격이 보이도록 잘라주세요.')).toBeVisible();
+  await expect(
+    editor.getByRole('img', { name: '상품 이미지, 이름, 가격이 모두 들어가게 자른 예시' })
+  ).toBeVisible();
   await expect(editor.getByRole('button', { name: '완료' })).toBeDisabled();
 
   await editor.getByRole('button', { name: '1번째 사진 편집' }).click();
-  await expect(editor.getByRole('button', { name: '1번째 사진 편집' })).toHaveAttribute(
+  await expect(editor.getByRole('button', { name: '1번째 사진 편집, 확인함' })).toHaveAttribute(
     'aria-current',
     'true'
   );
+  await expect(editor.getByRole('button', { name: '2번째 사진 편집', exact: true })).toBeVisible();
+
+  /** Cropper 준비(opacity-0 해제) 뒤에도 완료가 닫혀 있어야 모든 장 확인 조건이 검증된다 */
+  await expect(editor.locator('.image-crop-editor > div')).toHaveCSS('opacity', '1');
   await expect(editor.getByRole('button', { name: '완료' })).toBeDisabled();
 
   /** 첫 장만 크롭 — 손대지 않은 둘째 장은 원본 그대로 가야 한다 */
-  await expect(editor.locator('.cropper-point.point-se')).toBeVisible();
   const handleBox = await editor.locator('.cropper-point.point-se').boundingBox();
   if (!handleBox) throw new Error('crop handle not found');
   await page.mouse.move(handleBox.x + handleBox.width / 2, handleBox.y + handleBox.height / 2);
@@ -83,7 +90,7 @@ test('여러 장을 고르면 에디터가 열리고, 편집한 장만 JPEG 로 
 
   /** 하단 썸네일로 장 이동 — 마지막 장까지 띄우면 완료가 열린다 */
   await editor.getByRole('button', { name: '2번째 사진 편집' }).click();
-  await expect(editor.getByRole('button', { name: '2번째 사진 편집' })).toHaveAttribute(
+  await expect(editor.getByRole('button', { name: '2번째 사진 편집, 확인함' })).toHaveAttribute(
     'aria-current',
     'true'
   );
