@@ -6,7 +6,7 @@ export const MOCK_FOLDER: FolderT = {
   id: 1,
   name: '겨울 아우터',
   wishCount: 7,
-  coverImageUrls: [MOCK_IMAGE_URLS.product, MOCK_IMAGE_URLS.product, MOCK_IMAGE_URLS.product],
+  coverImageUrls: [MOCK_IMAGE_URLS.product, null, MOCK_IMAGE_URLS.product],
   createdAt: '2026-10-20T13:02:11',
 };
 
