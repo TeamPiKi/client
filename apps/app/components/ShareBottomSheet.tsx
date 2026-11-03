@@ -59,9 +59,9 @@ function ShareBottomSheetContent({ url, text }: ShareExtensionProps) {
     openHostApp(`/?web=${encodeURIComponent(webPath)}`);
   };
 
-  const handleOpenWishlist = () => openHostAppAt('/archive/wish');
+  const handleOpenWishlist = () => openHostAppAt('/wish');
   const handleOpenLogin = () => openHostAppAt('/login');
-  const handleOpenWishEdit = (wishId: number) => openHostAppAt(`/archive/wish/${wishId}`);
+  const handleOpenWishEdit = (wishId: number) => openHostAppAt(`/wish/${wishId}`);
 
   const handleClose = () => {
     abortRef.current?.abort();

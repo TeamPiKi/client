@@ -5,7 +5,7 @@ import { useCallback, useEffect, useRef } from 'react';
 import { toShareIntentPayload } from '@/utils/serializeShareIntent';
 import { WebBridge } from '@/utils/webBridge';
 
-const WISHLIST_PATH = '/archive/wish';
+const WISHLIST_PATH = '/wish';
 
 const isWishlistPath = (uri: URL) => uri.pathname === WISHLIST_PATH;
 
@@ -40,13 +40,13 @@ export const useShareIntent = ({ onChangeWebviewUri, webviewUri }: Props) => {
     try {
       const nextUri = new URL(webviewUri);
 
-      /** 이미 아카이브 위시 탭: 즉시 전송 */
+      /** 이미 위시 목록: 즉시 전송 */
       if (isWishlistPath(nextUri)) {
         sendShareIntent();
         return;
       }
 
-      /** 다른 페이지: payload 보관 후 아카이브 위시로 이동 → WEB_REQ_READY 수신 시 전송 */
+      /** 다른 페이지: payload 보관 후 위시 목록으로 이동 → WEB_REQ_READY 수신 시 전송 */
       nextUri.pathname = WISHLIST_PATH;
       nextUri.search = '';
       nextUri.hash = '';
