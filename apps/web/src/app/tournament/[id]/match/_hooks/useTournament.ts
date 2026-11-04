@@ -17,7 +17,7 @@ import type {
   GetTournamentResponseT,
   TournamentMatchT,
 } from '../../_common/_types/tournamentResponse';
-import { type TransitionStageT, getRoundLabel, getTransitionStage } from '../_utils/rounds';
+import { type TransitionStageT, getTransitionStage } from '../_utils/rounds';
 import { usePostRecordMatch } from './usePostRecordMatch';
 
 type UseTournamentArgs = {
@@ -86,7 +86,6 @@ const useTournament = ({ tournamentId, inProgress }: UseTournamentArgs) => {
   const pendingNextRoundRef = useRef<InProgressT | null>(null);
 
   const isFinalRound = currentRound === 2;
-  const badgeLabel = getRoundLabel(currentRound, matchIndex);
 
   /**
    * 서버 권위 상태로 재동기화.
@@ -226,7 +225,7 @@ const useTournament = ({ tournamentId, inProgress }: UseTournamentArgs) => {
     currentMatch,
     remainingItems,
     currentRound,
-    badgeLabel,
+    matchIndex,
     isFinalRound,
     transitionStage,
     selectionEpoch,

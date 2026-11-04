@@ -4,12 +4,12 @@ import usePreloadMatchImages from '../../_common/_hooks/usePreloadMatchImages';
 import type { GetTournamentInProgressResponseT } from '../../_common/_types/tournamentResponse';
 import matchBackground from '../_assets/match-background.jpg';
 import useTournament from '../_hooks/useTournament';
+import MatchBadge from './MatchBadge';
 import MatchHeader from './MatchHeader';
 import MatchSkeleton from './MatchSkeleton';
-import RoundBadge from './RoundBadge';
+import MatchTitle from './MatchTitle';
 import RoundTicker from './RoundTicker';
 import RoundTransitionSheet from './RoundTransitionSheet';
-import TournamentQuestion from './TournamentQuestion';
 import VsSection from './VsSection';
 
 type TournamentClientProps = {
@@ -23,7 +23,7 @@ function TournamentClient({ tournamentId, tournamentName, inProgress }: Tourname
     currentMatch,
     remainingItems,
     currentRound,
-    badgeLabel,
+    matchIndex,
     isFinalRound,
     transitionStage,
     selectionEpoch,
@@ -35,7 +35,7 @@ function TournamentClient({ tournamentId, tournamentName, inProgress }: Tourname
   usePreloadMatchImages(remainingItems.map(item => item.imageUrl));
 
   return (
-    <main className="relative hide-scrollbar flex min-h-dvh flex-col overflow-y-auto pb-6">
+    <main className="relative flex min-h-dvh flex-col overflow-hidden">
       {/** 배경 */}
       <div aria-hidden className="pointer-events-none absolute inset-0 bg-[#A2DEFF]">
         <div
@@ -46,19 +46,18 @@ function TournamentClient({ tournamentId, tournamentName, inProgress }: Tourname
         <div className="absolute inset-0 bg-linear-to-b from-white/0 to-white" />
       </div>
 
-      <div className="relative flex flex-1 flex-col items-center">
+      <div className="relative flex flex-col">
         <MatchHeader />
         <RoundTicker currentRound={currentRound} isFinal={isFinalRound} />
-        <div className="mt-6 flex flex-col items-center gap-6">
-          <div className="flex flex-col items-center gap-4">
-            <RoundBadge label={badgeLabel} isFinal={isFinalRound} />
-            <TournamentQuestion isFinal={isFinalRound} />
-          </div>
-          {isFinalRound && (
-            <p className="heading-2-medium text-text-neutral-secondary">최종 선택을 해주세요</p>
-          )}
+      </div>
+
+      <div className="relative flex w-full flex-1 flex-col items-center justify-center gap-[50px] pb-[calc(var(--spacing-padding-top)+90px)]">
+        <div className="flex flex-col items-center gap-4">
+          <MatchBadge matchIndex={matchIndex} isFinal={isFinalRound} />
+          <MatchTitle isFinal={isFinalRound} />
         </div>
-        <div className={`w-full ${isFinalRound ? 'mt-29' : 'mt-8'}`}>
+
+        <div className="w-full">
           {/* 기록 대기 중에는 이전 화면을 유지해 스켈레톤 깜빡임을 방지한다. */}
           {!currentMatch ? (
             <MatchSkeleton isFinal={isFinalRound} />
