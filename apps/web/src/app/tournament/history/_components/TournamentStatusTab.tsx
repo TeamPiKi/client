@@ -16,13 +16,15 @@ const TABS: { value: TournamentStatusTabT; label: string }[] = [
 
 function TournamentStatusTab({ activeTab, onTabChange }: Props) {
   return (
-    <div className="flex w-full gap-0.5">
+    <div role="tablist" className="flex w-full gap-0.5">
       {TABS.map(({ value, label }) => {
         const isActive = activeTab === value;
         return (
           <button
             key={value}
             type="button"
+            role="tab"
+            aria-selected={isActive}
             onClick={() => onTabChange(value)}
             className={cn(
               'flex flex-1 cursor-pointer flex-col items-center gap-3 body-1-semibold transition-colors',
