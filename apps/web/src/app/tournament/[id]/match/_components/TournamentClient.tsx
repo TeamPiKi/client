@@ -1,5 +1,7 @@
 'use client';
 
+import { useState } from 'react';
+
 import usePreloadMatchImages from '../../_common/_hooks/usePreloadMatchImages';
 import type { GetTournamentInProgressResponseT } from '../../_common/_types/tournamentResponse';
 import matchBackground from '../_assets/match-background.jpg';
@@ -31,6 +33,11 @@ function TournamentClient({ tournamentId, tournamentName, inProgress }: Tourname
     handleTransitionComplete,
   } = useTournament({ tournamentId, tournamentName, inProgress });
 
+  const [pickedMatchKey, setPickedMatchKey] = useState<string | null>(null);
+  const matchKey = currentMatch
+    ? `${currentMatch.first.tournamentItemId}-${currentMatch.second.tournamentItemId}-${selectionEpoch}`
+    : null;
+
   // 다음 대진은 미리 알 수 없어도 후보는 알고 있다 — 라운드의 남은 아이템 이미지를 미리 받아둔다
   usePreloadMatchImages(remainingItems.map(item => item.imageUrl));
 
@@ -54,7 +61,7 @@ function TournamentClient({ tournamentId, tournamentName, inProgress }: Tourname
       <div className="relative flex w-full flex-1 flex-col items-center justify-center gap-[50px] pb-[calc(var(--spacing-padding-top)+90px)]">
         <div className="flex flex-col items-center gap-4">
           <MatchBadge matchIndex={matchIndex} isFinal={isFinalRound} />
-          <MatchTitle isFinal={isFinalRound} />
+          <MatchTitle isFinal={isFinalRound} isPicked={pickedMatchKey === matchKey} />
         </div>
 
         <div className="w-full">
@@ -62,9 +69,11 @@ function TournamentClient({ tournamentId, tournamentName, inProgress }: Tourname
             <MatchSkeleton />
           ) : (
             <VsSection
-              key={`${currentMatch.first.tournamentItemId}-${currentMatch.second.tournamentItemId}-${selectionEpoch}`}
+              key={matchKey}
               left={currentMatch.first}
               right={currentMatch.second}
+              isFinal={isFinalRound}
+              onPick={() => setPickedMatchKey(matchKey)}
               onSelect={handleSelect}
             />
           )}
