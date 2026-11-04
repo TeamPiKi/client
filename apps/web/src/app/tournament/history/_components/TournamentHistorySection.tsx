@@ -3,7 +3,7 @@
 import { useSearchParams } from 'next/navigation';
 import { Suspense } from 'react';
 
-import Spacing from '@/components/spacing';
+import CollapsibleTitle from '@/components/common/collapsible-title';
 import { Z_INDEX } from '@/consts/zIndex';
 import { replaceUrlKeepingState } from '@/utils/replaceUrlKeepingState';
 
@@ -38,19 +38,19 @@ function TournamentHistorySection() {
   return (
     <>
       <div
-        className="sticky top-0 flex w-full flex-col bg-bg-layer-basement pt-padding-top pb-2"
+        className="sticky top-0 flex w-full flex-col gap-6 bg-bg-layer-default px-5 pt-padding-top pb-3"
         style={{ zIndex: Z_INDEX.STICKY_HEADER }}
       >
-        <h1 className="heading-1-bold text-text-neutral-primary">내 토너먼트</h1>
-        <Spacing size={16} />
-        <TournamentStatusTab activeTab={activeTab} onTabChange={handleTabChange} />
-        <Spacing size={24} />
-        <TournamentPlayTypeFilter
-          activeFilter={activePlayTypeFilter}
-          onFilterChange={handlePlayTypeFilterChange}
-        />
+        <CollapsibleTitle>내 토너먼트</CollapsibleTitle>
+        <div className="flex flex-col gap-3">
+          <TournamentStatusTab activeTab={activeTab} onTabChange={handleTabChange} />
+          <TournamentPlayTypeFilter
+            activeFilter={activePlayTypeFilter}
+            onFilterChange={handlePlayTypeFilterChange}
+          />
+        </div>
       </div>
-      <div className="hide-scrollbar flex flex-1 flex-col gap-4 overflow-y-auto pt-4 pb-46">
+      <div className="flex flex-1 flex-col gap-4 px-5 pt-4 pb-46">
         <Suspense
           key={`${activeTab}-${activePlayTypeFilter}`}
           fallback={<TournamentHistorySkeleton />}
