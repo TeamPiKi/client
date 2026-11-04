@@ -61,7 +61,10 @@ function TournamentClient({ tournamentId, inProgress }: TournamentClientProps) {
       <div className="relative flex w-full flex-1 flex-col items-center justify-center gap-[50px] pb-[calc(var(--spacing-padding-top)+90px)]">
         <div className="flex flex-col items-center gap-4">
           <MatchBadge matchIndex={matchIndex} isFinal={isFinalRound} />
-          <MatchTitle isFinal={isFinalRound} isPicked={pickedMatchKey === matchKey} />
+          <MatchTitle
+            isFinal={isFinalRound}
+            isPicked={matchKey !== null && pickedMatchKey === matchKey}
+          />
         </div>
 
         <div className="w-full">
