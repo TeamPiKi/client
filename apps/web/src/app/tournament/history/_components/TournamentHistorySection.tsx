@@ -1,12 +1,11 @@
 'use client';
 
 import { useSearchParams } from 'next/navigation';
-import { Suspense, useEffect, useState } from 'react';
+import { Suspense } from 'react';
 
+import CollapsibleTitle from '@/components/common/collapsible-title';
 import { Z_INDEX } from '@/consts/zIndex';
-import { cn } from '@/utils/cn';
 import { replaceUrlKeepingState } from '@/utils/replaceUrlKeepingState';
-import { getScrollContainer } from '@/utils/scrollRestoration';
 
 import { PLAY_TYPE_BY_FILTER, PLAY_TYPE_FILTER } from '../_consts/tournamentPlayType';
 import { STATUS_BY_TAB } from '../_consts/tournamentTab';
@@ -18,14 +17,10 @@ import TournamentHistorySkeleton from './TournamentHistorySkeleton';
 import TournamentPlayTypeFilter from './TournamentPlayTypeFilter';
 import TournamentStatusTab from './TournamentStatusTab';
 
-const TITLE_HEIGHT_WITH_GAP = 52;
-
 function TournamentHistorySection() {
   const searchParams = useSearchParams();
   const activeTab = parseTabParam(searchParams.get('tab'));
   const activePlayTypeFilter = parsePlayParam(searchParams.get('play'));
-  
-  const [isTitleHidden, setIsTitleHidden] = useState(false);
 
   const syncSearchParams = (tab: TournamentStatusTabT, play: TournamentPlayTypeFilterT) => {
     replaceUrlKeepingState(`?tab=${tab}&play=${play}`);
@@ -40,35 +35,13 @@ function TournamentHistorySection() {
     syncSearchParams(activeTab, play);
   };
 
-  /** 스크롤 시 제목 부분을 숨김/노출 처리 함 */
-  useEffect(() => {
-    const scroller = getScrollContainer();
-    if (!scroller) return;
-
-    const handleScroll = () => {
-      if (scroller.scrollTop > TITLE_HEIGHT_WITH_GAP) setIsTitleHidden(true);
-      else if (scroller.scrollTop <= 0) setIsTitleHidden(false);
-    };
-    scroller.addEventListener('scroll', handleScroll, { passive: true });
-    return () => scroller.removeEventListener('scroll', handleScroll);
-  }, []);
-
   return (
     <>
       <div
         className="sticky top-0 flex w-full flex-col gap-6 bg-bg-layer-default px-5 pt-padding-top pb-3"
         style={{ zIndex: Z_INDEX.STICKY_HEADER }}
       >
-        <div
-          className={cn(
-            'grid transition-all duration-100',
-            isTitleHidden ? '-mb-6 grid-rows-[0fr] opacity-0' : 'grid-rows-[1fr]'
-          )}
-        >
-          <h1 className="min-h-0 overflow-hidden heading-1-bold text-text-neutral-primary">
-            내 토너먼트
-          </h1>
-        </div>
+        <CollapsibleTitle>내 토너먼트</CollapsibleTitle>
         <div className="flex flex-col gap-3">
           <TournamentStatusTab activeTab={activeTab} onTabChange={handleTabChange} />
           <TournamentPlayTypeFilter
