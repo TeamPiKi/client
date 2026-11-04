@@ -4,6 +4,7 @@ import usePreloadMatchImages from '../../_common/_hooks/usePreloadMatchImages';
 import type { GetTournamentInProgressResponseT } from '../../_common/_types/tournamentResponse';
 import matchBackground from '../_assets/match-background.jpg';
 import useTournament from '../_hooks/useTournament';
+import MatchHeader from './MatchHeader';
 import MatchSkeleton from './MatchSkeleton';
 import RoundBadge from './RoundBadge';
 import RoundTransitionSheet from './RoundTransitionSheet';
@@ -32,7 +33,7 @@ function TournamentClient({ tournamentId, tournamentName, inProgress }: Tourname
   usePreloadMatchImages(remainingItems.map(item => item.imageUrl));
 
   return (
-    <main className="relative hide-scrollbar flex min-h-dvh flex-col items-center overflow-y-auto px-5 pt-padding-top pb-6">
+    <main className="relative hide-scrollbar flex min-h-dvh flex-col overflow-y-auto pb-6">
       {/** 배경 */}
       <div aria-hidden className="pointer-events-none absolute inset-0 bg-[#A2DEFF]">
         <div
@@ -43,29 +44,32 @@ function TournamentClient({ tournamentId, tournamentName, inProgress }: Tourname
         <div className="absolute inset-0 bg-linear-to-b from-white/0 to-white" />
       </div>
 
-      <div className="relative mt-6 flex flex-col items-center gap-6">
-        <div className="flex flex-col items-center gap-4">
-          <RoundBadge label={roundLabel} isFinal={isFinalRound} />
-          <TournamentQuestion isFinal={isFinalRound} />
+      <div className="relative flex flex-1 flex-col items-center">
+        <MatchHeader />
+        <div className="mt-6 flex flex-col items-center gap-6">
+          <div className="flex flex-col items-center gap-4">
+            <RoundBadge label={roundLabel} isFinal={isFinalRound} />
+            <TournamentQuestion isFinal={isFinalRound} />
+          </div>
+          {isFinalRound && (
+            <p className="heading-2-medium text-text-neutral-secondary">최종 선택을 해주세요</p>
+          )}
         </div>
-        {isFinalRound && (
-          <p className="heading-2-medium text-text-neutral-secondary">최종 선택을 해주세요</p>
-        )}
-      </div>
-      <div className={`relative -mx-5 ${isFinalRound ? 'mt-29' : 'mt-8'}`}>
-        {/* 기록 대기 중에는 이전 화면을 유지해 스켈레톤 깜빡임을 방지한다. */}
-        {!currentMatch ? (
-          <MatchSkeleton isFinal={isFinalRound} />
-        ) : (
-          <VsSection
-            // 매치가 바뀌면 remount — selectionEpoch 는 기록 실패 시 카드 선택 락을 푸는 용도
-            key={`${currentMatch.first.tournamentItemId}-${currentMatch.second.tournamentItemId}-${selectionEpoch}`}
-            left={currentMatch.first}
-            right={currentMatch.second}
-            isFinal={isFinalRound}
-            onSelect={handleSelect}
-          />
-        )}
+        <div className={`w-full ${isFinalRound ? 'mt-29' : 'mt-8'}`}>
+          {/* 기록 대기 중에는 이전 화면을 유지해 스켈레톤 깜빡임을 방지한다. */}
+          {!currentMatch ? (
+            <MatchSkeleton isFinal={isFinalRound} />
+          ) : (
+            <VsSection
+              // 매치가 바뀌면 remount — selectionEpoch 는 기록 실패 시 카드 선택 락을 푸는 용도
+              key={`${currentMatch.first.tournamentItemId}-${currentMatch.second.tournamentItemId}-${selectionEpoch}`}
+              left={currentMatch.first}
+              right={currentMatch.second}
+              isFinal={isFinalRound}
+              onSelect={handleSelect}
+            />
+          )}
+        </div>
       </div>
 
       {transitionStage && (
