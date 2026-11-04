@@ -140,7 +140,6 @@ async function TournamentPage({ params }: TournamentPageProps) {
     <HydrationBoundary state={dehydrate(queryClient)}>
       <TournamentClient
         tournamentId={playTournamentId}
-        tournamentName={hydratedTournament.name}
         inProgress={hydratedTournament.inProgress}
       />
     </HydrationBoundary>

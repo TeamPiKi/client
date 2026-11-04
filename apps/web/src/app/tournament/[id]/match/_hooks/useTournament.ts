@@ -22,8 +22,6 @@ import { usePostRecordMatch } from './usePostRecordMatch';
 
 type UseTournamentArgs = {
   tournamentId: number;
-  /** 현재 미사용 — TournamentClient 호출 시그니처 유지를 위해 인자만 받는다 */
-  tournamentName: string;
   inProgress: GetTournamentInProgressResponseT['inProgress'];
 };
 

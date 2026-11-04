@@ -16,11 +16,10 @@ import VsSection from './VsSection';
 
 type TournamentClientProps = {
   tournamentId: number;
-  tournamentName: string;
   inProgress: GetTournamentInProgressResponseT['inProgress'];
 };
 
-function TournamentClient({ tournamentId, tournamentName, inProgress }: TournamentClientProps) {
+function TournamentClient({ tournamentId, inProgress }: TournamentClientProps) {
   const {
     currentMatch,
     remainingItems,
@@ -31,9 +30,10 @@ function TournamentClient({ tournamentId, tournamentName, inProgress }: Tourname
     selectionEpoch,
     handleSelect,
     handleTransitionComplete,
-  } = useTournament({ tournamentId, tournamentName, inProgress });
+  } = useTournament({ tournamentId, inProgress });
 
   const [pickedMatchKey, setPickedMatchKey] = useState<string | null>(null);
+
   const matchKey = currentMatch
     ? `${currentMatch.first.tournamentItemId}-${currentMatch.second.tournamentItemId}-${selectionEpoch}`
     : null;
