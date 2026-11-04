@@ -1,8 +1,5 @@
 'use client';
 
-import type { ComponentType, SVGProps } from 'react';
-
-import { BasketIconOutline, ReceiptIconOutline } from '@/assets/icons';
 import { cn } from '@/utils/cn';
 
 import type { TournamentStatusTabT } from '../_types/tournamentTab';
@@ -12,35 +9,36 @@ type Props = {
   onTabChange: (tab: TournamentStatusTabT) => void;
 };
 
-const TABS: {
-  value: TournamentStatusTabT;
-  label: string;
-  Icon: ComponentType<SVGProps<SVGSVGElement>>;
-}[] = [
-  { value: 'ongoing', label: '진행 중', Icon: BasketIconOutline },
-  { value: 'completed', label: '완료', Icon: ReceiptIconOutline },
+const TABS: { value: TournamentStatusTabT; label: string }[] = [
+  { value: 'ongoing', label: '진행 중' },
+  { value: 'completed', label: '완료' },
 ];
 
 function TournamentStatusTab({ activeTab, onTabChange }: Props) {
   return (
-    <div className="flex w-full border-b border-border-neutral-muted">
-      {TABS.map(({ value, label, Icon }) => (
-        <button
-          key={value}
-          type="button"
-          onClick={() => onTabChange(value)}
-          className={cn(
-            'relative flex h-11 flex-1 cursor-pointer items-center justify-center gap-1 body-1-semibold transition-colors',
-            activeTab === value ? 'text-text-neutral-primary' : 'text-text-neutral-tertiary'
-          )}
-        >
-          <Icon className="size-5" />
-          {label}
-          {activeTab === value && (
-            <span className="absolute inset-x-0 bottom-0 h-0.5 bg-text-neutral-primary" />
-          )}
-        </button>
-      ))}
+    <div role="tablist" className="flex w-full gap-0.5">
+      {TABS.map(({ value, label }) => {
+        const isActive = activeTab === value;
+        return (
+          <button
+            key={value}
+            type="button"
+            role="tab"
+            aria-selected={isActive}
+            onClick={() => onTabChange(value)}
+            className={cn(
+              'flex flex-1 cursor-pointer flex-col items-center gap-3 body-1-semibold transition-colors',
+              isActive ? 'text-text-neutral-primary' : 'text-text-neutral-tertiary'
+            )}
+          >
+            {label}
+            <span
+              className={cn('h-0.5 w-full rounded-full', isActive && 'bg-gray-700')}
+              aria-hidden
+            />
+          </button>
+        );
+      })}
     </div>
   );
 }
