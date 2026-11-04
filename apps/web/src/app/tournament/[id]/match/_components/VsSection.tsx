@@ -88,6 +88,7 @@ function VsSection({ left, right, isFinal = false, onPick, onSelect }: VsSection
                 getCardClassName(side)
               )}
               style={isPicked ? { zIndex: Z_INDEX.BASE_IMAGE + 4 } : {}}
+              inert={isFinal && !!selectedSide && !isPicked}
             >
               <ProductCard {...product} onClick={() => handleClick(side, product)} />
               {isPicked && (
