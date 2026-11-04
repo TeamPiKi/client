@@ -22,7 +22,7 @@ function MatchTitle({ isFinal = false, isPicked = false }: MatchTitleProps) {
         {isFinal ? '최후의 선택을 받을 위시는?' : '내 마음을 움직이는 위시는?'}
       </h1>
       <p
-        aria-live="polite"
+        aria-hidden
         className={cn(
           titleClassName,
           'absolute inset-0',
@@ -33,6 +33,9 @@ function MatchTitle({ isFinal = false, isPicked = false }: MatchTitleProps) {
       >
         선택 완료!
       </p>
+      <span role="status" className="sr-only">
+        {isPicked ? '선택 완료!' : ''}
+      </span>
     </div>
   );
 }
