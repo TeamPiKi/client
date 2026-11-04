@@ -32,7 +32,7 @@ async function TournamentHistoryPage({ searchParams }: Props) {
   );
 
   return (
-    <main className="flex min-h-dvh flex-col bg-bg-layer-basement px-5">
+    <main className="flex min-h-dvh flex-col bg-bg-layer-basement">
       <HydrationBoundary state={dehydrate(queryClient)}>
         <TournamentHistorySection />
       </HydrationBoundary>

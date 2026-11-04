@@ -25,7 +25,7 @@ const FILTERS: {
 
 function TournamentPlayTypeFilter({ activeFilter, onFilterChange }: Props) {
   return (
-    <div role="group" aria-label="플레이 유형 필터" className="flex gap-1">
+    <div role="group" aria-label="플레이 유형 필터" className="flex gap-2">
       {FILTERS.map(({ value, label, Icon }) => {
         const isActive = activeFilter === value;
 

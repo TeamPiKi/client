@@ -48,7 +48,7 @@ test('토너먼트를 열었다 뒤로 돌아오면 떠날 때의 탭이 그대�
 
   /** 완료 탭 주소로 진입 후 진행 중으로 전환 — 주소만 바뀌고 RSC 는 완료 탭인 상태 */
   await page.goto('/tournament/history?tab=completed&play=all');
-  await page.getByRole('button', { name: '진행 중' }).click();
+  await page.getByRole('tab', { name: '진행 중' }).click();
 
   await page.getByRole('link', { name: 'E2E 토너먼트' }).click();
   await page.waitForURL(/\/tournament\/1\/create/);
@@ -56,12 +56,12 @@ test('토너먼트를 열었다 뒤로 돌아오면 떠날 때의 탭이 그대�
   await page.goBack();
   await expect(page).toHaveURL(/tab=ongoing/);
 
-  const ongoingTab = page.getByRole('button', { name: '진행 중' });
-  const completedTab = page.getByRole('button', { name: '완료' });
+  const ongoingTab = page.getByRole('tab', { name: '진행 중' });
+  const completedTab = page.getByRole('tab', { name: '완료' });
 
-  /** 활성 탭은 밑줄(span)을 가진다 — 주소와 어긋나면 완료 탭이 활성으로 복원된다 */
-  await expect(ongoingTab.locator('span')).toBeVisible();
-  await expect(completedTab.locator('span')).toHaveCount(0);
+  /** 주소와 어긋나면 완료 탭이 활성으로 복원됨 */
+  await expect(ongoingTab).toHaveAttribute('aria-selected', 'true');
+  await expect(completedTab).toHaveAttribute('aria-selected', 'false');
 });
 
 test('탭을 옮기면 플레이 유형 필터가 전체로 초기화된다', async ({ page, api }) => {
@@ -75,7 +75,7 @@ test('탭을 옮기면 플레이 유형 필터가 전체로 초기화된다', as
 
   await expect(soloChip).toHaveAttribute('aria-pressed', 'true');
 
-  await page.getByRole('button', { name: '완료' }).click();
+  await page.getByRole('tab', { name: '완료' }).click();
 
   await expect(allChip).toHaveAttribute('aria-pressed', 'true');
   await expect(soloChip).toHaveAttribute('aria-pressed', 'false');
