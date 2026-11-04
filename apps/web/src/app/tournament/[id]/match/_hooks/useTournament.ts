@@ -27,6 +27,9 @@ type UseTournamentArgs = {
 
 type InProgressT = NonNullable<GetTournamentInProgressResponseT['inProgress']>;
 
+const NEXT_MATCH_REVEAL_MS = 1500;
+const FINAL_REVEAL_MS = 3000;
+
 // 다음 라운드에 진출하는 아이템 수에 따라 어떤 전환 화면을 보여줄지 결정
 // 2 → 결승 진입, 4 → 준결승 진입, 그 외 → 일반 다음 라운드
 const getTransitionStage = (nextRoundItemCount: number): TransitionStageT => {
@@ -133,6 +136,16 @@ const useTournament = ({ tournamentId, inProgress }: UseTournamentArgs) => {
 
   const unlockSelection = () => setSelectionEpoch(prev => prev + 1);
 
+  const revealEndAtRef = useRef(0);
+  const runAfterReveal = (callback: () => void) => {
+    const remainingMs = revealEndAtRef.current - Date.now();
+    if (remainingMs <= 0) {
+      callback();
+      return;
+    }
+    setTimeout(callback, remainingMs);
+  };
+
   /**
    * 기록은 성공했고 다음 라운드 조회만 실패한 상태 — 재선택을 유도하면 같은 매치를
    * 중복 기록하게 되므로, 조회(GET)만 다시 시도하는 액션을 토스트로 제공한다.
@@ -158,6 +171,10 @@ const useTournament = ({ tournamentId, inProgress }: UseTournamentArgs) => {
 
     const { first, second } = currentMatch;
 
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const revealMs = isFinalRound ? FINAL_REVEAL_MS : NEXT_MATCH_REVEAL_MS;
+    revealEndAtRef.current = Date.now() + (prefersReducedMotion ? 0 : revealMs);
+
     postRecordMatchMutation(
       {
         currentRound,
@@ -166,50 +183,52 @@ const useTournament = ({ tournamentId, inProgress }: UseTournamentArgs) => {
         selectedTournamentItemId: winner.tournamentItemId,
       },
       {
-        onSuccess: async data => {
-          // 토너먼트 종료 — 캐시 정리(훅 onSuccess)까지 끝난 뒤 결과 페이지로
-          if (data.completed) {
-            router.replace(ROUTES.TOURNAMENT_RESULT(tournamentId));
-            return;
-          }
+        onSuccess: data =>
+          runAfterReveal(async () => {
+            // 토너먼트 종료 — 캐시 정리(훅 onSuccess)까지 끝난 뒤 결과 페이지로
+            if (data.completed) {
+              router.replace(ROUTES.TOURNAMENT_RESULT(tournamentId));
+              return;
+            }
 
-          // 같은 라운드의 다음 대결 — 서버가 준 매치로 교체
-          if (data.nextMatch) {
-            setCurrentMatch(data.nextMatch);
-            setMatchIndex(prev => prev + 1);
-            return;
-          }
+            // 같은 라운드의 다음 대결 — 서버가 준 매치로 교체
+            if (data.nextMatch) {
+              setCurrentMatch(data.nextMatch);
+              setMatchIndex(prev => prev + 1);
+              return;
+            }
 
-          // nextMatch 없음 — 라운드 종료. 재조회로 다음 라운드 진입
-          try {
-            await syncWithServer();
-          } catch {
-            // 조회 실패 — 자동 1회 재시도 후에도 실패하면 수동 재시도 토스트로 전환
+            // nextMatch 없음 — 라운드 종료. 재조회로 다음 라운드 진입
             try {
               await syncWithServer();
             } catch {
-              showSyncRetryToast();
+              // 조회 실패 — 자동 1회 재시도 후에도 실패하면 수동 재시도 토스트로 전환
+              try {
+                await syncWithServer();
+              } catch {
+                showSyncRetryToast();
+              }
             }
-          }
-        },
+          }),
         // 문구는 usePostRecordMatch(4xx)·전역(5xx·네트워크)이 담당 — 여기선 복구 동작만 한다
-        onError: async error => {
-          const status = isAxiosError<ApiErrorResponseT>(error) ? error.response?.status : null;
+        onError: error =>
+          runAfterReveal(async () => {
+            const status = isAxiosError<ApiErrorResponseT>(error) ? error.response?.status : null;
 
-          // 400 TOURNAMENT-034(브래킷에 없는 조합) · 409 TOURNAMENT-035(이미 기록된 대결)
-          // — 클라 상태가 서버 브래킷과 어긋난 것이라 재선택이 아니라 재동기화가 필요하다.
-          if (status === 400 || status === 409) {
-            try {
-              await syncWithServer();
-            } catch {
-              showSyncRetryToast();
+            // 400 TOURNAMENT-034(브래킷에 없는 조합) · 409 TOURNAMENT-035(이미 기록된 대결)
+            // — 클라 상태가 서버 브래킷과 어긋난 것이라 재선택이 아니라 재동기화가 필요하다.
+            if (status === 400 || status === 409) {
+              try {
+                await syncWithServer();
+              } catch {
+                showSyncRetryToast();
+              }
+              return;
             }
-            return;
-          }
 
-          // 그 외 — 매치는 그대로라 재선택할 수 있게 카드 락만 푼다
-          unlockSelection();
-        },
+            // 그 외 — 매치는 그대로라 재선택할 수 있게 카드 락만 푼다
+            unlockSelection();
+          }),
       }
     );
   };

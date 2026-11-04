@@ -1,11 +1,12 @@
 'use client';
 
+import { useState } from 'react';
+
 import { Z_INDEX } from '@/consts/zIndex';
 import { cn } from '@/utils/cn';
 
 import type { CardSideT, ProductT } from '../../_common/_types/tournament';
 import { carmenSans } from '../_consts/font';
-import useCardSelectionAnimation from '../_hooks/useCardSelectionAnimation';
 import ProductCard from './ProductCard';
 import VsBadge from './VsBadge';
 import './VsSection.css';
@@ -37,7 +38,14 @@ const CARD_MOVE = {
 } as const;
 
 function VsSection({ left, right, isFinal = false, onPick, onSelect }: VsSectionProps) {
-  const { handleClick, selectedSide } = useCardSelectionAnimation({ isFinal, onPick, onSelect });
+  const [selectedSide, setSelectedSide] = useState<CardSideT | null>(null);
+
+  const handleClick = (side: CardSideT, product: ProductT) => {
+    if (selectedSide) return;
+    setSelectedSide(side);
+    onPick?.();
+    onSelect(product);
+  };
 
   const getCardClassName = (side: CardSideT) => {
     const isLeft = side === 'left';
