@@ -1,0 +1,15 @@
+@keyframes round-ticker-scroll {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.round-ticker-track {
+  animation: round-ticker-scroll var(--round-ticker-duration, 30s) linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .round-ticker-track {
+    animation: none;
+  }
+}
