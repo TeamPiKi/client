@@ -45,19 +45,22 @@ function RoundTicker({ currentRound, isFinal = false }: RoundTickerProps) {
   ));
 
   return (
-    <div
-      aria-hidden
-      className="flex h-[46px] w-full items-center overflow-hidden bg-linear-to-r from-white/60 to-white/80"
-    >
+    <>
+      <span className="sr-only">{label}</span>
       <div
-        ref={trackRef}
-        className="round-ticker-track flex w-max"
-        style={{ '--round-ticker-duration': `${durationSec}s` } as CSSProperties}
+        aria-hidden
+        className="flex h-[46px] w-full items-center overflow-hidden bg-linear-to-r from-white/60 to-white/80"
       >
-        <div className={halfClassName}>{items}</div>
-        <div className={halfClassName}>{items}</div>
+        <div
+          ref={trackRef}
+          className="round-ticker-track flex w-max"
+          style={{ '--round-ticker-duration': `${durationSec}s` } as CSSProperties}
+        >
+          <div className={halfClassName}>{items}</div>
+          <div className={halfClassName}>{items}</div>
+        </div>
       </div>
-    </div>
+    </>
   );
 }
 
