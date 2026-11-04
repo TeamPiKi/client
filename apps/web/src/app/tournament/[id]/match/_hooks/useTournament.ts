@@ -85,8 +85,8 @@ const useTournament = ({ tournamentId, inProgress }: UseTournamentArgs) => {
   // 준결승/결승 바텀시트 표시 중 재조회 없이 적용할 다음 라운드 데이터
   const pendingNextRoundRef = useRef<InProgressT | null>(null);
 
-  const roundLabel = getRoundLabel(currentRound, matchIndex);
   const isFinalRound = currentRound === 2;
+  const badgeLabel = getRoundLabel(currentRound, matchIndex);
 
   /**
    * 서버 권위 상태로 재동기화.
@@ -225,7 +225,8 @@ const useTournament = ({ tournamentId, inProgress }: UseTournamentArgs) => {
   return {
     currentMatch,
     remainingItems,
-    roundLabel,
+    currentRound,
+    badgeLabel,
     isFinalRound,
     transitionStage,
     selectionEpoch,

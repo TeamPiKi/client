@@ -7,6 +7,7 @@ import useTournament from '../_hooks/useTournament';
 import MatchHeader from './MatchHeader';
 import MatchSkeleton from './MatchSkeleton';
 import RoundBadge from './RoundBadge';
+import RoundTicker from './RoundTicker';
 import RoundTransitionSheet from './RoundTransitionSheet';
 import TournamentQuestion from './TournamentQuestion';
 import VsSection from './VsSection';
@@ -21,7 +22,8 @@ function TournamentClient({ tournamentId, tournamentName, inProgress }: Tourname
   const {
     currentMatch,
     remainingItems,
-    roundLabel,
+    currentRound,
+    badgeLabel,
     isFinalRound,
     transitionStage,
     selectionEpoch,
@@ -46,9 +48,10 @@ function TournamentClient({ tournamentId, tournamentName, inProgress }: Tourname
 
       <div className="relative flex flex-1 flex-col items-center">
         <MatchHeader />
+        <RoundTicker currentRound={currentRound} isFinal={isFinalRound} />
         <div className="mt-6 flex flex-col items-center gap-6">
           <div className="flex flex-col items-center gap-4">
-            <RoundBadge label={roundLabel} isFinal={isFinalRound} />
+            <RoundBadge label={badgeLabel} isFinal={isFinalRound} />
             <TournamentQuestion isFinal={isFinalRound} />
           </div>
           {isFinalRound && (
