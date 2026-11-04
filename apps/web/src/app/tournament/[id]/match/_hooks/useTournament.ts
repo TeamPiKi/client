@@ -17,7 +17,7 @@ import type {
   GetTournamentResponseT,
   TournamentMatchT,
 } from '../../_common/_types/tournamentResponse';
-import { type TransitionStageT, getTransitionStage } from '../_utils/rounds';
+import type { TransitionStageT } from '../_types/transitionStage';
 import { usePostRecordMatch } from './usePostRecordMatch';
 
 type UseTournamentArgs = {
@@ -28,6 +28,14 @@ type UseTournamentArgs = {
 };
 
 type InProgressT = NonNullable<GetTournamentInProgressResponseT['inProgress']>;
+
+// 다음 라운드에 진출하는 아이템 수에 따라 어떤 전환 화면을 보여줄지 결정
+// 2 → 결승 진입, 4 → 준결승 진입, 그 외 → 일반 다음 라운드
+const getTransitionStage = (nextRoundItemCount: number): TransitionStageT => {
+  if (nextRoundItemCount === 2) return 'toFinal';
+  if (nextRoundItemCount > 2 && nextRoundItemCount <= 4) return 'toSemi';
+  return 'toNext';
+};
 
 const useTournament = ({ tournamentId, inProgress }: UseTournamentArgs) => {
   const router = useRouter();
