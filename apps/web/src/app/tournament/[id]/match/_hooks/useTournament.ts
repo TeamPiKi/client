@@ -3,7 +3,7 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { isAxiosError } from 'axios';
 import { useRouter } from 'next/navigation';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 
 import { ROUTES } from '@/consts/route';
@@ -137,13 +137,21 @@ const useTournament = ({ tournamentId, inProgress }: UseTournamentArgs) => {
   const unlockSelection = () => setSelectionEpoch(prev => prev + 1);
 
   const revealEndAtRef = useRef(0);
+  const revealTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(
+    () => () => {
+      if (revealTimerRef.current) clearTimeout(revealTimerRef.current);
+    },
+    []
+  );
   const runAfterReveal = (callback: () => void) => {
     const remainingMs = revealEndAtRef.current - Date.now();
     if (remainingMs <= 0) {
       callback();
       return;
     }
-    setTimeout(callback, remainingMs);
+    revealTimerRef.current = setTimeout(callback, remainingMs);
   };
 
   /**
