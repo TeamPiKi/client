@@ -1,136 +1,124 @@
 'use client';
 
+import { useState } from 'react';
+
 import { Z_INDEX } from '@/consts/zIndex';
+import { cn } from '@/utils/cn';
 
-import type { ProductT } from '../../_common/_types/tournament';
-import useCardSelectionAnimation from '../_hooks/useCardSelectionAnimation';
+import type { CardSideT, ProductT } from '../../_common/_types/tournament';
+import { carmenSans } from '../_consts/font';
 import ProductCard from './ProductCard';
-
-const HANGER_HEIGHT = 54;
-const HOOK_HEIGHT = 33;
-const IMAGE_HEIGHT = 123;
-const HORIZONTAL_LINE_WIDTH = 304.524;
-const DASH_V =
-  'repeating-linear-gradient(to bottom, rgba(77,77,77,0.60) 0, rgba(77,77,77,0.60) 3px, transparent 3px, transparent 6px)';
-const DASH_H =
-  'repeating-linear-gradient(to right, rgba(77,77,77,0.60) 0, rgba(77,77,77,0.60) 3px, transparent 3px, transparent 6px)';
+import VsBadge from './VsBadge';
+import './VsSection.css';
 
 type VsSectionProps = {
   left: ProductT;
   right: ProductT;
   isFinal?: boolean;
+  onPick?: () => void;
   onSelect: (winner: ProductT) => void;
 };
 
-function VsSection({ left, right, isFinal = false, onSelect }: VsSectionProps) {
-  const {
-    handleClick,
-    selectedSide,
-    animationDuration,
-    hangerRotate,
-    leftCardShift,
-    rightCardShift,
-    leftCardStyle,
-    rightCardStyle,
-  } = useCardSelectionAnimation(onSelect);
+/** 카드 변형 — 왼쪽 기준이며 오른쪽은 x 반전 */
+const CARD_MOVE = {
+  /** 일반 매치 */
+  win: 'translate-y-[3.25px] scale-[1.11]',
+  winLeft: 'translate-x-[6.25px]',
+  winRight: '-translate-x-[6.25px]',
+  lose: 'translate-y-[3.5px] scale-[0.91] opacity-50',
+  loseLeft: '-translate-x-[8.5px]',
+  loseRight: 'translate-x-[8.5px]',
+  /** 결승 */
+  finalWin: 'translate-y-[3.5px] scale-[1.11]',
+  finalWinLeft: 'translate-x-[85px]',
+  finalWinRight: '-translate-x-[85px]',
+  finalLose: 'pointer-events-none translate-y-[30px] opacity-0',
+  finalLoseLeft: '-translate-x-[250px] -rotate-[16deg]',
+  finalLoseRight: 'translate-x-[250px] rotate-[16deg]',
+} as const;
 
-  const transition = 'transition-all ease-in-out';
-  const duration = { transitionDuration: `${animationDuration}ms` };
+function VsSection({ left, right, isFinal = false, onPick, onSelect }: VsSectionProps) {
+  const [selectedSide, setSelectedSide] = useState<CardSideT | null>(null);
+
+  const handleClick = (side: CardSideT, product: ProductT) => {
+    if (selectedSide) return;
+    setSelectedSide(side);
+    onPick?.();
+    onSelect(product);
+  };
+
+  const getCardClassName = (side: CardSideT) => {
+    const isLeft = side === 'left';
+    if (!selectedSide) return cn('vs-card', 'active:scale-[0.97]');
+
+    const isPicked = selectedSide === side;
+    if (isFinal) {
+      return isPicked
+        ? cn(
+            'vs-card-final-win',
+            CARD_MOVE.finalWin,
+            isLeft ? CARD_MOVE.finalWinLeft : CARD_MOVE.finalWinRight
+          )
+        : cn(
+            'vs-card-final-lose',
+            CARD_MOVE.finalLose,
+            isLeft ? CARD_MOVE.finalLoseLeft : CARD_MOVE.finalLoseRight
+          );
+    }
+    return isPicked
+      ? cn('vs-card', CARD_MOVE.win, isLeft ? CARD_MOVE.winLeft : CARD_MOVE.winRight)
+      : cn('vs-card', CARD_MOVE.lose, isLeft ? CARD_MOVE.loseLeft : CARD_MOVE.loseRight);
+  };
+
+  const sides: { side: CardSideT; product: ProductT }[] = [
+    { side: 'left', product: left },
+    { side: 'right', product: right },
+  ];
 
   return (
-    <div className="w-full">
-      {/* 헹거 영역 — 결승에선 제거 */}
-      {!isFinal && (
-        <div className="relative" style={{ height: HANGER_HEIGHT }}>
-          <div
-            className="absolute top-0 left-1/2 h-full -translate-x-1/2"
-            style={{
-              width: '1px',
-              backgroundImage: DASH_V,
-              maskImage: 'linear-gradient(to bottom, transparent 0%, black 100%)',
-              WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 100%)',
-            }}
-          />
-          <div
-            className={`absolute bottom-0 left-1/2 -translate-x-1/2 ${transition}`}
-            style={{
-              width: HORIZONTAL_LINE_WIDTH,
-              height: '1px',
-              backgroundImage: DASH_H,
-              transform: `rotate(${hangerRotate}deg)`,
-              ...duration,
-            }}
-          />
-        </div>
-      )}
-
-      {/* 카드 영역 */}
-      <div className="flex justify-center gap-1.5">
-        {/* 왼쪽 */}
-        <div
-          className={`flex w-[148px] flex-col items-center ${transition}`}
-          style={{
-            transform: `translateY(${leftCardShift}px) scale(${leftCardStyle.scale})`,
-            ...(leftCardStyle.blur > 0 && { filter: `blur(${leftCardStyle.blur}px)` }),
-            ...duration,
-          }}
-        >
-          {!isFinal && (
+    <div className="relative isolate flex justify-center gap-[22px]">
+      {sides.map(({ side, product }) => {
+        const isPicked = selectedSide === side;
+        return (
+          <div key={side} className="relative">
             <div
-              style={{
-                width: '1px',
-                height: HOOK_HEIGHT,
-                backgroundImage: DASH_V,
-              }}
-            />
-          )}
-          <ProductCard
-            {...left}
-            isFinal={isFinal}
-            isPicked={selectedSide === 'left'}
-            onClick={() => handleClick('left', left)}
-          />
-        </div>
-
-        {/* VS 뱃지 */}
-        <div
-          className={`flex size-8 shrink-0 items-center justify-center rounded-full bg-bg-neutral-secondary text-[12.026px] leading-[17.18px] font-semibold tracking-[-0.515px] text-white ${transition}`}
-          style={{
-            zIndex: Z_INDEX.BASE_IMAGE + 1,
-            marginTop: isFinal ? IMAGE_HEIGHT / 2 - 16 : HOOK_HEIGHT + IMAGE_HEIGHT - 16,
-            filter: selectedSide ? 'blur(2px)' : 'none',
-            ...duration,
-          }}
-        >
-          VS
-        </div>
-
-        {/* 오른쪽 */}
-        <div
-          className={`flex w-[148px] flex-col items-center ${transition}`}
-          style={{
-            transform: `translateY(${rightCardShift}px) scale(${rightCardStyle.scale})`,
-            ...(rightCardStyle.blur > 0 && { filter: `blur(${rightCardStyle.blur}px)` }),
-            ...duration,
-          }}
-        >
-          {!isFinal && (
-            <div
-              style={{
-                width: '1px',
-                height: HOOK_HEIGHT,
-                backgroundImage: DASH_V,
-              }}
-            />
-          )}
-          <ProductCard
-            {...right}
-            isFinal={isFinal}
-            isPicked={selectedSide === 'right'}
-            onClick={() => handleClick('right', right)}
-          />
-        </div>
-      </div>
+              className={cn(
+                'relative rounded-[20px]',
+                isPicked && 'shadow-[0_0_0_2px_#76CEFD,0_6px_18px_0_rgba(118,206,253,0.35)]',
+                getCardClassName(side)
+              )}
+              style={isPicked ? { zIndex: Z_INDEX.BASE_IMAGE + 4 } : {}}
+              inert={isFinal && !!selectedSide && !isPicked}
+            >
+              <ProductCard {...product} onClick={() => handleClick(side, product)} />
+              {isPicked && (
+                <div
+                  className={cn(
+                    carmenSans.className,
+                    'vs-pick',
+                    isFinal && 'vs-pick-final',
+                    'absolute -top-4 -left-3.5 flex size-15 items-center justify-center rounded-full bg-sky-blue-400 text-[22px] leading-6 font-bold tracking-[-0.6px] text-white shadow-[1px_3px_4px_0_rgba(0,0,0,0.15)]'
+                  )}
+                  style={{ zIndex: Z_INDEX.BASE_IMAGE + 2 }}
+                >
+                  <span className="-rotate-15">Pick!</span>
+                  <div
+                    aria-hidden
+                    className="pointer-events-none absolute inset-0 rounded-full shadow-[inset_0_1px_8.1px_0_#A2DEFF]"
+                  />
+                </div>
+              )}
+            </div>
+            {isPicked && !isFinal && (
+              <div
+                aria-hidden
+                className="vs-ripple pointer-events-none absolute inset-0 rounded-[20px] border-2 border-sky-blue-400"
+              />
+            )}
+          </div>
+        );
+      })}
+      <VsBadge isPicked={!!selectedSide} isFinal={isFinal} />
     </div>
   );
 }

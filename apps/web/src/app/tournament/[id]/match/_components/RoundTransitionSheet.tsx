@@ -5,7 +5,7 @@ import type { CSSProperties } from 'react';
 
 import { Z_INDEX } from '@/consts/zIndex';
 
-import type { TransitionStageT } from '../_utils/rounds';
+import type { TransitionStageT } from '../_types/transitionStage';
 import './RoundTransitionSheet.css';
 
 // ── Countdown arc ─────────────────────────────────────────────────────────────

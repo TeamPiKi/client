@@ -1,0 +1,104 @@
+/* Tailwind v4 의 translate·scale·rotate 는 transform 이 아닌 개별 속성이라 각각 transition 대상에 넣음 */
+
+/* ── 카드 ─────────────────────────────────────────────────────────────────── */
+.vs-card {
+  transition:
+    translate 0.45s cubic-bezier(0.34, 1.56, 0.64, 1),
+    scale 0.45s cubic-bezier(0.34, 1.56, 0.64, 1),
+    opacity 0.35s ease,
+    box-shadow 0.35s ease;
+}
+.vs-card-final-win {
+  transition:
+    translate 0.6s cubic-bezier(0.34, 1.4, 0.64, 1),
+    scale 0.6s cubic-bezier(0.34, 1.4, 0.64, 1),
+    opacity 0.45s ease,
+    box-shadow 0.4s ease;
+}
+.vs-card-final-lose {
+  transition:
+    translate 0.5s cubic-bezier(0.55, 0, 0.8, 0.4),
+    rotate 0.5s cubic-bezier(0.55, 0, 0.8, 0.4),
+    opacity 0.5s ease-in;
+}
+
+/* ── 고른 카드 테두리 파동 ─────────────────────────────────────────────────── */
+@keyframes vs-ripple {
+  0% {
+    transform: scale(1.02);
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(1.2);
+    opacity: 0;
+  }
+}
+.vs-ripple {
+  animation: vs-ripple 0.7s ease-out both;
+}
+
+/* ── Pick! 배지 ───────────────────────────────────────────────────────────── */
+@keyframes vs-pick {
+  0% {
+    transform: scale(0) rotate(-60deg);
+  }
+  100% {
+    transform: scale(1) rotate(0);
+  }
+}
+.vs-pick {
+  animation: vs-pick 0.55s 0.15s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+.vs-pick-final {
+  animation-delay: 0.45s;
+}
+
+/* ── VS 불꽃 ──────────────────────────────────────────────────────────────── */
+.vs-flame {
+  transition:
+    scale 0.35s cubic-bezier(0.5, -0.4, 0.7, 1),
+    rotate 0.35s cubic-bezier(0.5, -0.4, 0.7, 1),
+    opacity 0.3s ease;
+}
+.vs-flame-final {
+  transition:
+    scale 0.3s ease-out,
+    opacity 0.3s ease-out;
+}
+
+/* ── 결승 VS 파편 ─────────────────────────────────────────────────────────── */
+@keyframes vs-spark {
+  0% {
+    transform: translateY(-26px) scaleY(0.2);
+    opacity: 0;
+  }
+  25% {
+    transform: translateY(-44px) scaleY(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-66px) scaleY(0.2);
+    opacity: 0;
+  }
+}
+.vs-spark {
+  animation: vs-spark 0.55s ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vs-card,
+  .vs-card-final-win,
+  .vs-card-final-lose,
+  .vs-flame,
+  .vs-flame-final {
+    transition: none;
+  }
+  .vs-pick {
+    animation: none;
+  }
+  /** 파동·파편은 멈춘 채 남으면 안 되므로 아예 숨김 */
+  .vs-ripple,
+  .vs-spark {
+    display: none;
+  }
+}

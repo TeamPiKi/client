@@ -32,19 +32,18 @@ test('4강 두 매치를 진행하면 결승으로 전환되고, 결승 선택�
   const candidateCard = page.getByRole('button', { name: /E2E/ });
 
   /** 4강 1번째 매치 — 기록 응답의 nextMatch 로 다음 매치 진입 */
-  await expect(page.getByText('4강 라운드 1')).toBeVisible();
+  await expect(page.getByText('Match 1')).toBeVisible();
   await candidateCard.first().click();
 
   /** 4강 2번째(라운드 마지막) 매치 — nextMatch 가 없어 서버 재조회로 결승 라운드 진입 */
-  await expect(page.getByText('4강 라운드 2')).toBeVisible();
+  await expect(page.getByText('Match 2')).toBeVisible();
   api.get(ENDPOINTS.TOURNAMENT(2), MOCK_TOURNAMENT_IN_PROGRESS_FINAL);
   api.post(ENDPOINTS.TOURNAMENT_MATCHES(2), { nextMatch: null, completed: null });
   await candidateCard.first().click();
 
   /** 결승 전환 바텀시트(3초 카운트다운 후 자동 종료) → 결승전 화면 */
   await expect(page.getByText('마지막 한 판!')).toBeVisible();
-  await expect(page.getByText('결승전')).toBeVisible();
-  await expect(page.getByText('최종 선택을 해주세요')).toBeVisible();
+  await expect(page.getByText('최후의 선택을 받을 위시는?')).toBeVisible();
 
   /** 결승 기록 — completed 에 1~4위 결과가 담겨 온다 */
   api.post(ENDPOINTS.TOURNAMENT_MATCHES(2), {
