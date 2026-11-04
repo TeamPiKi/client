@@ -58,16 +58,13 @@ function TournamentClient({ tournamentId, tournamentName, inProgress }: Tourname
         </div>
 
         <div className="w-full">
-          {/* 기록 대기 중에는 이전 화면을 유지해 스켈레톤 깜빡임을 방지한다. */}
           {!currentMatch ? (
-            <MatchSkeleton isFinal={isFinalRound} />
+            <MatchSkeleton />
           ) : (
             <VsSection
-              // 매치가 바뀌면 remount — selectionEpoch 는 기록 실패 시 카드 선택 락을 푸는 용도
               key={`${currentMatch.first.tournamentItemId}-${currentMatch.second.tournamentItemId}-${selectionEpoch}`}
               left={currentMatch.first}
               right={currentMatch.second}
-              isFinal={isFinalRound}
               onSelect={handleSelect}
             />
           )}
