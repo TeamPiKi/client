@@ -60,7 +60,7 @@ const nextConfig = async () => {
           destination: '/tournament/join/:id',
           permanent: false,
         },
-        /** 구 인스타 바이오 링크 호환 
+        /** 구 인스타 바이오 링크 호환
          * TODO: 바이오 교체 후 제거 */
         {
           source: '/open',
@@ -102,6 +102,11 @@ const nextConfig = async () => {
         {
           source: '/api/v1/:path*',
           destination: `${process.env.NEXT_PUBLIC_API_URL}/api/v1/:path*`,
+        },
+        /** TODO: 배포 전 열린 탭의 옛 SSE 경로 호환. 요청이 0이 되면 제거 (#795) */
+        {
+          source: '/api/notifications/subscribe',
+          destination: `${process.env.NEXT_PUBLIC_API_URL}/api/v1/notifications/subscribe`,
         },
       ];
     },
