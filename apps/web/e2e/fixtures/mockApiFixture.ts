@@ -100,8 +100,6 @@ export const test = base.extend<{ api: ApiMockT }>({
       });
     });
 
-    await page.route('**/api/notifications/subscribe', holdSseOpen);
-
     const fulfillMockImage = (route: Route, originalUrl: string) =>
       route.fulfill({
         status: 200,
