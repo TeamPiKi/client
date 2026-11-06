@@ -148,11 +148,7 @@ export const useNotificationSSE = (enabled: boolean) => {
         headers['Authorization'] = `Bearer ${accessToken}`;
       }
 
-      // 웹: Route Handler 경유 (Next.js rewrite 버퍼링 우회, 서버사이드에서 auth 처리)
-      // 앱: 기존 rewrite 경로 사용 (Authorization 헤더로 직접 인증)
-      const url = isApp ? ENDPOINTS.NOTIFICATIONS_SUBSCRIBE : '/api/notifications/subscribe';
-
-      fetchEventSource(url, {
+      fetchEventSource(ENDPOINTS.NOTIFICATIONS_SUBSCRIBE, {
         headers,
         credentials: 'include',
         signal: controller.signal,

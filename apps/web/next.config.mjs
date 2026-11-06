@@ -60,7 +60,7 @@ const nextConfig = async () => {
           destination: '/tournament/join/:id',
           permanent: false,
         },
-        /** 구 인스타 바이오 링크 호환 
+        /** 구 인스타 바이오 링크 호환
          * TODO: 바이오 교체 후 제거 */
         {
           source: '/open',
