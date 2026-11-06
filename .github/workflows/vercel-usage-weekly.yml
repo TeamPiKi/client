@@ -1,0 +1,32 @@
+name: Vercel Usage Weekly
+
+on:
+  schedule:
+    - cron: '0 1 * * 1'
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: vercel-usage-weekly
+  cancel-in-progress: false
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          sparse-checkout: .github/scripts
+
+      - name: Vercel 사용량 요약 전송 (허거덩 봇)
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_USAGE_TOKEN }}
+          VERCEL_TEAM_ID: team_T5YwJSg0Lb05lHOyDQzBphyV
+          DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
+          CHANNEL_ID: ${{ secrets.DISCORD_SENTRY_CHANNEL_ID }}
+        run: bash .github/scripts/vercel-usage-weekly.sh
