@@ -20,13 +20,13 @@ trap 'rm -rf "$WORK"' EXIT
 
 discord_post() {
   local path="$1" body="$2" code
-  code=$(curl -s --max-time 10 -o "$WORK/discord.json" -w '%{http_code}' \
+  code=$(curl -sS --max-time 10 -o "$WORK/discord.json" -w '%{http_code}' \
     -X POST "https://discord.com/api/v10$path" \
     -H "Authorization: Bot $DISCORD_BOT_TOKEN" \
     -H "Content-Type: application/json; charset=utf-8" \
     --data "$body") || code="000"
   if [ "$code" -lt 200 ] || [ "$code" -ge 300 ]; then
-    echo "::error::Discord 요청 실패 $path (HTTP $code) $(cat "$WORK/discord.json" 2>/dev/null)"
+    echo "::error::Discord 요청 실패 $path (HTTP $code) $(cat "$WORK/discord.json" 2>/dev/null)" >&2
     return 1
   fi
   jq -r '.id' "$WORK/discord.json"
