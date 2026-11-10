@@ -2,15 +2,17 @@
 
 import { useQueryClient } from '@tanstack/react-query';
 import { useParams, useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import { ROUTES } from '@/consts/route';
 import { TOURNAMENT_STATUS } from '@/consts/tournament';
 
 import usePreloadMatchImages from '../_common/_hooks/usePreloadMatchImages';
 import type { GetTournamentResponseT } from '../_common/_types/tournamentResponse';
-import LoadingBar from './_components/LoadingBar';
-import TournamentBracketAnimation from './_components/TournamentBracketAnimation';
+import LoadingCharacter from './_components/LoadingCharacter';
+import LoadingStepCard from './_components/LoadingStepCard';
+import LoadingStepTitle from './_components/LoadingStepTitle';
+import useLoadingStep from './_hooks/useLoadingStep';
 
 const LOADING_DURATION_MS = 4000;
 
@@ -38,30 +40,29 @@ function TournamentLoadingPage() {
 
   usePreloadMatchImages(getCandidateImageUrls(tournamentData));
 
+  const [isComplete, setIsComplete] = useState(false);
+
   useEffect(() => {
-    const timer = setTimeout(() => {
-      router.replace(ROUTES.TOURNAMENT_MATCH(tournamentId));
-    }, LOADING_DURATION_MS);
+    const timer = setTimeout(() => setIsComplete(true), LOADING_DURATION_MS);
     return () => clearTimeout(timer);
+  }, []);
+
+  const handleDone = useCallback(() => {
+    router.replace(ROUTES.TOURNAMENT_MATCH(tournamentId));
   }, [router, tournamentId]);
 
-  return (
-    <main className="flex min-h-dvh flex-col justify-center px-5 pt-padding-top pb-6">
-      <header className="flex flex-col gap-2 text-center tracking-[-0.6px]">
-        <h1 className="text-[24px] leading-8 font-bold text-text-neutral-primary">
-          대진표 만드는 중...
-        </h1>
-        <p className="heading-2-medium text-text-neutral-tertiary">
-          비슷한 가격대 상품끼리 대진표를 짜고 있어요
-        </p>
-      </header>
+  const { step, barProgress } = useLoadingStep({ isComplete, onDone: handleDone });
 
-      <div className="mt-11">
-        <LoadingBar />
+  return (
+    <main className="flex min-h-dvh flex-col justify-center bg-linear-to-b from-white to-[#a2deff] px-5 pt-padding-top pb-6">
+      <LoadingStepTitle step={step} />
+
+      <div className="mt-[26px]">
+        <LoadingStepCard step={step} barProgress={barProgress} />
       </div>
 
-      <div className="mt-20">
-        <TournamentBracketAnimation />
+      <div className="mt-[17px]">
+        <LoadingCharacter />
       </div>
     </main>
   );
