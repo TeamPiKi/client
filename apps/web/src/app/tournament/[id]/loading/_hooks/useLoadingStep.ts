@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from 'react';
 
 import type { LoadingStepT } from '../_types/loadingStep';
 
-const ESTIMATE_MS = 4000;
 const PROGRESS_TICK_MS = 100;
 
 const STEP_2_PROGRESS = 0.5;
@@ -17,12 +16,10 @@ const STEP_MOTION_MS: Record<LoadingStepT, number> = {
 const DONE_HOLD_MS = 800;
 
 type UseLoadingStepParams = {
+  progress: number;
   isComplete: boolean;
   onDone: () => void;
 };
-
-const getFakeProgress = (elapsedMs: number) =>
-  0.9 * (1 - Math.exp((-1.6 * elapsedMs) / ESTIMATE_MS));
 
 const getBarProgress = (step: LoadingStepT, progress: number) => {
   if (step === 1) return Math.min(progress, STEP_2_PROGRESS);
@@ -30,10 +27,8 @@ const getBarProgress = (step: LoadingStepT, progress: number) => {
   return 1;
 };
 
-const useLoadingStep = ({ isComplete, onDone }: UseLoadingStepParams) => {
+const useLoadingStep = ({ progress, isComplete, onDone }: UseLoadingStepParams) => {
   const [step, setStep] = useState<LoadingStepT>(1);
-  const [progress, setProgress] = useState(0);
-  const startedAtRef = useRef<number | null>(null);
   const stepStartedAtRef = useRef<number | null>(null);
 
   useEffect(() => {
@@ -41,15 +36,11 @@ const useLoadingStep = ({ isComplete, onDone }: UseLoadingStepParams) => {
 
     const interval = window.setInterval(() => {
       const now = performance.now();
-      startedAtRef.current ??= now;
       stepStartedAtRef.current ??= now;
-
-      const nextProgress = getFakeProgress(now - startedAtRef.current);
-      setProgress(nextProgress);
 
       if (now - stepStartedAtRef.current < STEP_MOTION_MS[step]) return;
 
-      const shouldAdvance = step === 1 ? nextProgress >= STEP_2_PROGRESS || isComplete : isComplete;
+      const shouldAdvance = step === 1 ? progress >= STEP_2_PROGRESS || isComplete : isComplete;
       if (!shouldAdvance) return;
 
       stepStartedAtRef.current = now;
@@ -57,7 +48,7 @@ const useLoadingStep = ({ isComplete, onDone }: UseLoadingStepParams) => {
     }, PROGRESS_TICK_MS);
 
     return () => window.clearInterval(interval);
-  }, [step, isComplete]);
+  }, [step, progress, isComplete]);
 
   useEffect(() => {
     if (step !== 3) return;

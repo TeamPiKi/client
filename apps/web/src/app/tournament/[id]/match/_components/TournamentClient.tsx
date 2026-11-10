@@ -1,10 +1,11 @@
 'use client';
 
+import Image from 'next/image';
 import { useState } from 'react';
 
+import matchBackground from '../../_common/_assets/match-background.jpg';
 import usePreloadMatchImages from '../../_common/_hooks/usePreloadMatchImages';
 import type { GetTournamentInProgressResponseT } from '../../_common/_types/tournamentResponse';
-import matchBackground from '../_assets/match-background.jpg';
 import useTournament from '../_hooks/useTournament';
 import MatchBadge from './MatchBadge';
 import MatchHeader from './MatchHeader';
@@ -45,10 +46,19 @@ function TournamentClient({ tournamentId, inProgress }: TournamentClientProps) {
     <main className="relative flex min-h-dvh flex-col overflow-hidden">
       {/** 배경 */}
       <div aria-hidden className="pointer-events-none absolute inset-0 bg-[#A2DEFF]">
-        <div
-          className="absolute inset-0 bg-cover opacity-40"
+        {/**
+         * NOTE: 원본이 늦게 와도 빈 배경 대신 흐린 미리보기가 먼저 보이도록 blur placeholder 사용.
+         * unoptimized — 로딩 화면이 프리로드하는 원본 URL(matchBackground.src)과 맞춰 캐시를 그대로 쓴다.
+         */}
+        <Image
+          src={matchBackground}
+          alt=""
+          fill
+          unoptimized
+          placeholder="blur"
+          className="object-cover opacity-40"
           /** NOTE: 이미지가 프레임 왼쪽 위로 밀려 있어, 그 지점을 비율로 고정해 항상 같은 이미지 부분이 보이게 함 */
-          style={{ backgroundImage: `url(${matchBackground.src})`, backgroundPosition: '15% 51%' }}
+          style={{ objectPosition: '15% 51%' }}
         />
         <div className="absolute inset-0 bg-linear-to-b from-white/0 to-white" />
       </div>

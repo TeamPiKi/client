@@ -1,6 +1,6 @@
 import { cn } from '@/utils/cn';
 
-import { carmenSans } from '../_consts/font';
+import { carmenSans } from '../../_common/_consts/font';
 
 type MatchBadgeProps = {
   /** 라운드 안에서 몇 번째 매치인지 (0부터) */
