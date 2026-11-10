@@ -6,7 +6,7 @@ import type { CSSProperties } from 'react';
 import { TrophyIconFill } from '@/assets/icons';
 import { cn } from '@/utils/cn';
 
-import { carmenSans } from '../_consts/font';
+import { carmenSans } from '../../_common/_consts/font';
 import './RoundTicker.css';
 
 /** RoundTicker 움직이는 속도 */

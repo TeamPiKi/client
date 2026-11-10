@@ -4,7 +4,7 @@ import { useState } from 'react';
 
 import usePreloadMatchImages from '../../_common/_hooks/usePreloadMatchImages';
 import type { GetTournamentInProgressResponseT } from '../../_common/_types/tournamentResponse';
-import matchBackground from '../_assets/match-background.jpg';
+import matchBackground from '../../_common/_assets/match-background.jpg';
 import useTournament from '../_hooks/useTournament';
 import MatchBadge from './MatchBadge';
 import MatchHeader from './MatchHeader';

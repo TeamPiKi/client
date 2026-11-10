@@ -6,7 +6,7 @@ import { Z_INDEX } from '@/consts/zIndex';
 import { cn } from '@/utils/cn';
 
 import type { CardSideT, ProductT } from '../../_common/_types/tournament';
-import { carmenSans } from '../_consts/font';
+import { carmenSans } from '../../_common/_consts/font';
 import ProductCard from './ProductCard';
 import VsBadge from './VsBadge';
 import './VsSection.css';
