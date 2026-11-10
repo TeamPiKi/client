@@ -9,6 +9,7 @@ import { TOURNAMENT_STATUS } from '@/consts/tournament';
 
 import usePreloadMatchImages from '../_common/_hooks/usePreloadMatchImages';
 import type { GetTournamentResponseT } from '../_common/_types/tournamentResponse';
+import LoadingCharacter from './_components/LoadingCharacter';
 import LoadingStepCard from './_components/LoadingStepCard';
 import LoadingStepTitle from './_components/LoadingStepTitle';
 import useLoadingStep from './_hooks/useLoadingStep';
@@ -58,6 +59,10 @@ function TournamentLoadingPage() {
 
       <div className="mt-[26px]">
         <LoadingStepCard step={step} barProgress={barProgress} />
+      </div>
+
+      <div className="mt-[17px]">
+        <LoadingCharacter />
       </div>
     </main>
   );
