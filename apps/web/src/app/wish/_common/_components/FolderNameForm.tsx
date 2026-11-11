@@ -65,7 +65,7 @@ function FolderNameForm({
           </DrawerTitle>
         }
       />
-      <div className={cn('flex flex-col pb-1.5', errorMessage ? 'gap-2' : 'gap-9')}>
+      <div className={cn('flex flex-col pb-1.5', errorMessage ? 'gap-4' : 'gap-9')}>
         <Input
           aria-label="폴더명"
           placeholder="폴더명을 입력해주세요."
