@@ -36,7 +36,6 @@ function FolderNameForm({
   onSubmit,
 }: FolderNameFormProps) {
   const [name, setName] = useState(initialName);
-  const [isEmptySubmitted, setIsEmptySubmitted] = useState(false);
 
   const trimmedName = name.trim();
   const isUnchanged = initialName !== '' && trimmedName === initialName;
@@ -44,14 +43,10 @@ function FolderNameForm({
 
   let errorMessage: string | null = submitErrorMessage;
   if (isOverLimit) errorMessage = `최대 ${MAX_FOLDER_NAME_LENGTH}자까지 입력할 수 있어요.`;
-  else if (isEmptySubmitted) errorMessage = '폴더 이름을 입력해 주세요.';
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!trimmedName) {
-      setIsEmptySubmitted(true);
-      return;
-    }
+    if (!trimmedName) return;
 
     onSubmit(trimmedName);
   };
@@ -77,7 +72,6 @@ function FolderNameForm({
           value={name}
           onChange={event => {
             setName(event.target.value);
-            setIsEmptySubmitted(false);
             onNameChange?.();
           }}
           aria-invalid={errorMessage !== null}
@@ -88,7 +82,7 @@ function FolderNameForm({
         <Button
           type="submit"
           size="lg"
-          disabled={name === '' || isUnchanged || isOverLimit || isPending}
+          disabled={trimmedName === '' || isUnchanged || isOverLimit || isPending}
         >
           완료
         </Button>
