@@ -8,6 +8,7 @@ export type ItemInfoT = {
   name: string | null;
   /** FAILED·INCOMPLETE 는 가격을 못 가져올 수 있다 */
   price: number | null;
+  discountRate?: number | null;
   /** 링크로 담은 경우에만 존재 — 이미지 위 원본 링크 칩 (라벨은 hostname) */
   sourceUrl: string | null;
 };

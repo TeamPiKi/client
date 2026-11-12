@@ -9,6 +9,7 @@ type ItemT = {
   method: ItemExtractMethodT | null;
   userInput: boolean;
   refreshing: boolean;
+  discountRate: number | null;
 } & (
   | {
       id: null;

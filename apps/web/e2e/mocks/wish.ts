@@ -39,6 +39,7 @@ export const MOCK_WISH_DETAIL: GetWishResponseT = {
     status: 'READY',
     name: 'E2E 스니커즈',
     price: 10000,
+    discountRate: null,
     currency: 'KRW',
     imageUrl: MOCK_IMAGE_URLS.product,
     sourceUrl: MOCK_WISH_SOURCE_URL,
