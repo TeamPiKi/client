@@ -9,7 +9,6 @@ function NotFound() {
   return (
     <ErrorScreen
       Icon={props => <Basket {...props} type="panic" />}
-      iconClassName="text-sky-blue-400"
       title="페이지를 찾을 수 없어요"
       description="링크가 잘못되었거나 삭제된 페이지예요"
     >

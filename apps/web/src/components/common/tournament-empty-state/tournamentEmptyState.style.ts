@@ -15,7 +15,7 @@ export const tournamentEmptyStateStyles = cva('flex flex-col items-center', {
 export const tournamentEmptyStateIconStyles = cva('size-[60px]', {
   variants: {
     variant: {
-      default: 'text-sky-blue-400',
+      default: 'text-sky-blue-300',
       muted: 'text-gray-300',
     },
   },
