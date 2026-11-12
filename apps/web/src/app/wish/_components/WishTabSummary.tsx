@@ -24,7 +24,9 @@ function FolderTabSummary() {
 
   if (foldersData.length === 0) return null;
 
-  return <p className="body-2-medium text-text-neutral-tertiary">폴더 {foldersData.length}개</p>;
+  return (
+    <p className="pb-4 body-2-medium text-text-neutral-tertiary">폴더 {foldersData.length}개</p>
+  );
 }
 
 function WishTabSummary({ wishCount, mode, onEdit, onSearch }: WishTabSummaryProps) {

@@ -7,7 +7,7 @@ type FolderEmptyStateProps = {
 
 function FolderEmptyState({ onAdd }: FolderEmptyStateProps) {
   return (
-    <div className="flex flex-col items-center gap-4 pt-[75px]" role="status">
+    <div className="flex flex-col items-center gap-4 pt-[91px]" role="status">
       <Basket type="default" />
       <p className="flex flex-col items-center gap-1 text-center body-1-medium text-text-neutral-secondary">
         아직 생성한 폴더가 없어요.
