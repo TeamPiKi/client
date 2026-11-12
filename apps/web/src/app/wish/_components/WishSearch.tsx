@@ -74,7 +74,7 @@ function WishSearch({ onClose }: WishSearchProps) {
         </DialogDescription>
         <div
           className={cn(
-            'sticky top-0 mx-auto flex w-full max-w-120 flex-col gap-6 rounded-b-3xl px-5 pt-padding-top pb-[23px] transition-colors',
+            'sticky top-0 mx-auto flex w-full max-w-120 flex-col gap-[21px] rounded-b-3xl px-5 pt-padding-top pb-[21px] transition-colors',
             isSearching ? 'bg-bg-layer-default' : 'bg-bg-layer-basement'
           )}
         >
