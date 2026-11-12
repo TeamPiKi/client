@@ -35,6 +35,7 @@ function WishInfoScreen({ wishId }: WishInfoScreenProps) {
         imageUrl: item.imageUrl,
         name: item.name,
         price: item.price,
+        discountRate: item.discountRate,
         sourceUrl: item.sourceUrl,
       }}
       onSave={(data, onSuccess) => patchWishMutation(data, { onSuccess })}

@@ -65,7 +65,7 @@ function WishCard({
             {name}
           </p>
           <p className="flex gap-1 body-2-semibold">
-            {discountRate !== null && <span className="text-bg-accent">{discountRate}%</span>}
+            {!!discountRate && <span className="text-bg-accent">{discountRate}%</span>}
             <span className="truncate text-text-neutral-primary">{formatPrice(String(price))}</span>
           </p>
         </div>

@@ -37,6 +37,7 @@ function ItemDetailView({ item, memo, priceRefresh, onEdit }: ItemDetailViewProp
       <ItemInfoCard
         name={item.name}
         price={item.price}
+        discountRate={item.discountRate}
         priceRefresh={priceRefresh}
         onEdit={onEdit}
       />

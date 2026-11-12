@@ -49,6 +49,7 @@ function WishGrid({
           <WishCard
             name={item.name}
             price={item.price}
+            discountRate={item.discountRate}
             imageUrl={item.imageUrl}
             sourcePlatform={item.sourcePlatform}
             isWinner={winnerTournamentIds.length > 0}

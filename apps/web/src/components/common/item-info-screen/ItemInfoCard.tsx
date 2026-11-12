@@ -9,6 +9,7 @@ import type { PriceRefreshT } from './itemInfoScreen.type';
 type ItemInfoCardProps = {
   name: string;
   price: number;
+  discountRate?: number | null;
   /** 링크로 담은 상품에만 전달 — 없으면 새로고침 버튼을 노출하지 않는다 */
   priceRefresh?: PriceRefreshT;
   /** 없으면 조회 전용 — 수정 버튼을 노출하지 않는다 */
@@ -16,7 +17,7 @@ type ItemInfoCardProps = {
 };
 
 /** 상품명·가격과 액션 버튼을 담은 카드. 가격 정보를 불러오는 동안에는 로딩만 보여준다 */
-function ItemInfoCard({ name, price, priceRefresh, onEdit }: ItemInfoCardProps) {
+function ItemInfoCard({ name, price, discountRate, priceRefresh, onEdit }: ItemInfoCardProps) {
   const isRefreshing = priceRefresh?.isPending ?? false;
 
   return (
@@ -27,7 +28,10 @@ function ItemInfoCard({ name, price, priceRefresh, onEdit }: ItemInfoCardProps) 
 
         <Spacing size={8} />
 
-        <p className="heading-2-semibold text-text-neutral-primary">{formatPrice(String(price))}</p>
+        <p className="flex gap-1 heading-2-semibold">
+          {!!discountRate && <span className="text-bg-accent">{discountRate}%</span>}
+          <span className="text-text-neutral-primary">{formatPrice(String(price))}</span>
+        </p>
 
         {(priceRefresh || onEdit) && (
           <>

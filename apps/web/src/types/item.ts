@@ -8,6 +8,7 @@ export type ItemT = {
   status: ItemStatusT;
   name: string | null;
   price: number | null;
+  discountRate: number | null;
   currency: string | null;
   imageUrl: string | null;
   sourceUrl: string | null;
