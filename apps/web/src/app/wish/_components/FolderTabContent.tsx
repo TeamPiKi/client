@@ -61,7 +61,7 @@ function FolderTabContent() {
       {foldersData.length === 0 ? (
         <FolderEmptyState onAdd={handleOpenCreateSheet} />
       ) : (
-        <ul className="grid grid-cols-2">
+        <ul className="grid grid-cols-2 gap-y-8">
           <li>
             <FolderAddCard onClick={handleOpenCreateSheet} />
           </li>
