@@ -3,8 +3,8 @@
 import Link from 'next/link';
 import { useEffect } from 'react';
 
-import BasketGuestIcon from '@/assets/images/basket-guest.svg';
 import { buttonStyles } from '@/components/button/button.style';
+import Basket from '@/components/common/basket';
 import { ANALYTICS_EVENT } from '@/consts/analytics';
 import { LOGIN_SOURCE } from '@/consts/loginSource';
 import { ROUTES } from '@/consts/route';
@@ -25,7 +25,7 @@ function MypageGuestBanner() {
 
   return (
     <div className="flex items-center gap-3">
-      <BasketGuestIcon className="size-[52px] shrink-0" aria-hidden />
+      <Basket type="default" className="size-13 shrink-0" />
       <div className="flex min-w-0 flex-1 flex-col">
         <p className="body-1-medium text-gray-900">3초면 가입 끝,</p>
         <p className="body-1-medium text-gray-900">지금 가입하고 위시 모아보기</p>

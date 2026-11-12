@@ -1,4 +1,4 @@
-import BasketEmptyIcon from '@/assets/images/basket-empty.svg';
+import Basket from '@/components/common/basket';
 
 import {
   type TournamentEmptyStateVariantProps,
@@ -13,7 +13,7 @@ type TournamentEmptyStateProps = TournamentEmptyStateVariantProps;
 function TournamentEmptyState({ variant }: TournamentEmptyStateProps) {
   return (
     <div className={tournamentEmptyStateStyles({ variant })} role="status">
-      <BasketEmptyIcon className={tournamentEmptyStateIconStyles({ variant })} aria-hidden />
+      <Basket type="confused" className={tournamentEmptyStateIconStyles({ variant })} />
       <div className={tournamentEmptyStateTextGroupStyles({ variant })}>
         <p className={tournamentEmptyStateTitleStyles({ variant })}>최근 토너먼트가 없어요</p>
         <p className="text-center body-1-medium text-text-neutral-tertiary">

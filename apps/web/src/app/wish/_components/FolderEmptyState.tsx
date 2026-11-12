@@ -1,5 +1,5 @@
-import BasketGuestIcon from '@/assets/images/basket-guest.svg';
 import Button from '@/components/button';
+import Basket from '@/components/common/basket';
 
 type FolderEmptyStateProps = {
   onAdd: () => void;
@@ -8,7 +8,7 @@ type FolderEmptyStateProps = {
 function FolderEmptyState({ onAdd }: FolderEmptyStateProps) {
   return (
     <div className="flex flex-col items-center gap-4 pt-[75px]" role="status">
-      <BasketGuestIcon width={60} height={60} aria-hidden />
+      <Basket type="default" />
       <p className="flex flex-col items-center gap-1 text-center body-1-medium text-text-neutral-secondary">
         아직 생성한 폴더가 없어요.
         <span className="body-1-semibold text-bg-neutral-secondary">

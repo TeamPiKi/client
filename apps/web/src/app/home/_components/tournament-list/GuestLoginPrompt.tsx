@@ -3,8 +3,8 @@
 import Link from 'next/link';
 import { useEffect } from 'react';
 
-import BasketGuestIcon from '@/assets/images/basket-guest.svg';
 import { buttonStyles } from '@/components/button/button.style';
+import Basket from '@/components/common/basket';
 import { ANALYTICS_EVENT } from '@/consts/analytics';
 import { LOGIN_SOURCE } from '@/consts/loginSource';
 import { ROUTES } from '@/consts/route';
@@ -25,7 +25,7 @@ function GuestLoginPrompt() {
 
   return (
     <div className="flex flex-1 flex-col items-center justify-center gap-4">
-      <BasketGuestIcon className="size-[60px]" aria-hidden />
+      <Basket type="default" />
       <div className="flex flex-col gap-1 text-center">
         <p className="body-1-medium text-text-neutral-secondary">아직 로그인 전이세요?</p>
         <p className="body-1-semibold text-gray-800">지금 가입하고 위시 한 곳에서 관리하기</p>
