@@ -33,7 +33,7 @@ function WishTabBar() {
             aria-controls={WISH_TAB_PANEL_ID}
             onClick={() => !isActive && replaceUrlKeepingState(path)}
             className={cn(
-              'flex flex-1 cursor-pointer flex-col items-center gap-3 body-1-semibold transition-colors',
+              'flex flex-1 cursor-pointer flex-col items-center gap-[7px] pt-[9px] body-1-semibold transition-colors',
               isActive ? 'text-text-neutral-primary' : 'text-text-neutral-tertiary'
             )}
           >
