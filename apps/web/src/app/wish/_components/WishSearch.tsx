@@ -140,7 +140,7 @@ function WishSearch({ onClose }: WishSearchProps) {
               </>
             ) : (
               <div className="flex flex-col items-center gap-4 pt-12.5">
-                <Basket type="default" />
+                <Basket type="panic" />
                 <p className="body-1-medium text-text-neutral-secondary">일치하는 상품이 없어요.</p>
               </div>
             )}
