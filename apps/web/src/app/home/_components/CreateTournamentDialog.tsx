@@ -17,6 +17,7 @@ import Input from '@/components/input';
 import { TOOLTIP_VARIANT_KEY } from '@/consts/abTest';
 import { ANALYTICS_EVENT } from '@/consts/analytics';
 import { GUEST_BLOCK_LOCATION } from '@/consts/guestBlockLocation';
+import { ONBOARDING_KEY } from '@/consts/onboarding';
 import { ROUTES } from '@/consts/route';
 import { Z_INDEX } from '@/consts/zIndex';
 import { useGetMe } from '@/hooks/useGetMe';
@@ -27,6 +28,7 @@ import {
   subscribeAbVariant,
 } from '@/utils/abTest';
 import { logAnalyticsEvent, setAnalyticsUserProperties } from '@/utils/analytics';
+import { hasSeenOnboarding } from '@/utils/onboarding';
 
 import TooltipAb from './tooltip-ab';
 
@@ -59,21 +61,26 @@ function CreateTournamentDialog() {
 
   /** 홈 진입 1회만 — 클릭률의 분모가 되므로 중복 집계되면 안 된다 */
   const hasLoggedViewRef = useRef(false);
+  const tooltipStateRef = useRef<'shown' | 'dismissed'>('shown');
 
   useEffect(() => {
     if (!variant || hasLoggedViewRef.current) return;
     hasLoggedViewRef.current = true;
+    tooltipStateRef.current = hasSeenOnboarding(ONBOARDING_KEY.HOME_TOOLTIP)
+      ? 'dismissed'
+      : 'shown';
 
     setAnalyticsUserProperties({ tooltip_variant: variant });
     logAnalyticsEvent(ANALYTICS_EVENT.HOME_VIEW, {
       tooltip_variant: variant,
+      tooltip_state: tooltipStateRef.current,
       identity_type: userData.identityType,
     });
   }, [variant, userData.identityType]);
 
   const handleTriggerClick = () => {
     logAnalyticsEvent(ANALYTICS_EVENT.NEW_TOURNAMENT_CLICK, {
-      ...(variant && { tooltip_variant: variant }),
+      ...(variant && { tooltip_variant: variant, tooltip_state: tooltipStateRef.current }),
       identity_type: userData.identityType,
     });
 
