@@ -56,7 +56,7 @@ function FolderSelectSheet({
             onSubmit={onAddFolder}
           />
         ) : (
-          <div className="flex flex-col gap-3">
+          <div className="-mt-2 flex flex-col gap-3">
             <Header
               center={
                 <DrawerTitle className="heading-2-semibold text-text-neutral-primary">
