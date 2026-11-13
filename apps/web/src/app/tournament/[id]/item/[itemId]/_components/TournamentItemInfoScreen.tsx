@@ -40,6 +40,7 @@ function TournamentItemInfoScreen({
         imageUrl: tournamentItemData.imageUrl ?? null,
         name: tournamentItemData.name ?? null,
         price: tournamentItemData.price ?? null,
+        discountRate: tournamentItemData.discountRate ?? null,
         sourceUrl: tournamentItemData.sourceUrl ?? null,
       }}
       readOnly={!canEdit}
