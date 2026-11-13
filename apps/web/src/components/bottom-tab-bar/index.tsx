@@ -294,7 +294,7 @@ function BottomTabBar() {
             <div
               ref={bubbleRef}
               className={cn(
-                'relative size-full overflow-hidden rounded-full transition-[scale,transform,transform-origin,background-color,box-shadow,backdrop-filter] duration-300',
+                'relative size-full overflow-hidden rounded-full transition-[scale,transform,background-color,box-shadow,backdrop-filter] duration-300',
                 isGrabbing ? 'scale-125 liquid-glass-lens' : 'bg-black/8'
               )}
               style={{ transitionTimingFunction: SPRING_EASE }}
