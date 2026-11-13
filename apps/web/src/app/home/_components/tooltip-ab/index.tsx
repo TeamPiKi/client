@@ -5,10 +5,12 @@ import { useState } from 'react';
 import Tooltip from '@/components/common/tooltip';
 import type { AbVariantT } from '@/consts/abTest';
 import { ANALYTICS_EVENT } from '@/consts/analytics';
+import { ONBOARDING_KEY } from '@/consts/onboarding';
 import { Z_INDEX } from '@/consts/zIndex';
 import { useGetMe } from '@/hooks/useGetMe';
 import { logAnalyticsEvent } from '@/utils/analytics';
 import { cn } from '@/utils/cn';
+import { hasSeenOnboarding, markOnboardingSeen } from '@/utils/onboarding';
 
 import { TOOLTIP_CONTENT } from './tooltipAb.const';
 
@@ -20,7 +22,7 @@ function TooltipAb({ variant }: TooltipAbProps) {
   const { userData } = useGetMe();
 
   const [isClicked, setIsClicked] = useState(false);
-  const [isRemoved, setIsRemoved] = useState(false);
+  const [isRemoved, setIsRemoved] = useState(() => hasSeenOnboarding(ONBOARDING_KEY.HOME_TOOLTIP));
 
   const { Icon, iconClassName, message } = TOOLTIP_CONTENT[variant];
 
@@ -30,6 +32,7 @@ function TooltipAb({ variant }: TooltipAbProps) {
     if (isClicked) return;
 
     setIsClicked(true);
+    markOnboardingSeen(ONBOARDING_KEY.HOME_TOOLTIP);
     logAnalyticsEvent(ANALYTICS_EVENT.TOOLTIP_DISMISS, {
       tooltip_variant: variant,
       identity_type: userData.identityType,

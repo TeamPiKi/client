@@ -60,6 +60,8 @@ const SPRING_EASE =
 const SLIDE_EASE =
   'linear(0, 0.5 7.6%, 0.84 15%, 1.04 24%, 1.07 32%, 1.05 40%, 1.01 54%, 0.99 68%, 1)';
 
+const EDGE_EASE = 'cubic-bezier(0.22, 1, 0.36, 1)';
+
 const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
 
 const matchesTabPath = (pathname: string, basePath: string) =>
@@ -69,6 +71,14 @@ const indexToLeft = (index: number) => BAR_PADDING + index * TAB_STEP;
 
 const leftToIndex = (left: number) =>
   clamp(Math.round((left - BAR_PADDING) / TAB_STEP), 0, TABS.length - 1);
+
+const isEdgeIndex = (index: number) => index === 0 || index === TABS.length - 1;
+
+const getBubbleOrigin = (index: number) => {
+  if (index === 0) return 'left';
+  if (index === TABS.length - 1) return 'right';
+  return 'center';
+};
 
 function BottomTabBar() {
   const pathname = usePathname();
@@ -123,9 +133,11 @@ function BottomTabBar() {
       router.prefetch(pressTabForPrefetch.href);
 
     const isMovingToRight = pressLeft >= indexToLeft(activeIndex);
+    const slideEase = isEdgeIndex(pressIndex) ? EDGE_EASE : SLIDE_EASE;
+    if (bubbleRef.current) bubbleRef.current.style.transformOrigin = getBubbleOrigin(pressIndex);
     indicator.style.transitionProperty = 'left, right';
     indicator.style.transitionDuration = '0.4s, 0.4s';
-    indicator.style.transitionTimingFunction = `${SLIDE_EASE}, ${SLIDE_EASE}`;
+    indicator.style.transitionTimingFunction = `${slideEase}, ${slideEase}`;
     indicator.style.transitionDelay = isMovingToRight ? '0.08s, 0s' : '0s, 0.08s';
     indicator.style.left = `${pressLeft}px`;
     indicator.style.right = `${BAR_WIDTH - pressLeft - TAB_WIDTH}px`;
@@ -154,6 +166,8 @@ function BottomTabBar() {
       if (nextHoverIndex !== hoverIndex) {
         hoverIndex = nextHoverIndex;
         triggerHaptic(HAPTIC_STYLE.SELECTION);
+        if (bubbleRef.current)
+          bubbleRef.current.style.transformOrigin = getBubbleOrigin(hoverIndex);
       }
 
       const velocity = clamp(e.clientX - lastX, -10, 10);
@@ -192,9 +206,11 @@ function BottomTabBar() {
       if (releaseEvent.type === 'pointercancel') {
         isDraggedRef.current = false;
         const activeLeft = indexToLeft(activeIndex);
+        const cancelEase = isEdgeIndex(activeIndex) ? EDGE_EASE : SPRING_EASE;
+        if (bubble) bubble.style.transformOrigin = getBubbleOrigin(activeIndex);
         indicator.style.transitionProperty = 'left, right';
         indicator.style.transitionDuration = '0.4s, 0.4s';
-        indicator.style.transitionTimingFunction = `${SPRING_EASE}, ${SPRING_EASE}`;
+        indicator.style.transitionTimingFunction = `${cancelEase}, ${cancelEase}`;
         indicator.style.transitionDelay = '0s, 0s';
         indicator.style.left = `${activeLeft}px`;
         indicator.style.right = `${BAR_WIDTH - activeLeft - TAB_WIDTH}px`;
@@ -214,9 +230,11 @@ function BottomTabBar() {
       const targetIndex = leftToIndex(left);
       const targetLeft = indexToLeft(targetIndex);
       const isSnapRight = targetLeft >= left;
+      const snapEase = isEdgeIndex(targetIndex) ? EDGE_EASE : SPRING_EASE;
+      if (bubble) bubble.style.transformOrigin = getBubbleOrigin(targetIndex);
       indicator.style.transitionProperty = 'left, right';
       indicator.style.transitionDuration = '0.4s, 0.4s';
-      indicator.style.transitionTimingFunction = `${SPRING_EASE}, ${SPRING_EASE}`;
+      indicator.style.transitionTimingFunction = `${snapEase}, ${snapEase}`;
       indicator.style.transitionDelay = isSnapRight ? '0.08s, 0s' : '0s, 0.08s';
       indicator.style.left = `${targetLeft}px`;
       indicator.style.right = `${BAR_WIDTH - targetLeft - TAB_WIDTH}px`;

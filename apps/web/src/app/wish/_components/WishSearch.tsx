@@ -3,7 +3,7 @@
 import { type FormEvent, useRef, useState } from 'react';
 
 import { ChevronBackwardIconFill, CloseCircularIconFill } from '@/assets/icons';
-import BasketGuestIcon from '@/assets/images/basket-guest.svg';
+import Basket from '@/components/common/basket';
 import WishGrid from '@/components/common/wish-grid';
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/dialog';
 import { Header } from '@/components/header';
@@ -74,7 +74,7 @@ function WishSearch({ onClose }: WishSearchProps) {
         </DialogDescription>
         <div
           className={cn(
-            'sticky top-0 mx-auto flex w-full max-w-120 flex-col gap-6 rounded-b-3xl px-5 pt-padding-top pb-[23px] transition-colors',
+            'sticky top-0 mx-auto flex w-full max-w-120 flex-col gap-[21px] rounded-b-3xl px-5 pt-padding-top pb-[21px] transition-colors',
             isSearching ? 'bg-bg-layer-default' : 'bg-bg-layer-basement'
           )}
         >
@@ -140,7 +140,7 @@ function WishSearch({ onClose }: WishSearchProps) {
               </>
             ) : (
               <div className="flex flex-col items-center gap-4 pt-12.5">
-                <BasketGuestIcon width={60} height={60} aria-hidden />
+                <Basket type="panic" />
                 <p className="body-1-medium text-text-neutral-secondary">일치하는 상품이 없어요.</p>
               </div>
             )}

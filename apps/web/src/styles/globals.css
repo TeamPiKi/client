@@ -133,7 +133,7 @@
   --color-text-neutral-tertiary: var(--color-gray-300);
   --color-text-neutral-inverse: var(--color-base-50);
 
-  --color-border-accent: var(--color-sky-blue-400);
+  --color-border-accent: var(--color-blue-500);
   --color-border-warning: var(--color-yellow-400);
   --color-border-error: var(--color-red-400);
   --color-border-success: var(--color-green-400);

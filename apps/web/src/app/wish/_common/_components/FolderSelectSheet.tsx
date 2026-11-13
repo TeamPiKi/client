@@ -1,6 +1,7 @@
 'use client';
 
 import { FolderAddIconFill } from '@/assets/icons';
+import Basket from '@/components/common/basket';
 import { Drawer, DrawerContent, DrawerDescription, DrawerTitle } from '@/components/drawer';
 import { Header } from '@/components/header';
 import type { FolderT } from '@/types/folder';
@@ -55,7 +56,7 @@ function FolderSelectSheet({
             onSubmit={onAddFolder}
           />
         ) : (
-          <div className="flex flex-col gap-3">
+          <div className="-mt-2 flex flex-col gap-3">
             <Header
               center={
                 <DrawerTitle className="heading-2-semibold text-text-neutral-primary">
@@ -73,25 +74,37 @@ function FolderSelectSheet({
                 </button>
               }
             />
-            <ul className="flex max-h-[50dvh] flex-col overflow-y-auto">
-              {folders.map(folder => (
-                <li key={folder.id}>
-                  <button
-                    type="button"
-                    onClick={() => onSelect(folder)}
-                    className="flex h-15 w-full cursor-pointer items-center gap-[13px] text-left"
-                  >
-                    <FolderListThumbnail coverImageUrls={folder.coverImageUrls} />
-                    <span className="flex min-w-0 items-center gap-[5px] body-1-medium">
-                      <span className="truncate text-text-neutral-primary">{folder.name}</span>
-                      <span className="shrink-0 text-text-neutral-tertiary">
-                        ({folder.wishCount})
+            {folders.length === 0 ? (
+              <div className="flex flex-col items-center gap-4 pt-3 pb-3" role="status">
+                <Basket type="default" />
+                <p className="flex flex-col items-center gap-1 text-center body-1-medium text-text-neutral-secondary">
+                  아직 생성한 폴더가 없어요.
+                  <span className="body-1-semibold text-bg-neutral-secondary">
+                    폴더를 생성하고 위시를 관리해보세요.
+                  </span>
+                </p>
+              </div>
+            ) : (
+              <ul className="flex max-h-[50dvh] flex-col overflow-y-auto">
+                {folders.map(folder => (
+                  <li key={folder.id}>
+                    <button
+                      type="button"
+                      onClick={() => onSelect(folder)}
+                      className="flex h-15 w-full cursor-pointer items-center gap-[13px] text-left"
+                    >
+                      <FolderListThumbnail coverImageUrls={folder.coverImageUrls} />
+                      <span className="flex min-w-0 items-center gap-[5px] body-1-medium">
+                        <span className="truncate text-text-neutral-primary">{folder.name}</span>
+                        <span className="shrink-0 text-text-neutral-tertiary">
+                          ({folder.wishCount})
+                        </span>
                       </span>
-                    </span>
-                  </button>
-                </li>
-              ))}
-            </ul>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
         )}
       </DrawerContent>

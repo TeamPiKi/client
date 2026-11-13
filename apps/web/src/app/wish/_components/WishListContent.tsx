@@ -60,7 +60,7 @@ function WishListContent() {
       <div
         className={cn(
           'sticky top-0 flex flex-col gap-6 bg-bg-layer-default px-5 pt-padding-top',
-          isFolderTab ? 'pb-4' : 'pb-6'
+          !isFolderTab && 'pb-6'
         )}
         style={{ zIndex: Z_INDEX.STICKY_HEADER }}
       >
