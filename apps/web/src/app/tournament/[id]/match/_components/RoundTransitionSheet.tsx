@@ -329,7 +329,7 @@ function RoundTransitionSheet({ stage, onComplete }: RoundTransitionSheetProps) 
         role="dialog"
         aria-modal="true"
         aria-label={title}
-        className={`fixed right-safe-right bottom-0 left-safe-left mx-auto max-w-120 cursor-pointer overflow-hidden ${isExiting ? 'rs-sheet-exit' : 'rs-sheet'}`}
+        className={`@container fixed right-safe-right bottom-0 left-safe-left mx-auto max-w-120 cursor-pointer overflow-hidden ${isExiting ? 'rs-sheet-exit' : 'rs-sheet'}`}
         style={{
           zIndex: Z_INDEX.DRAWER,
           height: 540,
@@ -410,8 +410,8 @@ function RoundTransitionSheet({ stage, onComplete }: RoundTransitionSheetProps) 
             </p>
           </div>
 
-          {/* Mini bracket */}
-          <div className="mt-9">
+          {/* NOTE: 레일로 시트가 브래킷(320px) + 좌우 패딩보다 좁아지면 축소. 일반 폰은 원래 크기 */}
+          <div className="mt-9 origin-top @max-[360px]:scale-90 @max-[328px]:scale-80 @max-[296px]:scale-70 @max-[264px]:scale-60">
             <MiniBracket stage={stage} />
           </div>
         </div>
