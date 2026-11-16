@@ -136,6 +136,7 @@
           "androidMultiIntentFilters": ["image/*"]
         }
       ],
+      "./plugins/withShareExtensionDeploymentTarget.js",
       [
         "expo-share-extension",
         {
@@ -169,6 +170,7 @@
       "expo-notifications",
       "expo-secure-store",
       "@react-native-firebase/app",
+      "./plugins/withFirebaseAppConfigure.js",
       "@react-native-firebase/messaging",
       "@react-native-firebase/analytics",
       [

@@ -36,13 +36,29 @@ const withKakaoLoginConfig = (config, { nativeAppKey }) => {
     }
 
     if (!contents.includes('AuthApi.isKakaoTalkLoginUrl')) {
-      const ANCHOR = 'return super.application(app, open: url, options: options) || RCTLinkingManager.application(app, open: url, options: options)';
-      const next = contents.replace(
-        ANCHOR,
-        'if AuthApi.isKakaoTalkLoginUrl(url) {\n      return AuthController.handleOpenUrl(url: url)\n    }\n    ' + ANCHOR
-      );
+      /**
+       * NOTE: UIScene 생명주기(SDK 58)에서는 SceneDelegate 가 받은 URL 을 Expo 가 이 메서드로 넘긴다.
+       * React Native 알림은 Expo 가 따로 하므로 RCTLinkingManager 를 다시 부르지 않는다.
+       * 콜드 스타트 링크는 JS 의 카카오 SDK 초기화 전에 들어오므로 kakao 스킴일 때만 카카오 API 를 부른다.
+       */
+      const ANCHOR = '  var reactNativeFactory: RCTReactNativeFactory?\n';
+      const OPEN_URL_HANDLER = [
+        '',
+        '  public override func application(',
+        '    _ app: UIApplication,',
+        '    open url: URL,',
+        '    options: [UIApplication.OpenURLOptionsKey: Any] = [:]',
+        '  ) -> Bool {',
+        '    if url.scheme?.hasPrefix("kakao") == true && AuthApi.isKakaoTalkLoginUrl(url) {',
+        '      return AuthController.handleOpenUrl(url: url)',
+        '    }',
+        '    return super.application(app, open: url, options: options)',
+        '  }',
+        '',
+      ].join('\n');
+      const next = contents.replace(ANCHOR, ANCHOR + OPEN_URL_HANDLER);
       if (next === contents) {
-        throw new Error('[withKakaoLoginConfig] AppDelegate.swift에서 openURL 핸들러를 찾을 수 없어 KakaoSDKAuth URL 핸들러 추가에 실패했습니다.');
+        throw new Error('[withKakaoLoginConfig] AppDelegate.swift에서 reactNativeFactory 선언을 찾을 수 없어 KakaoSDKAuth URL 핸들러 추가에 실패했습니다.');
       }
       contents = next;
     }
