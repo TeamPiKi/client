@@ -28,14 +28,16 @@ function ByWishContent({ tournamentId }: ByWishContentProps) {
   const backWithFallback = useBackWithFallback();
   const [activeFolderId, setActiveFolderId] = useState<number | null>(null);
   /** 칩을 오가며 고른 위시도 담을 수 있게 wishId 와 itemId 를 함께 들고 있음 */
-  const [selectedItemIds, setSelectedItemIds] = useState<Map<number, number>>(new Map());
+  const [pickedItemIds, setPickedItemIds] = useState<Map<number, number>>(new Map());
   const { tournamentData } = useGetTournament(tournamentId);
 
   const pending = 'pending' in tournamentData ? tournamentData.pending : null;
   const existingItemCount = pending?.items.length ?? 0;
   const existingItemIds = new Set(pending?.items.map(({ itemId }) => itemId));
   const addableCount = Math.max(MAX_SELECT - existingItemCount, 0);
-  const isOverSelectionLimit = selectedItemIds.size > addableCount;
+  const selectedItemIds = new Map(
+    Array.from(pickedItemIds).filter(([, itemId]) => !existingItemIds.has(itemId))
+  );
 
   const { foldersData } = useGetFolders();
   const { allWishesData, wishesData, fetchNextPage, hasNextPage, isFetchingNextPage } =
@@ -60,12 +62,10 @@ function ByWishContent({ tournamentId }: ByWishContentProps) {
     }
 
     const itemId = selectableWishes.find(({ wish }) => wish.id === wishId)?.item.id;
-    setSelectedItemIds(prev => {
-      const next = new Map(prev);
-      if (isSelected) next.delete(wishId);
-      else if (typeof itemId === 'number') next.set(wishId, itemId);
-      return next;
-    });
+    const next = new Map(selectedItemIds);
+    if (isSelected) next.delete(wishId);
+    else if (typeof itemId === 'number') next.set(wishId, itemId);
+    setPickedItemIds(next);
   };
 
   const handleNext = () => postTournamentItemsByWishMutation(Array.from(selectedItemIds.values()));
@@ -124,7 +124,7 @@ function ByWishContent({ tournamentId }: ByWishContentProps) {
         <Button
           variant="primary"
           size="lg"
-          disabled={selectedItemIds.size === 0 || isOverSelectionLimit}
+          disabled={selectedItemIds.size === 0 || selectedItemIds.size > addableCount}
           isLoading={isPostTournamentItemsByWishPending}
           onClick={handleNext}
         >
