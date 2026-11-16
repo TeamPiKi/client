@@ -275,7 +275,7 @@ function BottomTabBar() {
       {/* NOTE: 폴더블 레일로 쓸 수 있는 너비가 탭바보다 좁으면 축소. 일반 폰(360px 이상)은 원래 크기 */}
       <div
         ref={fitRef}
-        className="pointer-events-auto relative origin-bottom @max-[352px]:scale-90 @max-[320px]:scale-80"
+        className="pointer-events-auto relative origin-bottom @max-[352px]:scale-90 @max-[320px]:scale-80 @max-[288px]:scale-70"
       >
         <div
           ref={barRef}
