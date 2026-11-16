@@ -13,7 +13,7 @@ function WishlistFabArea({ isDeleteMode, onAddItem }: WishlistFabAreaProps) {
   return (
     <div
       style={{ zIndex: Z_INDEX.FAB }}
-      className="pointer-events-none fixed right-0 bottom-[103px] left-0 mx-auto flex w-full max-w-120 justify-end pr-5"
+      className="pointer-events-none fixed right-safe-right bottom-[103px] left-safe-left mx-auto flex max-w-120 justify-end pr-5"
     >
       <Button
         variant="primary"

@@ -329,7 +329,7 @@ function RoundTransitionSheet({ stage, onComplete }: RoundTransitionSheetProps) 
         role="dialog"
         aria-modal="true"
         aria-label={title}
-        className={`fixed bottom-0 left-1/2 w-full max-w-120 -translate-x-1/2 cursor-pointer overflow-hidden ${isExiting ? 'rs-sheet-exit' : 'rs-sheet'}`}
+        className={`fixed right-safe-right bottom-0 left-safe-left mx-auto max-w-120 cursor-pointer overflow-hidden ${isExiting ? 'rs-sheet-exit' : 'rs-sheet'}`}
         style={{
           zIndex: Z_INDEX.DRAWER,
           height: 540,

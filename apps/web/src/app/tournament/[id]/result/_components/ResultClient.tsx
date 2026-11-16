@@ -151,7 +151,10 @@ function ResultClient({ tournamentId, isGuest = false, isApp = false }: ResultCl
       </BottomCta>
 
       {isLoginRequiredOpen && (
-        <div className="fixed inset-0 mx-auto max-w-120" style={{ zIndex: Z_INDEX.DIALOG }}>
+        <div
+          className="fixed inset-y-0 right-safe-right left-safe-left mx-auto max-w-120"
+          style={{ zIndex: Z_INDEX.DIALOG }}
+        >
           <LoginRequired
             title={LOGIN_REQUIRED_TITLE.RECEIPT_SAVE}
             redirectPath={ROUTES.TOURNAMENT_RESULT(tournamentId)}
