@@ -92,9 +92,10 @@ async function RootLayout({
       <body className="h-full overflow-hidden pr-safe-right pl-safe-left">
         <Providers hasInitialToken={hasToken}>
           {/** TEMP: max width 임시 값 */}
+          {/** NOTE: data-wide-layout 을 단 화면만 앱 웹뷰 넓은 화면에서 최대 960px 로 넓힘 */}
           <div
             id={SCROLL_CONTAINER_ID}
-            className="mx-auto hide-scrollbar h-full max-w-120 overflow-y-auto [scrollbar-gutter:stable]"
+            className="mx-auto hide-scrollbar h-full max-w-120 overflow-y-auto [scrollbar-gutter:stable] app-wide:has-[[data-wide-layout]]:max-w-240"
           >
             <HydrationBoundary state={dehydrate(queryClient)}>{children}</HydrationBoundary>
           </div>
