@@ -84,6 +84,7 @@
       "expo-font",
       "expo-web-browser",
       "expo-image",
+      "expo-status-bar",
       "expo-apple-authentication",
       [
         "@react-native-kakao/core",
