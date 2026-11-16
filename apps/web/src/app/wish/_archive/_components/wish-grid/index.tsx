@@ -2,13 +2,12 @@ import Link from 'next/link';
 import type { MouseEvent } from 'react';
 
 import { CheckboxEmptyIconFill, CheckboxSelectedIconFill } from '@/assets/icons';
+import WishCard from '@/components/common/wish-card';
 import { ITEM_STATUS } from '@/consts/item';
 import { ROUTES } from '@/consts/route';
 import { Z_INDEX } from '@/consts/zIndex';
 import type { GetWishlistResponseT } from '@/types/wish';
 import { SCROLL_NAMESPACE, saveScrollAnchor } from '@/utils/scrollRestoration';
-
-import WishCard from '../wish-card';
 
 type WishGridProps = {
   items: GetWishlistResponseT[];
