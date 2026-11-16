@@ -602,7 +602,7 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   productImageDim: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     backgroundColor: 'rgba(0, 0, 0, 0.05)',
   },
   productCheckBadge: {

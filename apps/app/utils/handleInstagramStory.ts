@@ -34,7 +34,7 @@ const writeStoryImageFile = (base64: string) => {
   if (file.exists) file.delete();
 
   file.create();
-  file.write(base64, { encoding: 'base64' });
+  file.writeSync(base64, { encoding: 'base64' });
 
   return file;
 };

@@ -27,18 +27,22 @@
     "prettier-plugin-tailwindcss": "^0.7.2",
     "turbo": "^2.8.21",
     "typescript": "5.9.2",
-    "typescript-eslint": "^8.50.0"
+    "typescript-eslint": "^8.73.0"
   },
   "packageManager": "pnpm@10.17.0",
   "pnpm": {
     "overrides": {
-      "react": "19.1.0",
-      "react-dom": "19.1.0",
-      "@types/react": "19.1.17",
-      "@types/react-dom": "~19.1.0"
+      "react": "19.3.0",
+      "react-dom": "19.3.0",
+      "@types/react": "~19.3.0",
+      "@types/react-dom": "~19.3.0",
+      "typescript-eslint": "^8.73.0",
+      "@typescript-eslint/eslint-plugin": "^8.73.0",
+      "@typescript-eslint/parser": "^8.73.0"
     },
     "patchedDependencies": {
-      "xcode@3.0.1": "apps/app/patches/xcode+3.0.1.patch"
+      "react-native-webview@14.0.1": "apps/app/patches/react-native-webview@14.0.1.patch",
+      "@react-native-cookies/cookies@6.2.1": "apps/app/patches/@react-native-cookies__cookies@6.2.1.patch"
     }
   },
   "engines": {
