@@ -97,11 +97,11 @@ function VsSection({ left, right, isFinal = false, onPick, onSelect }: VsSection
                     wantedSans.className,
                     'vs-pick',
                     isFinal && 'vs-pick-final',
-                    'absolute -top-4 -left-3.5 flex size-15 items-center justify-center rounded-full bg-sky-blue-400 text-[22px] leading-6 font-bold tracking-[-0.6px] text-white shadow-[1px_3px_4px_0_rgba(0,0,0,0.15)]'
+                    'absolute -top-4 -left-3.5 flex size-15 -rotate-15 items-center justify-center rounded-full bg-sky-blue-400 text-[22px] leading-6 font-bold tracking-[-0.6px] text-white shadow-[1px_3px_4px_0_rgba(0,0,0,0.15)]'
                   )}
                   style={{ zIndex: Z_INDEX.BASE_IMAGE + 2 }}
                 >
-                  <span className="-rotate-15">Pick!</span>
+                  <span>Pick!</span>
                   <div
                     aria-hidden
                     className="pointer-events-none absolute inset-0 rounded-full shadow-[inset_0_1px_8.1px_0_#A2DEFF]"
