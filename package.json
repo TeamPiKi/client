@@ -32,13 +32,10 @@
   "packageManager": "pnpm@10.17.0",
   "pnpm": {
     "overrides": {
-      "react": "19.1.0",
-      "react-dom": "19.1.0",
-      "@types/react": "19.1.17",
-      "@types/react-dom": "~19.1.0"
-    },
-    "patchedDependencies": {
-      "xcode@3.0.1": "apps/app/patches/xcode+3.0.1.patch"
+      "react": "19.2.0",
+      "react-dom": "19.2.0",
+      "@types/react": "~19.2.10",
+      "@types/react-dom": "~19.2.7"
     }
   },
   "engines": {
