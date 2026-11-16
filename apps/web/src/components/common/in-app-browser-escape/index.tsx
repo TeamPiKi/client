@@ -107,7 +107,7 @@ function InAppBrowserEscape({ landingEnv }: InAppBrowserEscapeProps) {
       style={{ backgroundColor: '#FAFAFA', zIndex: Z_INDEX.IN_APP_BROWSER_ESCAPE }}
     >
       <div
-        className="fixed top-1/2 left-1/2"
+        className="fixed top-1/2 left-safe-center"
         style={{ transform: `translate(-50%, -50%) scale(${SPLASH_LOGO_SCALE})` }}
       >
         <PikiLogo
