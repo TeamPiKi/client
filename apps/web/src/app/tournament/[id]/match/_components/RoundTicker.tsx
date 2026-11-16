@@ -37,7 +37,10 @@ function RoundTicker({ currentRound, isFinal = false }: RoundTickerProps) {
     <span key={index} className="flex shrink-0 items-center gap-[7px]">
       <TrophyIconFill className="size-5.5 text-sky-blue-200" />
       <span
-        className={cn(wantedSans.className, 'text-[16px] leading-6 font-bold text-sky-blue-200')}
+        className={cn(
+          wantedSans.className,
+          'bg-linear-to-r from-sky-blue-100 to-sky-blue-300 bg-clip-text text-[18px] leading-6 font-semibold text-transparent'
+        )}
       >
         {label}
       </span>
