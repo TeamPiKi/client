@@ -5,7 +5,6 @@ import { useState } from 'react';
 import CheckboxSelectedIconFill from '@/assets/icons/fill/checkbox-selected.svg';
 import TrashIconFill from '@/assets/icons/fill/trash.svg';
 import ConfirmDialog from '@/components/common/confirm-dialog';
-import { ITEM_STATUS } from '@/consts/item';
 import { useGetWishes } from '@/hooks/useGetWishes';
 
 import { useShareIntentWish } from '../../_hooks/useShareIntentWish';
@@ -37,9 +36,7 @@ function WishContent() {
   });
 
   const { wishesData: wishlistData } = useGetWishes();
-  const selectableIds = wishlistData
-    .filter(({ item }) => item.status !== ITEM_STATUS.FAILED && item.status !== ITEM_STATUS.PARSING)
-    .map(({ wish }) => wish.id);
+  const selectableIds = wishlistData.map(({ wish }) => wish.id);
   const isAllSelected = selectableIds.length > 0 && selectableIds.every(id => selectedIds.has(id));
 
   const handleEnterDeleteMode = () => {
