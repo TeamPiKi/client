@@ -63,9 +63,9 @@ const Toaster = ({ ...props }: ToasterProps) => {
             '--normal-bg': 'var(--color-gray-700)',
             '--normal-text': 'var(--color-text-neutral-inverse)',
             '--border-radius': 'var(--radius-xl)',
-            '--width': 'min(440px, calc(100vw - 40px))',
-            width: 'min(440px, calc(100vw - 40px))',
-            left: '50%',
+            '--width': 'min(440px, calc(100vw - 40px - var(--spacing-safe-x)))',
+            width: 'min(440px, calc(100vw - 40px - var(--spacing-safe-x)))',
+            left: 'var(--spacing-safe-center)',
             right: 'auto',
             transform: 'translateX(-50%)',
           } as React.CSSProperties

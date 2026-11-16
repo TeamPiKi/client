@@ -89,7 +89,7 @@ async function RootLayout({
           </>
         )}
       </head>
-      <body className="h-full overflow-hidden">
+      <body className="h-full overflow-hidden pr-safe-right pl-safe-left">
         <Providers hasInitialToken={hasToken}>
           {/** TEMP: max width 임시 값 */}
           <div

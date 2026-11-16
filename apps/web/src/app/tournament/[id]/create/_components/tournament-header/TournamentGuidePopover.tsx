@@ -17,7 +17,7 @@ function TournamentGuidePopover() {
       <PopoverContent
         align="end"
         sideOffset={25}
-        className="w-[calc(100vw-2.5rem)] max-w-[440px] gap-4 p-5"
+        className="w-[calc(100vw-2.5rem-var(--spacing-safe-x))] max-w-[440px] gap-4 p-5"
       >
         <h2 className="heading-1-bold">토너먼트 진행 가이드</h2>
         <ul className="flex flex-col gap-2">

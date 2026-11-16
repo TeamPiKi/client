@@ -21,7 +21,7 @@ export default function GlobalError({ error, reset }: Props) {
 
   return (
     <html lang="ko" className="h-full">
-      <body className="mx-auto my-0 h-full max-w-120 antialiased">
+      <body className="mx-auto my-0 h-full max-w-120 pr-safe-right pl-safe-left antialiased">
         <div className="h-full bg-bg-layer-basement pt-padding-top">
           <div className="flex flex-col items-center gap-[30px] pt-[calc(253px_-_env(safe-area-inset-top))]">
             <div className="flex flex-col items-center gap-[25px]">
