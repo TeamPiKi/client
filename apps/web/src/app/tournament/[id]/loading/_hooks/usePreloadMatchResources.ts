@@ -5,7 +5,7 @@ import { TOURNAMENT_STATUS } from '@/consts/tournament';
 
 import { getTournament } from '../../_common/_apis/getTournament';
 import matchBackground from '../../_common/_assets/match-background.jpg';
-import { carmenSans } from '../../_common/_consts/font';
+import { wantedSans } from '../../_common/_consts/font';
 import { loadMatchImage } from '../../_common/_utils/loadMatchImage';
 
 const PRIORITY_WAIT_MS = 8000;
@@ -82,7 +82,7 @@ const usePreloadMatchResources = (tournamentId: number) => {
     });
 
     const fontTask = document.fonts
-      .load(`700 1em ${carmenSans.style.fontFamily}`)
+      .load(`1em ${wantedSans.style.fontFamily}`)
       .catch(() => null)
       .then(completeOne);
 

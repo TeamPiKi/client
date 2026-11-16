@@ -6,7 +6,7 @@ import type { CSSProperties } from 'react';
 import { TrophyIconFill } from '@/assets/icons';
 import { cn } from '@/utils/cn';
 
-import { carmenSans } from '../../_common/_consts/font';
+import { wantedSans } from '../../_common/_consts/font';
 import './RoundTicker.css';
 
 /** RoundTicker 움직이는 속도 */
@@ -37,7 +37,7 @@ function RoundTicker({ currentRound, isFinal = false }: RoundTickerProps) {
     <span key={index} className="flex shrink-0 items-center gap-[7px]">
       <TrophyIconFill className="size-5.5 text-sky-blue-200" />
       <span
-        className={cn(carmenSans.className, 'text-[16px] leading-6 font-bold text-sky-blue-200')}
+        className={cn(wantedSans.className, 'text-[16px] leading-6 font-bold text-sky-blue-200')}
       >
         {label}
       </span>

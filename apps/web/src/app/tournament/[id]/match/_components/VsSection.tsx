@@ -6,7 +6,7 @@ import { Z_INDEX } from '@/consts/zIndex';
 import { cn } from '@/utils/cn';
 
 import type { CardSideT, ProductT } from '../../_common/_types/tournament';
-import { carmenSans } from '../../_common/_consts/font';
+import { wantedSans } from '../../_common/_consts/font';
 import ProductCard from './ProductCard';
 import VsBadge from './VsBadge';
 import './VsSection.css';
@@ -94,7 +94,7 @@ function VsSection({ left, right, isFinal = false, onPick, onSelect }: VsSection
               {isPicked && (
                 <div
                   className={cn(
-                    carmenSans.className,
+                    wantedSans.className,
                     'vs-pick',
                     isFinal && 'vs-pick-final',
                     'absolute -top-4 -left-3.5 flex size-15 items-center justify-center rounded-full bg-sky-blue-400 text-[22px] leading-6 font-bold tracking-[-0.6px] text-white shadow-[1px_3px_4px_0_rgba(0,0,0,0.15)]'
