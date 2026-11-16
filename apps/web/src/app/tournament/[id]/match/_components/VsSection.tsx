@@ -5,8 +5,8 @@ import { useState } from 'react';
 import { Z_INDEX } from '@/consts/zIndex';
 import { cn } from '@/utils/cn';
 
-import type { CardSideT, ProductT } from '../../_common/_types/tournament';
 import { wantedSans } from '../../_common/_consts/font';
+import type { CardSideT, ProductT } from '../../_common/_types/tournament';
 import ProductCard from './ProductCard';
 import VsBadge from './VsBadge';
 import './VsSection.css';
@@ -76,7 +76,7 @@ function VsSection({ left, right, isFinal = false, onPick, onSelect }: VsSection
   ];
 
   return (
-    <div className="relative isolate flex justify-center gap-[22px]">
+    <div className="relative isolate flex justify-center gap-[22px] @xl:gap-10">
       {sides.map(({ side, product }) => {
         const isPicked = selectedSide === side;
         return (

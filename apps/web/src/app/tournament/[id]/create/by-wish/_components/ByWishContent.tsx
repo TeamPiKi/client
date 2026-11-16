@@ -75,7 +75,7 @@ function ByWishContent({ tournamentId }: ByWishContentProps) {
   if (hasNoWish) return <NoWishDialog onBack={handleBackToCreate} />;
 
   return (
-    <div className="flex h-full flex-col bg-bg-layer-default">
+    <div data-wide-layout className="flex h-full flex-col bg-bg-layer-default">
       <div className="px-5 pt-padding-top">
         <Header
           left={<HeaderIcon name="BACK" />}
