@@ -83,6 +83,7 @@
       "expo-router",
       "expo-font",
       "expo-web-browser",
+      "expo-image",
       "expo-apple-authentication",
       [
         "@react-native-kakao/core",
