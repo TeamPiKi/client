@@ -90,11 +90,23 @@ const readSuccessBody = async (response: Response): Promise<ShareWishT | null> =
   }
 };
 
+/** 전체 링크엔 추적 정보가 붙을 수 있어 사이트 주소만 남긴다 */
+const getHost = (url: string) => {
+  try {
+    return new URL(url).hostname;
+  } catch {
+    return null;
+  }
+};
+
 /** Share Extension에서 링크로 위시 등록 */
 export const postWishLinkFromShare = async (
   productUrl: string
 ): Promise<PostWishLinkFromShareResultT> => {
-  const captureContext = { tags: { source: 'share-extension' } };
+  const captureContext = {
+    tags: { source: 'share-extension' },
+    extra: { productHost: getHost(productUrl) },
+  };
 
   /** 빌드 설정 누락 — 다시 눌러도 결과가 같다 */
   if (!process.env.EXPO_PUBLIC_API_URL) return { ok: false, reason: 'server', retryable: false };
