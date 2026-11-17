@@ -4,13 +4,16 @@ import {
   type WebBridgeMessageT,
 } from '@piki/core';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Linking, View } from 'react-native';
+import { Linking, Platform, View } from 'react-native';
 import type { WebView } from 'react-native-webview';
 import Webview from 'react-native-webview';
 import type {
   WebViewErrorEvent,
   WebViewHttpErrorEvent,
+  WebViewNavigation,
   WebViewNavigationEvent,
+  WebViewRenderProcessGoneEvent,
+  WebViewTerminatedEvent,
 } from 'react-native-webview/lib/WebViewTypes';
 
 import SplashOverlay from '@/components/SplashOverlay';
@@ -35,9 +38,14 @@ import {
 import { TokenStorage } from '@/utils/tokenStorage';
 import { WebBridge } from '@/utils/webBridge';
 
+const HOME_URI = process.env.EXPO_PUBLIC_WEB_URL;
+
 function Page() {
   const webviewRef = useRef<WebView | null>(null);
-  const [webviewUri, setWebviewUri] = useState(process.env.EXPO_PUBLIC_WEB_URL);
+  const [webviewUri, setWebviewUri] = useState(HOME_URI);
+  /** WebView 재생성용 key */
+  const [webviewKey, setWebviewKey] = useState(0);
+  const lastUrlRef = useRef<string | null>(null);
   /** 워밍업 페이지 로드 완료 여부 */
   const [isWarmupLoaded, setIsWarmupLoaded] = useState(false);
   /** 실제 페이지 로드 완료 여부 */
@@ -196,9 +204,38 @@ function Page() {
     }
   }, []);
 
+  const handleNavigationStateChange = useCallback((navigation: WebViewNavigation) => {
+    lastUrlRef.current = navigation.url.split('?')[0] ?? null;
+  }, []);
+
+  const recoverWebViewProcess = useCallback((extra: Record<string, unknown>) => {
+    const error = new Error('WebView process terminated');
+    error.name = 'WebViewProcessTerminated';
+    captureError(error, {
+      tags: { source: 'webview', platform: Platform.OS },
+      extra: { url: lastUrlRef.current, ...extra },
+    });
+
+    setIsWebViewLoaded(false);
+    setWebviewUri(HOME_URI);
+    setWebviewKey(key => key + 1);
+  }, []);
+
+  const handleContentProcessDidTerminate = useCallback(
+    (_event: WebViewTerminatedEvent) => recoverWebViewProcess({}),
+    [recoverWebViewProcess]
+  );
+
+  const handleRenderProcessGone = useCallback(
+    (event: WebViewRenderProcessGoneEvent) =>
+      recoverWebViewProcess({ didCrash: event.nativeEvent.didCrash }),
+    [recoverWebViewProcess]
+  );
+
   return (
     <View style={{ flex: 1 }}>
       <Webview
+        key={webviewKey}
         ref={webviewRef}
         style={{ flex: 1 }}
         applicationNameForUserAgent={USER_AGENT}
@@ -207,6 +244,9 @@ function Page() {
         onLoadEnd={handleWebViewLoadEnd}
         onError={handleWebViewError}
         onHttpError={handleWebViewHttpError}
+        onNavigationStateChange={handleNavigationStateChange}
+        onContentProcessDidTerminate={handleContentProcessDidTerminate}
+        onRenderProcessGone={handleRenderProcessGone}
         allowsBackForwardNavigationGestures
         setBuiltInZoomControls={false}
         cacheEnabled
