@@ -123,7 +123,20 @@ export const postWishLinkFromShare = async (
 
     if (postWishResponse.status === 401 && refreshToken) {
       /** 토큰 만료 시 토큰 갱신 */
-      const refreshResponse = await postTokenRefresh(refreshToken);
+      let refreshResponse: Response;
+      try {
+        refreshResponse = await postTokenRefresh(refreshToken);
+      } catch (error) {
+        /** postTokenRefresh 는 타임아웃으로만 요청을 끊는다 */
+        const isTimeout = error instanceof Error && error.name === 'AbortError';
+        if (isNetworkError(error) || isTimeout)
+          captureApiError('postTokenRefresh', {
+            ...captureContext,
+            extra: { ...captureContext.extra, isTimeout },
+          });
+        else captureError(error, captureContext);
+        return { ok: false, reason: 'network', retryable: true };
+      }
 
       if (!refreshResponse.ok) {
         if (refreshResponse.status >= 500)
