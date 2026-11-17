@@ -30,8 +30,9 @@ const CARD_MOVE = {
   loseRight: 'translate-x-[8.5px]',
   /** 결승 */
   finalWin: 'translate-y-[3.5px] scale-[1.11]',
-  finalWinLeft: 'translate-x-[85px]',
-  finalWinRight: '-translate-x-[85px]',
+  /** (카드 너비 + 카드 간격) / 2 만큼 이동해야 가운데. 넓은 화면은 카드 · 간격이 커져 값도 커짐 */
+  finalWinLeft: 'translate-x-[85px] @xl:translate-x-[120px] @3xl:translate-x-[140px]',
+  finalWinRight: '-translate-x-[85px] @xl:-translate-x-[120px] @3xl:-translate-x-[140px]',
   finalLose: 'pointer-events-none translate-y-[30px] opacity-0',
   finalLoseLeft: '-translate-x-[250px] -rotate-[16deg]',
   finalLoseRight: 'translate-x-[250px] rotate-[16deg]',
