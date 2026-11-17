@@ -42,64 +42,66 @@ function WishGrid({
   };
 
   return (
-    <ul className="grid grid-cols-3 gap-x-[1.5px] gap-y-6">
-      {leadingItem && <li>{leadingItem}</li>}
-      {wishes.map(({ wish, item, winnerTournamentIds }, index) => {
-        const card = (
-          <WishCard
-            name={item.name}
-            price={item.price}
-            discountRate={item.discountRate}
-            imageUrl={item.imageUrl}
-            sourcePlatform={item.sourcePlatform}
-            isWinner={winnerTournamentIds.length > 0}
-            preload={index < PRELOAD_COUNT}
-          />
-        );
+    <div className="@container">
+      <ul className="grid grid-cols-3 gap-x-[1.5px] gap-y-6 @xl:grid-cols-4 @3xl:grid-cols-5">
+        {leadingItem && <li>{leadingItem}</li>}
+        {wishes.map(({ wish, item, winnerTournamentIds }, index) => {
+          const card = (
+            <WishCard
+              name={item.name}
+              price={item.price}
+              discountRate={item.discountRate}
+              imageUrl={item.imageUrl}
+              sourcePlatform={item.sourcePlatform}
+              isWinner={winnerTournamentIds.length > 0}
+              preload={index < PRELOAD_COUNT}
+            />
+          );
 
-        if (!selectedWishIds) {
-          /** 파싱 중인 위시는 상세 진입 불가 */
-          if (item.status === ITEM_STATUS.PARSING) return <li key={wish.id}>{card}</li>;
+          if (!selectedWishIds) {
+            /** 파싱 중인 위시는 상세 진입 불가 */
+            if (item.status === ITEM_STATUS.PARSING) return <li key={wish.id}>{card}</li>;
 
+            return (
+              <li key={wish.id}>
+                <Link
+                  href={ROUTES.WISH_EDIT(wish.id)}
+                  data-scroll-anchor-id={wish.id}
+                  onClick={event => handleLinkClick(event, wish.id)}
+                  className="block"
+                >
+                  {card}
+                </Link>
+              </li>
+            );
+          }
+
+          const isSelected = selectedWishIds.has(wish.id);
           return (
             <li key={wish.id}>
-              <Link
-                href={ROUTES.WISH_EDIT(wish.id)}
-                data-scroll-anchor-id={wish.id}
-                onClick={event => handleLinkClick(event, wish.id)}
-                className="block"
+              <button
+                type="button"
+                aria-pressed={isSelected}
+                onClick={() => onToggleSelect?.(wish.id)}
+                className="relative w-full cursor-pointer text-left"
               >
                 {card}
-              </Link>
+                <span
+                  style={{ zIndex: Z_INDEX.BASE_IMAGE + 1 }}
+                  className="pointer-events-none absolute top-[15px] right-[15px]"
+                >
+                  {isSelected ? (
+                    <CheckboxSelectedIconFill className="size-[18px] text-bg-accent" />
+                  ) : (
+                    <CheckboxEmptyIconFill className="size-[18px] text-black/8" />
+                  )}
+                </span>
+              </button>
             </li>
           );
-        }
-
-        const isSelected = selectedWishIds.has(wish.id);
-        return (
-          <li key={wish.id}>
-            <button
-              type="button"
-              aria-pressed={isSelected}
-              onClick={() => onToggleSelect?.(wish.id)}
-              className="relative w-full cursor-pointer text-left"
-            >
-              {card}
-              <span
-                style={{ zIndex: Z_INDEX.BASE_IMAGE + 1 }}
-                className="pointer-events-none absolute top-[15px] right-[15px]"
-              >
-                {isSelected ? (
-                  <CheckboxSelectedIconFill className="size-[18px] text-bg-accent" />
-                ) : (
-                  <CheckboxEmptyIconFill className="size-[18px] text-black/8" />
-                )}
-              </span>
-            </button>
-          </li>
-        );
-      })}
-    </ul>
+        })}
+      </ul>
+    </div>
   );
 }
 

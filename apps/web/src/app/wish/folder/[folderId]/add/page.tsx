@@ -31,7 +31,7 @@ async function FolderWishAddPage({ params }: FolderWishAddPageProps) {
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <main className="flex min-h-dvh flex-col bg-bg-layer-basement pb-bottom-cta">
+      <main data-wide-layout className="flex min-h-dvh flex-col bg-bg-layer-basement pb-bottom-cta">
         <FolderWishSelectContent folderId={folderId} />
       </main>
     </HydrationBoundary>

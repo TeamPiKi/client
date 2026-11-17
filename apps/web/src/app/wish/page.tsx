@@ -31,7 +31,7 @@ async function WishPage() {
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <main className="flex min-h-dvh flex-col bg-bg-layer-basement pb-46">
+      <main data-wide-layout className="flex min-h-dvh flex-col bg-bg-layer-basement pb-46">
         <WishListContent />
       </main>
     </HydrationBoundary>
