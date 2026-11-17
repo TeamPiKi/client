@@ -1,4 +1,5 @@
 import { postTokenRefresh } from '@/apis/postTokenRefresh';
+import { captureApiError, captureError, isNetworkError } from '@/utils/captureError';
 
 import { TokenStorage } from './tokenStorage';
 
@@ -89,10 +90,24 @@ const readSuccessBody = async (response: Response): Promise<ShareWishT | null> =
   }
 };
 
+/** 전체 링크엔 추적 정보가 붙을 수 있어 사이트 주소만 남긴다 */
+const getHost = (url: string) => {
+  try {
+    return new URL(url).hostname;
+  } catch {
+    return null;
+  }
+};
+
 /** Share Extension에서 링크로 위시 등록 */
 export const postWishLinkFromShare = async (
   productUrl: string
 ): Promise<PostWishLinkFromShareResultT> => {
+  const captureContext = {
+    tags: { source: 'share-extension' },
+    extra: { productHost: getHost(productUrl) },
+  };
+
   /** 빌드 설정 누락 — 다시 눌러도 결과가 같다 */
   if (!process.env.EXPO_PUBLIC_API_URL) return { ok: false, reason: 'server', retryable: false };
 
@@ -108,9 +123,27 @@ export const postWishLinkFromShare = async (
 
     if (postWishResponse.status === 401 && refreshToken) {
       /** 토큰 만료 시 토큰 갱신 */
-      const refreshResponse = await postTokenRefresh(refreshToken);
+      let refreshResponse: Response;
+      try {
+        refreshResponse = await postTokenRefresh(refreshToken);
+      } catch (error) {
+        /** postTokenRefresh 는 타임아웃으로만 요청을 끊는다 */
+        const isTimeout = error instanceof Error && error.name === 'AbortError';
+        if (isNetworkError(error) || isTimeout)
+          captureApiError('postTokenRefresh', {
+            ...captureContext,
+            extra: { ...captureContext.extra, isTimeout },
+          });
+        else captureError(error, captureContext);
+        return { ok: false, reason: 'network', retryable: true };
+      }
 
       if (!refreshResponse.ok) {
+        if (refreshResponse.status >= 500)
+          captureApiError('postTokenRefresh', {
+            status: refreshResponse.status,
+            ...captureContext,
+          });
         /** 죽은 토큰으로 재시도가 반복되지 않도록 정리 */
         if (refreshResponse.status === 401) await TokenStorage.clearTokens();
         return { ok: false, reason: 'sessionExpired', retryable: false };
@@ -128,6 +161,8 @@ export const postWishLinkFromShare = async (
     }
 
     if (!postWishResponse.ok) {
+      if (postWishResponse.status >= 500)
+        captureApiError('postWishLink', { status: postWishResponse.status, ...captureContext });
       const code = await readErrorCode(postWishResponse);
       /** refreshToken 이 없어 갱신조차 못 한 401 도 세션 만료로 본다 */
       const reason: ShareFailureReasonT =
@@ -139,7 +174,9 @@ export const postWishLinkFromShare = async (
     const wish = await readSuccessBody(postWishResponse);
 
     return { ok: true, wish, accessToken: activeToken };
-  } catch {
+  } catch (error) {
+    if (isNetworkError(error)) captureApiError('postWishLink', captureContext);
+    else captureError(error, captureContext);
     return { ok: false, reason: 'network', retryable: true };
   }
 };
