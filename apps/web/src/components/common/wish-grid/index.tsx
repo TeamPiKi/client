@@ -47,6 +47,7 @@ function WishGrid({
       {wishes.map(({ wish, item, winnerTournamentIds }, index) => {
         const card = (
           <WishCard
+            status={item.status}
             name={item.name}
             price={item.price}
             discountRate={item.discountRate}
