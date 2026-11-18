@@ -95,7 +95,7 @@ function Page() {
     void logAppOpenEvent();
   }, []);
 
-  const { sendShareIntent, clearPendingShareIntent } = useShareIntent({
+  const { sendShareIntent, getRecoveryUri } = useShareIntent({
     onChangeWebviewUri: handleWebviewUriChange,
     webviewUri,
   });
@@ -217,12 +217,11 @@ function Page() {
         extra: { url: lastUrlRef.current, ...extra },
       });
 
-      clearPendingShareIntent();
       setIsWebViewLoaded(false);
-      setWebviewUri(HOME_URI);
+      setWebviewUri(getRecoveryUri(HOME_URI));
       setWebviewKey(key => key + 1);
     },
-    [clearPendingShareIntent]
+    [getRecoveryUri]
   );
 
   const handleContentProcessDidTerminate = useCallback(

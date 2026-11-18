@@ -9,6 +9,14 @@ const WISHLIST_PATH = '/wish';
 
 const isWishlistPath = (uri: URL) => uri.pathname === WISHLIST_PATH;
 
+const toWishlistUri = (uri: string) => {
+  const nextUri = new URL(uri);
+  nextUri.pathname = WISHLIST_PATH;
+  nextUri.search = '';
+  nextUri.hash = '';
+  return nextUri.toString();
+};
+
 type Props = {
   onChangeWebviewUri: (uri: string) => void;
   webviewUri: string;
@@ -16,49 +24,55 @@ type Props = {
 
 /** 다른 앱에서의 share intent 수신과 웹으로의 전달 흐름을 관리 */
 export const useShareIntent = ({ onChangeWebviewUri, webviewUri }: Props) => {
-  const pendingShareIntentRef = useRef<ShareIntentPayloadT | null>(null);
+  const pendingShareIntentsRef = useRef<ShareIntentPayloadT[]>([]);
 
   const { hasShareIntent, shareIntent, resetShareIntent } = useShareIntentContext();
 
   /** pending payload를 웹으로 전송하고 ref/native intent 정리 */
   const sendShareIntent = useCallback(() => {
-    const pending = pendingShareIntentRef.current;
-    if (!pending) return;
+    const pendings = pendingShareIntentsRef.current;
+    if (pendings.length === 0) return;
 
-    WebBridge.postMessage({ type: WEBBRIDGE_MESSAGE_TYPE.APP_RES_SHARE_INTENT, payload: pending });
+    pendings.forEach(payload =>
+      WebBridge.postMessage({ type: WEBBRIDGE_MESSAGE_TYPE.APP_RES_SHARE_INTENT, payload })
+    );
     resetShareIntent();
-    pendingShareIntentRef.current = null;
+    pendingShareIntentsRef.current = [];
   }, [resetShareIntent]);
 
-  const clearPendingShareIntent = useCallback(() => {
-    pendingShareIntentRef.current = null;
-  }, []);
+  /** WebView 재생성 시 열 주소. 전달 전 공유가 있으면 위시 목록 */
+  const getRecoveryUri = useCallback(
+    (homeUri: string) =>
+      pendingShareIntentsRef.current.length > 0 ? toWishlistUri(homeUri) : homeUri,
+    []
+  );
 
   /** 다른 앱에서 ShareIntent 수신 후 웹으로 전송 */
   useEffect(() => {
     if (!hasShareIntent) return;
-    if (pendingShareIntentRef.current) return;
 
-    pendingShareIntentRef.current = toShareIntentPayload(shareIntent);
+    const payload = toShareIntentPayload(shareIntent);
+    const serialized = JSON.stringify(payload);
+    const isQueued = pendingShareIntentsRef.current.some(
+      pending => JSON.stringify(pending) === serialized
+    );
+    if (isQueued) return;
+
+    pendingShareIntentsRef.current.push(payload);
 
     try {
-      const nextUri = new URL(webviewUri);
-
       /** 이미 위시 목록: 즉시 전송 */
-      if (isWishlistPath(nextUri)) {
+      if (isWishlistPath(new URL(webviewUri))) {
         sendShareIntent();
         return;
       }
 
       /** 다른 페이지: payload 보관 후 위시 목록으로 이동 → WEB_REQ_READY 수신 시 전송 */
-      nextUri.pathname = WISHLIST_PATH;
-      nextUri.search = '';
-      nextUri.hash = '';
-      onChangeWebviewUri(nextUri.toString());
+      onChangeWebviewUri(toWishlistUri(webviewUri));
     } catch {
       return;
     }
   }, [hasShareIntent, onChangeWebviewUri, shareIntent, webviewUri, sendShareIntent]);
 
-  return { sendShareIntent, clearPendingShareIntent };
+  return { sendShareIntent, getRecoveryUri };
 };
