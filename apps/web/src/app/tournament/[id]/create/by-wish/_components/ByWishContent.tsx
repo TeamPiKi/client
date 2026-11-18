@@ -5,6 +5,7 @@ import { toast } from 'sonner';
 
 import BottomCta from '@/components/bottom-cta';
 import Button from '@/components/button';
+import NextPageStatus from '@/components/common/next-page-status';
 import WishGrid from '@/components/common/wish-grid';
 import { Header, HeaderIcon } from '@/components/header';
 import { ITEM_STATUS } from '@/consts/item';
@@ -40,9 +41,18 @@ function ByWishContent({ tournamentId }: ByWishContentProps) {
   );
 
   const { foldersData } = useGetFolders();
-  const { allWishesData, wishesData, fetchNextPage, hasNextPage, isFetchingNextPage } =
-    useFolderWishes(activeFolderId);
-  const bottomRef = useIntersectionObserver(fetchNextPage, hasNextPage && !isFetchingNextPage);
+  const {
+    allWishesData,
+    wishesData,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isFetchNextPageError,
+  } = useFolderWishes(activeFolderId);
+  const bottomRef = useIntersectionObserver(
+    fetchNextPage,
+    hasNextPage && !isFetchingNextPage && !isFetchNextPageError
+  );
 
   const { postTournamentItemsByWishMutation, isPostTournamentItemsByWishPending } =
     usePostTournamentItemsByWish(tournamentId, existingItemCount);
@@ -117,7 +127,12 @@ function ByWishContent({ tournamentId }: ByWishContentProps) {
             onToggleSelect={handleToggleSelect}
           />
         )}
-        <div ref={bottomRef} />
+        <NextPageStatus
+          ref={bottomRef}
+          isFetching={isFetchingNextPage}
+          isError={isFetchNextPageError}
+          onRetry={fetchNextPage}
+        />
       </main>
 
       <BottomCta hasGradient>

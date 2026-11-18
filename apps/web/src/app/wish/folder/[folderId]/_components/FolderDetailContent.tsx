@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
 import { ChevronBackwardIconFill } from '@/assets/icons';
+import NextPageStatus from '@/components/common/next-page-status';
 import WishGrid from '@/components/common/wish-grid';
 import { Header } from '@/components/header';
 import Spacing from '@/components/spacing';
@@ -34,10 +35,14 @@ type FolderDetailContentProps = {
 function FolderDetailView({ folder }: { folder: FolderT }) {
   const backWithFallback = useBackWithFallback();
 
-  const { wishesData, fetchNextPage, hasNextPage, isFetchingNextPage } = useGetWishes({
-    folderId: folder.id,
-  });
-  const bottomRef = useIntersectionObserver(fetchNextPage, hasNextPage && !isFetchingNextPage);
+  const { wishesData, fetchNextPage, hasNextPage, isFetchingNextPage, isFetchNextPageError } =
+    useGetWishes({
+      folderId: folder.id,
+    });
+  const bottomRef = useIntersectionObserver(
+    fetchNextPage,
+    hasNextPage && !isFetchingNextPage && !isFetchNextPageError
+  );
 
   const scrollRestoration = {
     namespace: SCROLL_NAMESPACE.WISHLIST_FOLDER,
@@ -176,7 +181,12 @@ function FolderDetailView({ folder }: { folder: FolderT }) {
           onToggleSelect: handleToggle,
         })}
       />
-      <div ref={bottomRef} />
+      <NextPageStatus
+        ref={bottomRef}
+        isFetching={isFetchingNextPage}
+        isError={isFetchNextPageError}
+        onRetry={fetchNextPage}
+      />
 
       {mode === WISH_MODE.EDIT && (
         <WishEditActionBar

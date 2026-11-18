@@ -20,5 +20,6 @@ export const useFolderWishes = (folderId: number | null) => {
     fetchNextPage: folderWishes.fetchNextPage,
     hasNextPage: folderWishes.hasNextPage,
     isFetchingNextPage: folderWishes.isFetchingNextPage,
+    isFetchNextPageError: folderWishes.isFetchNextPageError,
   };
 };

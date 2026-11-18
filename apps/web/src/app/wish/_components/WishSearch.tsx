@@ -4,6 +4,7 @@ import { type FormEvent, useRef, useState } from 'react';
 
 import { ChevronBackwardIconFill, CloseCircularIconFill } from '@/assets/icons';
 import Basket from '@/components/common/basket';
+import NextPageStatus from '@/components/common/next-page-status';
 import WishGrid from '@/components/common/wish-grid';
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/dialog';
 import { Header } from '@/components/header';
@@ -30,9 +31,13 @@ function WishSearch({ onClose }: WishSearchProps) {
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
+    isFetchNextPageError,
     isSearchWishesPending,
   } = useSearchWishes(submittedKeyword);
-  const bottomRef = useIntersectionObserver(fetchNextPage, hasNextPage && !isFetchingNextPage);
+  const bottomRef = useIntersectionObserver(
+    fetchNextPage,
+    hasNextPage && !isFetchingNextPage && !isFetchNextPageError
+  );
 
   const isSearching = isFocused || submittedKeyword === null;
 
@@ -136,7 +141,12 @@ function WishSearch({ onClose }: WishSearchProps) {
             {searchWishesData.length > 0 ? (
               <>
                 <WishGrid wishes={searchWishesData} />
-                <div ref={bottomRef} />
+                <NextPageStatus
+                  ref={bottomRef}
+                  isFetching={isFetchingNextPage}
+                  isError={isFetchNextPageError}
+                  onRetry={fetchNextPage}
+                />
               </>
             ) : (
               <div className="flex flex-col items-center gap-4 pt-12.5">

@@ -1,5 +1,6 @@
 'use client';
 
+import NextPageStatus from '@/components/common/next-page-status';
 import WishGrid from '@/components/common/wish-grid';
 import { ITEM_STATUS } from '@/consts/item';
 import { useGetWishes } from '@/hooks/useGetWishes';
@@ -17,14 +18,18 @@ const SCROLL_RESTORATION = { namespace: SCROLL_NAMESPACE.WISHLIST, scope: WISH_T
 function AllWishTabContent(props: AllWishTabContentProps) {
   const isEditMode = Boolean(props.selectedWishIds);
 
-  const { wishesData, fetchNextPage, hasNextPage, isFetchingNextPage } = useGetWishes();
+  const { wishesData, fetchNextPage, hasNextPage, isFetchingNextPage, isFetchNextPageError } =
+    useGetWishes();
   const hasPendingItem = wishesData.some(
     ({ item }) => item.status === ITEM_STATUS.PARSING || item.refreshing
   );
 
   useSSEFallback(['wishlists'], hasPendingItem);
   useScrollRestoration(SCROLL_RESTORATION);
-  const bottomRef = useIntersectionObserver(fetchNextPage, hasNextPage && !isFetchingNextPage);
+  const bottomRef = useIntersectionObserver(
+    fetchNextPage,
+    hasNextPage && !isFetchingNextPage && !isFetchNextPageError
+  );
 
   return (
     <>
@@ -34,7 +39,12 @@ function AllWishTabContent(props: AllWishTabContentProps) {
         leadingItem={!isEditMode && <WishAddCard />}
         scrollRestoration={SCROLL_RESTORATION}
       />
-      <div ref={bottomRef} />
+      <NextPageStatus
+        ref={bottomRef}
+        isFetching={isFetchingNextPage}
+        isError={isFetchNextPageError}
+        onRetry={fetchNextPage}
+      />
     </>
   );
 }
