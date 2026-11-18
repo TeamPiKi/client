@@ -30,6 +30,10 @@ export const useShareIntent = ({ onChangeWebviewUri, webviewUri }: Props) => {
     pendingShareIntentRef.current = null;
   }, [resetShareIntent]);
 
+  const clearPendingShareIntent = useCallback(() => {
+    pendingShareIntentRef.current = null;
+  }, []);
+
   /** 다른 앱에서 ShareIntent 수신 후 웹으로 전송 */
   useEffect(() => {
     if (!hasShareIntent) return;
@@ -56,5 +60,5 @@ export const useShareIntent = ({ onChangeWebviewUri, webviewUri }: Props) => {
     }
   }, [hasShareIntent, onChangeWebviewUri, shareIntent, webviewUri, sendShareIntent]);
 
-  return { sendShareIntent };
+  return { sendShareIntent, clearPendingShareIntent };
 };

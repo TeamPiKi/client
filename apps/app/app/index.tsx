@@ -95,7 +95,7 @@ function Page() {
     void logAppOpenEvent();
   }, []);
 
-  const { sendShareIntent } = useShareIntent({
+  const { sendShareIntent, clearPendingShareIntent } = useShareIntent({
     onChangeWebviewUri: handleWebviewUriChange,
     webviewUri,
   });
@@ -208,18 +208,22 @@ function Page() {
     lastUrlRef.current = navigation.url.split('?')[0] ?? null;
   }, []);
 
-  const recoverWebViewProcess = useCallback((extra: Record<string, unknown>) => {
-    const error = new Error('WebView process terminated');
-    error.name = 'WebViewProcessTerminated';
-    captureError(error, {
-      tags: { source: 'webview', platform: Platform.OS },
-      extra: { url: lastUrlRef.current, ...extra },
-    });
+  const recoverWebViewProcess = useCallback(
+    (extra: Record<string, unknown>) => {
+      const error = new Error('WebView process terminated');
+      error.name = 'WebViewProcessTerminated';
+      captureError(error, {
+        tags: { source: 'webview', platform: Platform.OS },
+        extra: { url: lastUrlRef.current, ...extra },
+      });
 
-    setIsWebViewLoaded(false);
-    setWebviewUri(HOME_URI);
-    setWebviewKey(key => key + 1);
-  }, []);
+      clearPendingShareIntent();
+      setIsWebViewLoaded(false);
+      setWebviewUri(HOME_URI);
+      setWebviewKey(key => key + 1);
+    },
+    [clearPendingShareIntent]
+  );
 
   const handleContentProcessDidTerminate = useCallback(
     (_event: WebViewTerminatedEvent) => recoverWebViewProcess({}),
