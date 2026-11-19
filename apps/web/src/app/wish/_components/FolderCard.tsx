@@ -19,6 +19,8 @@ type FolderCardProps = {
   wishCount: number;
   /** 앞에서부터 최대 3장 사용 */
   thumbnailUrls: (string | null)[];
+  isPublic: boolean;
+  onToggleVisibility: () => void;
   onRename: () => void;
   onDelete: () => void;
 };
@@ -78,6 +80,8 @@ function FolderCard({
   name,
   wishCount,
   thumbnailUrls,
+  isPublic,
+  onToggleVisibility,
   onRename,
   onDelete,
 }: FolderCardProps) {
@@ -106,7 +110,13 @@ function FolderCard({
         </div>
       </Link>
       <div className="absolute right-3 bottom-[34px] flex">
-        <FolderMenu folderName={name} onRename={onRename} onDelete={onDelete} />
+        <FolderMenu
+          folderName={name}
+          isPublic={isPublic}
+          onToggleVisibility={onToggleVisibility}
+          onRename={onRename}
+          onDelete={onDelete}
+        />
       </div>
     </div>
   );
