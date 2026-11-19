@@ -1,14 +1,20 @@
 'use client';
 
+import { useQueryClient } from '@tanstack/react-query';
 import { useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
+import { wishesInfiniteQueryOptions } from '@/apis/getWishes';
+import { wishesCountQueryOptions } from '@/apis/getWishesCount';
 import CollapsibleTitle from '@/components/common/collapsible-title';
+import PullToRefresh from '@/components/common/pull-to-refresh';
 import { Z_INDEX } from '@/consts/zIndex';
 import { useGetWishesCount } from '@/hooks/useGetWishesCount';
+import { usePullToRefresh } from '@/hooks/usePullToRefresh';
 import type { FolderT } from '@/types/folder';
 import { cn } from '@/utils/cn';
+import { refetchFirstPage } from '@/utils/refetchFirstPage';
 
 import WishEditActionBar from '../_common/_components/WishEditActionBar';
 import WishEditHeader from '../_common/_components/WishEditHeader';
@@ -55,6 +61,16 @@ function WishListContent() {
 
   const handleDelete = () => deleteWishesMutation(Array.from(selectedWishIds));
 
+  const queryClient = useQueryClient();
+  const pullToRefresh = usePullToRefresh(
+    () =>
+      Promise.all([
+        refetchFirstPage(queryClient, wishesInfiniteQueryOptions().queryKey),
+        queryClient.refetchQueries({ queryKey: wishesCountQueryOptions().queryKey }),
+      ]),
+    !isFolderTab && mode !== WISH_MODE.EDIT
+  );
+
   return (
     <>
       <div
@@ -69,7 +85,10 @@ function WishListContent() {
         ) : (
           <>
             <CollapsibleTitle>내 위시리스트</CollapsibleTitle>
-            <WishTabBar />
+            <div>
+              <WishTabBar />
+              <PullToRefresh {...pullToRefresh} />
+            </div>
           </>
         )}
         <WishTabSummary
