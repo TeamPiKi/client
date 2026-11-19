@@ -12,7 +12,7 @@ type PullToRefreshProps = {
 function PullToRefresh({ pullDistance, isPulling, isRefreshing }: PullToRefreshProps) {
   return (
     <div
-      className={cn('overflow-hidden', !isPulling && 'transition-[height] duration-200')}
+      className={cn('shrink-0 overflow-hidden', !isPulling && 'transition-[height] duration-200')}
       style={{ height: pullDistance }}
     >
       <div className="flex items-center justify-center" style={{ height: INDICATOR_HEIGHT }}>
