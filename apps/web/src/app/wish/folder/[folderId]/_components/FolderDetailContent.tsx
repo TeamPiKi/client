@@ -114,7 +114,10 @@ function FolderDetailView({ folder }: { folder: FolderT }) {
     () =>
       Promise.all([
         refetchFirstPage(queryClient, wishesInfiniteQueryOptions({ folderId: folder.id }).queryKey),
-        queryClient.refetchQueries({ queryKey: foldersQueryOptions.queryKey }),
+        queryClient.refetchQueries(
+          { queryKey: foldersQueryOptions.queryKey },
+          { throwOnError: true }
+        ),
       ]),
     { enabled: mode !== WISH_MODE.EDIT }
   );

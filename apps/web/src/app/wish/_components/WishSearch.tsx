@@ -54,7 +54,10 @@ function WishSearch({ onClose }: WishSearchProps) {
       const request = { q: submittedKeyword ?? '' };
       return Promise.all([
         refetchFirstPage(queryClient, wishesInfiniteQueryOptions(request).queryKey),
-        queryClient.refetchQueries({ queryKey: wishesCountQueryOptions(request).queryKey }),
+        queryClient.refetchQueries(
+          { queryKey: wishesCountQueryOptions(request).queryKey },
+          { throwOnError: true }
+        ),
       ]);
     },
     { enabled: !isSearching, scrollerRef }

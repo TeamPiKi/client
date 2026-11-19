@@ -72,7 +72,10 @@ function WishListContent() {
           )
         : Promise.all([
             refetchFirstPage(queryClient, wishesInfiniteQueryOptions().queryKey),
-            queryClient.refetchQueries({ queryKey: wishesCountQueryOptions().queryKey }),
+            queryClient.refetchQueries(
+              { queryKey: wishesCountQueryOptions().queryKey },
+              { throwOnError: true }
+            ),
           ]),
     { enabled: mode !== WISH_MODE.EDIT }
   );
