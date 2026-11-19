@@ -1,4 +1,4 @@
-import { useEffect, useEffectEvent, useState } from 'react';
+import { type RefObject, useEffect, useEffectEvent, useState } from 'react';
 import { toast } from 'sonner';
 
 import {
@@ -10,7 +10,13 @@ import { getApiErrorStatus, isWithdrawnAccountError } from '@/utils/apiError';
 import { getApiErrorMessage } from '@/utils/getApiErrorMessage';
 import { getScrollContainer } from '@/utils/scrollRestoration';
 
-export const usePullToRefresh = (onRefresh: () => Promise<unknown>, enabled = true) => {
+export const usePullToRefresh = (
+  onRefresh: () => Promise<unknown>,
+  {
+    enabled = true,
+    scrollerRef,
+  }: { enabled?: boolean; scrollerRef?: RefObject<HTMLElement | null> } = {}
+) => {
   const [pullDistance, setPullDistance] = useState(0);
   const [isPulling, setIsPulling] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -20,7 +26,7 @@ export const usePullToRefresh = (onRefresh: () => Promise<unknown>, enabled = tr
   useEffect(() => {
     if (!enabled) return;
 
-    const scroller = getScrollContainer();
+    const scroller = scrollerRef ? scrollerRef.current : getScrollContainer();
     if (!scroller) return;
 
     let startY: number | null = null;
@@ -92,7 +98,7 @@ export const usePullToRefresh = (onRefresh: () => Promise<unknown>, enabled = tr
       scroller.removeEventListener('touchend', handleTouchEnd);
       scroller.removeEventListener('touchcancel', reset);
     };
-  }, [enabled]);
+  }, [enabled, scrollerRef]);
 
   return { pullDistance, isPulling, isRefreshing };
 };

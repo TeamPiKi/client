@@ -68,7 +68,7 @@ function WishListContent() {
         refetchFirstPage(queryClient, wishesInfiniteQueryOptions().queryKey),
         queryClient.refetchQueries({ queryKey: wishesCountQueryOptions().queryKey }),
       ]),
-    !isFolderTab && mode !== WISH_MODE.EDIT
+    { enabled: !isFolderTab && mode !== WISH_MODE.EDIT }
   );
 
   return (

@@ -1,11 +1,14 @@
 'use client';
 
-import { useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
+import { useRef, useState } from 'react';
 import { toast } from 'sonner';
 
+import { wishesInfiniteQueryOptions } from '@/apis/getWishes';
 import BottomCta from '@/components/bottom-cta';
 import Button from '@/components/button';
 import NextPageStatus from '@/components/common/next-page-status';
+import PullToRefresh from '@/components/common/pull-to-refresh';
 import WishGrid from '@/components/common/wish-grid';
 import { Header, HeaderIcon } from '@/components/header';
 import { ITEM_STATUS } from '@/consts/item';
@@ -13,6 +16,8 @@ import { ROUTES } from '@/consts/route';
 import { useBackWithFallback } from '@/hooks/useBackWithFallback';
 import { useGetFolders } from '@/hooks/useGetFolders';
 import useIntersectionObserver from '@/hooks/useIntersectionObserver';
+import { usePullToRefresh } from '@/hooks/usePullToRefresh';
+import { refetchFirstPage } from '@/utils/refetchFirstPage';
 
 import { useGetTournament } from '../../../_common/_hooks/useGetTournament';
 import { MAX_SELECT } from '../_consts/selectLimits';
@@ -52,6 +57,18 @@ function ByWishContent({ tournamentId }: ByWishContentProps) {
   const bottomRef = useIntersectionObserver(
     fetchNextPage,
     hasNextPage && !isFetchingNextPage && !isFetchNextPageError
+  );
+
+  const queryClient = useQueryClient();
+  const scrollerRef = useRef<HTMLElement>(null);
+  const pullToRefresh = usePullToRefresh(
+    () =>
+      refetchFirstPage(
+        queryClient,
+        wishesInfiniteQueryOptions(activeFolderId === null ? {} : { folderId: activeFolderId })
+          .queryKey
+      ),
+    { scrollerRef }
   );
 
   const { postTournamentItemsByWishMutation, isPostTournamentItemsByWishPending } =
@@ -108,7 +125,11 @@ function ByWishContent({ tournamentId }: ByWishContentProps) {
         </p>
       </div>
 
-      <main className="hide-scrollbar flex flex-1 flex-col overflow-y-auto bg-bg-layer-basement pb-32">
+      <main
+        ref={scrollerRef}
+        className="hide-scrollbar flex flex-1 flex-col overflow-y-auto bg-bg-layer-basement pb-32"
+      >
+        <PullToRefresh {...pullToRefresh} />
         {hasNoSelectableWish ? (
           <div className="flex flex-1 flex-col items-center justify-center gap-2" role="status">
             <p className="heading-2-semibold text-text-neutral-primary">

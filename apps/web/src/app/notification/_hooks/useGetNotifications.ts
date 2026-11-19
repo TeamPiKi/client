@@ -14,7 +14,7 @@ export const useGetNotifications = () => {
     hasNextPage,
     isFetchingNextPage,
     isPending,
-    isError,
+    isLoadingError,
     isFetchNextPageError,
     refetch,
   } = useInfiniteQuery({
@@ -42,7 +42,7 @@ export const useGetNotifications = () => {
     hasNextPage,
     isFetchingNextPage,
     isPending,
-    isError,
+    isLoadingError,
     isFetchNextPageError,
     refetch,
   };
