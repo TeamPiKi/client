@@ -1,16 +1,22 @@
 'use client';
 
+import { useQueryClient } from '@tanstack/react-query';
 import { type FormEvent, useRef, useState } from 'react';
 
+import { wishesInfiniteQueryOptions } from '@/apis/getWishes';
+import { wishesCountQueryOptions } from '@/apis/getWishesCount';
 import { ChevronBackwardIconFill, CloseCircularIconFill } from '@/assets/icons';
 import Basket from '@/components/common/basket';
 import NextPageStatus from '@/components/common/next-page-status';
+import PullToRefresh from '@/components/common/pull-to-refresh';
 import WishGrid from '@/components/common/wish-grid';
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/dialog';
 import { Header } from '@/components/header';
 import Input from '@/components/input';
 import useIntersectionObserver from '@/hooks/useIntersectionObserver';
+import { usePullToRefresh } from '@/hooks/usePullToRefresh';
 import { cn } from '@/utils/cn';
+import { refetchFirstPage } from '@/utils/refetchFirstPage';
 
 import { useSearchWishes } from '../_hooks/useSearchWishes';
 
@@ -41,6 +47,19 @@ function WishSearch({ onClose }: WishSearchProps) {
 
   const isSearching = isFocused || submittedKeyword === null;
 
+  const queryClient = useQueryClient();
+  const scrollerRef = useRef<HTMLDivElement>(null);
+  const pullToRefresh = usePullToRefresh(
+    () => {
+      const request = { q: submittedKeyword ?? '' };
+      return Promise.all([
+        refetchFirstPage(queryClient, wishesInfiniteQueryOptions(request).queryKey),
+        queryClient.refetchQueries({ queryKey: wishesCountQueryOptions(request).queryKey }),
+      ]);
+    },
+    { enabled: !isSearching, scrollerRef }
+  );
+
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const trimmedKeyword = keyword.trim();
@@ -63,6 +82,7 @@ function WishSearch({ onClose }: WishSearchProps) {
       }}
     >
       <DialogContent
+        ref={scrollerRef}
         showCloseButton={false}
         showOverlay={false}
         onOpenAutoFocus={event => {
@@ -130,6 +150,7 @@ function WishSearch({ onClose }: WishSearchProps) {
         {isSearching && (
           <div aria-hidden className="fixed inset-0 -z-10 bg-black/20" onClick={onClose} />
         )}
+        {!isSearching && <PullToRefresh {...pullToRefresh} />}
         {!isSearching && !isSearchWishesPending && (
           <section
             aria-live="polite"
