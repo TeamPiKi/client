@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
-import { ChevronBackwardIconFill } from '@/assets/icons';
+import { ChevronBackwardIconFill, LockIconFill } from '@/assets/icons';
 import WishGrid from '@/components/common/wish-grid';
 import { Header } from '@/components/header';
 import Spacing from '@/components/spacing';
@@ -148,7 +148,12 @@ function FolderDetailView({ folder }: { folder: FolderT }) {
             </>
           ) : (
             <>
-              <p className="text-text-neutral-tertiary">상품 {formatWishCount(folder.wishCount)}</p>
+              <p className="flex items-center gap-1 text-text-neutral-tertiary">
+                {!folder.isPublic && (
+                  <LockIconFill aria-hidden className="size-4 text-icon-neutral-secondary" />
+                )}
+                상품 {formatWishCount(folder.wishCount)}
+              </p>
               <div className="flex items-center gap-3 text-text-neutral-secondary">
                 <button
                   type="button"

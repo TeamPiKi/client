@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import type { MouseEvent } from 'react';
 
+import { LockIconFill } from '@/assets/icons';
 import ImageIconOutline from '@/assets/icons/outline/image.svg';
 import BaseImage from '@/components/base-image';
 import { ROUTES } from '@/consts/route';
@@ -109,6 +110,11 @@ function FolderCard({
           <p className="caption-1-regular text-text-neutral-secondary">위시 {wishCount}개</p>
         </div>
       </Link>
+      {!isPublic && (
+        <div className="pointer-events-none absolute top-3 right-3 flex size-6 items-center justify-center rounded-full bg-black/50">
+          <LockIconFill aria-hidden className="size-4 text-icon-neutral-inverse" />
+        </div>
+      )}
       <div className="absolute right-3 bottom-[34px] flex">
         <FolderMenu
           folderName={name}
