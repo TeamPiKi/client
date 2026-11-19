@@ -51,12 +51,13 @@ function ByWishContent({ tournamentId }: ByWishContentProps) {
     wishesData,
     fetchNextPage,
     hasNextPage,
+    isFetching,
     isFetchingNextPage,
     isFetchNextPageError,
   } = useFolderWishes(activeFolderId);
   const bottomRef = useIntersectionObserver(
     fetchNextPage,
-    hasNextPage && !isFetchingNextPage && !isFetchNextPageError
+    hasNextPage && !isFetching && !isFetchNextPageError
   );
 
   const queryClient = useQueryClient();

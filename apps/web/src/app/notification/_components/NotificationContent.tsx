@@ -36,6 +36,7 @@ function NotificationContent() {
     refetch,
     fetchNextPage,
     hasNextPage,
+    isFetching,
     isFetchingNextPage,
   } = useGetNotifications();
   const { postNotificationsReadMutation, isPostNotificationsReadPending } =
@@ -54,7 +55,7 @@ function NotificationContent() {
 
   const bottomRef = useIntersectionObserver(
     fetchNextPage,
-    !!hasNextPage && !isFetchingNextPage && !isFetchNextPageError
+    !!hasNextPage && !isFetching && !isFetchNextPageError
   );
 
   const handleNotificationClick = (notification: (typeof notificationsData)[number]) => {

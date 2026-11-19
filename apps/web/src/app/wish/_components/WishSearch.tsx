@@ -36,13 +36,14 @@ function WishSearch({ onClose }: WishSearchProps) {
     searchWishesCountData,
     fetchNextPage,
     hasNextPage,
+    isFetching,
     isFetchingNextPage,
     isFetchNextPageError,
     isSearchWishesPending,
   } = useSearchWishes(submittedKeyword);
   const bottomRef = useIntersectionObserver(
     fetchNextPage,
-    hasNextPage && !isFetchingNextPage && !isFetchNextPageError
+    hasNextPage && !isFetching && !isFetchNextPageError
   );
 
   const isSearching = isFocused || submittedKeyword === null;

@@ -41,13 +41,19 @@ type FolderDetailContentProps = {
 function FolderDetailView({ folder }: { folder: FolderT }) {
   const backWithFallback = useBackWithFallback();
 
-  const { wishesData, fetchNextPage, hasNextPage, isFetchingNextPage, isFetchNextPageError } =
-    useGetWishes({
-      folderId: folder.id,
-    });
+  const {
+    wishesData,
+    fetchNextPage,
+    hasNextPage,
+    isFetching,
+    isFetchingNextPage,
+    isFetchNextPageError,
+  } = useGetWishes({
+    folderId: folder.id,
+  });
   const bottomRef = useIntersectionObserver(
     fetchNextPage,
-    hasNextPage && !isFetchingNextPage && !isFetchNextPageError
+    hasNextPage && !isFetching && !isFetchNextPageError
   );
 
   const scrollRestoration = {

@@ -18,8 +18,14 @@ const SCROLL_RESTORATION = { namespace: SCROLL_NAMESPACE.WISHLIST, scope: WISH_T
 function AllWishTabContent(props: AllWishTabContentProps) {
   const isEditMode = Boolean(props.selectedWishIds);
 
-  const { wishesData, fetchNextPage, hasNextPage, isFetchingNextPage, isFetchNextPageError } =
-    useGetWishes();
+  const {
+    wishesData,
+    fetchNextPage,
+    hasNextPage,
+    isFetching,
+    isFetchingNextPage,
+    isFetchNextPageError,
+  } = useGetWishes();
   const hasPendingItem = wishesData.some(
     ({ item }) => item.status === ITEM_STATUS.PARSING || item.refreshing
   );
@@ -28,7 +34,7 @@ function AllWishTabContent(props: AllWishTabContentProps) {
   useScrollRestoration(SCROLL_RESTORATION);
   const bottomRef = useIntersectionObserver(
     fetchNextPage,
-    hasNextPage && !isFetchingNextPage && !isFetchNextPageError
+    hasNextPage && !isFetching && !isFetchNextPageError
   );
 
   return (
