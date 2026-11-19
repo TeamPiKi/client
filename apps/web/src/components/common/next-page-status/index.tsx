@@ -11,7 +11,7 @@ type NextPageStatusProps = {
 };
 
 function NextPageStatus({ ref, isFetching, isError, onRetry }: NextPageStatusProps) {
-  if (isError) {
+  if (isError && !isFetching) {
     return (
       <div className="flex justify-center py-4">
         <button
