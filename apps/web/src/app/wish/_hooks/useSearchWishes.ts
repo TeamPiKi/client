@@ -7,7 +7,15 @@ export const useSearchWishes = (keyword: string | null) => {
   const request = { q: keyword ?? '' };
   const enabled = keyword !== null;
 
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isPending } = useInfiniteQuery({
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetching,
+    isFetchingNextPage,
+    isFetchNextPageError,
+    isPending,
+  } = useInfiniteQuery({
     ...wishesInfiniteQueryOptions(request),
     enabled,
   });
@@ -23,7 +31,9 @@ export const useSearchWishes = (keyword: string | null) => {
     searchWishesCountData,
     fetchNextPage,
     hasNextPage,
+    isFetching,
     isFetchingNextPage,
+    isFetchNextPageError,
     isSearchWishesPending: isPending,
   };
 };
