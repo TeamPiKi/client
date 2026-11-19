@@ -1,10 +1,14 @@
 'use client';
 
+import { useQueryClient } from '@tanstack/react-query';
 import { useSearchParams } from 'next/navigation';
 import { Suspense } from 'react';
 
 import CollapsibleTitle from '@/components/common/collapsible-title';
+import PullToRefresh from '@/components/common/pull-to-refresh';
+import { QUERY_KEYS } from '@/consts/queryKeys';
 import { Z_INDEX } from '@/consts/zIndex';
+import { usePullToRefresh } from '@/hooks/usePullToRefresh';
 import { replaceUrlKeepingState } from '@/utils/replaceUrlKeepingState';
 
 import { PLAY_TYPE_BY_FILTER, PLAY_TYPE_FILTER } from '../_consts/tournamentPlayType';
@@ -35,6 +39,20 @@ function TournamentHistorySection() {
     syncSearchParams(activeTab, play);
   };
 
+  const queryClient = useQueryClient();
+  const pullToRefresh = usePullToRefresh(() =>
+    queryClient.refetchQueries(
+      {
+        queryKey: QUERY_KEYS.TOURNAMENT.LIST.BY_PARAMS({
+          status: STATUS_BY_TAB[activeTab],
+          playType: PLAY_TYPE_BY_FILTER[activePlayTypeFilter],
+        }),
+        exact: true,
+      },
+      { throwOnError: true }
+    )
+  );
+
   return (
     <>
       <div
@@ -50,6 +68,7 @@ function TournamentHistorySection() {
           />
         </div>
       </div>
+      <PullToRefresh {...pullToRefresh} />
       <div className="flex flex-1 flex-col gap-4 px-5 pt-4 pb-46">
         <Suspense
           key={`${activeTab}-${activePlayTypeFilter}`}
