@@ -12,6 +12,7 @@ import { useBackWithFallback } from '@/hooks/useBackWithFallback';
 import { usePageBackground } from '@/hooks/usePageBackground';
 
 import { REPORT_REASONS } from '../_consts/report';
+import ReportEtcField from './ReportEtcField';
 
 function ReportForm() {
   usePageBackground('var(--color-bg-layer-default)');
@@ -19,6 +20,12 @@ function ReportForm() {
   const backWithFallback = useBackWithFallback();
 
   const [selectedReason, setSelectedReason] = useState<ReportReasonT | null>(null);
+  const [etcReason, setEtcReason] = useState<string>('');
+
+  const handleReasonChange = (reason: ReportReasonT) => {
+    setSelectedReason(reason);
+    setEtcReason('');
+  };
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -41,6 +48,7 @@ function ReportForm() {
 
         <Spacing size={43} />
 
+        {/** TODO: 다시 누르면 선택 해제되는 토글 여부 디자인 답변 따라 수정 필요 https://www.figma.com/design/NlgTPUvrwaHNDcBy33bDf2/?node-id=4419-31989#2015080227 */}
         <fieldset className="flex flex-col gap-8">
           <legend className="sr-only">신고 사유</legend>
           {REPORT_REASONS.map(({ value, label }) => (
@@ -49,10 +57,17 @@ function ReportForm() {
               value={value}
               label={label}
               checked={selectedReason === value}
-              onChange={setSelectedReason}
+              onChange={handleReasonChange}
             />
           ))}
         </fieldset>
+
+        {selectedReason === 'ETC' && (
+          <>
+            <Spacing size={19} />
+            <ReportEtcField value={etcReason} onChange={setEtcReason} />
+          </>
+        )}
       </div>
 
       <BottomCta className="border-t border-gray-50 bg-bg-layer-default">
