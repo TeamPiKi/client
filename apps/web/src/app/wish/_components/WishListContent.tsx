@@ -5,6 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
+import { foldersQueryOptions } from '@/apis/getFolders';
 import { wishesInfiniteQueryOptions } from '@/apis/getWishes';
 import { wishesCountQueryOptions } from '@/apis/getWishesCount';
 import CollapsibleTitle from '@/components/common/collapsible-title';
@@ -64,11 +65,16 @@ function WishListContent() {
   const queryClient = useQueryClient();
   const pullToRefresh = usePullToRefresh(
     () =>
-      Promise.all([
-        refetchFirstPage(queryClient, wishesInfiniteQueryOptions().queryKey),
-        queryClient.refetchQueries({ queryKey: wishesCountQueryOptions().queryKey }),
-      ]),
-    { enabled: !isFolderTab && mode !== WISH_MODE.EDIT }
+      isFolderTab
+        ? queryClient.refetchQueries(
+            { queryKey: foldersQueryOptions.queryKey },
+            { throwOnError: true }
+          )
+        : Promise.all([
+            refetchFirstPage(queryClient, wishesInfiniteQueryOptions().queryKey),
+            queryClient.refetchQueries({ queryKey: wishesCountQueryOptions().queryKey }),
+          ]),
+    { enabled: mode !== WISH_MODE.EDIT }
   );
 
   return (
