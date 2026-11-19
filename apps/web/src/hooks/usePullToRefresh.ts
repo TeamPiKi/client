@@ -1,4 +1,4 @@
-import { type RefObject, useEffect, useEffectEvent, useState } from 'react';
+import { type RefObject, useEffect, useEffectEvent, useRef, useState } from 'react';
 import { toast } from 'sonner';
 
 import {
@@ -20,6 +20,8 @@ export const usePullToRefresh = (
   const [pullDistance, setPullDistance] = useState(0);
   const [isPulling, setIsPulling] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  
+  const isLockedRef = useRef(false);
 
   const refresh = useEffectEvent(() => onRefresh());
 
@@ -31,17 +33,17 @@ export const usePullToRefresh = (
 
     let startY: number | null = null;
     let distance = 0;
-    let isLocked = false;
 
     const reset = () => {
       startY = null;
       distance = 0;
       setIsPulling(false);
-      setPullDistance(0);
+      
+      if (!isLockedRef.current) setPullDistance(0);
     };
 
     const handleTouchStart = (event: TouchEvent) => {
-      if (isLocked || scroller.scrollTop > 0) return;
+      if (isLockedRef.current || scroller.scrollTop > 0) return;
       startY = event.touches[0]?.clientY ?? null;
     };
 
@@ -69,7 +71,7 @@ export const usePullToRefresh = (
 
       startY = null;
       distance = 0;
-      isLocked = true;
+      isLockedRef.current = true;
       setIsPulling(false);
       setIsRefreshing(true);
       setPullDistance(INDICATOR_HEIGHT);
@@ -80,7 +82,7 @@ export const usePullToRefresh = (
         if (getApiErrorStatus(error) !== 401 && !isWithdrawnAccountError(error))
           toast.error(getApiErrorMessage(error));
       } finally {
-        isLocked = false;
+        isLockedRef.current = false;
         setIsRefreshing(false);
         setPullDistance(0);
       }
