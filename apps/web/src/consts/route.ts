@@ -29,6 +29,7 @@ export const ROUTES = {
   MYPAGE_EDIT: '/mypage/edit',
   MYPAGE_WITHDRAW: '/mypage/withdraw',
   TOURNAMENT_HISTORY: '/tournament/history',
+  REPORT: (userId: number) => `/report/${userId}`,
 
   /** 4. Authorized Guest or Member */
   TOURNAMENT_CREATE: (tournamentId: number, highlightItemId?: number) =>

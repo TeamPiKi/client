@@ -43,6 +43,7 @@ const isMemberOnlyRoute = (pathname: string) => {
   if (matchesPath(pathname, ROUTES.WISHLIST)) return true;
   if (matchesPath(pathname, ROUTES.NOTIFICATION)) return true;
   if (matchesPath(pathname, ROUTES.TOURNAMENT_HISTORY)) return true;
+  if (matchesPath(pathname, '/report')) return true;
 
   return false;
 };
