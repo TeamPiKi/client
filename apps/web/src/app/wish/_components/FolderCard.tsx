@@ -117,6 +117,7 @@ function FolderCard({
           style={{ zIndex: Z_INDEX.BASE_IMAGE + 1 }}
         >
           <LockIconFill aria-hidden className="size-4.5 text-icon-neutral-inverse" />
+          <span className="sr-only">비공개 폴더</span>
         </div>
       )}
       <div className="absolute right-3 bottom-[34px] flex">
