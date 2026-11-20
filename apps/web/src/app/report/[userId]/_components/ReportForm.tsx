@@ -96,12 +96,12 @@ function ReportReasonOption({ value, label, checked, onChange }: ReportReasonOpt
         value={value}
         checked={checked}
         onChange={() => onChange(value)}
-        className="sr-only"
+        className="peer sr-only"
       />
       {checked ? (
-        <CheckboxSelectedIconFill className="size-5 text-bg-accent" />
+        <CheckboxSelectedIconFill className="size-5 rounded-sm text-bg-accent peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-bg-accent" />
       ) : (
-        <CheckboxEmptyIconFill className="size-5 text-black/8" />
+        <CheckboxEmptyIconFill className="size-5 rounded-sm text-black/8 peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-bg-accent" />
       )}
       <span className="body-1-medium text-text-neutral-primary">{label}</span>
     </label>
