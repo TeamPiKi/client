@@ -150,7 +150,7 @@ function FolderDetailView({ folder }: { folder: FolderT }) {
             <>
               <p className="flex items-center gap-1 text-text-neutral-tertiary">
                 {!folder.isPublic && (
-                  <LockIconFill aria-hidden className="size-4 text-icon-neutral-secondary" />
+                  <LockIconFill aria-hidden className="size-4.5 text-icon-neutral-secondary" />
                 )}
                 상품 {formatWishCount(folder.wishCount)}
               </p>

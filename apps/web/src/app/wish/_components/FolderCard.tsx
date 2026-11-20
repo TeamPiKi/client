@@ -113,10 +113,10 @@ function FolderCard({
       </Link>
       {!isPublic && (
         <div
-          className="pointer-events-none absolute top-3 right-3 flex size-6 items-center justify-center rounded-full bg-black/50"
+          className="pointer-events-none absolute top-3 right-3 flex size-[26px] items-center justify-center rounded-full bg-black/30"
           style={{ zIndex: Z_INDEX.BASE_IMAGE + 1 }}
         >
-          <LockIconFill aria-hidden className="size-4 text-icon-neutral-inverse" />
+          <LockIconFill aria-hidden className="size-4.5 text-icon-neutral-inverse" />
         </div>
       )}
       <div className="absolute right-3 bottom-[34px] flex">
