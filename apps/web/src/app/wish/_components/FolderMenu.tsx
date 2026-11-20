@@ -1,5 +1,7 @@
 'use client';
 
+import { useRef } from 'react';
+
 import {
   FolderIconFill,
   LockIconFill,
@@ -29,28 +31,42 @@ function FolderMenu({
   onRename,
   onDelete,
 }: FolderMenuProps) {
+  const isItemSelectedRef = useRef(false);
+
+  const handleSelect = (callback: () => void) => () => {
+    isItemSelectedRef.current = true;
+    callback();
+  };
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger aria-label={`${folderName} 폴더 메뉴`}>
         <ThreeDotVerticalIconFill className="size-5 text-icon-neutral-primary" />
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" sideOffset={12}>
+      <DropdownMenuContent
+        align="end"
+        sideOffset={12}
+        onCloseAutoFocus={event => {
+          if (isItemSelectedRef.current) event.preventDefault();
+          isItemSelectedRef.current = false;
+        }}
+      >
         {isPublic ? (
-          <DropdownMenuItem onSelect={onToggleVisibility}>
+          <DropdownMenuItem onSelect={handleSelect(onToggleVisibility)}>
             <LockIconFill aria-hidden />
             비공개로 전환
           </DropdownMenuItem>
         ) : (
-          <DropdownMenuItem onSelect={onToggleVisibility}>
+          <DropdownMenuItem onSelect={handleSelect(onToggleVisibility)}>
             <UnlockIconFill aria-hidden />
             공개로 전환
           </DropdownMenuItem>
         )}
-        <DropdownMenuItem onSelect={onRename}>
+        <DropdownMenuItem onSelect={handleSelect(onRename)}>
           <FolderIconFill aria-hidden />
           폴더명 변경하기
         </DropdownMenuItem>
-        <DropdownMenuItem onSelect={onDelete}>
+        <DropdownMenuItem onSelect={handleSelect(onDelete)}>
           <TrashIconFill aria-hidden />
           삭제하기
         </DropdownMenuItem>

@@ -30,7 +30,6 @@ function DropdownMenuContent({
   className,
   sideOffset = 4,
   style,
-  onCloseAutoFocus,
   ...props
 }: React.ComponentProps<typeof DropdownMenuPrimitive.Content>) {
   return (
@@ -52,10 +51,6 @@ function DropdownMenuContent({
             className
           )}
           style={{ zIndex: Z_INDEX.DROPDOWN_MENU, ...style }}
-          onCloseAutoFocus={event => {
-            event.preventDefault();
-            onCloseAutoFocus?.(event);
-          }}
           {...props}
         />
       </DropdownMenuPrimitive.Portal>
