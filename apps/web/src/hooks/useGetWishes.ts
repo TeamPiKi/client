@@ -4,11 +4,17 @@ import { wishesInfiniteQueryOptions } from '@/apis/getWishes';
 import type { GetWishesRequestT } from '@/types/wish';
 
 export const useGetWishes = (request: GetWishesRequestT = {}) => {
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } = useSuspenseInfiniteQuery(
-    wishesInfiniteQueryOptions(request)
-  );
+  const { data, fetchNextPage, hasNextPage, isFetching, isFetchingNextPage, isFetchNextPageError } =
+    useSuspenseInfiniteQuery(wishesInfiniteQueryOptions(request));
 
   const wishesData = data.pages.flatMap(page => page.data);
 
-  return { wishesData, fetchNextPage, hasNextPage, isFetchingNextPage };
+  return {
+    wishesData,
+    fetchNextPage,
+    hasNextPage,
+    isFetching,
+    isFetchingNextPage,
+    isFetchNextPageError,
+  };
 };
