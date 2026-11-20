@@ -17,7 +17,10 @@ function DropdownMenuTrigger({
   return (
     <DropdownMenuPrimitive.Trigger
       data-slot="dropdown-menu-trigger"
-      className={cn('cursor-pointer', className)}
+      className={cn(
+        'relative cursor-pointer after:absolute after:top-1/2 after:left-1/2 after:size-10 after:-translate-x-1/2 after:-translate-y-1/2',
+        className
+      )}
       {...props}
     />
   );
