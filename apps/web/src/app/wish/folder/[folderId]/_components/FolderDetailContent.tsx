@@ -1,10 +1,15 @@
 'use client';
 
+import { useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
+import { foldersQueryOptions } from '@/apis/getFolders';
+import { wishesInfiniteQueryOptions } from '@/apis/getWishes';
 import { ChevronBackwardIconFill } from '@/assets/icons';
+import NextPageStatus from '@/components/common/next-page-status';
+import PullToRefresh from '@/components/common/pull-to-refresh';
 import WishGrid from '@/components/common/wish-grid';
 import { Header } from '@/components/header';
 import Spacing from '@/components/spacing';
@@ -14,8 +19,10 @@ import { useBackWithFallback } from '@/hooks/useBackWithFallback';
 import { useGetFolders } from '@/hooks/useGetFolders';
 import { useGetWishes } from '@/hooks/useGetWishes';
 import useIntersectionObserver from '@/hooks/useIntersectionObserver';
+import { usePullToRefresh } from '@/hooks/usePullToRefresh';
 import { useScrollRestoration } from '@/hooks/useScrollRestoration';
 import type { FolderT, FolderWishSelectionT } from '@/types/folder';
+import { refetchFirstPage } from '@/utils/refetchFirstPage';
 import { SCROLL_NAMESPACE } from '@/utils/scrollRestoration';
 
 import WishEditActionBar from '../../../_common/_components/WishEditActionBar';
@@ -34,10 +41,20 @@ type FolderDetailContentProps = {
 function FolderDetailView({ folder }: { folder: FolderT }) {
   const backWithFallback = useBackWithFallback();
 
-  const { wishesData, fetchNextPage, hasNextPage, isFetchingNextPage } = useGetWishes({
+  const {
+    wishesData,
+    fetchNextPage,
+    hasNextPage,
+    isFetching,
+    isFetchingNextPage,
+    isFetchNextPageError,
+  } = useGetWishes({
     folderId: folder.id,
   });
-  const bottomRef = useIntersectionObserver(fetchNextPage, hasNextPage && !isFetchingNextPage);
+  const bottomRef = useIntersectionObserver(
+    fetchNextPage,
+    hasNextPage && !isFetching && !isFetchNextPageError
+  );
 
   const scrollRestoration = {
     namespace: SCROLL_NAMESPACE.WISHLIST_FOLDER,
@@ -98,6 +115,19 @@ function FolderDetailView({ folder }: { folder: FolderT }) {
 
   const handleDelete = () => deleteFolderWishesMutation({ selection, count: selectedCount });
 
+  const queryClient = useQueryClient();
+  const pullToRefresh = usePullToRefresh(
+    () =>
+      Promise.all([
+        refetchFirstPage(queryClient, wishesInfiniteQueryOptions({ folderId: folder.id }).queryKey),
+        queryClient.refetchQueries(
+          { queryKey: foldersQueryOptions.queryKey },
+          { throwOnError: true }
+        ),
+      ]),
+    { enabled: mode !== WISH_MODE.EDIT }
+  );
+
   return (
     <>
       <div
@@ -129,6 +159,7 @@ function FolderDetailView({ folder }: { folder: FolderT }) {
             />
           </div>
         )}
+        <PullToRefresh {...pullToRefresh} />
         <Spacing size={24} />
         <div className="flex items-center justify-between px-5 body-2-medium">
           {mode === WISH_MODE.EDIT ? (
@@ -176,7 +207,12 @@ function FolderDetailView({ folder }: { folder: FolderT }) {
           onToggleSelect: handleToggle,
         })}
       />
-      <div ref={bottomRef} />
+      <NextPageStatus
+        ref={bottomRef}
+        isFetching={isFetchingNextPage}
+        isError={isFetchNextPageError}
+        onRetry={fetchNextPage}
+      />
 
       {mode === WISH_MODE.EDIT && (
         <WishEditActionBar
