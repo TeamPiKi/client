@@ -1,3 +1,5 @@
+import type { ReactNode } from 'react';
+
 import BaseImage from '@/components/base-image';
 import Skeleton from '@/components/skeleton';
 
@@ -5,9 +7,10 @@ type FriendListItemProps = {
   nickname: string;
   profileImage: string;
   description?: string;
+  action?: ReactNode;
 };
 
-function FriendListItem({ nickname, profileImage, description }: FriendListItemProps) {
+function FriendListItem({ nickname, profileImage, description, action }: FriendListItemProps) {
   return (
     <li className="flex h-17 items-center gap-3.5 p-5">
       <span className="relative size-7.5 shrink-0 overflow-hidden rounded-full outline-[2.6px] outline-white">
@@ -25,6 +28,7 @@ function FriendListItem({ nickname, profileImage, description }: FriendListItemP
           <p className="truncate caption-1-regular text-text-neutral-secondary">{description}</p>
         )}
       </div>
+      {action}
     </li>
   );
 }
