@@ -7,6 +7,7 @@ import { LockIconFill } from '@/assets/icons';
 import ImageIconOutline from '@/assets/icons/outline/image.svg';
 import BaseImage from '@/components/base-image';
 import { ROUTES } from '@/consts/route';
+import { Z_INDEX } from '@/consts/zIndex';
 import { cn } from '@/utils/cn';
 import { SCROLL_NAMESPACE, saveScrollAnchor } from '@/utils/scrollRestoration';
 
@@ -111,7 +112,10 @@ function FolderCard({
         </div>
       </Link>
       {!isPublic && (
-        <div className="pointer-events-none absolute top-3 right-3 flex size-6 items-center justify-center rounded-full bg-black/50">
+        <div
+          className="pointer-events-none absolute top-3 right-3 flex size-6 items-center justify-center rounded-full bg-black/50"
+          style={{ zIndex: Z_INDEX.BASE_IMAGE + 1 }}
+        >
           <LockIconFill aria-hidden className="size-4 text-icon-neutral-inverse" />
         </div>
       )}
