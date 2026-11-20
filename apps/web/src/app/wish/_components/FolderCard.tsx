@@ -3,9 +3,11 @@
 import Link from 'next/link';
 import type { MouseEvent } from 'react';
 
+import { LockIconFill } from '@/assets/icons';
 import ImageIconOutline from '@/assets/icons/outline/image.svg';
 import BaseImage from '@/components/base-image';
 import { ROUTES } from '@/consts/route';
+import { Z_INDEX } from '@/consts/zIndex';
 import { cn } from '@/utils/cn';
 import { SCROLL_NAMESPACE, saveScrollAnchor } from '@/utils/scrollRestoration';
 
@@ -19,6 +21,8 @@ type FolderCardProps = {
   wishCount: number;
   /** 앞에서부터 최대 3장 사용 */
   thumbnailUrls: (string | null)[];
+  isPublic: boolean;
+  onToggleVisibility: () => void;
   onRename: () => void;
   onDelete: () => void;
 };
@@ -78,6 +82,8 @@ function FolderCard({
   name,
   wishCount,
   thumbnailUrls,
+  isPublic,
+  onToggleVisibility,
   onRename,
   onDelete,
 }: FolderCardProps) {
@@ -105,8 +111,23 @@ function FolderCard({
           <p className="caption-1-regular text-text-neutral-secondary">위시 {wishCount}개</p>
         </div>
       </Link>
+      {!isPublic && (
+        <div
+          className="pointer-events-none absolute top-3 right-3 flex size-[26px] items-center justify-center rounded-full bg-black/30"
+          style={{ zIndex: Z_INDEX.BASE_IMAGE + 1 }}
+        >
+          <LockIconFill aria-hidden className="size-4.5 text-icon-neutral-inverse" />
+          <span className="sr-only">비공개 폴더</span>
+        </div>
+      )}
       <div className="absolute right-3 bottom-[34px] flex">
-        <FolderMenu folderName={name} onRename={onRename} onDelete={onDelete} />
+        <FolderMenu
+          folderName={name}
+          isPublic={isPublic}
+          onToggleVisibility={onToggleVisibility}
+          onRename={onRename}
+          onDelete={onDelete}
+        />
       </div>
     </div>
   );

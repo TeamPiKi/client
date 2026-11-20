@@ -7,7 +7,7 @@ import { toast } from 'sonner';
 
 import { foldersQueryOptions } from '@/apis/getFolders';
 import { wishesInfiniteQueryOptions } from '@/apis/getWishes';
-import { ChevronBackwardIconFill } from '@/assets/icons';
+import { ChevronBackwardIconFill, LockIconFill } from '@/assets/icons';
 import NextPageStatus from '@/components/common/next-page-status';
 import PullToRefresh from '@/components/common/pull-to-refresh';
 import WishGrid from '@/components/common/wish-grid';
@@ -179,7 +179,15 @@ function FolderDetailView({ folder }: { folder: FolderT }) {
             </>
           ) : (
             <>
-              <p className="text-text-neutral-tertiary">상품 {formatWishCount(folder.wishCount)}</p>
+              <p className="flex items-center gap-1 text-text-neutral-tertiary">
+                {!folder.isPublic && (
+                  <>
+                    <LockIconFill aria-hidden className="size-4.5 text-icon-neutral-secondary" />
+                    <span className="sr-only">비공개 폴더</span>
+                  </>
+                )}
+                상품 {formatWishCount(folder.wishCount)}
+              </p>
               <div className="flex items-center gap-3 text-text-neutral-secondary">
                 <button
                   type="button"

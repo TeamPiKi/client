@@ -23,6 +23,7 @@ export const ENDPOINTS = {
   /** 위시 폴더 */
   FOLDERS: '/api/v1/folders',
   FOLDER: (id: number) => `/api/v1/folders/${id}`,
+  FOLDER_VISIBILITY: (id: number) => `/api/v1/folders/${id}/visibility`,
   FOLDER_WISHES: (id: number) => `/api/v1/folders/${id}/wishes`,
   FOLDER_WISHES_MOVE: (id: number) => `/api/v1/folders/${id}/wishes/move`,
 
