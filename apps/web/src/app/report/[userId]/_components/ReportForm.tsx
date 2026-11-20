@@ -23,7 +23,7 @@ function ReportForm() {
   const [etcReason, setEtcReason] = useState<string>('');
 
   const handleReasonChange = (reason: ReportReasonT) => {
-    setSelectedReason(reason);
+    setSelectedReason(prev => (prev === reason ? null : reason));
     setEtcReason('');
   };
 
@@ -48,7 +48,6 @@ function ReportForm() {
 
         <Spacing size={43} />
 
-        {/** TODO: 다시 누르면 선택 해제되는 토글 여부 디자인 답변 따라 수정 필요 https://www.figma.com/design/NlgTPUvrwaHNDcBy33bDf2/?node-id=4419-31989#2015080227 */}
         <fieldset className="flex flex-col gap-8">
           <legend className="sr-only">신고 사유</legend>
           {REPORT_REASONS.map(({ value, label }) => (
@@ -92,7 +91,7 @@ function ReportReasonOption({ value, label, checked, onChange }: ReportReasonOpt
   return (
     <label className="flex cursor-pointer items-center gap-4">
       <input
-        type="radio"
+        type="checkbox"
         name="reason"
         value={value}
         checked={checked}
