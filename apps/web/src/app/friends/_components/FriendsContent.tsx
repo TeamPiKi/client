@@ -1,0 +1,170 @@
+'use client';
+
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useState } from 'react';
+
+import ConfirmDialog from '@/components/common/confirm-dialog';
+import UnderlineTab from '@/components/common/underline-tab';
+import { ROUTES } from '@/consts/route';
+import { useDeleteFriend } from '@/hooks/useDeleteFriend';
+import { usePostBlock } from '@/hooks/usePostBlock';
+import { replaceUrlKeepingState } from '@/utils/replaceUrlKeepingState';
+
+import { BLOCKED_USERS_MOCK, FRIENDS_MOCK } from '../_consts/friendMock';
+import { FRIEND_TAB, FRIEND_TAB_PATH } from '../_consts/friendTab';
+import { useDeleteBlock } from '../_hooks/useDeleteBlock';
+import type { FriendT, FriendTabT } from '../_types/friend';
+import { parseFriendTabParam } from '../_utils/friendSearchParams';
+import BlockedUserMenu from './BlockedUserMenu';
+import FriendEmptyState from './FriendEmptyState';
+import FriendListItem from './FriendListItem';
+import FriendMenu from './FriendMenu';
+
+const FRIEND_TAB_PANEL_ID = 'friend-tab-panel';
+
+function FriendsContent() {
+  const searchParams = useSearchParams();
+  const activeTab = parseFriendTabParam(searchParams.get('tab'));
+
+  const router = useRouter();
+
+  /** TEMP: 목데이터 삭제·차단 결과 표시용 상태라 API 연동 시 조회 쿼리로 교체함 */
+  const [friends, setFriends] = useState(FRIENDS_MOCK);
+  /** TEMP: 목데이터 차단 해제 결과 표시용 상태라 API 연동 시 조회 쿼리로 교체함 */
+  const [blockedUsers, setBlockedUsers] = useState(BLOCKED_USERS_MOCK);
+
+  const [deleteTarget, setDeleteTarget] = useState<FriendT | null>(null);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [blockTarget, setBlockTarget] = useState<FriendT | null>(null);
+  const [isBlockDialogOpen, setIsBlockDialogOpen] = useState(false);
+
+  const removeFriend = (userId: number) =>
+    setFriends(prev => prev.filter(friend => friend.userId !== userId));
+
+  const { deleteFriendMutation, isDeleteFriendPending } = useDeleteFriend({
+    onSuccess: userId => {
+      removeFriend(userId);
+      setIsDeleteDialogOpen(false);
+    },
+  });
+
+  /** TODO: 차단한 친구를 차단 목록으로 옮길지 기획 확인 후 반영 */
+  const { postBlockMutation, isPostBlockPending } = usePostBlock({
+    onSuccess: userId => {
+      removeFriend(userId);
+      setIsBlockDialogOpen(false);
+    },
+  });
+
+  const { deleteBlockMutation } = useDeleteBlock({
+    onSuccess: userId => setBlockedUsers(prev => prev.filter(user => user.userId !== userId)),
+  });
+
+  const handleTabChange = (tab: FriendTabT) => {
+    if (tab !== activeTab) replaceUrlKeepingState(FRIEND_TAB_PATH[tab]);
+  };
+
+  return (
+    <>
+      <div className="px-5 pt-4">
+        <UnderlineTab
+          tabs={[
+            { value: FRIEND_TAB.FRIENDS, label: `친구 ${friends.length}` },
+            { value: FRIEND_TAB.BLOCKED, label: '차단 목록' },
+          ]}
+          activeTab={activeTab}
+          onTabChange={handleTabChange}
+          idPrefix="friend-tab"
+          panelId={FRIEND_TAB_PANEL_ID}
+        />
+      </div>
+
+      <div id={FRIEND_TAB_PANEL_ID} role="tabpanel" aria-labelledby={`friend-tab-${activeTab}`}>
+        {activeTab === FRIEND_TAB.FRIENDS &&
+          (friends.length > 0 ? (
+            <ul className="flex flex-col gap-1.5 pt-7">
+              {friends.map(friend => (
+                <FriendListItem
+                  key={friend.userId}
+                  nickname={friend.nickname}
+                  profileImage={friend.profileImage}
+                  description={
+                    friend.isPublic
+                      ? `폴더 ${friend.folderCount}개 · 위시 ${friend.wishCount}개`
+                      : '비공개'
+                  }
+                  action={
+                    <FriendMenu
+                      nickname={friend.nickname}
+                      onDelete={() => {
+                        setDeleteTarget(friend);
+                        setIsDeleteDialogOpen(true);
+                      }}
+                      onBlock={() => {
+                        setBlockTarget(friend);
+                        setIsBlockDialogOpen(true);
+                      }}
+                      onReport={() => router.push(ROUTES.REPORT(friend.userId))}
+                    />
+                  }
+                />
+              ))}
+            </ul>
+          ) : (
+            <FriendEmptyState
+              title="아직 친구가 없어요"
+              description="친구를 추가하고 서로의 위시를 구경해 보세요"
+            />
+          ))}
+
+        {activeTab === FRIEND_TAB.BLOCKED &&
+          (blockedUsers.length > 0 ? (
+            <ul className="flex flex-col gap-1.5 pt-7">
+              {blockedUsers.map(user => (
+                <FriendListItem
+                  key={user.userId}
+                  nickname={user.nickname}
+                  profileImage={user.profileImage}
+                  action={
+                    <BlockedUserMenu
+                      nickname={user.nickname}
+                      onUnblock={() => deleteBlockMutation(user.userId)}
+                      onReport={() => router.push(ROUTES.REPORT(user.userId))}
+                    />
+                  }
+                />
+              ))}
+            </ul>
+          ) : (
+            <FriendEmptyState
+              title="차단한 사용자가 없어요"
+              description="차단한 사용자는 이곳에서 확인할 수 있어요"
+            />
+          ))}
+      </div>
+
+      <ConfirmDialog
+        open={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+        title={`'${deleteTarget?.nickname}' 님을 친구에서 삭제할까요?`}
+        description="상대방에게 알림은 가지 않아요."
+        confirmLabel="삭제하기"
+        icon={null}
+        isPending={isDeleteFriendPending}
+        onConfirm={() => deleteTarget && deleteFriendMutation(deleteTarget.userId)}
+      />
+      <ConfirmDialog
+        open={isBlockDialogOpen}
+        onOpenChange={setIsBlockDialogOpen}
+        title={`'${blockTarget?.nickname}'님을 차단할까요?`}
+        description="차단하면 서로의 위시를 볼 수 없어요."
+        confirmLabel="차단하기"
+        icon={null}
+        isPending={isPostBlockPending}
+        onConfirm={() => blockTarget && postBlockMutation(blockTarget.userId)}
+      />
+    </>
+  );
+}
+
+export default FriendsContent;

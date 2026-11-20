@@ -30,6 +30,8 @@ export const ROUTES = {
   MYPAGE_WITHDRAW: '/mypage/withdraw',
   TOURNAMENT_HISTORY: '/tournament/history',
   REPORT: (userId: number) => `/report/${userId}`,
+  FRIENDS: '/friends',
+  FRIENDS_BLOCKED_TAB: '/friends?tab=blocked',
 
   /** 4. Authorized Guest or Member */
   TOURNAMENT_CREATE: (tournamentId: number, highlightItemId?: number) =>

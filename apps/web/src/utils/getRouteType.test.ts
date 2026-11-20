@@ -12,6 +12,7 @@ describe('getRouteType', () => {
     expect(getRouteType('/wish/3')).toBe('MEMBER_ONLY');
     expect(getRouteType('/wish/folder/3')).toBe('MEMBER_ONLY');
     expect(getRouteType('/report/3')).toBe('MEMBER_ONLY');
+    expect(getRouteType('/friends')).toBe('MEMBER_ONLY');
     expect(getRouteType('/wishlist')).toBeNull(); // 올바르지 않은 경로 테스트
   });
 

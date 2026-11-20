@@ -10,12 +10,14 @@ import { wishesInfiniteQueryOptions } from '@/apis/getWishes';
 import { wishesCountQueryOptions } from '@/apis/getWishesCount';
 import CollapsibleTitle from '@/components/common/collapsible-title';
 import PullToRefresh from '@/components/common/pull-to-refresh';
+import UnderlineTab from '@/components/common/underline-tab';
 import { Z_INDEX } from '@/consts/zIndex';
 import { useGetWishesCount } from '@/hooks/useGetWishesCount';
 import { usePullToRefresh } from '@/hooks/usePullToRefresh';
 import type { FolderT } from '@/types/folder';
 import { cn } from '@/utils/cn';
 import { refetchFirstPage } from '@/utils/refetchFirstPage';
+import { replaceUrlKeepingState } from '@/utils/replaceUrlKeepingState';
 
 import WishEditActionBar from '../_common/_components/WishEditActionBar';
 import WishEditHeader from '../_common/_components/WishEditHeader';
@@ -23,17 +25,22 @@ import { WISH_MODE } from '../_common/_consts/wishMode';
 import { useDeleteWishes } from '../_common/_hooks/useDeleteWishes';
 import { usePostFolderWishes } from '../_common/_hooks/usePostFolderWishes';
 import { useWishEditMode } from '../_common/_hooks/useWishEditMode';
-import { WISH_TAB } from '../_consts/wishTab';
+import { WISH_TAB, WISH_TABS, WISH_TAB_PANEL_ID, WISH_TAB_PATH } from '../_consts/wishTab';
 import { useShareIntentWish } from '../_hooks/useShareIntentWish';
+import type { WishTabT } from '../_types/wishTab';
 import { parseWishTabParam } from '../_utils/wishSearchParams';
 import WishSearch from './WishSearch';
-import WishTabBar from './WishTabBar';
 import WishTabContent from './WishTabContent';
 import WishTabSummary from './WishTabSummary';
 
 function WishListContent() {
   const searchParams = useSearchParams();
-  const isFolderTab = parseWishTabParam(searchParams.get('tab')) === WISH_TAB.FOLDER;
+  const activeTab = parseWishTabParam(searchParams.get('tab'));
+  const isFolderTab = activeTab === WISH_TAB.FOLDER;
+
+  const handleTabChange = (tab: WishTabT) => {
+    if (tab !== activeTab) replaceUrlKeepingState(WISH_TAB_PATH[tab]);
+  };
 
   useShareIntentWish();
 
@@ -95,7 +102,13 @@ function WishListContent() {
           <>
             <CollapsibleTitle>내 위시리스트</CollapsibleTitle>
             <div>
-              <WishTabBar />
+              <UnderlineTab
+                tabs={WISH_TABS}
+                activeTab={activeTab}
+                onTabChange={handleTabChange}
+                idPrefix="wish-tab"
+                panelId={WISH_TAB_PANEL_ID}
+              />
               <PullToRefresh {...pullToRefresh} />
             </div>
           </>
