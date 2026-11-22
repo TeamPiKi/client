@@ -1,5 +1,7 @@
 'use client';
 
+import type { KeyboardEvent } from 'react';
+
 import { cn } from '@/utils/cn';
 
 import type { UnderlineTabItemT } from './underlineTab.types';
@@ -21,8 +23,23 @@ function UnderlineTab<T extends string>({
   idPrefix,
   panelId,
 }: UnderlineTabProps<T>) {
+  /** 좌우 방향키는 포커스만 옮기고, 선택은 Enter·Space(버튼 클릭)로 바꾼다 */
+  const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+    if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
+
+    const tabElements = Array.from(
+      event.currentTarget.querySelectorAll<HTMLButtonElement>('[role="tab"]')
+    );
+    const currentIndex = tabElements.indexOf(event.target as HTMLButtonElement);
+    if (currentIndex === -1) return;
+
+    event.preventDefault();
+    const offset = event.key === 'ArrowRight' ? 1 : -1;
+    tabElements[(currentIndex + offset + tabElements.length) % tabElements.length]?.focus();
+  };
+
   return (
-    <div role="tablist" className="flex w-full">
+    <div role="tablist" className="flex w-full" onKeyDown={handleKeyDown}>
       {tabs.map(({ value, label }) => {
         const isActive = activeTab === value;
         return (
@@ -33,6 +50,7 @@ function UnderlineTab<T extends string>({
             role="tab"
             aria-selected={isActive}
             aria-controls={panelId}
+            tabIndex={isActive ? 0 : -1}
             onClick={() => onTabChange(value)}
             className={cn(
               'flex flex-1 cursor-pointer flex-col items-center gap-[7px] pt-[9px] body-1-semibold transition-colors',
