@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 
 import ConfirmDialog from '@/components/common/confirm-dialog';
 import UnderlineTab from '@/components/common/underline-tab';
@@ -37,6 +37,17 @@ function FriendsContent() {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [blockTarget, setBlockTarget] = useState<FriendT | null>(null);
   const [isBlockDialogOpen, setIsBlockDialogOpen] = useState(false);
+  /** 확인창 취소 시 포커스를 되돌릴 행의 메뉴 버튼 (삭제·차단 후엔 행이 사라져 복원하지 않음) */
+  const menuTriggerRef = useRef<HTMLButtonElement | null>(null);
+
+  const handleDialogCloseAutoFocus = (event: Event) => {
+    const trigger = menuTriggerRef.current;
+    menuTriggerRef.current = null;
+    if (!trigger?.isConnected) return;
+
+    event.preventDefault();
+    trigger.focus();
+  };
 
   const removeFriend = (userId: number) =>
     setFriends(prev => prev.filter(friend => friend.userId !== userId));
@@ -96,11 +107,13 @@ function FriendsContent() {
                   action={
                     <FriendMenu
                       nickname={friend.nickname}
-                      onDelete={() => {
+                      onDelete={trigger => {
+                        menuTriggerRef.current = trigger;
                         setDeleteTarget(friend);
                         setIsDeleteDialogOpen(true);
                       }}
-                      onBlock={() => {
+                      onBlock={trigger => {
+                        menuTriggerRef.current = trigger;
                         setBlockTarget(friend);
                         setIsBlockDialogOpen(true);
                       }}
@@ -152,6 +165,7 @@ function FriendsContent() {
         icon={null}
         isPending={isDeleteFriendPending}
         onConfirm={() => deleteTarget && deleteFriendMutation(deleteTarget.userId)}
+        onCloseAutoFocus={handleDialogCloseAutoFocus}
       />
       <ConfirmDialog
         open={isBlockDialogOpen}
@@ -162,6 +176,7 @@ function FriendsContent() {
         icon={null}
         isPending={isPostBlockPending}
         onConfirm={() => blockTarget && postBlockMutation(blockTarget.userId)}
+        onCloseAutoFocus={handleDialogCloseAutoFocus}
       />
     </>
   );
