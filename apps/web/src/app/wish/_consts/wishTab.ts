@@ -1,4 +1,4 @@
-import type { UnderlineTabItemT } from '@/components/common/underline-tab/underlineTab.types';
+import type { UnderlineTabItemT } from '@/components/common/underline-tab';
 import { ROUTES } from '@/consts/route';
 
 import type { WishTabT } from '../_types/wishTab';

@@ -1,4 +1,4 @@
-import type { UnderlineTabItemT } from '@/components/common/underline-tab/underlineTab.types';
+import type { UnderlineTabItemT } from '@/components/common/underline-tab';
 import { TOURNAMENT_STATUS } from '@/consts/tournament';
 import type { TournamentStatusT } from '@/types/tournament';
 

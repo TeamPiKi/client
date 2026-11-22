@@ -4,6 +4,8 @@ import { cn } from '@/utils/cn';
 
 import type { UnderlineTabItemT } from './underlineTab.types';
 
+export type { UnderlineTabItemT } from './underlineTab.types';
+
 type UnderlineTabProps<T extends string> = {
   tabs: readonly UnderlineTabItemT<T>[];
   activeTab: T;
@@ -38,10 +40,7 @@ function UnderlineTab<T extends string>({
             )}
           >
             {label}
-            <span
-              className={cn('h-0.5 w-full', isActive && 'bg-gray-900')}
-              aria-hidden
-            />
+            <span className={cn('h-0.5 w-full', isActive && 'bg-gray-900')} aria-hidden />
           </button>
         );
       })}
