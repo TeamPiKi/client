@@ -56,4 +56,10 @@ describe('getRouteType', () => {
     expect(getRouteType('/mypage/edit')).toBe('MEMBER_ONLY');
     expect(getRouteType('/mypage/unknown')).toBeNull();
   });
+
+  it('프로필은 userId 세그먼트 하나만 게스트에게도 허용한다', () => {
+    expect(getRouteType('/profile/3')).toBe('MEMBER_AND_GUEST');
+    expect(getRouteType('/profile')).toBeNull();
+    expect(getRouteType('/profile/3/extra')).toBeNull();
+  });
 });

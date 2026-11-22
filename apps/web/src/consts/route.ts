@@ -18,6 +18,7 @@ export const ROUTES = {
   TOURNAMENT_JOIN_BY_LINK: (id: number) => `/tournament/join/${id}`,
   MYPAGE: '/mypage',
   PLAY_FROM_LINK: (sourceTournamentId: number) => `/play/${sourceTournamentId}`,
+  PROFILE: (userId: number) => `/profile/${userId}`,
 
   /** 3. Member Only */
   WISHLIST: '/wish',
