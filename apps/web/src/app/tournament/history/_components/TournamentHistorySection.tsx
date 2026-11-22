@@ -6,20 +6,25 @@ import { Suspense } from 'react';
 
 import CollapsibleTitle from '@/components/common/collapsible-title';
 import PullToRefresh from '@/components/common/pull-to-refresh';
+import UnderlineTab from '@/components/common/underline-tab';
 import { QUERY_KEYS } from '@/consts/queryKeys';
 import { Z_INDEX } from '@/consts/zIndex';
 import { usePullToRefresh } from '@/hooks/usePullToRefresh';
 import { replaceUrlKeepingState } from '@/utils/replaceUrlKeepingState';
 
 import { PLAY_TYPE_BY_FILTER, PLAY_TYPE_FILTER } from '../_consts/tournamentPlayType';
-import { STATUS_BY_TAB } from '../_consts/tournamentTab';
+import {
+  STATUS_BY_TAB,
+  TOURNAMENT_STATUS_TABS,
+  TOURNAMENT_TAB_ID_PREFIX,
+  TOURNAMENT_TAB_PANEL_ID,
+} from '../_consts/tournamentTab';
 import type { TournamentPlayTypeFilterT } from '../_types/tournamentPlayType';
 import type { TournamentStatusTabT } from '../_types/tournamentTab';
 import { parsePlayParam, parseTabParam } from '../_utils/tournamentSearchParams';
 import TournamentHistoryList from './TournamentHistoryList';
 import TournamentHistorySkeleton from './TournamentHistorySkeleton';
 import TournamentPlayTypeFilter from './TournamentPlayTypeFilter';
-import TournamentStatusTab from './TournamentStatusTab';
 
 function TournamentHistorySection() {
   const searchParams = useSearchParams();
@@ -61,7 +66,13 @@ function TournamentHistorySection() {
       >
         <CollapsibleTitle>내 토너먼트</CollapsibleTitle>
         <div className="flex flex-col gap-3">
-          <TournamentStatusTab activeTab={activeTab} onTabChange={handleTabChange} />
+          <UnderlineTab
+            tabs={TOURNAMENT_STATUS_TABS}
+            activeTab={activeTab}
+            onTabChange={handleTabChange}
+            idPrefix={TOURNAMENT_TAB_ID_PREFIX}
+            panelId={TOURNAMENT_TAB_PANEL_ID}
+          />
           <TournamentPlayTypeFilter
             activeFilter={activePlayTypeFilter}
             onFilterChange={handlePlayTypeFilterChange}
@@ -69,7 +80,12 @@ function TournamentHistorySection() {
         </div>
       </div>
       <PullToRefresh {...pullToRefresh} />
-      <div className="flex flex-1 flex-col gap-4 px-5 pt-4 pb-46">
+      <div
+        id={TOURNAMENT_TAB_PANEL_ID}
+        role="tabpanel"
+        aria-labelledby={`${TOURNAMENT_TAB_ID_PREFIX}-${activeTab}`}
+        className="flex flex-1 flex-col gap-4 px-5 pt-4 pb-46"
+      >
         <Suspense
           key={`${activeTab}-${activePlayTypeFilter}`}
           fallback={<TournamentHistorySkeleton />}
