@@ -14,6 +14,10 @@ export const STATUS_BY_TAB: Record<TournamentStatusTabT, TournamentStatusT[]> = 
   completed: [TOURNAMENT_STATUS.COMPLETED],
 };
 
+export const TOURNAMENT_TAB_ID_PREFIX = 'tournament-tab';
+
+export const TOURNAMENT_TAB_PANEL_ID = 'tournament-tab-panel';
+
 export const TOURNAMENT_STATUS_TABS: UnderlineTabItemT<TournamentStatusTabT>[] = [
   { value: 'ongoing', label: '진행 중' },
   { value: 'completed', label: '완료' },

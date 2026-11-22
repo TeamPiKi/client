@@ -13,7 +13,12 @@ import { usePullToRefresh } from '@/hooks/usePullToRefresh';
 import { replaceUrlKeepingState } from '@/utils/replaceUrlKeepingState';
 
 import { PLAY_TYPE_BY_FILTER, PLAY_TYPE_FILTER } from '../_consts/tournamentPlayType';
-import { STATUS_BY_TAB, TOURNAMENT_STATUS_TABS } from '../_consts/tournamentTab';
+import {
+  STATUS_BY_TAB,
+  TOURNAMENT_STATUS_TABS,
+  TOURNAMENT_TAB_ID_PREFIX,
+  TOURNAMENT_TAB_PANEL_ID,
+} from '../_consts/tournamentTab';
 import type { TournamentPlayTypeFilterT } from '../_types/tournamentPlayType';
 import type { TournamentStatusTabT } from '../_types/tournamentTab';
 import { parsePlayParam, parseTabParam } from '../_utils/tournamentSearchParams';
@@ -65,6 +70,8 @@ function TournamentHistorySection() {
             tabs={TOURNAMENT_STATUS_TABS}
             activeTab={activeTab}
             onTabChange={handleTabChange}
+            idPrefix={TOURNAMENT_TAB_ID_PREFIX}
+            panelId={TOURNAMENT_TAB_PANEL_ID}
           />
           <TournamentPlayTypeFilter
             activeFilter={activePlayTypeFilter}
@@ -73,7 +80,12 @@ function TournamentHistorySection() {
         </div>
       </div>
       <PullToRefresh {...pullToRefresh} />
-      <div className="flex flex-1 flex-col gap-4 px-5 pt-4 pb-46">
+      <div
+        id={TOURNAMENT_TAB_PANEL_ID}
+        role="tabpanel"
+        aria-labelledby={`${TOURNAMENT_TAB_ID_PREFIX}-${activeTab}`}
+        className="flex flex-1 flex-col gap-4 px-5 pt-4 pb-46"
+      >
         <Suspense
           key={`${activeTab}-${activePlayTypeFilter}`}
           fallback={<TournamentHistorySkeleton />}
