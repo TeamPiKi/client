@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useRef, useState } from 'react';
 
@@ -170,11 +171,20 @@ function ProfileContent({ profile, isGuest }: ProfileContentProps) {
         <ul className="grid grid-cols-2 gap-x-1.5 gap-y-8">
           {profile.folders.map(folder => (
             <li key={folder.folderId}>
-              <ProfileFolderCard
-                name={folder.name}
-                wishCount={folder.wishCount}
-                thumbnailUrls={folder.coverImageUrls}
-              />
+              <Link
+                href={
+                  relation === 'SELF'
+                    ? ROUTES.WISHLIST_FOLDER(folder.folderId)
+                    : ROUTES.EXPLORE_FOLDER(profile.userId, folder.folderId)
+                }
+                className="block"
+              >
+                <ProfileFolderCard
+                  name={folder.name}
+                  wishCount={folder.wishCount}
+                  thumbnailUrls={folder.coverImageUrls}
+                />
+              </Link>
             </li>
           ))}
         </ul>

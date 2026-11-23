@@ -103,8 +103,9 @@ function BottomTabBar() {
   const [isPressed, setIsPressed] = useState(false);
   const [isGrabbing, setIsGrabbing] = useState(false);
 
-  /** 폴더 상세는 위시 탭의 하위 화면이라 탭바 유지 */
+  /** 폴더 상세는 위시·탐색 탭의 하위 화면이라 탭바 유지 */
   const isWishFolderRoute = /^\/wish\/folder\/\d+$/.test(pathname);
+  const isExploreFolderRoute = /^\/explore\/folder\/[^/]+\/\d+$/.test(pathname);
   const activeIndex = TABS.findIndex(({ href }) => matchesTabPath(pathname, href));
 
   useEffect(
@@ -115,7 +116,8 @@ function BottomTabBar() {
   );
 
   // 탭 경로와 정확히 일치할 때만 노출 — 하위 상세/편집 라우트에서는 숨김
-  if (!isWishFolderRoute && !TABS.some(({ href }) => href === pathname)) return null;
+  if (!isWishFolderRoute && !isExploreFolderRoute && !TABS.some(({ href }) => href === pathname))
+    return null;
 
   const handlePointerDown = (event: React.PointerEvent) => {
     if (event.button !== 0 || isGrabbingRef.current) return;

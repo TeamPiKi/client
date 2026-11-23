@@ -1,15 +1,16 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { type InfiniteData, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
 import { TOAST_ACTION_DURATION_MS } from '@/components/toast/toast.const';
 import { QUERY_KEYS } from '@/consts/queryKeys';
 import { ROUTES } from '@/consts/route';
+import type { ApiResponseT } from '@/types/api';
 import { isGlobalNetError } from '@/utils/apiError';
 import { getApiErrorMessage } from '@/utils/getApiErrorMessage';
 
 import { postExploreWish } from '../_apis/postExploreWish';
-import type { ExploreWishDetailT } from '../_types/explore';
+import type { ExploreFolderT, ExploreWishDetailT, RecentWishT } from '../_types/explore';
 
 /** 다른 사람의 위시를 내 전체 위시에 담기 */
 export const usePostExploreWish = () => {
@@ -25,11 +26,34 @@ export const usePostExploreWish = () => {
         QUERY_KEYS.EXPLORE.WISH(wishId),
         prev => prev && { ...prev, isInMyWish: true }
       );
+      queryClient.setQueriesData<ExploreFolderT | null>(
+        { queryKey: ['explore', 'folder'] },
+        prev =>
+          prev && {
+            ...prev,
+            wishes: prev.wishes.map(wish =>
+              wish.wishId === wishId ? { ...wish, isInMyWish: true } : wish
+            ),
+          }
+      );
+      queryClient.setQueryData<InfiniteData<ApiResponseT<RecentWishT[]>>>(
+        QUERY_KEYS.EXPLORE.RECENT,
+        prev =>
+          prev && {
+            ...prev,
+            pages: prev.pages.map(page => ({
+              ...page,
+              data: page.data.map(wish =>
+                wish.wishId === wishId ? { ...wish, isInMyWish: true } : wish
+              ),
+            })),
+          }
+      );
       toast('내 위시에 상품을 담았어요', {
         duration: TOAST_ACTION_DURATION_MS,
         action: { label: '보러가기', onClick: () => router.push(ROUTES.WISHLIST) },
         /** 전역 액션 버튼은 회색이지만 이 토스트는 시안대로 흰색 */
-        classNames: { actionButton: '!text-text-neutral-inverse' },
+        classNames: { actionButton: '[&[data-button]]:!text-text-neutral-inverse' },
       });
     },
     onError: error => {

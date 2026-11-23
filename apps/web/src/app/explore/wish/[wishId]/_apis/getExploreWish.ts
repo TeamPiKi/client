@@ -2,10 +2,14 @@ import { queryOptions } from '@tanstack/react-query';
 
 import { QUERY_KEYS } from '@/consts/queryKeys';
 
-import { FRIEND_WISHES_MOCK, WINNER_WISHES_MOCK } from '../../../_common/_consts/exploreMock';
+import {
+  FRIEND_WISHES_MOCK,
+  RECENT_WISHES_MOCK,
+  WINNER_WISHES_MOCK,
+} from '../../../_common/_consts/exploreMock';
 import type { ExploreWishDetailT } from '../../../_common/_types/explore';
 
-/** TEMP: API 스펙 확정 전이라 1위 위시 · 친구가 담은 위시 목데이터로 상세 응답을 만들어 반환함 */
+/** TEMP: API 스펙 확정 전이라 1위 위시 · 친구가 담은 위시 · 방금 담긴 위시 목데이터로 상세 응답을 만들어 반환함 */
 export const getExploreWish = async (wishId: number): Promise<ExploreWishDetailT | null> => {
   const friendWish = FRIEND_WISHES_MOCK.find(wish => wish.wishId === wishId);
   if (friendWish) {
@@ -24,6 +28,36 @@ export const getExploreWish = async (wishId: number): Promise<ExploreWishDetailT
       savedCount: (wishId % 7) + 1,
       owner: { ...friend, isFriend: true },
       folder: wishId % 2 === 0 ? { id: wishId, name: '11월 위시리스트' } : null,
+      winnerTournament: null,
+    };
+  }
+
+  const recentWish = RECENT_WISHES_MOCK.find(wish => wish.wishId === wishId);
+  if (recentWish) {
+    const { item, isInMyWish, friend } = recentWish;
+    const isPrivateOwner = !friend && wishId % 3 === 0;
+
+    return {
+      wishId,
+      item: {
+        name: item.name,
+        price: item.price ?? 0,
+        discountRate: item.discountRate,
+        imageUrl: item.imageUrl ?? '',
+        sourceUrl: item.sourcePlatform ? 'https://29cm.onelink.me' : null,
+      },
+      isInMyWish,
+      savedCount: (wishId % 7) + 1,
+      owner: isPrivateOwner
+        ? null
+        : {
+            userId: friend?.userId ?? `user-${wishId}`,
+            nickname: friend?.nickname ?? '토라진 고양이',
+            profileImage:
+              friend?.profileImage ?? `https://picsum.photos/seed/piki-owner-${wishId}/80`,
+            isFriend: !!friend,
+          },
+      folder: !isPrivateOwner && wishId % 2 === 0 ? { id: wishId, name: '11월 위시리스트' } : null,
       winnerTournament: null,
     };
   }
