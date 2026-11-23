@@ -64,7 +64,7 @@ function TournamentHistorySection() {
         className="sticky top-0 flex w-full flex-col gap-6 bg-bg-layer-default px-5 pt-padding-top pb-3"
         style={{ zIndex: Z_INDEX.STICKY_HEADER }}
       >
-        <CollapsibleTitle>내 토너먼트</CollapsibleTitle>
+        <CollapsibleTitle title="내 토너먼트" />
         <div className="flex flex-col gap-3">
           <UnderlineTab
             tabs={TOURNAMENT_STATUS_TABS}

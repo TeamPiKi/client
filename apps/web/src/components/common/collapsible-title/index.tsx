@@ -9,11 +9,12 @@ import { getScrollContainer } from '@/utils/scrollRestoration';
 const TITLE_HEIGHT_WITH_GAP = 52;
 
 type CollapsibleTitleProps = {
-  children: React.ReactNode;
+  title: string;
+  right?: React.ReactNode;
 };
 
 /** NOTE: 부모는 gap-6 세로 flex 여야 함 */
-function CollapsibleTitle({ children }: CollapsibleTitleProps) {
+function CollapsibleTitle({ title, right }: CollapsibleTitleProps) {
   const [isHidden, setIsHidden] = useState(false);
 
   useEffect(() => {
@@ -38,9 +39,10 @@ function CollapsibleTitle({ children }: CollapsibleTitleProps) {
         isHidden ? '-mb-6 grid-rows-[0fr] opacity-0' : 'grid-rows-[1fr]'
       )}
     >
-      <h1 className="min-h-0 overflow-hidden heading-1-bold text-text-neutral-primary">
-        {children}
-      </h1>
+      <div className="flex min-h-0 items-center justify-between overflow-hidden">
+        <h1 className="heading-1-bold text-text-neutral-primary">{title}</h1>
+        {right}
+      </div>
     </div>
   );
 }
