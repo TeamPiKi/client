@@ -102,6 +102,7 @@ function FriendsContent() {
               {friends.map(friend => (
                 <FriendListItem
                   key={friend.userId}
+                  href={ROUTES.PROFILE(friend.userId)}
                   nickname={friend.nickname}
                   profileImage={friend.profileImage}
                   description={
@@ -141,6 +142,7 @@ function FriendsContent() {
               {blockedUsers.map(user => (
                 <FriendListItem
                   key={user.userId}
+                  href={ROUTES.PROFILE(user.userId)}
                   nickname={user.nickname}
                   profileImage={user.profileImage}
                   action={
