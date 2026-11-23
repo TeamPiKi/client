@@ -1,14 +1,19 @@
 'use client';
 
+import { useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 
 import { CheckCircledIconOutline } from '@/assets/icons';
 import Button from '@/components/button';
+import PullToRefresh from '@/components/common/pull-to-refresh';
+import { QUERY_KEYS } from '@/consts/queryKeys';
 import useIntersectionObserver from '@/hooks/useIntersectionObserver';
 import { usePostNotificationsRead } from '@/hooks/usePostNotificationsRead';
+import { usePullToRefresh } from '@/hooks/usePullToRefresh';
 import { cn } from '@/utils/cn';
 import { formatTimeKo } from '@/utils/formatDate';
+import { refetchFirstPage } from '@/utils/refetchFirstPage';
 import { isWebview } from '@/utils/webBridge';
 
 import { useGetNotifications } from '../_hooks/useGetNotifications';
@@ -26,11 +31,12 @@ function NotificationContent() {
     notificationsData,
     unreadCount,
     isPending,
-    isError,
+    isLoadingError,
     isFetchNextPageError,
     refetch,
     fetchNextPage,
     hasNextPage,
+    isFetching,
     isFetchingNextPage,
   } = useGetNotifications();
   const { postNotificationsReadMutation, isPostNotificationsReadPending } =
@@ -40,9 +46,16 @@ function NotificationContent() {
 
   const handleMarkAllRead = () => setIsMarkAllReadDialogOpen(true);
 
+  const queryClient = useQueryClient();
+  const scrollerRef = useRef<HTMLDivElement>(null);
+  const pullToRefresh = usePullToRefresh(
+    () => refetchFirstPage(queryClient, QUERY_KEYS.NOTIFICATION.LIST),
+    { scrollerRef }
+  );
+
   const bottomRef = useIntersectionObserver(
     fetchNextPage,
-    !!hasNextPage && !isFetchingNextPage && !isFetchNextPageError
+    !!hasNextPage && !isFetching && !isFetchNextPageError
   );
 
   const handleNotificationClick = (notification: (typeof notificationsData)[number]) => {
@@ -59,15 +72,17 @@ function NotificationContent() {
 
   return (
     <>
-      {renderContent()}
+      <div ref={scrollerRef} className="mt-4 hide-scrollbar flex-1 overflow-y-auto">
+        <PullToRefresh {...pullToRefresh} />
+        {renderContent()}
+      </div>
 
       <MarkAllReadDialog open={isMarkAllReadDialogOpen} onOpenChange={setIsMarkAllReadDialogOpen} />
     </>
   );
 
   function renderContent() {
-    if (isError && !isFetchNextPageError)
-      return <NotificationStateCard variant="error" onAction={() => refetch()} />;
+    if (isLoadingError) return <NotificationStateCard variant="error" onAction={() => refetch()} />;
     if (isEmpty)
       return <NotificationStateCard variant="empty" onAction={openNotificationSettings} />;
 

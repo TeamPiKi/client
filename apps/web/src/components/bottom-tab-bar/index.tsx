@@ -6,6 +6,8 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 
 import {
+  CompassIconFill,
+  CompassIconOutline,
   HeartIconFill,
   HeartIconOutline,
   HomeIconFill,
@@ -29,6 +31,12 @@ const TABS = [
     href: ROUTES.WISHLIST,
   },
   {
+    label: '탐색',
+    activeIcon: CompassIconFill,
+    inactiveIcon: CompassIconOutline,
+    href: ROUTES.EXPLORE,
+  },
+  {
     label: '토너먼트',
     activeIcon: TrophyIconFill,
     inactiveIcon: TrophyIconOutline,
@@ -42,8 +50,8 @@ const TABS = [
   },
 ] as const;
 
-const TAB_WIDTH = 72;
-const TAB_GAP = 8;
+const TAB_WIDTH = 68;
+const TAB_GAP = 0;
 const BAR_PADDING = 4;
 const TAB_STEP = TAB_WIDTH + TAB_GAP;
 const BAR_WIDTH = BAR_PADDING * 2 + TABS.length * TAB_WIDTH + (TABS.length - 1) * TAB_GAP;
@@ -95,8 +103,9 @@ function BottomTabBar() {
   const [isPressed, setIsPressed] = useState(false);
   const [isGrabbing, setIsGrabbing] = useState(false);
 
-  /** 폴더 상세는 위시 탭의 하위 화면이라 탭바 유지 */
+  /** 폴더 상세는 위시·탐색 탭의 하위 화면이라 탭바 유지 */
   const isWishFolderRoute = /^\/wish\/folder\/\d+$/.test(pathname);
+  const isExploreFolderRoute = /^\/explore\/folder\/[^/]+\/\d+$/.test(pathname);
   const activeIndex = TABS.findIndex(({ href }) => matchesTabPath(pathname, href));
 
   useEffect(
@@ -107,7 +116,8 @@ function BottomTabBar() {
   );
 
   // 탭 경로와 정확히 일치할 때만 노출 — 하위 상세/편집 라우트에서는 숨김
-  if (!isWishFolderRoute && !TABS.some(({ href }) => href === pathname)) return null;
+  if (!isWishFolderRoute && !isExploreFolderRoute && !TABS.some(({ href }) => href === pathname))
+    return null;
 
   const handlePointerDown = (event: React.PointerEvent) => {
     if (event.button !== 0 || isGrabbingRef.current) return;
@@ -272,7 +282,7 @@ function BottomTabBar() {
           e.stopPropagation();
         }}
         className={cn(
-          'liquid-glass inline-flex h-[58px] touch-none items-center gap-2 rounded-full p-1 shadow-[0px_6px_24px_0px_rgba(0,0,0,0.16)] transition-transform duration-200 ease-out select-none',
+          'liquid-glass inline-flex h-[58px] touch-none items-center rounded-full p-1 shadow-[0px_6px_24px_0px_rgba(0,0,0,0.16)] transition-transform duration-200 ease-out select-none',
           isGrabbing && 'liquid-glass-active',
           isPressed && 'scale-102'
         )}
@@ -319,7 +329,7 @@ function BottomTabBar() {
               prefetch={!isActive}
               draggable={false}
               className={cn(
-                'flex h-full w-[72px] cursor-pointer flex-col items-center justify-center rounded-full p-2 transition-colors',
+                'flex h-full w-[68px] cursor-pointer flex-col items-center justify-center rounded-full p-2 transition-colors',
                 isActive ? 'text-gray-900' : 'text-gray-800'
               )}
             >

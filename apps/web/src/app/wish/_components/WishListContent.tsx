@@ -1,14 +1,28 @@
 'use client';
 
+import { useQueryClient } from '@tanstack/react-query';
+import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
+import { foldersQueryOptions } from '@/apis/getFolders';
+import { wishesInfiniteQueryOptions } from '@/apis/getWishes';
+import { wishesCountQueryOptions } from '@/apis/getWishesCount';
+import BaseImage from '@/components/base-image';
 import CollapsibleTitle from '@/components/common/collapsible-title';
+import PullToRefresh from '@/components/common/pull-to-refresh';
+import UnderlineTab from '@/components/common/underline-tab';
+import Skeleton from '@/components/skeleton';
+import { ROUTES } from '@/consts/route';
 import { Z_INDEX } from '@/consts/zIndex';
+import { useGetMe } from '@/hooks/useGetMe';
 import { useGetWishesCount } from '@/hooks/useGetWishesCount';
+import { usePullToRefresh } from '@/hooks/usePullToRefresh';
 import type { FolderT } from '@/types/folder';
 import { cn } from '@/utils/cn';
+import { refetchFirstPage } from '@/utils/refetchFirstPage';
+import { replaceUrlKeepingState } from '@/utils/replaceUrlKeepingState';
 
 import WishEditActionBar from '../_common/_components/WishEditActionBar';
 import WishEditHeader from '../_common/_components/WishEditHeader';
@@ -16,17 +30,23 @@ import { WISH_MODE } from '../_common/_consts/wishMode';
 import { useDeleteWishes } from '../_common/_hooks/useDeleteWishes';
 import { usePostFolderWishes } from '../_common/_hooks/usePostFolderWishes';
 import { useWishEditMode } from '../_common/_hooks/useWishEditMode';
-import { WISH_TAB } from '../_consts/wishTab';
+import { WISH_TAB, WISH_TABS, WISH_TAB_PANEL_ID, WISH_TAB_PATH } from '../_consts/wishTab';
 import { useShareIntentWish } from '../_hooks/useShareIntentWish';
+import type { WishTabT } from '../_types/wishTab';
 import { parseWishTabParam } from '../_utils/wishSearchParams';
 import WishSearch from './WishSearch';
-import WishTabBar from './WishTabBar';
 import WishTabContent from './WishTabContent';
 import WishTabSummary from './WishTabSummary';
 
 function WishListContent() {
   const searchParams = useSearchParams();
-  const isFolderTab = parseWishTabParam(searchParams.get('tab')) === WISH_TAB.FOLDER;
+  const activeTab = parseWishTabParam(searchParams.get('tab'));
+  const isFolderTab = activeTab === WISH_TAB.FOLDER;
+  const { userData } = useGetMe();
+
+  const handleTabChange = (tab: WishTabT) => {
+    if (tab !== activeTab) replaceUrlKeepingState(WISH_TAB_PATH[tab]);
+  };
 
   useShareIntentWish();
 
@@ -55,6 +75,24 @@ function WishListContent() {
 
   const handleDelete = () => deleteWishesMutation(Array.from(selectedWishIds));
 
+  const queryClient = useQueryClient();
+  const pullToRefresh = usePullToRefresh(
+    () =>
+      isFolderTab
+        ? queryClient.refetchQueries(
+            { queryKey: foldersQueryOptions.queryKey },
+            { throwOnError: true }
+          )
+        : Promise.all([
+            refetchFirstPage(queryClient, wishesInfiniteQueryOptions().queryKey),
+            queryClient.refetchQueries(
+              { queryKey: wishesCountQueryOptions().queryKey },
+              { throwOnError: true }
+            ),
+          ]),
+    { enabled: mode !== WISH_MODE.EDIT }
+  );
+
   return (
     <>
       <div
@@ -68,8 +106,38 @@ function WishListContent() {
           <WishEditHeader selectedCount={selectedWishIds.size} onDone={handleExitEditMode} />
         ) : (
           <>
-            <CollapsibleTitle>내 위시리스트</CollapsibleTitle>
-            <WishTabBar />
+            <CollapsibleTitle
+              title="내 위시리스트"
+              right={
+                userData.identityType === 'MEMBER' && (
+                  <Link
+                    href={ROUTES.PROFILE(userData.id)}
+                    aria-label="내 프로필"
+                    className="flex size-[30px] shrink-0 items-center justify-center"
+                  >
+                    <span className="relative size-6 overflow-hidden rounded-full">
+                      <BaseImage
+                        src={userData.profileImage}
+                        alt=""
+                        sizes="24px"
+                        className="object-cover"
+                        loadingFallback={<Skeleton shape="circle" className="absolute inset-0" />}
+                      />
+                    </span>
+                  </Link>
+                )
+              }
+            />
+            <div>
+              <UnderlineTab
+                tabs={WISH_TABS}
+                activeTab={activeTab}
+                onTabChange={handleTabChange}
+                idPrefix="wish-tab"
+                panelId={WISH_TAB_PANEL_ID}
+              />
+              <PullToRefresh {...pullToRefresh} />
+            </div>
           </>
         )}
         <WishTabSummary

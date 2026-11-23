@@ -11,9 +11,7 @@ function Notification() {
         centerClassName="heading-1-bold"
       />
 
-      <div className="mt-4 hide-scrollbar flex-1 overflow-y-auto">
-        <NotificationContent />
-      </div>
+      <NotificationContent />
     </main>
   );
 }
