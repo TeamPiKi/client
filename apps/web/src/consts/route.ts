@@ -19,6 +19,7 @@ export const ROUTES = {
   MYPAGE: '/mypage',
   PLAY_FROM_LINK: (sourceTournamentId: number) => `/play/${sourceTournamentId}`,
   EXPLORE: '/explore',
+  EXPLORE_WINNERS: '/explore/winners',
   PROFILE: (userId: string) => `/profile/${userId}`,
 
   /** 3. Member Only */

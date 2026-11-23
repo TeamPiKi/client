@@ -20,4 +20,9 @@ export const QUERY_KEYS = {
         [...QUERY_KEYS.TOURNAMENT.LIST.ALL, params] as const,
     },
   },
+  /** 탐색 */
+  EXPLORE: {
+    /** 토너먼트 1위 위시 목록 */
+    WINNERS: ['explore', 'winners'] as const,
+  },
 };
