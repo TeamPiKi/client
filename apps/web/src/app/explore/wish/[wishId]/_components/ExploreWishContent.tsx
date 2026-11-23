@@ -3,7 +3,7 @@
 import { notFound } from 'next/navigation';
 
 import BaseImage from '@/components/base-image';
-import ItemLinkBanner from '@/components/common/item-info-screen/ItemLinkBanner';
+import { ItemLinkBanner } from '@/components/common/item-info-screen';
 import Skeleton from '@/components/skeleton';
 import { Z_INDEX } from '@/consts/zIndex';
 

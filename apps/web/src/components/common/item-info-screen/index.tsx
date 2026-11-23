@@ -129,4 +129,6 @@ function ItemInfoScreen({
   );
 }
 
+export { default as ItemLinkBanner } from './ItemLinkBanner';
+
 export default ItemInfoScreen;
