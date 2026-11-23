@@ -5,7 +5,6 @@ import BaseImage from '@/components/base-image';
 import Skeleton from '@/components/skeleton';
 
 type FriendListItemProps = {
-  /** 프로필 영역을 누르면 이동할 경로 (메뉴 버튼은 제외) */
   href: string;
   nickname: string;
   profileImage: string;

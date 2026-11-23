@@ -10,7 +10,6 @@ function ProfileVisibilitySection() {
   // TODO: 프로필 공개 여부 API 스펙이 나오면 조회·변경 API 로 교체
   const [isProfilePublic, setIsProfilePublic] = useState(true);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
-  /** 확인 모달은 상태로 열려 Radix 가 돌려줄 트리거가 없어, 닫힐 때 토글로 포커스를 직접 돌린다 */
   const switchRef = useRef<HTMLButtonElement>(null);
 
   const handleDialogCloseAutoFocus = (event: Event) => {
@@ -19,7 +18,6 @@ function ProfileVisibilitySection() {
   };
 
   const handleCheckedChange = (checked: boolean) => {
-    // 비공개 전환은 탐색 노출이 사라져 확인을 받고, 공개 전환은 바로 반영한다
     if (!checked) {
       setIsConfirmOpen(true);
       return;

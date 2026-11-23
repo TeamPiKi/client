@@ -59,7 +59,6 @@ function FriendsContent() {
     },
   });
 
-  /** 차단한 친구는 차단 목록 맨 위로 옮긴다 */
   const { postUserBlockMutation, isPostUserBlockPending } = usePostUserBlock({
     onSuccess: userId => {
       const blockedFriend = friends.find(friend => friend.userId === userId);
