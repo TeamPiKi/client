@@ -24,6 +24,8 @@ export const QUERY_KEYS = {
   EXPLORE: {
     /** 토너먼트 1위 위시 목록 */
     WINNERS: ['explore', 'winners'] as const,
+    /** 1위 위시가 나온 토너먼트의 후보 목록 */
+    CANDIDATES: (tournamentId: number) => ['explore', 'candidates', tournamentId] as const,
     /** 탐색 위시 상세 */
     WISH: (wishId: number) => ['explore', 'wish', wishId] as const,
   },

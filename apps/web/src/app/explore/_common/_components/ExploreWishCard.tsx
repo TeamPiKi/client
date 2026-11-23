@@ -88,6 +88,11 @@ function ExploreWishCard({
         {caption && (
           <p className="truncate caption-1-regular text-border-neutral-secondary">{caption}</p>
         )}
+        {item.sourcePlatform && (
+          <span className="self-start rounded-[3px] bg-gray-75 px-1 caption-1-regular text-text-neutral-secondary">
+            {item.sourcePlatform}
+          </span>
+        )}
       </div>
     </div>
   );

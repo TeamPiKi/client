@@ -1,7 +1,10 @@
+import Link from 'next/link';
+
 import { ChevronForwardIconFill } from '@/assets/icons';
 import BaseImage from '@/components/base-image';
 import Basket from '@/components/common/basket';
 import Skeleton from '@/components/skeleton';
+import { ROUTES } from '@/consts/route';
 
 import type { ExploreWishDetailT } from '../_types/exploreWish';
 
@@ -12,7 +15,10 @@ type WinnerTournamentCardProps = {
 /** 위시가 1위를 차지한 토너먼트 */
 function WinnerTournamentCard({ tournament }: WinnerTournamentCardProps) {
   return (
-    <div className="flex flex-col gap-4 rounded-2xl bg-bg-layer-default p-4">
+    <Link
+      href={ROUTES.EXPLORE_WINNER_CANDIDATES(tournament.id)}
+      className="flex cursor-pointer flex-col gap-4 rounded-2xl bg-bg-layer-default p-4"
+    >
       <div className="flex items-start justify-between">
         <div className="flex min-w-0 items-center gap-4">
           <Basket type="heart" className="size-[42px] shrink-0" />
@@ -47,7 +53,7 @@ function WinnerTournamentCard({ tournament }: WinnerTournamentCardProps) {
         </ul>
         <div className="pointer-events-none absolute inset-y-0 right-0 w-[45px] bg-linear-to-r from-white/0 to-white" />
       </div>
-    </div>
+    </Link>
   );
 }
 

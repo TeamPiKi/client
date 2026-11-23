@@ -4,6 +4,8 @@ export type ExploreItemT = {
   price: number | null;
   discountRate: number | null;
   imageUrl: string | null;
+  /** 구매처 이름 */
+  sourcePlatform?: string | null;
 };
 
 /** 토너먼트에서 1위를 차지한 위시 */
