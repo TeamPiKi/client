@@ -6,6 +6,8 @@ import Spacing from '@/components/spacing';
 import ExploreProfileLink from './_components/ExploreProfileLink';
 import FriendWishSection from './_components/FriendWishSection';
 import RecentWishSection from './_components/RecentWishSection';
+import RecentWishSectionSkeleton from './_components/RecentWishSectionSkeleton';
+import ThumbnailWishSectionSkeleton from './_components/ThumbnailWishSectionSkeleton';
 import WinnerWishSection from './_components/WinnerWishSection';
 
 function ExplorePage() {
@@ -20,13 +22,13 @@ function ExplorePage() {
       <Spacing size={36} />
 
       <div className="flex flex-col gap-12">
-        <Suspense>
+        <Suspense fallback={<ThumbnailWishSectionSkeleton />}>
           <WinnerWishSection />
         </Suspense>
-        <Suspense>
+        <Suspense fallback={<ThumbnailWishSectionSkeleton />}>
           <FriendWishSection />
         </Suspense>
-        <Suspense>
+        <Suspense fallback={<RecentWishSectionSkeleton />}>
           <RecentWishSection />
         </Suspense>
       </div>
