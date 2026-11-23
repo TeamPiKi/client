@@ -2,7 +2,11 @@ import type { ComponentProps } from 'react';
 
 import { cn } from '@/utils/cn';
 
-type SwitchProps = Omit<ComponentProps<'button'>, 'onChange' | 'role' | 'aria-checked'> & {
+/** onClick 은 토글 처리를 덮어쓰므로 받지 않는다 — 변경은 onCheckedChange 로 받는다 */
+type SwitchProps = Omit<
+  ComponentProps<'button'>,
+  'onClick' | 'onChange' | 'role' | 'aria-checked'
+> & {
   checked: boolean;
   onCheckedChange: (checked: boolean) => void;
 };
