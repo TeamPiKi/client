@@ -15,7 +15,7 @@ export const WINNER_WISHES_MOCK: WinnerWishT[] = Array.from({ length: 45 }, (_, 
     imageUrl: `https://picsum.photos/seed/piki-winner-${index + 1}/400`,
   },
   tournament: {
-    id: (index % TOURNAMENT_TITLES.length) + 1,
+    id: index + 1,
     title: TOURNAMENT_TITLES[index % TOURNAMENT_TITLES.length] ?? '',
   },
 }));
