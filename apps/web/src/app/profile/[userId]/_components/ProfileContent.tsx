@@ -11,6 +11,7 @@ import { useDeleteFriend } from '@/hooks/useDeleteFriend';
 import { useDeleteUserBlock } from '@/hooks/useDeleteUserBlock';
 import { usePostUserBlock } from '@/hooks/usePostUserBlock';
 import { cn } from '@/utils/cn';
+import { getLoginPath } from '@/utils/loginRedirect';
 
 import { usePostFriend } from '../_hooks/usePostFriend';
 import type { ProfileT } from '../_types/profile';
@@ -22,9 +23,10 @@ import ProfileSummary from './ProfileSummary';
 
 type ProfileContentProps = {
   profile: ProfileT;
+  isGuest: boolean;
 };
 
-function ProfileContent({ profile }: ProfileContentProps) {
+function ProfileContent({ profile, isGuest }: ProfileContentProps) {
   const router = useRouter();
 
   /** TEMP: 목데이터 친구 추가·삭제·차단 결과 표시용 상태라 API 연동 시 조회 쿼리 갱신으로 교체 */
@@ -32,7 +34,7 @@ function ProfileContent({ profile }: ProfileContentProps) {
 
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isBlockDialogOpen, setIsBlockDialogOpen] = useState(false);
-  
+  const [isLoginDialogOpen, setIsLoginDialogOpen] = useState(false);
 
   const menuTriggerRef = useRef<HTMLButtonElement | null>(null);
 
@@ -106,6 +108,8 @@ function ProfileContent({ profile }: ProfileContentProps) {
               <ProfileMenu
                 nickname={profile.nickname}
                 isFriend={isFriend}
+                isGuest={isGuest}
+                onLoginRequired={() => setIsLoginDialogOpen(true)}
                 onDeleteFriend={trigger => {
                   menuTriggerRef.current = trigger;
                   setIsDeleteDialogOpen(true);
@@ -136,7 +140,9 @@ function ProfileContent({ profile }: ProfileContentProps) {
             <ProfileActions
               relation={relation}
               isPending={isPostFriendPending || isDeleteUserBlockPending}
-              onAddFriend={() => postFriendMutation(profile.userId)}
+              onAddFriend={() =>
+                isGuest ? setIsLoginDialogOpen(true) : postFriendMutation(profile.userId)
+              }
               onUnblock={() => deleteUserBlockMutation(profile.userId)}
             />
           </>
@@ -194,6 +200,17 @@ function ProfileContent({ profile }: ProfileContentProps) {
         icon={null}
         isPending={isPostUserBlockPending}
         onConfirm={() => postUserBlockMutation(profile.userId)}
+        onCloseAutoFocus={handleDialogCloseAutoFocus}
+      />
+      <ConfirmDialog
+        open={isLoginDialogOpen}
+        onOpenChange={setIsLoginDialogOpen}
+        title="로그인이 필요해요"
+        description={`로그인하고 '${profile.nickname}'님을 친구로 추가해 보세요.`}
+        cancelLabel="그냥 볼래요"
+        confirmLabel="로그인하기"
+        icon={null}
+        onConfirm={() => router.push(getLoginPath(ROUTES.PROFILE(profile.userId)))}
         onCloseAutoFocus={handleDialogCloseAutoFocus}
       />
     </main>

@@ -18,13 +18,24 @@ import {
 type ProfileMenuProps = {
   nickname: string;
   isFriend: boolean;
+  /** 게스트는 메뉴 대신 로그인 안내를 띄움 */
+  isGuest: boolean;
+  onLoginRequired: () => void;
   /** trigger: 확인창을 닫은 뒤 포커스를 되돌릴 메뉴 버튼 */
   onDeleteFriend: (trigger: HTMLButtonElement | null) => void;
   onBlock: (trigger: HTMLButtonElement | null) => void;
   onReport: () => void;
 };
 
-function ProfileMenu({ nickname, isFriend, onDeleteFriend, onBlock, onReport }: ProfileMenuProps) {
+function ProfileMenu({
+  nickname,
+  isFriend,
+  isGuest,
+  onLoginRequired,
+  onDeleteFriend,
+  onBlock,
+  onReport,
+}: ProfileMenuProps) {
   const triggerRef = useRef<HTMLButtonElement>(null);
   const isItemSelectedRef = useRef(false);
 
@@ -32,6 +43,18 @@ function ProfileMenu({ nickname, isFriend, onDeleteFriend, onBlock, onReport }: 
     isItemSelectedRef.current = true;
     callback(triggerRef.current);
   };
+
+  if (isGuest)
+    return (
+      <button
+        type="button"
+        aria-label={`${nickname} 메뉴`}
+        onClick={onLoginRequired}
+        className="relative cursor-pointer after:absolute after:top-1/2 after:left-1/2 after:size-10 after:-translate-x-1/2 after:-translate-y-1/2"
+      >
+        <ThreeDotVerticalIconFill className="size-6 text-icon-neutral-primary" />
+      </button>
+    );
 
   return (
     <DropdownMenu>

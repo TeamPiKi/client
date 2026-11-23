@@ -5,13 +5,13 @@ import { getRoleOrRedirect } from '@/utils/getRoleOrRedirect';
 
 type ReportLayoutProps = {
   children: React.ReactNode;
+  params: Promise<{ userId: string }>;
 };
 
-async function ReportLayout({ children }: ReportLayoutProps) {
+async function ReportLayout({ children, params }: ReportLayoutProps) {
   const role = await getRoleOrRedirect();
 
-  /** TODO: 프로필 페이지 생기면 해당 사용자 프로필로 리다이렉트 */
-  if (role !== 'MEMBER') redirect(ROUTES.HOME);
+  if (role !== 'MEMBER') redirect(ROUTES.PROFILE((await params).userId));
 
   return children;
 }
