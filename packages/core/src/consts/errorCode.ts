@@ -104,6 +104,14 @@ export const ERROR_MESSAGE_MAP = {
   'FOLDER-004': '다른 폴더를 선택해 주세요.',
   'FOLDER-005': '선택한 위시를 다시 확인해 주세요.',
 
+  /** BLOCK */
+  'BLOCK-001': '차단 기능은 회원만 쓸 수 있어요.',
+  'BLOCK-002': '자기 자신은 차단할 수 없어요.',
+
+  /** FRIENDSHIP */
+  'FRIENDSHIP-001': '친구 기능은 회원만 쓸 수 있어요.',
+  'FRIENDSHIP-002': '자기 자신은 친구로 추가할 수 없어요.',
+
   /** ITEM */
   'ITEM-003': '상품 이름을 입력해 주세요.',
   'ITEM-004': '상품 가격을 입력해 주세요.',
@@ -249,6 +257,14 @@ export const ERROR_CODE = {
   FOLDER_INVALID_WISH_COUNT: 'FOLDER-003',
   FOLDER_SAME_TARGET: 'FOLDER-004',
   FOLDER_INVALID_SELECTION: 'FOLDER-005',
+
+  /** 차단 */
+  BLOCK_GUEST_CANNOT_USE: 'BLOCK-001',
+  BLOCK_SELF_NOT_ALLOWED: 'BLOCK-002',
+
+  /** 친구 */
+  FRIENDSHIP_GUEST_CANNOT_USE: 'FRIENDSHIP-001',
+  FRIENDSHIP_SELF_NOT_ALLOWED: 'FRIENDSHIP-002',
 
   /** 상품 */
   ITEM_NAME_REQUIRED_FOR_READY: 'ITEM-003',
