@@ -49,7 +49,7 @@ function FriendsContent() {
     trigger.focus();
   };
 
-  const removeFriend = (userId: number) =>
+  const removeFriend = (userId: string) =>
     setFriends(prev => prev.filter(friend => friend.userId !== userId));
 
   const { deleteFriendMutation, isDeleteFriendPending } = useDeleteFriend({

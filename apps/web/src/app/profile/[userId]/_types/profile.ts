@@ -18,8 +18,7 @@ export type ProfileFolderT = {
 };
 
 export type ProfileT = {
-  /** TODO: 서버는 UUID. 친구·신고 라우트와 함께 string 으로 전환 */
-  userId: number;
+  userId: string;
   nickname: string;
   profileImage: string;
   relation: ProfileRelationT;
