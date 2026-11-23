@@ -4,9 +4,9 @@ import Link from 'next/link';
 
 import { ROUTES } from '@/consts/route';
 
-import WinnerWishCard from '../_common/_components/WinnerWishCard';
 import { useGetWinnerWishes } from '../_common/_hooks/useGetWinnerWishes';
 import ExploreSectionHeader from './ExploreSectionHeader';
+import WinnerWishThumbnailCard from './WinnerWishThumbnailCard';
 
 /** 가로 스크롤에 노출할 최대 개수 */
 const MAX_COUNT = 20;
@@ -25,7 +25,7 @@ function WinnerWishSection() {
         {winnerWishesData.slice(0, MAX_COUNT).map(({ wishId, item }, index) => (
           <li key={wishId} className="w-[133px] shrink-0">
             <Link href={ROUTES.EXPLORE_WISH(wishId)} className="block">
-              <WinnerWishCard item={item} variant="scroll" isWinner preload={index < 3} />
+              <WinnerWishThumbnailCard item={item} preload={index < 3} />
             </Link>
           </li>
         ))}
