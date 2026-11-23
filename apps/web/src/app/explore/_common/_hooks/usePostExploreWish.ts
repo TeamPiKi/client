@@ -28,6 +28,8 @@ export const usePostExploreWish = () => {
       toast('내 위시에 상품을 담았어요', {
         duration: TOAST_ACTION_DURATION_MS,
         action: { label: '보러가기', onClick: () => router.push(ROUTES.WISHLIST) },
+        /** 전역 액션 버튼은 회색이지만 이 토스트는 시안대로 흰색 */
+        classNames: { actionButton: '!text-text-neutral-inverse' },
       });
     },
     onError: error => {
