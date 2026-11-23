@@ -34,7 +34,7 @@ export const ROUTES = {
   MYPAGE_EDIT: '/mypage/edit',
   MYPAGE_WITHDRAW: '/mypage/withdraw',
   TOURNAMENT_HISTORY: '/tournament/history',
-  REPORT: (userId: number) => `/report/${userId}`,
+  REPORT: (userId: string) => `/report/${userId}`,
   FRIENDS: '/friends',
   FRIENDS_BLOCKED_TAB: '/friends?tab=blocked',
 

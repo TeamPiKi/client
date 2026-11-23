@@ -1,1 +1,1 @@
-export type BasketTypeT = 'default' | 'confused' | 'panic' | 'heart';
+export type BasketTypeT = 'default' | 'confused' | 'panic' | 'lock' | 'heart';

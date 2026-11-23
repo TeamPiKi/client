@@ -31,6 +31,7 @@ const isMemberAndGuestRoute = (pathname: string) => {
   if (matchesPath(pathname, '/play')) return true;
   if (pathname === ROUTES.MYPAGE) return true;
   if (matchesPath(pathname, ROUTES.EXPLORE)) return true;
+  if (/^\/profile\/[^/]+$/.test(pathname)) return true;
 
   return false;
 };

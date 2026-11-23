@@ -7,12 +7,12 @@ import ConfirmDialog from '@/components/common/confirm-dialog';
 import UnderlineTab from '@/components/common/underline-tab';
 import { ROUTES } from '@/consts/route';
 import { useDeleteFriend } from '@/hooks/useDeleteFriend';
-import { usePostBlock } from '@/hooks/usePostBlock';
+import { useDeleteUserBlock } from '@/hooks/useDeleteUserBlock';
+import { usePostUserBlock } from '@/hooks/usePostUserBlock';
 import { replaceUrlKeepingState } from '@/utils/replaceUrlKeepingState';
 
 import { BLOCKED_USERS_MOCK, FRIENDS_MOCK } from '../_consts/friendMock';
 import { FRIEND_TAB, FRIEND_TAB_PATH } from '../_consts/friendTab';
-import { useDeleteBlock } from '../_hooks/useDeleteBlock';
 import type { FriendT, FriendTabT } from '../_types/friend';
 import { parseFriendTabParam } from '../_utils/friendSearchParams';
 import BlockedUserMenu from './BlockedUserMenu';
@@ -30,7 +30,7 @@ function FriendsContent() {
 
   /** TEMP: 목데이터 삭제·차단 결과 표시용 상태라 API 연동 시 조회 쿼리로 교체함 */
   const [friends, setFriends] = useState(FRIENDS_MOCK);
-  /** TEMP: 목데이터 차단 해제 결과 표시용 상태라 API 연동 시 조회 쿼리로 교체함 */
+  /** TEMP: 목데이터 차단·차단 해제 결과 표시용 상태라 API 연동 시 조회 쿼리로 교체함 */
   const [blockedUsers, setBlockedUsers] = useState(BLOCKED_USERS_MOCK);
 
   const [deleteTarget, setDeleteTarget] = useState<FriendT | null>(null);
@@ -49,7 +49,7 @@ function FriendsContent() {
     trigger.focus();
   };
 
-  const removeFriend = (userId: number) =>
+  const removeFriend = (userId: string) =>
     setFriends(prev => prev.filter(friend => friend.userId !== userId));
 
   const { deleteFriendMutation, isDeleteFriendPending } = useDeleteFriend({
@@ -59,15 +59,19 @@ function FriendsContent() {
     },
   });
 
-  /** TODO: 차단한 친구를 차단 목록으로 옮길지 기획 확인 후 반영 */
-  const { postBlockMutation, isPostBlockPending } = usePostBlock({
+  const { postUserBlockMutation, isPostUserBlockPending } = usePostUserBlock({
     onSuccess: userId => {
+      const blockedFriend = friends.find(friend => friend.userId === userId);
+      if (blockedFriend) {
+        const { nickname, profileImage } = blockedFriend;
+        setBlockedUsers(prev => [{ userId, nickname, profileImage }, ...prev]);
+      }
       removeFriend(userId);
       setIsBlockDialogOpen(false);
     },
   });
 
-  const { deleteBlockMutation } = useDeleteBlock({
+  const { deleteUserBlockMutation } = useDeleteUserBlock({
     onSuccess: userId => setBlockedUsers(prev => prev.filter(user => user.userId !== userId)),
   });
 
@@ -97,6 +101,7 @@ function FriendsContent() {
               {friends.map(friend => (
                 <FriendListItem
                   key={friend.userId}
+                  href={ROUTES.PROFILE(friend.userId)}
                   nickname={friend.nickname}
                   profileImage={friend.profileImage}
                   description={
@@ -136,12 +141,13 @@ function FriendsContent() {
               {blockedUsers.map(user => (
                 <FriendListItem
                   key={user.userId}
+                  href={ROUTES.PROFILE(user.userId)}
                   nickname={user.nickname}
                   profileImage={user.profileImage}
                   action={
                     <BlockedUserMenu
                       nickname={user.nickname}
-                      onUnblock={() => deleteBlockMutation(user.userId)}
+                      onUnblock={() => deleteUserBlockMutation(user.userId)}
                       onReport={() => router.push(ROUTES.REPORT(user.userId))}
                     />
                   }
@@ -174,8 +180,8 @@ function FriendsContent() {
         description="차단하면 서로의 위시를 볼 수 없어요."
         confirmLabel="차단하기"
         icon={null}
-        isPending={isPostBlockPending}
-        onConfirm={() => blockTarget && postBlockMutation(blockTarget.userId)}
+        isPending={isPostUserBlockPending}
+        onConfirm={() => blockTarget && postUserBlockMutation(blockTarget.userId)}
         onCloseAutoFocus={handleDialogCloseAutoFocus}
       />
     </>
