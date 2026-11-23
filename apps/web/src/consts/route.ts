@@ -18,6 +18,7 @@ export const ROUTES = {
   TOURNAMENT_JOIN_BY_LINK: (id: number) => `/tournament/join/${id}`,
   MYPAGE: '/mypage',
   PLAY_FROM_LINK: (sourceTournamentId: number) => `/play/${sourceTournamentId}`,
+  PROFILE: (userId: string) => `/profile/${userId}`,
 
   /** 3. Member Only */
   WISHLIST: '/wish',
@@ -29,7 +30,7 @@ export const ROUTES = {
   MYPAGE_EDIT: '/mypage/edit',
   MYPAGE_WITHDRAW: '/mypage/withdraw',
   TOURNAMENT_HISTORY: '/tournament/history',
-  REPORT: (userId: number) => `/report/${userId}`,
+  REPORT: (userId: string) => `/report/${userId}`,
   FRIENDS: '/friends',
   FRIENDS_BLOCKED_TAB: '/friends?tab=blocked',
 

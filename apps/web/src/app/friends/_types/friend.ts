@@ -3,7 +3,7 @@ import type { FRIEND_TAB } from '../_consts/friendTab';
 export type FriendTabT = (typeof FRIEND_TAB)[keyof typeof FRIEND_TAB];
 
 export type FriendT = {
-  userId: number;
+  userId: string;
   nickname: string;
   profileImage: string;
   isPublic: boolean;
@@ -12,7 +12,7 @@ export type FriendT = {
 };
 
 export type BlockedUserT = {
-  userId: number;
+  userId: string;
   nickname: string;
   profileImage: string;
 };
