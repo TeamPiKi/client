@@ -30,6 +30,18 @@ export type FriendWishT = {
   friend: ExploreFriendT;
 };
 
+/** 방금 담긴 위시 */
+export type RecentWishT = {
+  wishId: number;
+  item: ExploreItemT;
+  /** 담긴 시각 (ISO 8601) */
+  savedAt: string;
+  /** 이미 내 위시에 있는 상품인지 */
+  isInMyWish: boolean;
+  /** 친구가 담은 위시일 때만 존재 */
+  friend: ExploreFriendT | null;
+};
+
 /** 탐색 위시 상세 */
 export type ExploreWishDetailT = {
   wishId: number;

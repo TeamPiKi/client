@@ -5,6 +5,7 @@ import Spacing from '@/components/spacing';
 
 import ExploreProfileLink from './_components/ExploreProfileLink';
 import FriendWishSection from './_components/FriendWishSection';
+import RecentWishSection from './_components/RecentWishSection';
 import WinnerWishSection from './_components/WinnerWishSection';
 
 function ExplorePage() {
@@ -24,6 +25,9 @@ function ExplorePage() {
         </Suspense>
         <Suspense>
           <FriendWishSection />
+        </Suspense>
+        <Suspense>
+          <RecentWishSection />
         </Suspense>
       </div>
     </main>

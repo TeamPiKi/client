@@ -26,6 +26,8 @@ export const QUERY_KEYS = {
     WINNERS: ['explore', 'winners'] as const,
     FRIEND_WISHES: (friendId: string | null) => ['explore', 'friend-wishes', friendId] as const,
     FRIENDS: ['explore', 'friends'] as const,
+    /** 방금 담긴 위시 목록 */
+    RECENT: ['explore', 'recent'] as const,
     /** 1위 위시가 나온 토너먼트의 후보 목록 */
     CANDIDATES: (tournamentId: number) => ['explore', 'candidates', tournamentId] as const,
     /** 탐색 위시 상세 */

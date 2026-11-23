@@ -21,6 +21,8 @@ export const GUEST_BLOCK_LOCATION = {
   GROUP_RESULT_MASK: 'group_result_mask',
   /** 탐색 위시 상세 내 위시로 담기 버튼 */
   EXPLORE_WISH_SAVE: 'explore_wish_save',
+  /** 탐색 위시 카드 하트 */
+  EXPLORE_CARD_SAVE: 'explore_card_save',
 } as const;
 
 export type GuestBlockLocationT =
