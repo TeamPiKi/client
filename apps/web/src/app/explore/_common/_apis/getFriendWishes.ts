@@ -10,22 +10,27 @@ const PAGE_SIZE = 20;
 
 /** TEMP: API 스펙 확정 전이라 목데이터를 커서 페이지네이션 응답 형태로 잘라 반환함 */
 export const getFriendWishes = async (
+  friendId: string | null,
   cursor: string | null = null
 ): Promise<ApiResponseT<FriendWishT[]>> => {
+  const friendWishes = friendId
+    ? FRIEND_WISHES_MOCK.filter(({ friend }) => friend.userId === friendId)
+    : FRIEND_WISHES_MOCK;
   const start = cursor ? Number(cursor) : 0;
   const end = start + PAGE_SIZE;
-  const hasNext = end < FRIEND_WISHES_MOCK.length;
+  const hasNext = end < friendWishes.length;
 
   return {
-    data: FRIEND_WISHES_MOCK.slice(start, end),
+    data: friendWishes.slice(start, end),
     code: null,
     pageResponse: { hasNext, nextCursor: hasNext ? String(end) : null },
   };
 };
 
-export const friendWishesInfiniteQueryOptions = infiniteQueryOptions({
-  queryKey: QUERY_KEYS.EXPLORE.FRIEND_WISHES,
-  queryFn: ({ pageParam }) => getFriendWishes(pageParam),
-  initialPageParam: null as string | null,
-  getNextPageParam: page => (page.pageResponse.hasNext ? page.pageResponse.nextCursor : null),
-});
+export const friendWishesInfiniteQueryOptions = (friendId: string | null) =>
+  infiniteQueryOptions({
+    queryKey: QUERY_KEYS.EXPLORE.FRIEND_WISHES(friendId),
+    queryFn: ({ pageParam }) => getFriendWishes(friendId, pageParam),
+    initialPageParam: null as string | null,
+    getNextPageParam: page => (page.pageResponse.hasNext ? page.pageResponse.nextCursor : null),
+  });
