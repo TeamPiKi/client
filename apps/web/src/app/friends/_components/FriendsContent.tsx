@@ -11,9 +11,9 @@ import { useDeleteUserBlock } from '@/hooks/useDeleteUserBlock';
 import { usePostUserBlock } from '@/hooks/usePostUserBlock';
 import { replaceUrlKeepingState } from '@/utils/replaceUrlKeepingState';
 
-import { BLOCKED_USERS_MOCK } from '../_consts/friendMock';
 import { FRIEND_TAB, FRIEND_TAB_PATH } from '../_consts/friendTab';
 import { useGetFriends } from '../_hooks/useGetFriends';
+import { useGetUserBlocks } from '../_hooks/useGetUserBlocks';
 import type { FriendT, FriendTabT } from '../_types/friend';
 import { parseFriendTabParam } from '../_utils/friendSearchParams';
 import BlockedUserMenu from './BlockedUserMenu';
@@ -32,9 +32,9 @@ function FriendsContent() {
   const {
     friendsData: { friendCount, friends },
   } = useGetFriends();
-
-  /** TEMP: 목데이터 차단 해제 결과 표시용 상태라 API 연동 시 조회 쿼리로 교체함 */
-  const [blockedUsers, setBlockedUsers] = useState(BLOCKED_USERS_MOCK);
+  const {
+    userBlocksData: { blocked: blockedUsers },
+  } = useGetUserBlocks();
 
   const [deleteTarget, setDeleteTarget] = useState<FriendT | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -60,9 +60,7 @@ function FriendsContent() {
     onSuccess: () => setIsBlockDialogOpen(false),
   });
 
-  const { deleteUserBlockMutation } = useDeleteUserBlock({
-    onSuccess: userId => setBlockedUsers(prev => prev.filter(user => user.userId !== userId)),
-  });
+  const { deleteUserBlockMutation } = useDeleteUserBlock();
 
   const handleTabChange = (tab: FriendTabT) => {
     if (tab !== activeTab) replaceUrlKeepingState(FRIEND_TAB_PATH[tab]);

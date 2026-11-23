@@ -5,12 +5,16 @@ import { getQueryClient } from '@/utils/queryClient';
 import { serverPrefetch } from '@/utils/serverPrefetch';
 
 import { friendsQueryOptions } from './_apis/getFriends';
+import { userBlocksQueryOptions } from './_apis/getUserBlocks';
 import FriendsContent from './_components/FriendsContent';
 
 async function FriendsPage() {
   const queryClient = getQueryClient();
 
-  await serverPrefetch(() => queryClient.fetchQuery(friendsQueryOptions));
+  await Promise.all([
+    serverPrefetch(() => queryClient.fetchQuery(friendsQueryOptions)),
+    serverPrefetch(() => queryClient.fetchQuery(userBlocksQueryOptions)),
+  ]);
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>

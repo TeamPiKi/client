@@ -21,3 +21,7 @@ export type BlockedUserT = {
   nickname: string;
   profileImage: string;
 };
+
+export type GetUserBlocksResponseT = {
+  blocked: BlockedUserT[];
+};
