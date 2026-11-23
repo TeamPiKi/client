@@ -8,6 +8,7 @@ import { toast } from 'sonner';
 import { CloseIconFill } from '@/assets/icons';
 import BottomCta from '@/components/bottom-cta';
 import Button from '@/components/button';
+import NextPageStatus from '@/components/common/next-page-status';
 import WishGrid from '@/components/common/wish-grid';
 import { Header } from '@/components/header';
 import { ROUTES } from '@/consts/route';
@@ -31,11 +32,15 @@ type FolderWishSelectContentProps = {
 function FolderWishSelectView({ folder }: { folder: FolderT }) {
   const backWithFallback = useBackWithFallback();
 
-  const { wishesData, fetchNextPage, hasNextPage, isFetchingNextPage } = useGetWishes({
-    excludeFolderId: folder.id,
-  });
+  const { wishesData, fetchNextPage, hasNextPage, isFetchingNextPage, isFetchNextPageError } =
+    useGetWishes({
+      excludeFolderId: folder.id,
+    });
   const { wishesCountData = 0 } = useGetWishesCount({ excludeFolderId: folder.id });
-  const bottomRef = useIntersectionObserver(fetchNextPage, hasNextPage && !isFetchingNextPage);
+  const bottomRef = useIntersectionObserver(
+    fetchNextPage,
+    hasNextPage && !isFetchingNextPage && !isFetchNextPageError
+  );
 
   const { selectedWishIds, handleToggleSelect } = useWishEditMode();
 
@@ -81,7 +86,12 @@ function FolderWishSelectView({ folder }: { folder: FolderT }) {
         selectedWishIds={selectedWishIds}
         onToggleSelect={handleToggle}
       />
-      <div ref={bottomRef} />
+      <NextPageStatus
+        ref={bottomRef}
+        isFetching={isFetchingNextPage}
+        isError={isFetchNextPageError}
+        onRetry={fetchNextPage}
+      />
 
       <BottomCta hasGradient>
         <Button

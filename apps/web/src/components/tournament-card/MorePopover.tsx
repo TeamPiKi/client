@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { type ComponentType, type MouseEvent, type SVGProps, useState } from 'react';
+import { type MouseEvent, useState } from 'react';
 
 import {
   GroupIconFill,
@@ -10,12 +10,17 @@ import {
   ThreeDotVerticalIconFill,
   TrashIconFill,
 } from '@/assets/icons';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/dropdown-menu';
 import { QUERY_ACTION } from '@/consts/queryAction';
 import { ROUTES } from '@/consts/route';
 import { TOURNAMENT_STATUS } from '@/consts/tournament';
 import type { TournamentStatusT } from '@/types/tournament';
 
-import { Popover, PopoverContent, PopoverTitle, PopoverTrigger } from '../popover';
 import FriendListDialog from './FriendListDialog';
 import TournamentDeleteDialog from './TournamentDeleteDialog';
 
@@ -28,7 +33,6 @@ type MorePopoverProps = {
 
 function MorePopover({ status, tournamentId, participantCount = 0 }: MorePopoverProps) {
   const router = useRouter();
-  const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isFriendListOpen, setIsFriendListOpen] = useState(false);
 
@@ -36,24 +40,20 @@ function MorePopover({ status, tournamentId, participantCount = 0 }: MorePopover
   const hasInvitedFriends = participantCount >= 2;
 
   const handleAddTournamentItem = () => {
-    setIsPopoverOpen(false);
     router.push(
       `${ROUTES.TOURNAMENT_CREATE(tournamentId)}?${QUERY_ACTION.KEY}=${QUERY_ACTION.VALUE.OPEN_GET_ITEM_DIALOG}`
     );
   };
 
   const handleDeleteTournament = () => {
-    setIsPopoverOpen(false);
     setIsDeleteDialogOpen(true);
   };
 
   const handleViewFriendList = () => {
-    setIsPopoverOpen(false);
     setIsFriendListOpen(true);
   };
 
   const handleViewTournamentResult = () => {
-    setIsPopoverOpen(false);
     router.push(ROUTES.TOURNAMENT_RESULT(tournamentId));
   };
 
@@ -69,27 +69,23 @@ function MorePopover({ status, tournamentId, participantCount = 0 }: MorePopover
         Dialog 는 이 래퍼 밖에 둔다 — 안에 두면 딤 클릭이 stopPropagation 에 막혀 닫히지 않는다.
       */}
       <div className="contents" onClick={handleStopCardNavigation}>
-        <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
-          <PopoverTrigger asChild>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
             <button type="button" aria-label="더보기" className="cursor-pointer">
               <ThreeDotVerticalIconFill className="size-6 text-icon-neutral-secondary" />
             </button>
-          </PopoverTrigger>
-          <PopoverContent className="p-2" align="end" alignOffset={-24}>
-            <PopoverTitle className="sr-only">더보기</PopoverTitle>
-
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" alignOffset={-24}>
             {status === TOURNAMENT_STATUS.PENDING && (
               <>
-                <OptionButton
-                  Icon={HeartIconFill}
-                  label="위시 추가하기"
-                  onClick={handleAddTournamentItem}
-                />
-                <OptionButton
-                  Icon={TrashIconFill}
-                  label="삭제하기"
-                  onClick={handleDeleteTournament}
-                />
+                <DropdownMenuItem onSelect={handleAddTournamentItem}>
+                  <HeartIconFill aria-hidden />
+                  위시 추가하기
+                </DropdownMenuItem>
+                <DropdownMenuItem onSelect={handleDeleteTournament}>
+                  <TrashIconFill aria-hidden />
+                  삭제하기
+                </DropdownMenuItem>
               </>
             )}
 
@@ -99,38 +95,33 @@ function MorePopover({ status, tournamentId, participantCount = 0 }: MorePopover
                 TODO: IN_PROGRESS 참여자 API 가 추가되면 친구 목록 보기 노출.
                 현재는 group-result(COMPLETED 전용) 만 사용 가능해 데이터를 못 받으므로 미노출.
               */}
-                <OptionButton
-                  disabled
-                  Icon={TrashIconFill}
-                  label="삭제하기"
-                  onClick={handleDeleteTournament}
-                />
+                <DropdownMenuItem disabled onSelect={handleDeleteTournament}>
+                  <TrashIconFill aria-hidden />
+                  삭제하기
+                </DropdownMenuItem>
               </>
             )}
 
             {status === TOURNAMENT_STATUS.COMPLETED && (
               <>
                 {hasInvitedFriends && (
-                  <OptionButton
-                    Icon={GroupIconFill}
-                    label="친구 목록 보기"
-                    onClick={handleViewFriendList}
-                  />
+                  <DropdownMenuItem onSelect={handleViewFriendList}>
+                    <GroupIconFill aria-hidden />
+                    친구 목록 보기
+                  </DropdownMenuItem>
                 )}
-                <OptionButton
-                  Icon={ReceiptIconFill}
-                  label="결과 확인하기"
-                  onClick={handleViewTournamentResult}
-                />
-                <OptionButton
-                  Icon={TrashIconFill}
-                  label="삭제하기"
-                  onClick={handleDeleteTournament}
-                />
+                <DropdownMenuItem onSelect={handleViewTournamentResult}>
+                  <ReceiptIconFill aria-hidden />
+                  결과 확인하기
+                </DropdownMenuItem>
+                <DropdownMenuItem onSelect={handleDeleteTournament}>
+                  <TrashIconFill aria-hidden />
+                  삭제하기
+                </DropdownMenuItem>
               </>
             )}
-          </PopoverContent>
-        </Popover>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
 
       <TournamentDeleteDialog
@@ -149,29 +140,3 @@ function MorePopover({ status, tournamentId, participantCount = 0 }: MorePopover
 }
 
 export default MorePopover;
-
-type OptionButtonProps = {
-  Icon: ComponentType<SVGProps<SVGSVGElement>>;
-  label: string;
-  onClick: () => void;
-  disabled?: boolean;
-};
-
-function OptionButton({ Icon, label, onClick, disabled = false }: OptionButtonProps) {
-  return (
-    <button
-      type="button"
-      className="group flex w-full cursor-pointer items-center gap-2 px-4 py-3 disabled:cursor-not-allowed"
-      onClick={onClick}
-      disabled={disabled}
-    >
-      <Icon
-        className="size-6 text-icon-neutral-primary group-disabled:text-icon-neutral-secondary"
-        aria-hidden
-      />
-      <span className="body-1-semibold text-text-neutral-primary group-disabled:text-text-neutral-tertiary">
-        {label}
-      </span>
-    </button>
-  );
-}

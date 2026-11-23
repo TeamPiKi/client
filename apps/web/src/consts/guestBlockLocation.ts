@@ -19,6 +19,8 @@ export const GUEST_BLOCK_LOCATION = {
   RECEIPT_SAVE: 'receipt_save',
   /** 그룹 결과 선택자 마스킹 */
   GROUP_RESULT_MASK: 'group_result_mask',
+  /** 탐색 위시 상세 내 위시로 담기 버튼 */
+  EXPLORE_WISH_SAVE: 'explore_wish_save',
 } as const;
 
 export type GuestBlockLocationT =

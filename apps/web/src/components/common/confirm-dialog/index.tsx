@@ -1,6 +1,6 @@
 'use client';
 
-import type { ReactNode } from 'react';
+import type { ComponentProps, ReactNode } from 'react';
 
 import { WarningIconFill } from '@/assets/icons';
 import Button from '@/components/button';
@@ -25,6 +25,7 @@ type ConfirmDialogProps = {
   isPending?: boolean;
   icon?: ReactNode;
   onConfirm: () => void;
+  onCloseAutoFocus?: ComponentProps<typeof DialogContent>['onCloseAutoFocus'];
 };
 
 function ConfirmDialog({
@@ -37,6 +38,7 @@ function ConfirmDialog({
   isPending = false,
   icon = <WarningIconFill width={48} height={48} className="text-red-300" aria-hidden />,
   onConfirm,
+  onCloseAutoFocus,
 }: ConfirmDialogProps) {
   const handleOpenChange = (isOpen: boolean) => {
     if (!isOpen && isPending) return;
@@ -47,6 +49,7 @@ function ConfirmDialog({
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent
         showCloseButton={false}
+        onCloseAutoFocus={onCloseAutoFocus}
         className={cn('w-[calc(min(100vw,480px)-72px)] max-w-none text-center', !icon && 'pt-8')}
       >
         {icon && <div className="flex justify-center">{icon}</div>}

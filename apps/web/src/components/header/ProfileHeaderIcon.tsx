@@ -3,9 +3,13 @@
 import Link from 'next/link';
 
 import { PersonIconFill, SettingsIconFill } from '@/assets/icons/fill';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/dropdown-menu';
 import { ROUTES } from '@/consts/route';
-
-import { Popover, PopoverClose, PopoverContent, PopoverTitle, PopoverTrigger } from '../popover';
 
 type ProfileHeaderIconProps = {
   onClick?: () => void;
@@ -21,31 +25,27 @@ type ProfileHeaderIconProps = {
  */
 function ProfileHeaderIcon({ onClick, className }: ProfileHeaderIconProps) {
   return (
-    <Popover>
-      <PopoverTrigger asChild>
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
         <button type="button" aria-label="마이페이지" className={className}>
           <PersonIconFill className="size-6 text-icon-neutral-secondary" />
         </button>
-      </PopoverTrigger>
-      <PopoverContent className="w-[184px] p-2" align="end" sideOffset={8}>
-        <PopoverTitle className="sr-only">마이페이지 메뉴</PopoverTitle>
-        <PopoverClose asChild>
-          <Link
-            href={ROUTES.MYPAGE}
-            className="flex w-full cursor-pointer items-center gap-3 px-4 py-3"
-          >
-            <SettingsIconFill className="size-6 shrink-0 text-icon-neutral-primary" aria-hidden />
-            <span className="body-1-semibold text-text-neutral-primary">설정</span>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" sideOffset={8}>
+        <DropdownMenuItem asChild>
+          <Link href={ROUTES.MYPAGE}>
+            <SettingsIconFill aria-hidden />
+            설정
           </Link>
-        </PopoverClose>
+        </DropdownMenuItem>
 
         {/** TODO: 버튼 액션 정해지면 활성화 예정. 작동하지 않는 버튼 보이지 않게 하기 위해 주석처리 함 */}
         {/* <button type="button" className={profileMenuItemClassName}>
           <MessageIconFill className="size-6 shrink-0 text-icon-neutral-primary" aria-hidden />
           <span className="body-1-semibold text-text-neutral-primary">의견 보내기</span>
         </button> */}
-      </PopoverContent>
-    </Popover>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }
 
