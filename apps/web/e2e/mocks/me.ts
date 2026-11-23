@@ -13,7 +13,7 @@ export const MOCK_GUEST_ME: GuestUserT = {
 };
 
 /** 회원 전용 UI(위시에서 가져오기 등)를 테스트할 때 사용 */
-export const MOCK_MEMBER_ME: MemberUserT = {
+export const MOCK_MEMBER_ME: MemberUserT & { email: string } = {
   id: 'e2e-member-id',
   nickname: '피키회원',
   profileImage: MOCK_IMAGE_URLS.avatar,

@@ -16,8 +16,8 @@ export type GuestUserT = BaseUserT & {
 export type MemberUserT = BaseUserT & {
   /** 유저 식별 타입 */
   identityType: 'MEMBER';
-  /** 유저 이메일 */
-  email: string;
+  /** 유저 이메일 (미수집·미동의면 null) */
+  email: string | null;
 };
 
 type BaseUserT = {
