@@ -17,6 +17,7 @@ function Switch({ checked, onCheckedChange, disabled, className, ...rest }: Swit
 
   return (
     <button
+      {...rest}
       type="button"
       role="switch"
       aria-checked={checked}
@@ -27,7 +28,6 @@ function Switch({ checked, onCheckedChange, disabled, className, ...rest }: Swit
         checked ? 'bg-bg-neutral-primary' : 'bg-gray-100',
         className
       )}
-      {...rest}
     >
       <span
         aria-hidden
