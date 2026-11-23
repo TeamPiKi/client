@@ -6,6 +6,7 @@ import AccountInfoSection from './_components/AccountInfoSection';
 import AppVersionFooter from './_components/AppVersionFooter';
 import MypageGuestBanner from './_components/MypageGuestBanner';
 import ProfileSection from './_components/ProfileSection';
+import ProfileVisibilitySection from './_components/ProfileVisibilitySection';
 
 async function MypagePage() {
   const isGuest = await getIsGuest();
@@ -26,6 +27,13 @@ async function MypagePage() {
         <ProfileSection />
 
         <Spacing size={32} />
+
+        {!isGuest && (
+          <>
+            <ProfileVisibilitySection />
+            <Spacing size={24} />
+          </>
+        )}
 
         <AccountInfoSection />
 

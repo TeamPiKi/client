@@ -30,7 +30,7 @@ function FriendsContent() {
 
   /** TEMP: 목데이터 삭제·차단 결과 표시용 상태라 API 연동 시 조회 쿼리로 교체함 */
   const [friends, setFriends] = useState(FRIENDS_MOCK);
-  /** TEMP: 목데이터 차단 해제 결과 표시용 상태라 API 연동 시 조회 쿼리로 교체함 */
+  /** TEMP: 목데이터 차단·차단 해제 결과 표시용 상태라 API 연동 시 조회 쿼리로 교체함 */
   const [blockedUsers, setBlockedUsers] = useState(BLOCKED_USERS_MOCK);
 
   const [deleteTarget, setDeleteTarget] = useState<FriendT | null>(null);
@@ -59,9 +59,13 @@ function FriendsContent() {
     },
   });
 
-  /** TODO: 차단한 친구를 차단 목록으로 옮길지 기획 확인 후 반영 */
   const { postUserBlockMutation, isPostUserBlockPending } = usePostUserBlock({
     onSuccess: userId => {
+      const blockedFriend = friends.find(friend => friend.userId === userId);
+      if (blockedFriend) {
+        const { nickname, profileImage } = blockedFriend;
+        setBlockedUsers(prev => [{ userId, nickname, profileImage }, ...prev]);
+      }
       removeFriend(userId);
       setIsBlockDialogOpen(false);
     },
@@ -97,6 +101,7 @@ function FriendsContent() {
               {friends.map(friend => (
                 <FriendListItem
                   key={friend.userId}
+                  href={ROUTES.PROFILE(friend.userId)}
                   nickname={friend.nickname}
                   profileImage={friend.profileImage}
                   description={
@@ -136,6 +141,7 @@ function FriendsContent() {
               {blockedUsers.map(user => (
                 <FriendListItem
                   key={user.userId}
+                  href={ROUTES.PROFILE(user.userId)}
                   nickname={user.nickname}
                   profileImage={user.profileImage}
                   action={

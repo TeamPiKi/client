@@ -1,6 +1,7 @@
 'use client';
 
 import { useQueryClient } from '@tanstack/react-query';
+import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 import { toast } from 'sonner';
@@ -8,10 +9,14 @@ import { toast } from 'sonner';
 import { foldersQueryOptions } from '@/apis/getFolders';
 import { wishesInfiniteQueryOptions } from '@/apis/getWishes';
 import { wishesCountQueryOptions } from '@/apis/getWishesCount';
+import BaseImage from '@/components/base-image';
 import CollapsibleTitle from '@/components/common/collapsible-title';
 import PullToRefresh from '@/components/common/pull-to-refresh';
 import UnderlineTab from '@/components/common/underline-tab';
+import Skeleton from '@/components/skeleton';
+import { ROUTES } from '@/consts/route';
 import { Z_INDEX } from '@/consts/zIndex';
+import { useGetMe } from '@/hooks/useGetMe';
 import { useGetWishesCount } from '@/hooks/useGetWishesCount';
 import { usePullToRefresh } from '@/hooks/usePullToRefresh';
 import type { FolderT } from '@/types/folder';
@@ -37,6 +42,7 @@ function WishListContent() {
   const searchParams = useSearchParams();
   const activeTab = parseWishTabParam(searchParams.get('tab'));
   const isFolderTab = activeTab === WISH_TAB.FOLDER;
+  const { userData } = useGetMe();
 
   const handleTabChange = (tab: WishTabT) => {
     if (tab !== activeTab) replaceUrlKeepingState(WISH_TAB_PATH[tab]);
@@ -100,7 +106,28 @@ function WishListContent() {
           <WishEditHeader selectedCount={selectedWishIds.size} onDone={handleExitEditMode} />
         ) : (
           <>
-            <CollapsibleTitle>내 위시리스트</CollapsibleTitle>
+            <CollapsibleTitle
+              title="내 위시리스트"
+              right={
+                userData.identityType === 'MEMBER' && (
+                  <Link
+                    href={ROUTES.PROFILE(userData.id)}
+                    aria-label="내 프로필"
+                    className="flex size-[30px] shrink-0 items-center justify-center"
+                  >
+                    <span className="relative size-6 overflow-hidden rounded-full">
+                      <BaseImage
+                        src={userData.profileImage}
+                        alt=""
+                        sizes="24px"
+                        className="object-cover"
+                        loadingFallback={<Skeleton shape="circle" className="absolute inset-0" />}
+                      />
+                    </span>
+                  </Link>
+                )
+              }
+            />
             <div>
               <UnderlineTab
                 tabs={WISH_TABS}
