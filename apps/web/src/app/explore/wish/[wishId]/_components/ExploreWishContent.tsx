@@ -9,6 +9,7 @@ import { Z_INDEX } from '@/consts/zIndex';
 
 import WinnerChip from '../../../_common/_components/WinnerChip';
 import { useGetExploreWish } from '../_hooks/useGetExploreWish';
+import AddToMyWishButton from './AddToMyWishButton';
 import WinnerTournamentCard from './WinnerTournamentCard';
 import WishItemInfoCard from './WishItemInfoCard';
 import WishOwnerCard from './WishOwnerCard';
@@ -23,7 +24,7 @@ function ExploreWishContent({ wishId }: ExploreWishContentProps) {
   /** 레이아웃이 없는 위시를 걸러 내지만 타입상 null 이 남아 한 번 더 막음 */
   if (!exploreWishData) notFound();
 
-  const { item, savedCount, owner, folder, winnerTournament } = exploreWishData;
+  const { item, isInMyWish, savedCount, owner, folder, winnerTournament } = exploreWishData;
 
   return (
     <div className="flex flex-col gap-4">
@@ -54,6 +55,8 @@ function ExploreWishContent({ wishId }: ExploreWishContentProps) {
       />
       <WishOwnerCard owner={owner} folder={folder} />
       {winnerTournament && <WinnerTournamentCard tournament={winnerTournament} />}
+
+      <AddToMyWishButton wishId={wishId} isInMyWish={isInMyWish} />
     </div>
   );
 }

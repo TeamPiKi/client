@@ -21,6 +21,7 @@ export const getExploreWish = async (wishId: number): Promise<ExploreWishDetailT
       imageUrl: item.imageUrl ?? '',
       sourceUrl: 'https://29cm.onelink.me',
     },
+    isInMyWish: wishId % 4 === 0,
     savedCount: (wishId % 7) + 1,
     owner: {
       userId: String(wishId),

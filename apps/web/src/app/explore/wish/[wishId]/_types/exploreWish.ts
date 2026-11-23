@@ -9,6 +9,8 @@ export type ExploreWishDetailT = {
     /** 링크로 담은 경우에만 존재 */
     sourceUrl: string | null;
   };
+  /** 이미 내 위시에 있는 상품인지 */
+  isInMyWish: boolean;
   /** 이 상품을 담은 사람 수 */
   savedCount: number;
   /** 위시를 담은 사람 */
