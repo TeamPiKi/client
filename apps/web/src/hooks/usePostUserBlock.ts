@@ -1,8 +1,8 @@
 import { useMutation } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
-export const usePostBlock = ({ onSuccess }: { onSuccess?: (userId: string) => void } = {}) => {
-  const { mutate: postBlockMutation, isPending: isPostBlockPending } = useMutation({
+export const usePostUserBlock = ({ onSuccess }: { onSuccess?: (userId: string) => void } = {}) => {
+  const { mutate: postUserBlockMutation, isPending: isPostUserBlockPending } = useMutation({
     /** TEMP: 차단 API 연동 전 목 처리 */
     mutationFn: async (_userId: string) => {},
     onSuccess: (_, userId) => {
@@ -11,5 +11,5 @@ export const usePostBlock = ({ onSuccess }: { onSuccess?: (userId: string) => vo
     },
   });
 
-  return { postBlockMutation, isPostBlockPending };
+  return { postUserBlockMutation, isPostUserBlockPending };
 };

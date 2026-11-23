@@ -7,12 +7,12 @@ import ConfirmDialog from '@/components/common/confirm-dialog';
 import UnderlineTab from '@/components/common/underline-tab';
 import { ROUTES } from '@/consts/route';
 import { useDeleteFriend } from '@/hooks/useDeleteFriend';
-import { usePostBlock } from '@/hooks/usePostBlock';
+import { useDeleteUserBlock } from '@/hooks/useDeleteUserBlock';
+import { usePostUserBlock } from '@/hooks/usePostUserBlock';
 import { replaceUrlKeepingState } from '@/utils/replaceUrlKeepingState';
 
 import { BLOCKED_USERS_MOCK, FRIENDS_MOCK } from '../_consts/friendMock';
 import { FRIEND_TAB, FRIEND_TAB_PATH } from '../_consts/friendTab';
-import { useDeleteBlock } from '../_hooks/useDeleteBlock';
 import type { FriendT, FriendTabT } from '../_types/friend';
 import { parseFriendTabParam } from '../_utils/friendSearchParams';
 import BlockedUserMenu from './BlockedUserMenu';
@@ -60,14 +60,14 @@ function FriendsContent() {
   });
 
   /** TODO: 차단한 친구를 차단 목록으로 옮길지 기획 확인 후 반영 */
-  const { postBlockMutation, isPostBlockPending } = usePostBlock({
+  const { postUserBlockMutation, isPostUserBlockPending } = usePostUserBlock({
     onSuccess: userId => {
       removeFriend(userId);
       setIsBlockDialogOpen(false);
     },
   });
 
-  const { deleteBlockMutation } = useDeleteBlock({
+  const { deleteUserBlockMutation } = useDeleteUserBlock({
     onSuccess: userId => setBlockedUsers(prev => prev.filter(user => user.userId !== userId)),
   });
 
@@ -141,7 +141,7 @@ function FriendsContent() {
                   action={
                     <BlockedUserMenu
                       nickname={user.nickname}
-                      onUnblock={() => deleteBlockMutation(user.userId)}
+                      onUnblock={() => deleteUserBlockMutation(user.userId)}
                       onReport={() => router.push(ROUTES.REPORT(user.userId))}
                     />
                   }
@@ -174,8 +174,8 @@ function FriendsContent() {
         description="차단하면 서로의 위시를 볼 수 없어요."
         confirmLabel="차단하기"
         icon={null}
-        isPending={isPostBlockPending}
-        onConfirm={() => blockTarget && postBlockMutation(blockTarget.userId)}
+        isPending={isPostUserBlockPending}
+        onConfirm={() => blockTarget && postUserBlockMutation(blockTarget.userId)}
         onCloseAutoFocus={handleDialogCloseAutoFocus}
       />
     </>
