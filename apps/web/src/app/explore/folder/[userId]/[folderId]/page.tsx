@@ -4,6 +4,7 @@ import { Suspense } from 'react';
 import { parseIdParam } from '@/utils/parseIdParam';
 
 import ExploreFolderContent from './_components/ExploreFolderContent';
+import ExploreFolderSkeleton from './_components/ExploreFolderSkeleton';
 
 type ExploreFolderPageProps = {
   params: Promise<{ userId: string; folderId: string }>;
@@ -16,7 +17,7 @@ async function ExploreFolderPage({ params }: ExploreFolderPageProps) {
 
   return (
     <main className="flex min-h-dvh flex-col bg-bg-layer-default pt-padding-top pb-32">
-      <Suspense>
+      <Suspense fallback={<ExploreFolderSkeleton />}>
         <ExploreFolderContent userId={userId} folderId={folderId} />
       </Suspense>
     </main>
