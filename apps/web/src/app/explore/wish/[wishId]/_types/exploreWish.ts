@@ -16,6 +16,7 @@ export type ExploreWishDetailT = {
     userId: string;
     nickname: string;
     profileImage: string;
+    isFriend: boolean;
   };
   /** 위시가 담긴 공개 폴더 — 폴더 없는 위시면 null */
   folder: {

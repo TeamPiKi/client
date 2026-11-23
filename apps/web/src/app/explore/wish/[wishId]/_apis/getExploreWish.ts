@@ -26,6 +26,7 @@ export const getExploreWish = async (wishId: number): Promise<ExploreWishDetailT
       userId: String(wishId),
       nickname: '난폭한 북극곰',
       profileImage: `https://picsum.photos/seed/piki-owner-${wishId}/80`,
+      isFriend: wishId % 3 === 0,
     },
     folder: wishId % 2 === 0 ? { id: wishId, name: '11월 위시리스트' } : null,
     winnerTournament: {

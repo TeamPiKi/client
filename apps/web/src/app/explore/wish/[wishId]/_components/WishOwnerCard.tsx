@@ -4,6 +4,7 @@ import { ChevronForwardIconFill, PersonIconFill } from '@/assets/icons';
 import BaseImage from '@/components/base-image';
 import Skeleton from '@/components/skeleton';
 import { ROUTES } from '@/consts/route';
+import { Z_INDEX } from '@/consts/zIndex';
 
 import type { ExploreWishDetailT } from '../_types/exploreWish';
 
@@ -31,9 +32,15 @@ function WishOwnerCard({ owner, folder }: WishOwnerCardProps) {
             loadingFallback={<Skeleton shape="circle" className="absolute inset-0" />}
           />
         </span>
-        <span className="absolute top-[27px] left-7 flex size-4 items-center justify-center rounded-full bg-sky-blue-300">
-          <PersonIconFill className="size-[9px] text-white" aria-hidden />
-        </span>
+        {owner.isFriend && (
+          <span
+            aria-label="친구"
+            style={{ zIndex: Z_INDEX.BASE_IMAGE + 1 }}
+            className="absolute top-[27px] left-7 flex size-4 items-center justify-center rounded-full bg-sky-blue-300"
+          >
+            <PersonIconFill className="size-[9px] text-white" aria-hidden />
+          </span>
+        )}
       </Link>
 
       <div className="flex min-w-0 flex-1 flex-col gap-0.5">
