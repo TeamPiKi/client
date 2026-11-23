@@ -2,6 +2,7 @@ import type { FC, SVGProps } from 'react';
 
 import BasketConfusedIcon from '@/assets/images/basket/confused.svg';
 import BasketDefaultIcon from '@/assets/images/basket/default.svg';
+import BasketHeartIcon from '@/assets/images/basket/heart.svg';
 import BasketLockIcon from '@/assets/images/basket/lock.svg';
 import BasketPanicIcon from '@/assets/images/basket/panic.svg';
 
@@ -12,4 +13,5 @@ export const BASKET_ICON: Record<BasketTypeT, FC<SVGProps<SVGSVGElement>>> = {
   confused: BasketConfusedIcon,
   panic: BasketPanicIcon,
   lock: BasketLockIcon,
+  heart: BasketHeartIcon,
 };
