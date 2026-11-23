@@ -6,8 +6,8 @@ import NextPageStatus from '@/components/common/next-page-status';
 import { ROUTES } from '@/consts/route';
 import useIntersectionObserver from '@/hooks/useIntersectionObserver';
 
-import ExploreWishCard from '../../_common/_components/ExploreWishCard';
 import { useGetWinnerWishes } from '../../_common/_hooks/useGetWinnerWishes';
+import WinnerWishGridCard from './WinnerWishGridCard';
 
 /** 이미지 preload 개수 */
 const PRELOAD_COUNT = 4;
@@ -32,9 +32,8 @@ function WinnerWishGrid() {
         {winnerWishesData.map(({ wishId, item, tournament }, index) => (
           <li key={wishId}>
             <Link href={ROUTES.EXPLORE_WISH(wishId)} className="block">
-              <ExploreWishCard
+              <WinnerWishGridCard
                 item={item}
-                variant="grid"
                 isWinner
                 caption={tournament.title}
                 preload={index < PRELOAD_COUNT}

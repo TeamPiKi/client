@@ -18,6 +18,18 @@ export type WinnerWishT = {
   };
 };
 
+export type ExploreFriendT = {
+  userId: string;
+  nickname: string;
+  profileImage: string;
+};
+
+export type FriendWishT = {
+  wishId: number;
+  item: ExploreItemT;
+  friend: ExploreFriendT;
+};
+
 /** 탐색 위시 상세 */
 export type ExploreWishDetailT = {
   wishId: number;

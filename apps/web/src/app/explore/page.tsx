@@ -4,6 +4,7 @@ import { Header } from '@/components/header';
 import Spacing from '@/components/spacing';
 
 import ExploreProfileLink from './_components/ExploreProfileLink';
+import FriendWishSection from './_components/FriendWishSection';
 import WinnerWishSection from './_components/WinnerWishSection';
 
 function ExplorePage() {
@@ -20,6 +21,9 @@ function ExplorePage() {
       <div className="flex flex-col gap-12">
         <Suspense>
           <WinnerWishSection />
+        </Suspense>
+        <Suspense>
+          <FriendWishSection />
         </Suspense>
       </div>
     </main>
