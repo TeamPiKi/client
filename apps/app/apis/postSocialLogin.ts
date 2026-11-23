@@ -1,7 +1,7 @@
 import type { ApiErrorCodeT, SocialLoginSuccessPayloadT, SocialProviderT } from '@piki/core';
 import { DEFAULT_ERROR_MESSAGE, SERVER_ERROR_MESSAGE, getErrorMessageByCode } from '@piki/core';
 
-import { captureError } from '@/utils/captureError';
+import { captureApiError, captureError } from '@/utils/captureError';
 
 type PostSocialLoginRequestT = {
   accessToken: string;
@@ -26,7 +26,7 @@ export const postSocialLogin = async (
     });
   } catch (error) {
     /** 네트워크 오류 */
-    captureError(error, { tags: { source: 'api', api: 'postSocialLogin', provider } });
+    captureApiError('postSocialLogin', { tags: { source: 'api', provider } });
     throw error;
   }
 
@@ -40,9 +40,10 @@ export const postSocialLogin = async (
   if (!response.ok) {
     /** 5xx 서버 오류만 수집 (4xx는 예상된 흐름이라 제외) */
     if (response.status >= 500) {
-      captureError(new Error(`postSocialLogin ${response.status}: ${data?.code ?? 'unknown'}`), {
-        tags: { source: 'api', api: 'postSocialLogin', provider },
-        extra: { status: response.status },
+      captureApiError('postSocialLogin', {
+        status: response.status,
+        tags: { source: 'api', provider },
+        extra: { apiCode: data?.code },
       });
     }
     const fallback = response.status >= 500 ? SERVER_ERROR_MESSAGE : DEFAULT_ERROR_MESSAGE;
