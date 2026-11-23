@@ -18,22 +18,24 @@ import {
 type ProfileMenuProps = {
   nickname: string;
   isFriend: boolean;
-  onDeleteFriend: () => void;
-  onBlock: () => void;
+  /** trigger: 확인창을 닫은 뒤 포커스를 되돌릴 메뉴 버튼 */
+  onDeleteFriend: (trigger: HTMLButtonElement | null) => void;
+  onBlock: (trigger: HTMLButtonElement | null) => void;
   onReport: () => void;
 };
 
 function ProfileMenu({ nickname, isFriend, onDeleteFriend, onBlock, onReport }: ProfileMenuProps) {
+  const triggerRef = useRef<HTMLButtonElement>(null);
   const isItemSelectedRef = useRef(false);
 
-  const handleSelect = (callback: () => void) => () => {
+  const handleSelect = (callback: (trigger: HTMLButtonElement | null) => void) => () => {
     isItemSelectedRef.current = true;
-    callback();
+    callback(triggerRef.current);
   };
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger aria-label={`${nickname} 메뉴`}>
+      <DropdownMenuTrigger ref={triggerRef} aria-label={`${nickname} 메뉴`}>
         <ThreeDotVerticalIconFill className="size-6 text-icon-neutral-primary" />
       </DropdownMenuTrigger>
       <DropdownMenuContent

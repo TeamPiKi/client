@@ -9,12 +9,14 @@ import type { ProfileRelationT } from '../_types/profile';
 
 type ProfileActionsProps = {
   relation: ProfileRelationT;
+  /** 친구 추가 · 차단 해제 요청 중 */
+  isPending: boolean;
   onAddFriend: () => void;
   onUnblock: () => void;
 };
 
 /** 관계별 버튼. 노출 여부는 호출하는 쪽에서 판단 */
-function ProfileActions({ relation, onAddFriend, onUnblock }: ProfileActionsProps) {
+function ProfileActions({ relation, isPending, onAddFriend, onUnblock }: ProfileActionsProps) {
   if (relation === 'SELF')
     return (
       <div className="flex gap-3 px-5">
@@ -30,7 +32,7 @@ function ProfileActions({ relation, onAddFriend, onUnblock }: ProfileActionsProp
   if (relation === 'BLOCKED')
     return (
       <div className="px-5">
-        <Button variant="secondary" size="lg" onClick={onUnblock}>
+        <Button variant="secondary" size="lg" isLoading={isPending} onClick={onUnblock}>
           차단 해제
         </Button>
       </div>
@@ -40,6 +42,7 @@ function ProfileActions({ relation, onAddFriend, onUnblock }: ProfileActionsProp
     <div className="px-5">
       <Button
         size="lg"
+        isLoading={isPending}
         icon="leading"
         leadingIcon={<AddCirularIconFill aria-hidden className="size-5" />}
         onClick={onAddFriend}

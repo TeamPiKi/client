@@ -1,12 +1,18 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
+import { useRef, useState } from 'react';
 
+import ConfirmDialog from '@/components/common/confirm-dialog';
 import { Header, HeaderIcon } from '@/components/header';
 import Spacing from '@/components/spacing';
 import { ROUTES } from '@/consts/route';
+import { useDeleteFriend } from '@/hooks/useDeleteFriend';
+import { useDeleteUserBlock } from '@/hooks/useDeleteUserBlock';
+import { usePostUserBlock } from '@/hooks/usePostUserBlock';
 import { cn } from '@/utils/cn';
 
+import { usePostFriend } from '../_hooks/usePostFriend';
 import type { ProfileT } from '../_types/profile';
 import ProfileActions from './ProfileActions';
 import ProfileEmptyState from './ProfileEmptyState';
@@ -21,10 +27,19 @@ type ProfileContentProps = {
 function ProfileContent({ profile }: ProfileContentProps) {
   const router = useRouter();
 
+  /** TEMP: 목데이터 친구 추가·삭제·차단 결과 표시용 상태라 API 연동 시 조회 쿼리 갱신으로 교체 */
+  const [relation, setRelation] = useState(profile.relation);
+
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isBlockDialogOpen, setIsBlockDialogOpen] = useState(false);
+  
+
+  const menuTriggerRef = useRef<HTMLButtonElement | null>(null);
+
   /** 차단 프로필 여부 */
-  const isBlocked = profile.relation === 'BLOCKED';
+  const isBlocked = relation === 'BLOCKED';
   /** 친구 프로필 여부 */
-  const isFriend = profile.relation === 'FRIEND';
+  const isFriend = relation === 'FRIEND';
   /** 비공개 프로필 여부 */
   const isPrivate = profile.foldersHidden && !isBlocked;
   /**
@@ -32,7 +47,7 @@ function ProfileContent({ profile }: ProfileContentProps) {
    *
    * - 노출하지 않는 경우: 내 프로필, 차단한 프로필
    */
-  const showMoreMenu = profile.relation === 'NOT_FRIEND' || isFriend;
+  const showMoreMenu = relation === 'NOT_FRIEND' || isFriend;
   /**
    * 프로필 하단 액션 버튼 노출 여부
    *
@@ -41,14 +56,39 @@ function ProfileContent({ profile }: ProfileContentProps) {
    * - 친구가 아니면서 공개 프로필인 경우
    */
   const showActionButton =
-    profile.relation === 'SELF' || isBlocked || (profile.relation === 'NOT_FRIEND' && !isPrivate);
+    relation === 'SELF' || isBlocked || (relation === 'NOT_FRIEND' && !isPrivate);
 
-  /** TODO: 친구 추가 동작 연결 */
-  const handleAddFriend = () => {};
-  /** TODO: 차단 · 친구 삭제 확인 모달과 차단 해제 동작 연결 */
-  const handleBlock = () => {};
-  const handleDeleteFriend = () => {};
-  const handleUnblock = () => {};
+  /**
+   * TODO: 친구 추가 후 바로 친구 상태로 바뀌는 게 맞는지 확인 후 진행
+   * @see https://www.figma.com/design/NlgTPUvrwaHNDcBy33bDf2/%F0%9F%94%B5-%EC%9E%91%EB%8B%B9%EB%AA%A8%EC%9D%98-v2?node-id=4419-32437
+   */
+  const { postFriendMutation, isPostFriendPending } = usePostFriend({
+    onSuccess: () => setRelation('FRIEND'),
+  });
+  const { deleteFriendMutation, isDeleteFriendPending } = useDeleteFriend({
+    onSuccess: () => {
+      setRelation('NOT_FRIEND');
+      setIsDeleteDialogOpen(false);
+    },
+  });
+  const { postUserBlockMutation, isPostUserBlockPending } = usePostUserBlock({
+    onSuccess: () => {
+      setRelation('BLOCKED');
+      setIsBlockDialogOpen(false);
+    },
+  });
+  const { deleteUserBlockMutation, isDeleteUserBlockPending } = useDeleteUserBlock({
+    onSuccess: () => setRelation('NOT_FRIEND'),
+  });
+
+  const handleDialogCloseAutoFocus = (event: Event) => {
+    const trigger = menuTriggerRef.current;
+    menuTriggerRef.current = null;
+    if (!trigger?.isConnected) return;
+
+    event.preventDefault();
+    trigger.focus();
+  };
 
   return (
     <main
@@ -66,8 +106,14 @@ function ProfileContent({ profile }: ProfileContentProps) {
               <ProfileMenu
                 nickname={profile.nickname}
                 isFriend={isFriend}
-                onDeleteFriend={handleDeleteFriend}
-                onBlock={handleBlock}
+                onDeleteFriend={trigger => {
+                  menuTriggerRef.current = trigger;
+                  setIsDeleteDialogOpen(true);
+                }}
+                onBlock={trigger => {
+                  menuTriggerRef.current = trigger;
+                  setIsBlockDialogOpen(true);
+                }}
                 onReport={() => router.push(ROUTES.REPORT(profile.userId))}
               />
             )
@@ -88,9 +134,10 @@ function ProfileContent({ profile }: ProfileContentProps) {
           <>
             <Spacing size={24} />
             <ProfileActions
-              relation={profile.relation}
-              onAddFriend={handleAddFriend}
-              onUnblock={handleUnblock}
+              relation={relation}
+              isPending={isPostFriendPending || isDeleteUserBlockPending}
+              onAddFriend={() => postFriendMutation(profile.userId)}
+              onUnblock={() => deleteUserBlockMutation(profile.userId)}
             />
           </>
         )}
@@ -126,6 +173,29 @@ function ProfileContent({ profile }: ProfileContentProps) {
           ))}
         </ul>
       )}
+
+      <ConfirmDialog
+        open={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+        title={`'${profile.nickname}' 님을 친구에서 삭제할까요?`}
+        description="상대방에게 알림은 가지 않아요."
+        confirmLabel="삭제하기"
+        icon={null}
+        isPending={isDeleteFriendPending}
+        onConfirm={() => deleteFriendMutation(profile.userId)}
+        onCloseAutoFocus={handleDialogCloseAutoFocus}
+      />
+      <ConfirmDialog
+        open={isBlockDialogOpen}
+        onOpenChange={setIsBlockDialogOpen}
+        title={`'${profile.nickname}'님을 차단할까요?`}
+        description="차단하면 서로의 위시를 볼 수 없어요."
+        confirmLabel="차단하기"
+        icon={null}
+        isPending={isPostUserBlockPending}
+        onConfirm={() => postUserBlockMutation(profile.userId)}
+        onCloseAutoFocus={handleDialogCloseAutoFocus}
+      />
     </main>
   );
 }
