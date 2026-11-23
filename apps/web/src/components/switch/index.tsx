@@ -1,42 +1,25 @@
+'use client';
+
+import { Switch as SwitchPrimitive } from 'radix-ui';
 import type { ComponentProps } from 'react';
 
 import { cn } from '@/utils/cn';
 
-type SwitchProps = Omit<
-  ComponentProps<'button'>,
-  'onClick' | 'onChange' | 'role' | 'aria-checked'
-> & {
-  checked: boolean;
-  onCheckedChange: (checked: boolean) => void;
-};
-
-function Switch({ checked, onCheckedChange, disabled, className, ...rest }: SwitchProps) {
-  const handleClick = () => {
-    onCheckedChange(!checked);
-  };
-
+function Switch({ className, ...props }: ComponentProps<typeof SwitchPrimitive.Root>) {
   return (
-    <button
-      {...rest}
-      type="button"
-      role="switch"
-      aria-checked={checked}
-      disabled={disabled}
-      onClick={handleClick}
+    <SwitchPrimitive.Root
+      data-slot="switch"
       className={cn(
-        'inline-flex h-7 w-12 shrink-0 cursor-pointer items-center rounded-full p-[3px] transition-colors disabled:cursor-not-allowed disabled:opacity-40',
-        checked ? 'bg-bg-neutral-primary' : 'bg-gray-100',
+        'inline-flex h-7 w-12 shrink-0 cursor-pointer items-center rounded-full bg-gray-100 p-[3px] transition-colors disabled:cursor-not-allowed disabled:opacity-40 data-[state=checked]:bg-bg-neutral-primary',
         className
       )}
+      {...props}
     >
-      <span
-        aria-hidden
-        className={cn(
-          'size-[22px] rounded-full bg-white transition-transform',
-          checked ? 'translate-x-5' : 'translate-x-0'
-        )}
+      <SwitchPrimitive.Thumb
+        data-slot="switch-thumb"
+        className="size-[22px] rounded-full bg-white transition-transform data-[state=checked]:translate-x-5"
       />
-    </button>
+    </SwitchPrimitive.Root>
   );
 }
 
