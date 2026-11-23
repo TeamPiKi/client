@@ -8,7 +8,7 @@ import formatPrice from '@/utils/formatPrice';
 import type { ExploreItemT } from '../_types/explore';
 import WinnerChip from './WinnerChip';
 
-type ExploreWishCardProps = {
+type WinnerWishCardProps = {
   item: ExploreItemT;
   /** scroll: 가로 스크롤 섹션용 작은 카드 · grid: 2열 목록용 카드 */
   variant: 'scroll' | 'grid';
@@ -35,13 +35,13 @@ const VARIANT_STYLE = {
   },
 } as const;
 
-function ExploreWishCard({
+function WinnerWishCard({
   item,
   variant,
   isWinner = false,
   caption,
   preload = false,
-}: ExploreWishCardProps) {
+}: WinnerWishCardProps) {
   const style = VARIANT_STYLE[variant];
   const imageFallback = (
     <div className="absolute inset-0 flex items-center justify-center text-gray-200">
@@ -98,4 +98,4 @@ function ExploreWishCard({
   );
 }
 
-export default ExploreWishCard;
+export default WinnerWishCard;

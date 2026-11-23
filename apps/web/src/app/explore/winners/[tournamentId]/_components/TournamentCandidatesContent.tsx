@@ -4,7 +4,7 @@ import { notFound } from 'next/navigation';
 
 import { Header, HeaderIcon } from '@/components/header';
 
-import ExploreWishCard from '../../../_common/_components/ExploreWishCard';
+import WinnerWishCard from '../../../_common/_components/WinnerWishCard';
 import { useGetTournamentCandidates } from '../_hooks/useGetTournamentCandidates';
 
 /** 이미지 preload 개수 */
@@ -35,7 +35,7 @@ function TournamentCandidatesContent({ tournamentId }: TournamentCandidatesConte
       <ul className="mt-6 grid grid-cols-2">
         {sortedCandidates.map(({ wishId, item, isWinner }, index) => (
           <li key={wishId}>
-            <ExploreWishCard
+            <WinnerWishCard
               item={item}
               variant="grid"
               isWinner={isWinner}
