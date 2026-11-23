@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { toast } from 'sonner';
 
 import ConfirmDialog from '@/components/common/confirm-dialog';
@@ -10,6 +10,13 @@ function ProfileVisibilitySection() {
   // TODO: 프로필 공개 여부 API 스펙이 나오면 조회·변경 API 로 교체
   const [isProfilePublic, setIsProfilePublic] = useState(true);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+  /** 확인 모달은 상태로 열려 Radix 가 돌려줄 트리거가 없어, 닫힐 때 토글로 포커스를 직접 돌린다 */
+  const switchRef = useRef<HTMLButtonElement>(null);
+
+  const handleDialogCloseAutoFocus = (event: Event) => {
+    event.preventDefault();
+    switchRef.current?.focus();
+  };
 
   const handleCheckedChange = (checked: boolean) => {
     // 비공개 전환은 탐색 노출이 사라져 확인을 받고, 공개 전환은 바로 반영한다
@@ -40,6 +47,7 @@ function ProfileVisibilitySection() {
             내 프로필 공개
           </span>
           <Switch
+            ref={switchRef}
             checked={isProfilePublic}
             onCheckedChange={handleCheckedChange}
             aria-labelledby="profile-visibility-label"
@@ -55,6 +63,7 @@ function ProfileVisibilitySection() {
         description="탐색에서 위시와 폴더가 모두 보이지 않아요"
         confirmLabel="비공개로 바꾸기"
         onConfirm={handleConfirmPrivate}
+        onCloseAutoFocus={handleDialogCloseAutoFocus}
       />
     </>
   );
