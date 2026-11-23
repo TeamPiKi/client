@@ -21,6 +21,7 @@ export const ROUTES = {
   EXPLORE: '/explore',
   EXPLORE_WINNERS: '/explore/winners',
   EXPLORE_WINNER_CANDIDATES: (tournamentId: number) => `/explore/winners/${tournamentId}`,
+  EXPLORE_FRIENDS: '/explore/friends',
   EXPLORE_WISH: (wishId: number) => `/explore/wish/${wishId}`,
   PROFILE: (userId: string) => `/profile/${userId}`,
 
