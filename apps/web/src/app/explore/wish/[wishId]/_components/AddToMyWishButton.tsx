@@ -1,18 +1,15 @@
 'use client';
 
-import { useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 
 import BottomCta from '@/components/bottom-cta';
 import Button from '@/components/button';
 import { GUEST_BLOCK_LOCATION } from '@/consts/guestBlockLocation';
-import { QUERY_KEYS } from '@/consts/queryKeys';
 import { ROUTES } from '@/consts/route';
 import { useGetMe } from '@/hooks/useGetMe';
 
 import GuestLoginSheet from '../../../_common/_components/GuestLoginSheet';
 import { usePostExploreWish } from '../../../_common/_hooks/usePostExploreWish';
-import type { ExploreWishDetailT } from '../_types/exploreWish';
 
 type AddToMyWishButtonProps = {
   wishId: number;
@@ -20,7 +17,6 @@ type AddToMyWishButtonProps = {
 };
 
 function AddToMyWishButton({ wishId, isInMyWish }: AddToMyWishButtonProps) {
-  const queryClient = useQueryClient();
   const { userData } = useGetMe();
   const [isLoginSheetOpen, setIsLoginSheetOpen] = useState(false);
   const { postExploreWishMutation, isPostExploreWishPending } = usePostExploreWish();
@@ -31,14 +27,7 @@ function AddToMyWishButton({ wishId, isInMyWish }: AddToMyWishButtonProps) {
       return;
     }
 
-    postExploreWishMutation(wishId, {
-      /** 담은 뒤에는 다시 담지 못하도록 상세 캐시를 담은 상태로 바꿈 */
-      onSuccess: () =>
-        queryClient.setQueryData<ExploreWishDetailT | null>(
-          QUERY_KEYS.EXPLORE.WISH(wishId),
-          prev => prev && { ...prev, isInMyWish: true }
-        ),
-    });
+    postExploreWishMutation(wishId);
   };
 
   return (

@@ -3,7 +3,7 @@ import { queryOptions } from '@tanstack/react-query';
 import { QUERY_KEYS } from '@/consts/queryKeys';
 
 import { WINNER_WISHES_MOCK } from '../../../_common/_consts/exploreMock';
-import type { ExploreWishDetailT } from '../_types/exploreWish';
+import type { ExploreWishDetailT } from '../../../_common/_types/explore';
 
 /** TEMP: API 스펙 확정 전이라 1위 위시 목데이터로 상세 응답을 만들어 반환함 */
 export const getExploreWish = async (wishId: number): Promise<ExploreWishDetailT | null> => {

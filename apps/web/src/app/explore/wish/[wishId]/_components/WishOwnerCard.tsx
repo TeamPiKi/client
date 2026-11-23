@@ -6,7 +6,7 @@ import Skeleton from '@/components/skeleton';
 import { ROUTES } from '@/consts/route';
 import { Z_INDEX } from '@/consts/zIndex';
 
-import type { ExploreWishDetailT } from '../_types/exploreWish';
+import type { ExploreWishDetailT } from '../../../_common/_types/explore';
 
 type WishOwnerCardProps = {
   owner: ExploreWishDetailT['owner'];

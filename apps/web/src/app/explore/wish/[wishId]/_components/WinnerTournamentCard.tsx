@@ -6,7 +6,7 @@ import Basket from '@/components/common/basket';
 import Skeleton from '@/components/skeleton';
 import { ROUTES } from '@/consts/route';
 
-import type { ExploreWishDetailT } from '../_types/exploreWish';
+import type { ExploreWishDetailT } from '../../../_common/_types/explore';
 
 type WinnerTournamentCardProps = {
   tournament: NonNullable<ExploreWishDetailT['winnerTournament']>;
