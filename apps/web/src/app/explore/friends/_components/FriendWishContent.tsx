@@ -1,12 +1,19 @@
 'use client';
 
+import { useQueryClient } from '@tanstack/react-query';
 import { useSearchParams } from 'next/navigation';
 import { Suspense } from 'react';
 
+import PullToRefresh from '@/components/common/pull-to-refresh';
+import Spacing from '@/components/spacing';
+import { QUERY_KEYS } from '@/consts/queryKeys';
 import { ROUTES } from '@/consts/route';
+import { usePullToRefresh } from '@/hooks/usePullToRefresh';
 import { cn } from '@/utils/cn';
+import { refetchFirstPage } from '@/utils/refetchFirstPage';
 import { replaceUrlKeepingState } from '@/utils/replaceUrlKeepingState';
 
+import { exploreFriendsQueryOptions } from '../_apis/getExploreFriends';
 import { useGetExploreFriends } from '../_hooks/useGetExploreFriends';
 import FriendWishGrid from './FriendWishGrid';
 
@@ -17,6 +24,17 @@ function FriendWishContent() {
   const activeFriendId = exploreFriendsData.some(({ userId }) => userId === friendParam)
     ? friendParam
     : null;
+
+  const queryClient = useQueryClient();
+  const pullToRefresh = usePullToRefresh(() =>
+    Promise.all([
+      queryClient.refetchQueries(
+        { queryKey: exploreFriendsQueryOptions.queryKey },
+        { throwOnError: true }
+      ),
+      refetchFirstPage(queryClient, QUERY_KEYS.EXPLORE.FRIEND_WISHES(activeFriendId)),
+    ])
+  );
 
   const handleChipClick = (userId: string | null) => {
     if (userId === activeFriendId) return;
@@ -33,7 +51,9 @@ function FriendWishContent() {
   ];
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col">
+      <PullToRefresh {...pullToRefresh} />
+      <Spacing size={16} />
       <div
         role="group"
         aria-label="친구 필터"
@@ -61,6 +81,7 @@ function FriendWishContent() {
         })}
       </div>
 
+      <Spacing size={24} />
       <Suspense>
         <FriendWishGrid friendId={activeFriendId} />
       </Suspense>

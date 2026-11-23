@@ -3,6 +3,7 @@ import { Suspense } from 'react';
 import { Header, HeaderIcon } from '@/components/header';
 
 import WinnerIllustration from './_components/WinnerIllustration';
+import WinnerPullToRefresh from './_components/WinnerPullToRefresh';
 import WinnerWishGrid from './_components/WinnerWishGrid';
 
 function ExploreWinnersPage() {
@@ -13,6 +14,8 @@ function ExploreWinnersPage() {
         left={<HeaderIcon name="BACK" className="size-7.5" />}
         center={<h1 className="heading-1-bold text-text-neutral-primary">남들은 뭘 골랐을까?</h1>}
       />
+
+      <WinnerPullToRefresh />
 
       <div className="mt-4 mb-6 flex items-end justify-between px-5">
         <div className="flex flex-col gap-0.5 text-gray-800">
