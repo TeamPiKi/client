@@ -10,7 +10,7 @@ import { cn } from '@/utils/cn';
 import type { ExploreWishDetailT } from '../../../_common/_types/explore';
 
 type WishOwnerCardProps = {
-  owner: ExploreWishDetailT['owner'];
+  owner: NonNullable<ExploreWishDetailT['owner']>;
   folder: ExploreWishDetailT['folder'];
 };
 

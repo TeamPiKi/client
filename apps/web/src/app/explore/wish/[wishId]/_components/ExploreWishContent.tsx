@@ -10,6 +10,7 @@ import { Z_INDEX } from '@/consts/zIndex';
 import WinnerChip from '../../../_common/_components/WinnerChip';
 import { useGetExploreWish } from '../_hooks/useGetExploreWish';
 import AddToMyWishButton from './AddToMyWishButton';
+import PrivateOwnerCard from './PrivateOwnerCard';
 import WinnerTournamentCard from './WinnerTournamentCard';
 import WishItemInfoCard from './WishItemInfoCard';
 import WishOwnerCard from './WishOwnerCard';
@@ -53,7 +54,7 @@ function ExploreWishContent({ wishId }: ExploreWishContentProps) {
         discountRate={item.discountRate}
         savedCount={savedCount}
       />
-      <WishOwnerCard owner={owner} folder={folder} />
+      {owner ? <WishOwnerCard owner={owner} folder={folder} /> : <PrivateOwnerCard />}
       {winnerTournament && <WinnerTournamentCard tournament={winnerTournament} />}
 
       <AddToMyWishButton wishId={wishId} isInMyWish={isInMyWish} />
