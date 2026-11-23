@@ -77,7 +77,7 @@ test('기타 내용을 쓰다 다른 사유로 바꾸면 상세 내용을 보내
   expect((await reportRequest).postDataJSON()).toEqual({ reason: 'IMPERSONATION' });
 });
 
-test('신고할 상대가 없으면 안내 토스트를 띄우고 신고 화면에 남는다', async ({ page, api }) => {
+test('신고할 상대가 없으면 안내 토스트를 띄우고 신고 화면을 벗어난다', async ({ page, api }) => {
   api.get(ENDPOINTS.USER, MOCK_MEMBER_ME);
   api.error('POST', ENDPOINTS.USER_REPORT(USER_ID), {
     status: 404,
@@ -89,5 +89,26 @@ test('신고할 상대가 없으면 안내 토스트를 띄우고 신고 화면�
   await page.getByRole('button', { name: '신고하기' }).click();
 
   await expect(page.getByText('존재하지 않는 계정이에요.')).toBeVisible();
-  await expect(page).toHaveURL(`${BASE_URL}/report/${USER_ID}`);
+  await expect(page).toHaveURL(`${BASE_URL}/home`);
+});
+
+test('기타 내용은 300자까지만 입력된다', async ({ page, api }) => {
+  api.get(ENDPOINTS.USER, MOCK_MEMBER_ME);
+  api.post(ENDPOINTS.USER_REPORT(USER_ID), null);
+
+  await page.goto(`/report/${USER_ID}`);
+  await page.getByText('기타', { exact: true }).click();
+  const field = page.getByRole('textbox', { name: '기타 신고 사유' });
+  await field.fill('가'.repeat(301));
+
+  await expect(field).toHaveValue('가'.repeat(300));
+  await expect(page.getByText('300/300')).toBeVisible();
+
+  const reportRequest = waitReportRequest(page);
+  await page.getByRole('button', { name: '신고하기' }).click();
+
+  expect((await reportRequest).postDataJSON()).toEqual({
+    reason: 'OTHER',
+    detail: '가'.repeat(300),
+  });
 });

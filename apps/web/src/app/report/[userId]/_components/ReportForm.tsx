@@ -29,6 +29,7 @@ function ReportForm({ userId }: ReportFormProps) {
 
   const { postUserReportMutation, isPostUserReportPending } = usePostUserReport({
     onSuccess: () => backWithFallback(ROUTES.PROFILE(userId)),
+    onNotFound: () => backWithFallback(ROUTES.HOME),
   });
 
   const handleReasonChange = (reason: ReportReasonT) => {
