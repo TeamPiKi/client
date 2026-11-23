@@ -6,9 +6,14 @@ export type FriendT = {
   userId: string;
   nickname: string;
   profileImage: string;
-  isPublic: boolean;
-  folderCount: number;
-  wishCount: number;
+  /** 상대가 프로필을 비공개로 두면 없음 */
+  folderCount?: number | null;
+  wishCount?: number | null;
+};
+
+export type GetFriendsResponseT = {
+  friendCount: number;
+  friends: FriendT[];
 };
 
 export type BlockedUserT = {

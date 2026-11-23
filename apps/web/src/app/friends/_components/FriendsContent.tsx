@@ -11,8 +11,9 @@ import { useDeleteUserBlock } from '@/hooks/useDeleteUserBlock';
 import { usePostUserBlock } from '@/hooks/usePostUserBlock';
 import { replaceUrlKeepingState } from '@/utils/replaceUrlKeepingState';
 
-import { BLOCKED_USERS_MOCK, FRIENDS_MOCK } from '../_consts/friendMock';
+import { BLOCKED_USERS_MOCK } from '../_consts/friendMock';
 import { FRIEND_TAB, FRIEND_TAB_PATH } from '../_consts/friendTab';
+import { useGetFriends } from '../_hooks/useGetFriends';
 import type { FriendT, FriendTabT } from '../_types/friend';
 import { parseFriendTabParam } from '../_utils/friendSearchParams';
 import BlockedUserMenu from './BlockedUserMenu';
@@ -28,9 +29,11 @@ function FriendsContent() {
 
   const router = useRouter();
 
-  /** TEMP: 목데이터 삭제·차단 결과 표시용 상태라 API 연동 시 조회 쿼리로 교체함 */
-  const [friends, setFriends] = useState(FRIENDS_MOCK);
-  /** TEMP: 목데이터 차단·차단 해제 결과 표시용 상태라 API 연동 시 조회 쿼리로 교체함 */
+  const {
+    friendsData: { friendCount, friends },
+  } = useGetFriends();
+
+  /** TEMP: 목데이터 차단 해제 결과 표시용 상태라 API 연동 시 조회 쿼리로 교체함 */
   const [blockedUsers, setBlockedUsers] = useState(BLOCKED_USERS_MOCK);
 
   const [deleteTarget, setDeleteTarget] = useState<FriendT | null>(null);
@@ -49,26 +52,12 @@ function FriendsContent() {
     trigger.focus();
   };
 
-  const removeFriend = (userId: string) =>
-    setFriends(prev => prev.filter(friend => friend.userId !== userId));
-
   const { deleteFriendMutation, isDeleteFriendPending } = useDeleteFriend({
-    onSuccess: userId => {
-      removeFriend(userId);
-      setIsDeleteDialogOpen(false);
-    },
+    onSuccess: () => setIsDeleteDialogOpen(false),
   });
 
   const { postUserBlockMutation, isPostUserBlockPending } = usePostUserBlock({
-    onSuccess: userId => {
-      const blockedFriend = friends.find(friend => friend.userId === userId);
-      if (blockedFriend) {
-        const { nickname, profileImage } = blockedFriend;
-        setBlockedUsers(prev => [{ userId, nickname, profileImage }, ...prev]);
-      }
-      removeFriend(userId);
-      setIsBlockDialogOpen(false);
-    },
+    onSuccess: () => setIsBlockDialogOpen(false),
   });
 
   const { deleteUserBlockMutation } = useDeleteUserBlock({
@@ -84,7 +73,7 @@ function FriendsContent() {
       <div className="px-5 pt-4">
         <UnderlineTab
           tabs={[
-            { value: FRIEND_TAB.FRIENDS, label: `친구 ${friends.length}` },
+            { value: FRIEND_TAB.FRIENDS, label: `친구 ${friendCount}` },
             { value: FRIEND_TAB.BLOCKED, label: '차단 목록' },
           ]}
           activeTab={activeTab}
@@ -105,7 +94,7 @@ function FriendsContent() {
                   nickname={friend.nickname}
                   profileImage={friend.profileImage}
                   description={
-                    friend.isPublic
+                    friend.folderCount != null && friend.wishCount != null
                       ? `폴더 ${friend.folderCount}개 · 위시 ${friend.wishCount}개`
                       : '비공개'
                   }
