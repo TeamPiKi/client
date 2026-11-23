@@ -10,11 +10,9 @@ import useIntersectionObserver from '@/hooks/useIntersectionObserver';
 import { useGetFriendWishes } from '../../_common/_hooks/useGetFriendWishes';
 import FriendWishGridCard from './FriendWishGridCard';
 
-/** 이미지 preload 개수 */
 const PRELOAD_COUNT = 4;
 
 type FriendWishGridProps = {
-  /** null 이면 전체 친구 */
   friendId: string | null;
 };
 

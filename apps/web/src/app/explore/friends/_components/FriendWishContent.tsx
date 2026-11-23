@@ -14,7 +14,6 @@ function FriendWishContent() {
   const { exploreFriendsData } = useGetExploreFriends();
   const searchParams = useSearchParams();
   const friendParam = searchParams.get('friend');
-  /** 비공개로 바뀌었거나 목록에서 빠진 친구 id 가 남아 있으면 전체로 봄 */
   const activeFriendId = exploreFriendsData.some(({ userId }) => userId === friendParam)
     ? friendParam
     : null;

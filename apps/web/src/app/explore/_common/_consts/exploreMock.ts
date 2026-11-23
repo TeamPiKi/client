@@ -36,10 +36,10 @@ const SLEEPY_MONKEY: ExploreFriendT = {
   profileImage: 'https://picsum.photos/seed/piki-friend-3/80',
 };
 
-/** TEMP: 친구 API 연동 전 목데이터 — 최근 담은 친구 순. 졸린 원숭이는 담은 위시가 없는 경우 */
+/** TEMP: 친구 API 연동 전 목데이터 */
 export const FRIENDS_MOCK: ExploreFriendT[] = [SLEEPY_CAT, GRAZING_LLAMA, SLEEPY_MONKEY];
 
-/** TEMP: 친구가 담은 위시 API 연동 전 목데이터 — 1위 위시 목데이터와 id 가 겹치지 않게 101 부터 */
+/** TEMP: 친구가 담은 위시 API 연동 전 목데이터 */
 export const FRIEND_WISHES_MOCK: FriendWishT[] = Array.from({ length: 30 }, (_, index) => ({
   wishId: index + 101,
   item: {

@@ -18,14 +18,12 @@ export type WinnerWishT = {
   };
 };
 
-/** 위시를 담은 친구 */
 export type ExploreFriendT = {
   userId: string;
   nickname: string;
   profileImage: string;
 };
 
-/** 친구가 담은 위시 */
 export type FriendWishT = {
   wishId: number;
   item: ExploreItemT;

@@ -8,7 +8,6 @@ import { useGetFriendWishes } from '../_common/_hooks/useGetFriendWishes';
 import ExploreSectionHeader from './ExploreSectionHeader';
 import FriendWishThumbnailCard from './FriendWishThumbnailCard';
 
-/** 가로 스크롤에 노출할 최대 개수 */
 const MAX_COUNT = 20;
 
 function FriendWishSection() {
