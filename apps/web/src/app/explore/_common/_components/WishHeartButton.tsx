@@ -8,8 +8,8 @@ import { GUEST_BLOCK_LOCATION } from '@/consts/guestBlockLocation';
 import { Z_INDEX } from '@/consts/zIndex';
 import { useGetMe } from '@/hooks/useGetMe';
 
-import GuestLoginSheet from '../_common/_components/GuestLoginSheet';
-import { usePostExploreWish } from '../_common/_hooks/usePostExploreWish';
+import { usePostExploreWish } from '../_hooks/usePostExploreWish';
+import GuestLoginSheet from './GuestLoginSheet';
 
 type WishHeartButtonProps = {
   wishId: number;

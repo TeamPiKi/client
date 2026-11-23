@@ -23,6 +23,7 @@ export const ROUTES = {
   EXPLORE_WINNER_CANDIDATES: (tournamentId: number) => `/explore/winners/${tournamentId}`,
   EXPLORE_FRIENDS: '/explore/friends',
   EXPLORE_WISH: (wishId: number) => `/explore/wish/${wishId}`,
+  EXPLORE_FOLDER: (userId: string, folderId: number) => `/explore/folder/${userId}/${folderId}`,
   PROFILE: (userId: string) => `/profile/${userId}`,
 
   /** 3. Member Only */

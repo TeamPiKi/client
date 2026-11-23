@@ -10,7 +10,7 @@ import { isGlobalNetError } from '@/utils/apiError';
 import { getApiErrorMessage } from '@/utils/getApiErrorMessage';
 
 import { postExploreWish } from '../_apis/postExploreWish';
-import type { ExploreWishDetailT, RecentWishT } from '../_types/explore';
+import type { ExploreFolderT, ExploreWishDetailT, RecentWishT } from '../_types/explore';
 
 /** 다른 사람의 위시를 내 전체 위시에 담기 */
 export const usePostExploreWish = () => {
@@ -25,6 +25,16 @@ export const usePostExploreWish = () => {
       queryClient.setQueryData<ExploreWishDetailT | null>(
         QUERY_KEYS.EXPLORE.WISH(wishId),
         prev => prev && { ...prev, isInMyWish: true }
+      );
+      queryClient.setQueriesData<ExploreFolderT | null>(
+        { queryKey: ['explore', 'folder'] },
+        prev =>
+          prev && {
+            ...prev,
+            wishes: prev.wishes.map(wish =>
+              wish.wishId === wishId ? { ...wish, isInMyWish: true } : wish
+            ),
+          }
       );
       queryClient.setQueryData<InfiniteData<ApiResponseT<RecentWishT[]>>>(
         QUERY_KEYS.EXPLORE.RECENT,

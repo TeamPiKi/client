@@ -77,3 +77,15 @@ export type ExploreWishDetailT = {
     candidateImageUrls: string[];
   } | null;
 };
+
+/** 다른 사람 공개 폴더 상세 */
+export type ExploreFolderT = {
+  folderId: number;
+  name: string;
+  wishes: {
+    wishId: number;
+    item: ExploreItemT;
+    /** TODO: 서버 공개 폴더 응답에 없는 값이라 API 연동 시 협의 필요 */
+    isInMyWish: boolean;
+  }[];
+};

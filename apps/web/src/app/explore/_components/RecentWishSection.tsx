@@ -6,10 +6,10 @@ import NextPageStatus from '@/components/common/next-page-status';
 import { ROUTES } from '@/consts/route';
 import useIntersectionObserver from '@/hooks/useIntersectionObserver';
 
+import WishHeartButton from '../_common/_components/WishHeartButton';
 import { useGetRecentWishes } from '../_hooks/useGetRecentWishes';
 import ExploreSectionHeader from './ExploreSectionHeader';
 import RecentWishGridCard from './RecentWishGridCard';
-import WishHeartButton from './WishHeartButton';
 
 const MINUTE_MS = 60 * 1000;
 
