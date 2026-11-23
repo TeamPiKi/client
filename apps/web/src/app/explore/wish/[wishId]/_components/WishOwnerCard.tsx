@@ -5,6 +5,7 @@ import BaseImage from '@/components/base-image';
 import Skeleton from '@/components/skeleton';
 import { ROUTES } from '@/consts/route';
 import { Z_INDEX } from '@/consts/zIndex';
+import { cn } from '@/utils/cn';
 
 import type { ExploreWishDetailT } from '../../../_common/_types/explore';
 
@@ -23,7 +24,12 @@ function WishOwnerCard({ owner, folder }: WishOwnerCardProps) {
         aria-label={`${owner.nickname} 프로필`}
         className="relative size-10 shrink-0 cursor-pointer"
       >
-        <span className="relative block size-full overflow-hidden rounded-full outline-2 outline-white">
+        <span
+          className={cn(
+            'relative block size-full overflow-hidden rounded-full',
+            owner.isFriend && 'outline-[2.4px] outline-sky-blue-300'
+          )}
+        >
           <BaseImage
             src={owner.profileImage}
             alt=""
