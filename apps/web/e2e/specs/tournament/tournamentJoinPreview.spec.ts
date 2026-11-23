@@ -40,7 +40,6 @@ test.describe('무토큰', () => {
   }) => {
     const NICKNAME = '피키손님';
     api.get(ENDPOINTS.USER, MOCK_GUEST_ME);
-    api.get(ENDPOINTS.USER_NICKNAME_CHECK, { available: true });
     api.get(ENDPOINTS.TOURNAMENT(1), MOCK_TOURNAMENT_PENDING);
     /** 실서버는 join/guest 응답의 Set-Cookie 로 게스트 토큰을 심는다 — 스텁도 같은 헤더를 낸다 */
     const guestToken = createFakeJwt(60 * 60, 'GUEST');
