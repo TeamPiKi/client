@@ -24,7 +24,6 @@ export const ERROR_MESSAGE_MAP = {
   'USER-002': '이미 가입된 계정이에요.',
   'USER-003': '탈퇴한 계정이에요.',
   'USER-004': '이미 누군가 쓰고 있는 닉네임이에요. 다른 걸 입력해 주세요.',
-  'USER-005': '닉네임을 만들지 못했어요. 잠시 후 다시 시도해 주세요.',
   'USER-006': '닉네임을 입력해 주세요.',
   'USER-007': '게스트는 탈퇴할 수 없어요.',
   'USER-008': '프로필 이미지는 회원만 바꿀 수 있어요.',
@@ -33,6 +32,7 @@ export const ERROR_MESSAGE_MAP = {
   'USER-011': '이미지 파일이 손상되었거나 형식이 맞지 않아요.',
   'USER-012': '닉네임은 10자까지 입력할 수 있어요.',
   'USER-013': '사용할 수 없는 닉네임이에요.',
+  'USER-014': '프로필 공개 설정은 회원만 바꿀 수 있어요.',
 
   /** AUTH */
   'AUTH-001': '로그인 정보가 만료됐어요. 다시 로그인해 주세요.',
@@ -112,6 +112,7 @@ export const ERROR_MESSAGE_MAP = {
   'ITEM-007': '링크로 등록한 상품만 새로고침할 수 있어요.',
   'ITEM-008': '아직 정보를 가져오는 중인 상품이에요. 끝난 뒤 다시 입력해 주세요.',
   'ITEM-009': '수정할 정보를 입력해 주세요.',
+  'ITEM-010': '정가는 판매가보다 낮을 수 없어요.',
 
   /** LINK */
   'LINK-001': '올바른 링크 형식이 아니에요. 다시 확인해 주세요.',
@@ -170,7 +171,6 @@ export const ERROR_CODE = {
   USER_ALREADY_MEMBER: 'USER-002',
   USER_DELETED: 'USER-003',
   USER_DUPLICATE_NICKNAME: 'USER-004',
-  USER_NICKNAME_GENERATION_FAILED: 'USER-005',
   USER_NICKNAME_BLANK: 'USER-006',
   USER_GUEST_CANNOT_WITHDRAW: 'USER-007',
   USER_GUEST_CANNOT_UPDATE_PROFILE_IMAGE: 'USER-008',
@@ -179,6 +179,7 @@ export const ERROR_CODE = {
   USER_MALFORMED_PROFILE_IMAGE: 'USER-011',
   USER_NICKNAME_TOO_LONG: 'USER-012',
   USER_NICKNAME_RESERVED: 'USER-013',
+  USER_GUEST_CANNOT_UPDATE_PROFILE_VISIBILITY: 'USER-014',
 
   /** 인증 */
   AUTH_INVALID_TOKEN: 'AUTH-001',
@@ -258,6 +259,7 @@ export const ERROR_CODE = {
   ITEM_NOT_REFRESHABLE: 'ITEM-007',
   ITEM_PARSING_IN_PROGRESS: 'ITEM-008',
   ITEM_EMPTY_USER_INPUT: 'ITEM-009',
+  ITEM_ORIGINAL_PRICE_BELOW_PRICE: 'ITEM-010',
 
   /** 상품 링크 */
   LINK_INVALID_FORMAT: 'LINK-001',
