@@ -9,6 +9,7 @@ export const MOCK_GUEST_ME: GuestUserT = {
   profileImage: MOCK_IMAGE_URLS.avatar,
   identityType: 'GUEST',
   email: null,
+  isProfilePublic: true,
 };
 
 /** 회원 전용 UI(위시에서 가져오기 등)를 테스트할 때 사용 */
@@ -18,4 +19,5 @@ export const MOCK_MEMBER_ME: MemberUserT = {
   profileImage: MOCK_IMAGE_URLS.avatar,
   identityType: 'MEMBER',
   email: 'e2e@piki.dev',
+  isProfilePublic: true,
 };
