@@ -10,6 +10,7 @@ import {
   REFRESHED_BODY_TOKEN_SUB,
   REFRESHED_COOKIE_TOKEN_SUB,
 } from '../mocks/auth';
+import { MOCK_EXPLORE_FOLDER, MOCK_FOLDER_OWNER_ID } from '../mocks/explore';
 import { MOCK_FOLDERS } from '../mocks/folder';
 import { MOCK_GUEST_ME, MOCK_MEMBER_ME } from '../mocks/me';
 import {
@@ -64,6 +65,8 @@ const SSR_MOCK_ROUTES: Record<string, unknown> = {
   [`GET ${ENDPOINTS.WISHLIST(1)}`]: createApiSuccess(MOCK_WISH_DETAIL),
   [`GET ${ENDPOINTS.FOLDERS}`]: createApiSuccess(MOCK_FOLDERS),
   [`GET ${ENDPOINTS.WISHLISTS_COUNT}`]: createApiSuccess({ count: MOCK_WISHLIST_ENTRIES.length }),
+  [`GET ${ENDPOINTS.PROFILE_FOLDER(MOCK_FOLDER_OWNER_ID, MOCK_EXPLORE_FOLDER.folderId)}`]:
+    createApiSuccess(MOCK_EXPLORE_FOLDER),
 };
 
 const readCookie = (req: http.IncomingMessage, name: string) =>
