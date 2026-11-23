@@ -39,7 +39,8 @@ function CollapsibleTitle({ title, right }: CollapsibleTitleProps) {
         isHidden ? '-mb-6 grid-rows-[0fr] opacity-0' : 'grid-rows-[1fr]'
       )}
     >
-      <div className="flex min-h-0 items-center justify-between overflow-hidden">
+      {/** 접힌 동안 opacity 로만 숨겨져 안쪽 링크에 포커스가 가므로 inert 로 막는다 */}
+      <div className="flex min-h-0 items-center justify-between overflow-hidden" inert={isHidden}>
         <h1 className="heading-1-bold text-text-neutral-primary">{title}</h1>
         {right}
       </div>
