@@ -3,6 +3,8 @@
 import { type WebBridgeMessageT, isWebBridgeMessageT } from '@piki/core';
 import { useEffect, useRef } from 'react';
 
+import { captureError } from '@/utils/captureError';
+
 /**
  * WebBridge 메시지 수신 핸들러
  * 
@@ -32,15 +34,21 @@ export function useWebBridgeMessage(handler: (messageData: WebBridgeMessageT) =>
 
   useEffect(() => {
     const listener = (event: MessageEvent) => {
+      if (typeof event.data !== 'string') return;
+
+      /** window 메시지엔 다른 출처(광고·로그인 SDK 등)도 섞여 해석 실패는 조용히 넘긴다 */
+      let parsed: unknown;
       try {
-        if (typeof event.data !== 'string') return;
-
-        const parsed = JSON.parse(event.data);
-        if (!isWebBridgeMessageT(parsed)) return;
-
-        handlerRef.current(parsed);
+        parsed = JSON.parse(event.data);
       } catch {
-        console.error('웹뷰 통신메시지 파싱실패');
+        return;
+      }
+      if (!isWebBridgeMessageT(parsed)) return;
+
+      try {
+        handlerRef.current(parsed);
+      } catch (error) {
+        captureError(error, { tags: { source: 'webBridge', messageType: parsed.type } });
       }
     };
 
