@@ -15,6 +15,7 @@ export const Z_INDEX = {
   FAB: 30,
 
   POPOVER: 40,
+  DROPDOWN_MENU: 40,
 
   DIALOG: 50,
   DRAWER: 50,

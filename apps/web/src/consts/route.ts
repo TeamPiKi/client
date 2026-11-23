@@ -18,6 +18,12 @@ export const ROUTES = {
   TOURNAMENT_JOIN_BY_LINK: (id: number) => `/tournament/join/${id}`,
   MYPAGE: '/mypage',
   PLAY_FROM_LINK: (sourceTournamentId: number) => `/play/${sourceTournamentId}`,
+  EXPLORE: '/explore',
+  EXPLORE_WINNERS: '/explore/winners',
+  EXPLORE_WINNER_CANDIDATES: (tournamentId: number) => `/explore/winners/${tournamentId}`,
+  EXPLORE_FRIENDS: '/explore/friends',
+  EXPLORE_WISH: (wishId: number) => `/explore/wish/${wishId}`,
+  PROFILE: (userId: string) => `/profile/${userId}`,
 
   /** 3. Member Only */
   WISHLIST: '/wish',
@@ -29,6 +35,9 @@ export const ROUTES = {
   MYPAGE_EDIT: '/mypage/edit',
   MYPAGE_WITHDRAW: '/mypage/withdraw',
   TOURNAMENT_HISTORY: '/tournament/history',
+  REPORT: (userId: string) => `/report/${userId}`,
+  FRIENDS: '/friends',
+  FRIENDS_BLOCKED_TAB: '/friends?tab=blocked',
 
   /** 4. Authorized Guest or Member */
   TOURNAMENT_CREATE: (tournamentId: number, highlightItemId?: number) =>

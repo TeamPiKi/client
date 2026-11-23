@@ -12,10 +12,12 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 
 import { useWebBridgeMessage } from '@/hooks/useWebBridgeMessage';
+import { captureNonApiError } from '@/utils/captureError';
 import { nativeImageToFile } from '@/utils/handleImage';
 import { WebBridge, isWebview } from '@/utils/webBridge';
 
 const DEFAULT_MAX_COUNT = 5;
+const IMAGE_PROCESS_ERROR_MESSAGE = '이미지 처리 중 오류가 발생했어요.';
 
 type ImagePickerResultT = {
   files: File[];
@@ -55,27 +57,39 @@ export const useImagePicker = ({
   /** 이미지 선택 중인 상태 */
   const [isPending, setIsPending] = useState(false);
 
+  const notifyError = useCallback(
+    (error: Error, message: string) => {
+      if (onError) {
+        onError(error);
+        return;
+      }
+      toast.error(message);
+    },
+    [onError]
+  );
+
   const handleImagesSelect = useCallback(
     async ({ files, skippedCount }: ImagePickerResultT) => {
       /** 한도 초과 파일은 처리 전에 거른다 */
       const validFiles = files.filter(file => file.size <= MAX_IMAGE_UPLOAD_BYTES);
       const oversizedCount = files.length - validFiles.length;
-      if (oversizedCount > 0) 
-        toast.error(ERROR_MESSAGE_MAP[ERROR_CODE.UPLOAD_SIZE_EXCEEDED]);
+      if (oversizedCount > 0) toast.error(ERROR_MESSAGE_MAP[ERROR_CODE.UPLOAD_SIZE_EXCEEDED]);
       if (validFiles.length === 0) return;
 
       setIsPending(true);
       try {
         await onSuccess(validFiles, skippedCount);
       } catch (error) {
-        const pickError =
-          error instanceof Error ? error : new Error('이미지 처리 중 오류가 발생했습니다.');
-        onError?.(pickError);
+        captureNonApiError(error);
+        notifyError(
+          error instanceof Error ? error : new Error(IMAGE_PROCESS_ERROR_MESSAGE),
+          IMAGE_PROCESS_ERROR_MESSAGE
+        );
       } finally {
         setIsPending(false);
       }
     },
-    [onSuccess, onError]
+    [onSuccess, notifyError]
   );
 
   const rejectPendingRequest = useCallback((requestId: string, error: Error) => {
@@ -89,14 +103,22 @@ export const useImagePicker = ({
   /** 앱 → 웹 이미지 피커 응답 수신 */
   useWebBridgeMessage(message => {
     if (message.type === WEBBRIDGE_MESSAGE_TYPE.APP_RES_IMAGE_PICKER_SUCCESS) {
-      const pending = pendingRequestsRef.current.get(message.payload.requestId);
+      const { requestId } = message.payload;
+      const pending = pendingRequestsRef.current.get(requestId);
       if (!pending) return;
 
-      pendingRequestsRef.current.delete(message.payload.requestId);
-      pending.resolve({
-        files: message.payload.images.map(nativeImageToFile),
-        skippedCount: getSkippedCount(message.payload),
-      });
+      /** 변환 실패를 여기서 처리하지 않으면 응답 대기가 끝나지 않아 로딩이 멈추지 않는다 */
+      let files: File[];
+      try {
+        files = message.payload.images.map(nativeImageToFile);
+      } catch (error) {
+        captureNonApiError(error);
+        rejectPendingRequest(requestId, new Error(IMAGE_PROCESS_ERROR_MESSAGE));
+        return;
+      }
+
+      pendingRequestsRef.current.delete(requestId);
+      pending.resolve({ files, skippedCount: getSkippedCount(message.payload) });
       return;
     }
 
@@ -161,12 +183,12 @@ export const useImagePicker = ({
 
         const pickError =
           error instanceof Error ? error : new Error('이미지 선택 중 오류가 발생했습니다.');
-        onError?.(pickError);
+        notifyError(pickError, pickError.message);
       })
       .finally(() => {
         setIsPending(false);
       });
-  }, [maxCount, handleImagesSelect, onError]);
+  }, [maxCount, handleImagesSelect, notifyError]);
 
   /** 이미지 첨부 피커 열기 */
   const openPicker = useCallback(() => {

@@ -42,6 +42,7 @@ export { default as ClipboardIconOutline } from './clipboard.svg';
 export { default as CloseCircularIconOutline } from './close-circular.svg';
 export { default as CloseIconOutline } from './close.svg';
 export { default as CollapseIconOutline } from './collapse.svg';
+export { default as CompassIconOutline } from './compass.svg';
 export { default as ContactsIconOutline } from './contacts.svg';
 export { default as CopyIconOutline } from './copy.svg';
 export { default as CrosshairIconOutline } from './crosshair.svg';

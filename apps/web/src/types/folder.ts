@@ -7,6 +7,7 @@ export type FolderT = {
   /** 최근 넣은 위시 최대 3개 순서. 이미지 없는 위시 칸은 null */
   coverImageUrls: (string | null)[];
   createdAt: string;
+  isPublic: boolean;
 };
 
 export type GetFoldersResponseT = FolderT[];
@@ -22,6 +23,12 @@ export type PatchFolderRequestT = {
 };
 
 export type PatchFolderResponseT = FolderT;
+
+export type PatchFolderVisibilityRequestT = {
+  isPublic: boolean;
+};
+
+export type PatchFolderVisibilityResponseT = FolderT;
 
 export type PostFolderWishesRequestT = {
   wishIds: number[];
