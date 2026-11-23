@@ -1,5 +1,7 @@
 'use client';
 
+import Link from 'next/link';
+
 import { ROUTES } from '@/consts/route';
 
 import ExploreWishCard from '../_common/_components/ExploreWishCard';
@@ -22,7 +24,9 @@ function WinnerWishSection() {
       <ul className="hide-scrollbar flex gap-2.5 overflow-x-auto px-5">
         {winnerWishesData.slice(0, MAX_COUNT).map(({ wishId, item }, index) => (
           <li key={wishId} className="w-[133px] shrink-0">
-            <ExploreWishCard item={item} variant="scroll" isWinner preload={index < 3} />
+            <Link href={ROUTES.EXPLORE_WISH(wishId)} className="block">
+              <ExploreWishCard item={item} variant="scroll" isWinner preload={index < 3} />
+            </Link>
           </li>
         ))}
       </ul>

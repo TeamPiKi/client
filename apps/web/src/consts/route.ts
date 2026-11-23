@@ -20,6 +20,7 @@ export const ROUTES = {
   PLAY_FROM_LINK: (sourceTournamentId: number) => `/play/${sourceTournamentId}`,
   EXPLORE: '/explore',
   EXPLORE_WINNERS: '/explore/winners',
+  EXPLORE_WISH: (wishId: number) => `/explore/wish/${wishId}`,
   PROFILE: (userId: string) => `/profile/${userId}`,
 
   /** 3. Member Only */
