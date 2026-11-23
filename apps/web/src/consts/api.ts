@@ -29,6 +29,7 @@ export const ENDPOINTS = {
   BLOCK: (userId: string) => `/api/v1/blocks/${userId}`,
   FRIENDS: '/api/v1/friends',
   FRIEND: (userId: string) => `/api/v1/friends/${userId}`,
+  USER_REPORT: (userId: string) => `/api/v1/reports/users/${userId}`,
 
   /** 토너먼트 */
   TOURNAMENTS: '/api/v1/tournaments',
