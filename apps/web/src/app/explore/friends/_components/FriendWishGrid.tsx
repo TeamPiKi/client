@@ -7,8 +7,8 @@ import NextPageStatus from '@/components/common/next-page-status';
 import { ROUTES } from '@/consts/route';
 import useIntersectionObserver from '@/hooks/useIntersectionObserver';
 
-import FriendWishCard from '../../_common/_components/FriendWishCard';
 import { useGetFriendWishes } from '../../_common/_hooks/useGetFriendWishes';
+import FriendWishGridCard from './FriendWishGridCard';
 
 /** 이미지 preload 개수 */
 const PRELOAD_COUNT = 4;
@@ -49,12 +49,7 @@ function FriendWishGrid({ friendId }: FriendWishGridProps) {
         {friendWishesData.map(({ wishId, item, friend }, index) => (
           <li key={wishId}>
             <Link href={ROUTES.EXPLORE_WISH(wishId)} className="block">
-              <FriendWishCard
-                item={item}
-                friend={friend}
-                variant="grid"
-                preload={index < PRELOAD_COUNT}
-              />
+              <FriendWishGridCard item={item} friend={friend} preload={index < PRELOAD_COUNT} />
             </Link>
           </li>
         ))}

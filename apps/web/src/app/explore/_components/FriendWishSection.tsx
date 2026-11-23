@@ -4,9 +4,9 @@ import Link from 'next/link';
 
 import { ROUTES } from '@/consts/route';
 
-import FriendWishCard from '../_common/_components/FriendWishCard';
 import { useGetFriendWishes } from '../_common/_hooks/useGetFriendWishes';
 import ExploreSectionHeader from './ExploreSectionHeader';
+import FriendWishThumbnailCard from './FriendWishThumbnailCard';
 
 /** 가로 스크롤에 노출할 최대 개수 */
 const MAX_COUNT = 20;
@@ -27,7 +27,7 @@ function FriendWishSection() {
         {friendWishesData.slice(0, MAX_COUNT).map(({ wishId, item, friend }) => (
           <li key={wishId} className="w-[133px] shrink-0">
             <Link href={ROUTES.EXPLORE_WISH(wishId)} className="block">
-              <FriendWishCard item={item} friend={friend} variant="scroll" />
+              <FriendWishThumbnailCard item={item} friend={friend} />
             </Link>
           </li>
         ))}
