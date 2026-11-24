@@ -12,6 +12,7 @@ import Button from '@/components/button';
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/dialog';
 import { Header, HeaderIcon } from '@/components/header';
 import { Z_INDEX } from '@/consts/zIndex';
+import { captureNonApiError } from '@/utils/captureError';
 import { cn } from '@/utils/cn';
 import { type CropAreaT, cropImage } from '@/utils/cropImage';
 
@@ -160,7 +161,8 @@ function ImageCropEditor({
         results.push({ id: image.id, blob });
       }
       onConfirm(results);
-    } catch {
+    } catch (error) {
+      captureNonApiError(error);
       toast.error('이미지 처리 중 오류가 발생했어요.');
     } finally {
       setIsProcessing(false);
