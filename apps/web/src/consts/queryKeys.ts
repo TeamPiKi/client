@@ -20,6 +20,18 @@ export const QUERY_KEYS = {
         [...QUERY_KEYS.TOURNAMENT.LIST.ALL, params] as const,
     },
   },
+  /** 프로필 */
+  PROFILE: {
+    /** 프로필 (내 것 · 다른 사람) */
+    DETAIL: (userId: string) => ['profile', userId] as const,
+  },
+  /** 친구 */
+  FRIEND: {
+    /** 내 친구 목록 */
+    LIST: ['friends'] as const,
+    /** 차단 목록 */
+    BLOCKED: ['blocks'] as const,
+  },
   /** 탐색 */
   EXPLORE: {
     /** 토너먼트 1위 위시 목록 */
