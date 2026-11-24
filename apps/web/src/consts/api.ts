@@ -1,7 +1,6 @@
 export const ENDPOINTS = {
   /** 유저 */
   USER: '/api/v1/users/me',
-  USER_NICKNAME_CHECK: '/api/v1/users/nickname/check',
   USER_PROFILE_IMAGE_PRESIGNED: '/api/v1/users/me/profile-image',
 
   /** 인증 */

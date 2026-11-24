@@ -93,13 +93,8 @@ function JoinPreviewForm({
     onDeleted: () => setJoinErrorType('DELETED'),
   });
 
-  const {
-    isCheckingNickname,
-    isNicknameChanged,
-    isNicknameValid,
-    nicknameErrorText,
-    trimmedNickname,
-  } = useNicknameValidation(nickname, initialNickname);
+  const { isNicknameChanged, isNicknameValid, nicknameErrorText, trimmedNickname } =
+    useNicknameValidation(nickname, initialNickname);
 
   const helperText = nicknameErrorText ?? duplicateNicknameError;
 
@@ -110,7 +105,6 @@ function JoinPreviewForm({
   const isComplete =
     isNicknameValid &&
     !duplicateNicknameError &&
-    !isCheckingNickname &&
     !isPostJoinPending &&
     !isPostJoinGuestPending &&
     !isPatchTournamentNicknamePending;
