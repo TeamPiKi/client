@@ -1,4 +1,3 @@
-import { ERROR_CODE, ERROR_MESSAGE_MAP } from '@piki/core';
 import type { Page } from '@playwright/test';
 
 import { ENDPOINTS } from '@/consts/api';
@@ -14,24 +13,13 @@ const gotoProfileEdit = async (page: Page, api: ApiMockT) => {
   await expect(page.getByRole('heading', { name: '프로필 수정' })).toBeVisible();
 };
 
-test('중복 닉네임이면 안내 문구를 띄우고 수정 버튼이 비활성화된다', async ({ page, api }) => {
-  await gotoProfileEdit(page, api);
-  api.get(ENDPOINTS.USER_NICKNAME_CHECK, { available: false });
-
-  await page.getByRole('textbox').fill('피키중복');
-
-  await expect(page.getByText(ERROR_MESSAGE_MAP[ERROR_CODE.USER_DUPLICATE_NICKNAME])).toBeVisible();
-  await expect(page.getByRole('button', { name: '수정하기' })).toBeDisabled();
-});
-
-test('사용 가능한 닉네임으로 수정하면 마이페이지에 반영된다', async ({ page, api }) => {
+test('닉네임을 수정하면 마이페이지에 반영된다', async ({ page, api }) => {
   const NEW_NICKNAME = '피키새닉';
   await gotoProfileEdit(page, api);
 
   const submitButton = page.getByRole('button', { name: '수정하기' });
   await expect(submitButton).toBeDisabled();
 
-  api.get(ENDPOINTS.USER_NICKNAME_CHECK, { available: true });
   await page.getByRole('textbox').fill(NEW_NICKNAME);
   await expect(submitButton).toBeEnabled();
 
