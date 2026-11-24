@@ -120,6 +120,9 @@ function JoinPreviewForm({
     !isPostJoinGuestPending &&
     !isPatchTournamentNicknamePending;
 
+  const isSubmitting =
+    isPostJoinPending || isPostJoinGuestPending || isPatchTournamentNicknamePending;
+
   /** 참여 완료 후 뒤로가기로 join 화면에 돌아오면 재참여(409)가 되므로 히스토리에서 제거 */
   const goToTournament = useCallback(() => {
     router.replace(
@@ -209,6 +212,7 @@ function JoinPreviewForm({
             onChange={event => handleNicknameChange(event.target.value)}
             right={<EditIconFill className="size-5" />}
             maxLength={MAX_NICKNAME_LENGTH}
+            readOnly={isSubmitting}
             aria-invalid={Boolean(helperText)}
             {...(helperText ? { helperText } : {})}
           />
@@ -230,9 +234,7 @@ function JoinPreviewForm({
             variant="primary"
             disabled={!isComplete}
             onClick={handleConfirm}
-            isLoading={
-              isPostJoinPending || isPostJoinGuestPending || isPatchTournamentNicknamePending
-            }
+            isLoading={isSubmitting}
           >
             참여하기
           </Button>
