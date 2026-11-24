@@ -3,7 +3,7 @@
 import { ERROR_CODE, ERROR_MESSAGE_MAP } from '@piki/core';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useCallback, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 
 import GuestSignupBanner from '@/app/tournament/_common/_components/GuestSignupBanner';
 import { usePatchTournamentNickname } from '@/app/tournament/join/_hooks/usePatchTournamentNickname';
@@ -25,6 +25,7 @@ import { useNicknameValidation } from '@/hooks/useNicknameValidation';
 import { usePageBackground } from '@/hooks/usePageBackground';
 import type { GetInvitePreviewResponseT } from '@/types/tournament';
 import { logAnalyticsEvent } from '@/utils/analytics';
+import { getApiErrorCode } from '@/utils/apiError';
 import { getLoginPath } from '@/utils/loginRedirect';
 
 type JoinPreviewClientProps = {
@@ -69,13 +70,17 @@ function JoinPreviewForm({
   usePageBackground('var(--color-bg-layer-default)');
 
   const router = useRouter();
-  const { patchTournamentNicknameMutation, isPatchTournamentNicknamePending } =
-    usePatchTournamentNickname();
 
   const [nickname, setNickname] = useState(initialNickname);
   const [joinErrorType, setJoinErrorType] = useState<JoinErrorTypeT | null>(null);
-  /** 중복 체크 통과 후 참여 사이에 선점당한 닉네임 — 재입력 안내 (입력 변경 시 해제) */
   const [duplicateNicknameError, setDuplicateNicknameError] = useState<string | null>(null);
+
+  const hasJoinedRef = useRef(false);
+
+  const { patchTournamentNicknameMutation, isPatchTournamentNicknamePending } =
+    usePatchTournamentNickname({
+      onDuplicateNickname: () => setDuplicateNicknameError(DUPLICATE_NICKNAME_ERROR_TEXT),
+    });
 
   const { postJoinMutation, isPostJoinPending } = usePostJoin({
     onAlreadyJoined: () => router.replace(ROUTES.TOURNAMENT_CREATE(tournamentId)),
@@ -109,6 +114,9 @@ function JoinPreviewForm({
     !isPostJoinGuestPending &&
     !isPatchTournamentNicknamePending;
 
+  const isSubmitting =
+    isPostJoinPending || isPostJoinGuestPending || isPatchTournamentNicknamePending;
+
   /** 참여 완료 후 뒤로가기로 join 화면에 돌아오면 재참여(409)가 되므로 히스토리에서 제거 */
   const goToTournament = useCallback(() => {
     router.replace(
@@ -125,6 +133,23 @@ function JoinPreviewForm({
     setDuplicateNicknameError(null);
   };
 
+  const submitNickname = () => {
+    if (!isNicknameChanged) {
+      goToTournament();
+      return;
+    }
+
+    patchTournamentNicknameMutation(
+      { tournamentId, body: { nickname: trimmedNickname } },
+      {
+        onSuccess: goToTournament,
+        onError: error => {
+          if (getApiErrorCode(error) !== ERROR_CODE.USER_DUPLICATE_NICKNAME) goToTournament();
+        },
+      }
+    );
+  };
+
   const handleConfirm = () => {
     if (!isComplete) return;
 
@@ -136,6 +161,11 @@ function JoinPreviewForm({
       return;
     }
 
+    if (hasJoinedRef.current) {
+      submitNickname();
+      return;
+    }
+
     postJoinMutation(
       {
         tournamentId,
@@ -143,15 +173,8 @@ function JoinPreviewForm({
       },
       {
         onSuccess: () => {
-          if (!isNicknameChanged) {
-            goToTournament();
-            return;
-          }
-
-          patchTournamentNicknameMutation(
-            { tournamentId, body: { nickname: trimmedNickname } },
-            { onSuccess: goToTournament, onError: goToTournament }
-          );
+          hasJoinedRef.current = true;
+          submitNickname();
         },
       }
     );
@@ -183,6 +206,7 @@ function JoinPreviewForm({
             onChange={event => handleNicknameChange(event.target.value)}
             right={<EditIconFill className="size-5" />}
             maxLength={MAX_NICKNAME_LENGTH}
+            readOnly={isSubmitting}
             aria-invalid={Boolean(helperText)}
             {...(helperText ? { helperText } : {})}
           />
@@ -204,9 +228,7 @@ function JoinPreviewForm({
             variant="primary"
             disabled={!isComplete}
             onClick={handleConfirm}
-            isLoading={
-              isPostJoinPending || isPostJoinGuestPending || isPatchTournamentNicknamePending
-            }
+            isLoading={isSubmitting}
           >
             참여하기
           </Button>
