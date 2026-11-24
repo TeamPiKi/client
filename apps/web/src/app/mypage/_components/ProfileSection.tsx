@@ -60,9 +60,11 @@ function ProfileSummary({ userData }: ProfileSummaryProps) {
 
       <div className="min-w-0 flex-1">
         <p className="truncate body-1-bold text-text-neutral-primary">{userData.nickname}</p>
-        <p className="truncate body-2-medium text-text-neutral-tertiary" data-sentry-mask>
-          {userData.email}
-        </p>
+        {userData.email && (
+          <p className="truncate body-2-medium text-text-neutral-tertiary" data-sentry-mask>
+            {userData.email}
+          </p>
+        )}
       </div>
     </>
   );
