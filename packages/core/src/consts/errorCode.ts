@@ -112,6 +112,11 @@ export const ERROR_MESSAGE_MAP = {
   'FRIENDSHIP-001': '친구 기능은 회원만 쓸 수 있어요.',
   'FRIENDSHIP-002': '자기 자신은 친구로 추가할 수 없어요.',
 
+  /** REPORT */
+  'REPORT-001': '신고는 회원만 할 수 있어요.',
+  'REPORT-002': '자기 자신은 신고할 수 없어요.',
+  'REPORT-003': '그 사유에는 상세 내용을 보낼 수 없어요.',
+
   /** ITEM */
   'ITEM-003': '상품 이름을 입력해 주세요.',
   'ITEM-004': '상품 가격을 입력해 주세요.',
@@ -265,6 +270,11 @@ export const ERROR_CODE = {
   /** 친구 */
   FRIENDSHIP_GUEST_CANNOT_USE: 'FRIENDSHIP-001',
   FRIENDSHIP_SELF_NOT_ALLOWED: 'FRIENDSHIP-002',
+
+  /** 신고 */
+  REPORT_GUEST_CANNOT_USE: 'REPORT-001',
+  REPORT_SELF_NOT_ALLOWED: 'REPORT-002',
+  REPORT_DETAIL_NOT_ALLOWED: 'REPORT-003',
 
   /** 상품 */
   ITEM_NAME_REQUIRED_FOR_READY: 'ITEM-003',

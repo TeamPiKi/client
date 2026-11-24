@@ -3,7 +3,13 @@ import Spacing from '@/components/spacing';
 
 import ReportForm from './_components/ReportForm';
 
-function ReportPage() {
+type ReportPageProps = {
+  params: Promise<{ userId: string }>;
+};
+
+async function ReportPage({ params }: ReportPageProps) {
+  const { userId } = await params;
+
   return (
     <main className="flex h-dvh flex-col bg-bg-layer-default pt-padding-top">
       <Header
@@ -14,7 +20,7 @@ function ReportPage() {
 
       <Spacing size={28} />
 
-      <ReportForm />
+      <ReportForm userId={userId} />
     </main>
   );
 }
