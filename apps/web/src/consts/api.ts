@@ -52,6 +52,10 @@ export const ENDPOINTS = {
     `/api/v1/tournaments/${sourceTournamentId}/from-play-link`,
   TOURNAMENT_GROUP_RESULT: (id: number) => `/api/v1/tournaments/${id}/group-result`,
 
+  /** 프로필 */
+  PROFILE_FOLDER: (userId: string, folderId: number) =>
+    `/api/v1/profiles/${userId}/folders/${folderId}`,
+
   /** 알림 */
   NOTIFICATIONS_SUBSCRIBE: '/api/v1/notifications/subscribe',
   NOTIFICATIONS: '/api/v1/notifications',
