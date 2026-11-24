@@ -13,7 +13,15 @@ export const usePatchMe = () => {
 
   const { mutate: patchMeMutation, isPending: isPatchMePending } = useMutation({
     /** 이미지는 presign → S3 직접 PUT → imageKey 확정 순서로 올린다 */
-    mutationFn: async ({ image, nickname }: { image?: File; nickname?: string }) => {
+    mutationFn: async ({
+      image,
+      nickname,
+      isProfilePublic,
+    }: {
+      image?: File;
+      nickname?: string;
+      isProfilePublic?: boolean;
+    }) => {
       let imageKey: string | undefined;
 
       if (image) {
@@ -28,6 +36,7 @@ export const usePatchMe = () => {
       return patchMe({
         ...(nickname ? { nickname } : {}),
         ...(imageKey ? { imageKey } : {}),
+        ...(typeof isProfilePublic === 'boolean' ? { isProfilePublic } : {}),
       });
     },
     onSuccess: async () => {
@@ -38,7 +47,7 @@ export const usePatchMe = () => {
 
       /**
        * 400: 닉네임 형식 오류 · 이미지 형식/내용 오류(USER-009/010/011) · key 오류(UPLOAD-001/002)
-       * 403: 게스트는 프로필 이미지 변경 불가(USER-008)
+       * 403: 게스트는 프로필 이미지(USER-008)·프로필 공개 설정(USER-014) 변경 불가
        * 409: 중복 닉네임(USER-004)
        * S3 PUT 실패(S3UploadError)·502 STORAGE-00x 는 전역(isGlobalNetError)이 처리
        */

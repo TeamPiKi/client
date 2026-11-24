@@ -5,10 +5,13 @@ import { toast } from 'sonner';
 
 import ConfirmDialog from '@/components/common/confirm-dialog';
 import Switch from '@/components/switch';
+import { useGetMe } from '@/hooks/useGetMe';
+import { usePatchMe } from '@/hooks/usePatchMe';
 
 function ProfileVisibilitySection() {
-  // TODO: 프로필 공개 여부 API 스펙이 나오면 조회·변경 API 로 교체
-  const [isProfilePublic, setIsProfilePublic] = useState(true);
+  const { userData } = useGetMe();
+  const { patchMeMutation, isPatchMePending } = usePatchMe();
+
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const switchRef = useRef<HTMLButtonElement>(null);
 
@@ -23,14 +26,22 @@ function ProfileVisibilitySection() {
       return;
     }
 
-    setIsProfilePublic(true);
-    toast.success('내 프로필을 공개로 바꿨어요.');
+    patchMeMutation(
+      { isProfilePublic: true },
+      { onSuccess: () => toast.success('내 프로필을 공개로 바꿨어요.') }
+    );
   };
 
   const handleConfirmPrivate = () => {
-    setIsProfilePublic(false);
-    setIsConfirmOpen(false);
-    toast.success('내 프로필을 비공개로 바꿨어요.');
+    patchMeMutation(
+      { isProfilePublic: false },
+      {
+        onSuccess: () => {
+          setIsConfirmOpen(false);
+          toast.success('내 프로필을 비공개로 바꿨어요.');
+        },
+      }
+    );
   };
 
   return (
@@ -46,8 +57,9 @@ function ProfileVisibilitySection() {
           </span>
           <Switch
             ref={switchRef}
-            checked={isProfilePublic}
+            checked={userData.isProfilePublic}
             onCheckedChange={handleCheckedChange}
+            disabled={isPatchMePending}
             aria-labelledby="profile-visibility-label"
           />
         </div>
@@ -60,6 +72,7 @@ function ProfileVisibilitySection() {
         title="내 프로필을 비공개로 바꿀까요?"
         description="탐색에서 위시와 폴더가 모두 보이지 않아요"
         confirmLabel="비공개로 바꾸기"
+        isPending={isPatchMePending}
         onConfirm={handleConfirmPrivate}
         onCloseAutoFocus={handleDialogCloseAutoFocus}
       />
