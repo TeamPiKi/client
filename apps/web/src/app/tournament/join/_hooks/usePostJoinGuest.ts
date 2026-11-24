@@ -13,7 +13,7 @@ import { WebBridge, isWebview } from '@/utils/webBridge';
 import { postJoinGuest } from '../_apis/postJoinGuest';
 
 type UsePostJoinGuestParams = {
-  /** 닉네임 선점 경쟁에서 밀린 경우 — 프리뷰에서 재입력 유도 */
+  /** 같은 토너먼트에 같은 닉네임이 있는 경우 */
   onDuplicateNickname?: () => void;
   onParticipantsFull?: () => void;
   onAlreadyStarted?: () => void;
@@ -55,7 +55,6 @@ export const usePostJoinGuest = ({
 
       const apiErrorCode = getApiErrorCode(error);
 
-      /** 중복 체크 통과 후 참여 사이에 닉네임을 선점당한 경우 */
       if (apiErrorCode === ERROR_CODE.USER_DUPLICATE_NICKNAME && onDuplicateNickname) {
         onDuplicateNickname();
         return;

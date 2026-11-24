@@ -43,8 +43,3 @@ export type PatchMeRequestT = {
 
 /** 프로필 이미지 업로드 URL 발급 요청 */
 export type PostProfileImagePresignedUrlRequestT = PresignedImageRequestT;
-
-/** 닉네임 중복 체크 응답 */
-export type GetNicknameCheckResponseT = {
-  available: boolean;
-};

@@ -1,7 +1,6 @@
 export const ENDPOINTS = {
   /** 유저 */
   USER: '/api/v1/users/me',
-  USER_NICKNAME_CHECK: '/api/v1/users/nickname/check',
   USER_PROFILE_IMAGE_PRESIGNED: '/api/v1/users/me/profile-image',
 
   /** 인증 */
@@ -26,6 +25,11 @@ export const ENDPOINTS = {
   FOLDER_VISIBILITY: (id: number) => `/api/v1/folders/${id}/visibility`,
   FOLDER_WISHES: (id: number) => `/api/v1/folders/${id}/wishes`,
   FOLDER_WISHES_MOVE: (id: number) => `/api/v1/folders/${id}/wishes/move`,
+  BLOCKS: '/api/v1/blocks',
+  BLOCK: (userId: string) => `/api/v1/blocks/${userId}`,
+  FRIENDS: '/api/v1/friends',
+  FRIEND: (userId: string) => `/api/v1/friends/${userId}`,
+  USER_REPORT: (userId: string) => `/api/v1/reports/users/${userId}`,
 
   /** 토너먼트 */
   TOURNAMENTS: '/api/v1/tournaments',
