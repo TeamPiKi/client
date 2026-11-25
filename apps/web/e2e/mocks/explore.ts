@@ -74,7 +74,7 @@ export const MOCK_EXPLORE_WISH: GetExploreWishResponseT = {
   addedAt: '2026-11-24T09:58:30+09:00',
   saved: false,
   savedUserCount: 12,
-  item: DETAIL_ENTRY!.item,
+  item: { ...DETAIL_ENTRY!.item, sourceUrl: 'https://shop.example/products/501' },
   owner: {
     ...EXPLORE_FRIEND,
     relation: 'FRIEND',

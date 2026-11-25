@@ -71,3 +71,20 @@ test('이미 가진 상품이면 이미 있다고 안내한다', async ({ page, 
 
   await expect(page.getByText('이미 내 위시에 있는 상품이에요')).toBeVisible();
 });
+
+test('상품 링크 배너가 상품 이미지에 가려지지 않는다', async ({ page }) => {
+  await page.goto(ROUTES.EXPLORE_WISH(MOCK_EXPLORE_WISH.wishId));
+
+  const banner = page.getByRole('link', { name: 'shop.example' });
+  await expect(banner).toHaveAttribute('href', MOCK_EXPLORE_WISH.item.sourceUrl ?? '');
+  await expect(page.getByRole('img', { name: MOCK_EXPLORE_WISH.item.name ?? '' })).toHaveCSS(
+    'opacity',
+    '1'
+  );
+  const isOnTop = await banner.evaluate(element => {
+    const { left, top, width, height } = element.getBoundingClientRect();
+    const topElement = document.elementFromPoint(left + width / 2, top + height / 2);
+    return !!topElement && element.contains(topElement);
+  });
+  expect(isOnTop).toBe(true);
+});
