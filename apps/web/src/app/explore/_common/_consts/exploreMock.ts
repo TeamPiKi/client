@@ -55,19 +55,22 @@ export const FRIEND_WISHES_MOCK: FriendWishT[] = Array.from({ length: 30 }, (_, 
 }));
 
 /** TEMP: 탐색 API 연동 전 목데이터 */
-export const RECENT_WISHES_MOCK: RecentWishT[] = Array.from({ length: 45 }, (_, index) => ({
-  wishId: 1000 + index + 1,
-  item: {
-    name:
-      index % 3 === 0
-        ? `상품명입니다. 2줄 이상 길어지면 이렇게 보여요 ${index + 1}`
-        : '상품명입니다.',
-    price: 10000 * ((index % 10) + 1),
-    discountRate: index % 2 === 0 ? (index % 9) * 10 + 9 : null,
-    imageUrl: `https://picsum.photos/seed/piki-recent-${index + 1}/400`,
-    sourcePlatform: index % 4 === 3 ? null : 'Source',
-  },
-  savedAt: '',
-  isInMyWish: index % 5 === 4,
-  friend: index % 4 === 1 ? (FRIENDS_MOCK[index % FRIENDS_MOCK.length] ?? null) : null,
-}));
+export const RECENT_WISHES_MOCK: (RecentWishT & { friend: ExploreFriendT | null })[] = Array.from(
+  { length: 45 },
+  (_, index) => ({
+    wishId: 1000 + index + 1,
+    item: {
+      name:
+        index % 3 === 0
+          ? `상품명입니다. 2줄 이상 길어지면 이렇게 보여요 ${index + 1}`
+          : '상품명입니다.',
+      price: 10000 * ((index % 10) + 1),
+      discountRate: index % 2 === 0 ? (index % 9) * 10 + 9 : null,
+      imageUrl: `https://picsum.photos/seed/piki-recent-${index + 1}/400`,
+      sourcePlatform: index % 4 === 3 ? null : 'Source',
+    },
+    savedAt: '',
+    isInMyWish: index % 5 === 4,
+    friend: index % 4 === 1 ? (FRIENDS_MOCK[index % FRIENDS_MOCK.length] ?? null) : null,
+  })
+);

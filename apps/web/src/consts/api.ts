@@ -56,6 +56,10 @@ export const ENDPOINTS = {
   PROFILE_FOLDER: (userId: string, folderId: number) =>
     `/api/v1/profiles/${userId}/folders/${folderId}`,
 
+  /** 탐색 */
+  EXPLORE_RECENT: '/api/v1/explore/recent',
+  EXPLORE_FRIENDS: '/api/v1/explore/friends',
+
   /** 알림 */
   NOTIFICATIONS_SUBSCRIBE: '/api/v1/notifications/subscribe',
   NOTIFICATIONS: '/api/v1/notifications',

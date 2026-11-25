@@ -10,7 +10,12 @@ import {
   REFRESHED_BODY_TOKEN_SUB,
   REFRESHED_COOKIE_TOKEN_SUB,
 } from '../mocks/auth';
-import { MOCK_EXPLORE_FOLDER, MOCK_FOLDER_OWNER_ID } from '../mocks/explore';
+import {
+  MOCK_EXPLORE_FOLDER,
+  MOCK_FOLDER_OWNER_ID,
+  MOCK_FRIEND_WISHES,
+  createRecentWishes,
+} from '../mocks/explore';
 import { MOCK_FOLDERS } from '../mocks/folder';
 import {
   MOCK_BLOCKED_USERS,
@@ -75,6 +80,8 @@ const SSR_MOCK_ROUTES: Record<string, unknown> = {
   [`GET ${ENDPOINTS.WISHLISTS_COUNT}`]: createApiSuccess({ count: MOCK_WISHLIST_ENTRIES.length }),
   [`GET ${ENDPOINTS.PROFILE_FOLDER(MOCK_FOLDER_OWNER_ID, MOCK_EXPLORE_FOLDER.folderId)}`]:
     createApiSuccess(MOCK_EXPLORE_FOLDER),
+  [`GET ${ENDPOINTS.EXPLORE_RECENT}`]: createApiSuccess(createRecentWishes()),
+  [`GET ${ENDPOINTS.EXPLORE_FRIENDS}`]: createApiSuccess(MOCK_FRIEND_WISHES),
 };
 
 const readCookie = (req: http.IncomingMessage, name: string) =>
@@ -114,6 +121,12 @@ const isEmptyRequested = (req: http.IncomingMessage, pathname: string) => {
   if (!cookie) return false;
 
   return decodeURIComponent(cookie).split(',').includes(pathname);
+};
+
+/** 목록이 배열이 아니라 객체로 감싸진 응답의 빈 값 — 등록 안 된 경로는 빈 배열 */
+const SSR_EMPTY_DATA: Record<string, unknown> = {
+  [ENDPOINTS.EXPLORE_RECENT]: { updatedAt: null, wishes: [] },
+  [ENDPOINTS.EXPLORE_FRIENDS]: { friends: [], wishes: [] },
 };
 
 type StatusOverrideT = { status: number; code: string };
@@ -205,7 +218,8 @@ export const startMockApiServer = (port: number) =>
           extraBody: { user: MOCK_GUEST_ME },
         });
       if (routeKey === `GET ${ENDPOINTS.USER}`) return respondJson(res, 200, resolveMe(req));
-      if (isEmptyRequested(req, pathname)) return respondJson(res, 200, createApiSuccess([]));
+      if (isEmptyRequested(req, pathname))
+        return respondJson(res, 200, createApiSuccess(SSR_EMPTY_DATA[pathname] ?? []));
 
       if (!(routeKey in SSR_MOCK_ROUTES)) {
         return respondJson(res, 404, {

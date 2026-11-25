@@ -38,8 +38,41 @@ export type RecentWishT = {
   savedAt: string;
   /** 이미 내 위시에 있는 상품인지 */
   isInMyWish: boolean;
-  /** 친구가 담은 위시일 때만 존재 */
-  friend: ExploreFriendT | null;
+};
+
+export type RecentWishesT = {
+  /** 서버가 목록을 마지막으로 다시 만든 시각 — 만든 적 없으면 null */
+  updatedAt: string | null;
+  wishes: RecentWishT[];
+};
+
+type ExploreItemResponseT = {
+  id: number;
+  name: string;
+  price: number;
+  originalPrice: number | null;
+  discountRate: number | null;
+  currency: string | null;
+  imageUrl: string;
+  sourceUrl: string | null;
+  sourcePlatform: string | null;
+};
+
+type ExploreWishResponseT = {
+  wishId: number;
+  addedAt: string;
+  saved: boolean;
+  item: ExploreItemResponseT;
+};
+
+export type GetRecentWishesResponseT = {
+  updatedAt: string | null;
+  wishes: ExploreWishResponseT[];
+};
+
+export type GetFriendWishesResponseT = {
+  friends: ExploreFriendT[];
+  wishes: (ExploreWishResponseT & { friend: ExploreFriendT })[];
 };
 
 /** 탐색 위시 상세 */

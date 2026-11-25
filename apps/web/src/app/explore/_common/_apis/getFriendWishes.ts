@@ -1,29 +1,26 @@
-import { infiniteQueryOptions } from '@tanstack/react-query';
+import { environmentManager, infiniteQueryOptions } from '@tanstack/react-query';
 
+import { clientApi } from '@/apis/client';
+import { serverApi } from '@/apis/server';
+import { ENDPOINTS } from '@/consts/api';
 import { QUERY_KEYS } from '@/consts/queryKeys';
 import type { ApiResponseT } from '@/types/api';
 
-import { FRIEND_WISHES_MOCK } from '../_consts/exploreMock';
-import type { FriendWishT } from '../_types/explore';
+import type { FriendWishT, GetFriendWishesResponseT } from '../_types/explore';
 
-const PAGE_SIZE = 20;
-
-/** TEMP: API 스펙 확정 전이라 목데이터를 커서 페이지네이션 응답 형태로 잘라 반환함 */
 export const getFriendWishes = async (
   friendId: string | null,
   cursor: string | null = null
 ): Promise<ApiResponseT<FriendWishT[]>> => {
-  const friendWishes = friendId
-    ? FRIEND_WISHES_MOCK.filter(({ friend }) => friend.userId === friendId)
-    : FRIEND_WISHES_MOCK;
-  const start = cursor ? Number(cursor) : 0;
-  const end = start + PAGE_SIZE;
-  const hasNext = end < friendWishes.length;
+  const api = environmentManager.isServer() ? serverApi : clientApi;
+  const { data } = await api.get<ApiResponseT<GetFriendWishesResponseT>>(
+    ENDPOINTS.EXPLORE_FRIENDS,
+    { params: { size: 20, ...(friendId ? { friendId } : {}), ...(cursor ? { cursor } : {}) } }
+  );
 
   return {
-    data: friendWishes.slice(start, end),
-    code: null,
-    pageResponse: { hasNext, nextCursor: hasNext ? String(end) : null },
+    ...data,
+    data: data.data.wishes.map(({ wishId, item, friend }) => ({ wishId, item, friend })),
   };
 };
 
