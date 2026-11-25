@@ -59,6 +59,8 @@ export const ENDPOINTS = {
   /** 탐색 */
   EXPLORE_RECENT: '/api/v1/explore/recent',
   EXPLORE_FRIENDS: '/api/v1/explore/friends',
+  EXPLORE_WISH: (wishId: number) => `/api/v1/explore/wishes/${wishId}`,
+  EXPLORE_WISH_COPY: (wishId: number) => `/api/v1/explore/wishes/${wishId}/copy`,
 
   /** 알림 */
   NOTIFICATIONS_SUBSCRIBE: '/api/v1/notifications/subscribe',

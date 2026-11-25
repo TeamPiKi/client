@@ -12,8 +12,10 @@ import {
 } from '../mocks/auth';
 import {
   MOCK_EXPLORE_FOLDER,
+  MOCK_EXPLORE_WISH,
   MOCK_FOLDER_OWNER_ID,
   MOCK_FRIEND_WISHES,
+  MOCK_PRIVATE_EXPLORE_WISH,
   createRecentWishes,
 } from '../mocks/explore';
 import { MOCK_FOLDERS } from '../mocks/folder';
@@ -82,6 +84,9 @@ const SSR_MOCK_ROUTES: Record<string, unknown> = {
     createApiSuccess(MOCK_EXPLORE_FOLDER),
   [`GET ${ENDPOINTS.EXPLORE_RECENT}`]: createApiSuccess(createRecentWishes()),
   [`GET ${ENDPOINTS.EXPLORE_FRIENDS}`]: createApiSuccess(MOCK_FRIEND_WISHES),
+  [`GET ${ENDPOINTS.EXPLORE_WISH(MOCK_EXPLORE_WISH.wishId)}`]: createApiSuccess(MOCK_EXPLORE_WISH),
+  [`GET ${ENDPOINTS.EXPLORE_WISH(MOCK_PRIVATE_EXPLORE_WISH.wishId)}`]:
+    createApiSuccess(MOCK_PRIVATE_EXPLORE_WISH),
 };
 
 const readCookie = (req: http.IncomingMessage, name: string) =>

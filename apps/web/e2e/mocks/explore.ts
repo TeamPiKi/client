@@ -3,6 +3,7 @@ import type {
   GetRecentWishesResponseT,
 } from '@/app/explore/_common/_types/explore';
 import type { GetExploreFolderResponseT } from '@/app/explore/folder/[userId]/[folderId]/_types/exploreFolder';
+import type { GetExploreWishResponseT } from '@/app/explore/wish/[wishId]/_types/exploreWish';
 
 import { MOCK_FRIEND_PIKI } from './friend';
 import { MOCK_IMAGE_URLS } from './images';
@@ -64,4 +65,25 @@ export const MOCK_FRIEND_WISHES: GetFriendWishesResponseT = {
       friend: EXPLORE_FRIEND,
     },
   ],
+};
+
+const [DETAIL_ENTRY] = MOCK_WISHLIST_ENTRIES;
+
+export const MOCK_EXPLORE_WISH: GetExploreWishResponseT = {
+  wishId: 501,
+  addedAt: '2026-11-24T09:58:30+09:00',
+  saved: false,
+  savedUserCount: 12,
+  item: DETAIL_ENTRY!.item,
+  owner: {
+    ...EXPLORE_FRIEND,
+    relation: 'FRIEND',
+    folder: { folderId: MOCK_EXPLORE_FOLDER.folderId, name: MOCK_EXPLORE_FOLDER.name },
+  },
+};
+
+export const MOCK_PRIVATE_EXPLORE_WISH: GetExploreWishResponseT = {
+  ...MOCK_EXPLORE_WISH,
+  wishId: 502,
+  owner: null,
 };
