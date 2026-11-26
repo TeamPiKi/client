@@ -1,100 +1,48 @@
-import { queryOptions } from '@tanstack/react-query';
+import { environmentManager, queryOptions } from '@tanstack/react-query';
 
+import { clientApi } from '@/apis/client';
+import { serverApi } from '@/apis/server';
+import { ENDPOINTS } from '@/consts/api';
 import { QUERY_KEYS } from '@/consts/queryKeys';
+import type { ApiResponseT } from '@/types/api';
+import { getApiErrorStatus } from '@/utils/apiError';
 
-import {
-  FRIEND_WISHES_MOCK,
-  RECENT_WISHES_MOCK,
-  WINNER_WISHES_MOCK,
-} from '../../../_common/_consts/exploreMock';
 import type { ExploreWishDetailT } from '../../../_common/_types/explore';
+import type { GetExploreWishResponseT } from '../_types/exploreWish';
 
-/** TEMP: API 스펙 확정 전이라 1위 위시 · 친구가 담은 위시 · 방금 담긴 위시 목데이터로 상세 응답을 만들어 반환함 */
+/** 서버가 없는 위시·파싱 중·실패 위시를 404 로 응답하므로 null 로 바꿔 볼 수 없는 화면으로 보냄 */
 export const getExploreWish = async (wishId: number): Promise<ExploreWishDetailT | null> => {
-  const friendWish = FRIEND_WISHES_MOCK.find(wish => wish.wishId === wishId);
-  if (friendWish) {
-    const { item, friend } = friendWish;
+  const api = environmentManager.isServer() ? serverApi : clientApi;
+  try {
+    const { data } = await api.get<ApiResponseT<GetExploreWishResponseT>>(
+      ENDPOINTS.EXPLORE_WISH(wishId)
+    );
+    const { saved, savedUserCount, item, owner } = data.data;
 
     return {
       wishId,
       item: {
-        name: item.name,
+        name: item.name ?? '',
         price: item.price ?? 0,
         discountRate: item.discountRate,
         imageUrl: item.imageUrl ?? '',
-        sourceUrl: 'https://29cm.onelink.me',
+        sourceUrl: item.sourceUrl,
       },
-      isInMyWish: wishId % 4 === 0,
-      savedCount: (wishId % 7) + 1,
-      owner: { ...friend, isFriend: true },
-      folder: wishId % 2 === 0 ? { id: wishId, name: '11월 위시리스트' } : null,
+      isInMyWish: saved,
+      savedCount: savedUserCount,
+      owner: owner && {
+        userId: owner.userId,
+        nickname: owner.nickname,
+        profileImage: owner.profileImage,
+        isFriend: owner.relation === 'FRIEND',
+      },
+      folder: owner?.folder ? { id: owner.folder.folderId, name: owner.folder.name } : null,
       winnerTournament: null,
     };
+  } catch (error) {
+    if (getApiErrorStatus(error) === 404) return null;
+    throw error;
   }
-
-  const recentWish = RECENT_WISHES_MOCK.find(wish => wish.wishId === wishId);
-  if (recentWish) {
-    const { item, isInMyWish, friend } = recentWish;
-    const isPrivateOwner = !friend && wishId % 3 === 0;
-
-    return {
-      wishId,
-      item: {
-        name: item.name,
-        price: item.price ?? 0,
-        discountRate: item.discountRate,
-        imageUrl: item.imageUrl ?? '',
-        sourceUrl: item.sourcePlatform ? 'https://29cm.onelink.me' : null,
-      },
-      isInMyWish,
-      savedCount: (wishId % 7) + 1,
-      owner: isPrivateOwner
-        ? null
-        : {
-            userId: friend?.userId ?? `user-${wishId}`,
-            nickname: friend?.nickname ?? '토라진 고양이',
-            profileImage:
-              friend?.profileImage ?? `https://picsum.photos/seed/piki-owner-${wishId}/80`,
-            isFriend: !!friend,
-          },
-      folder: !isPrivateOwner && wishId % 2 === 0 ? { id: wishId, name: '11월 위시리스트' } : null,
-      winnerTournament: null,
-    };
-  }
-
-  const winnerWish = WINNER_WISHES_MOCK.find(wish => wish.wishId === wishId);
-  if (!winnerWish) return null;
-
-  const { item, tournament } = winnerWish;
-
-  return {
-    wishId,
-    item: {
-      name: item.name,
-      price: item.price ?? 0,
-      discountRate: item.discountRate,
-      imageUrl: item.imageUrl ?? '',
-      sourceUrl: 'https://29cm.onelink.me',
-    },
-    isInMyWish: wishId % 4 === 0,
-    savedCount: (wishId % 7) + 1,
-    owner: {
-      userId: String(wishId),
-      nickname: '난폭한 북극곰',
-      profileImage: `https://picsum.photos/seed/piki-owner-${wishId}/80`,
-      isFriend: wishId % 3 === 0,
-    },
-    folder: wishId % 2 === 0 ? { id: wishId, name: '11월 위시리스트' } : null,
-    winnerTournament: {
-      id: tournament.id,
-      title: tournament.title,
-      candidateCount: 12,
-      candidateImageUrls: Array.from(
-        { length: 6 },
-        (_, index) => `https://picsum.photos/seed/piki-candidate-${tournament.id}-${index}/140`
-      ),
-    },
-  };
 };
 
 export const exploreWishQueryOptions = (wishId: number) =>

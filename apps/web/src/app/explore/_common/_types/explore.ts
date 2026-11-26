@@ -75,6 +75,13 @@ export type GetFriendWishesResponseT = {
   wishes: (ExploreWishResponseT & { friend: ExploreFriendT })[];
 };
 
+export type PostExploreWishResponseT = {
+  /** 내 위시 id — 이미 가진 상품이면 원래 위시 id */
+  wishId: number;
+  /** true 면 새로 만들지 않음 */
+  alreadySaved: boolean;
+};
+
 /** 탐색 위시 상세 */
 export type ExploreWishDetailT = {
   wishId: number;
