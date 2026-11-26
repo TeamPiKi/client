@@ -16,8 +16,8 @@ export type GuestUserT = BaseUserT & {
 export type MemberUserT = BaseUserT & {
   /** 유저 식별 타입 */
   identityType: 'MEMBER';
-  /** 유저 이메일 */
-  email: string;
+  /** 유저 이메일 (미수집·미동의면 null) */
+  email: string | null;
 };
 
 type BaseUserT = {
@@ -27,6 +27,8 @@ type BaseUserT = {
   nickname: string;
   /** 유저 프로필 이미지 URL */
   profileImage: string;
+  /** 내 프로필 공개 여부 */
+  isProfilePublic: boolean;
 };
 
 /** 유저 정보 수정 요청 — 담아 보낸 필드만 갱신된다 */
@@ -35,12 +37,9 @@ export type PatchMeRequestT = {
   nickname?: string;
   /** 업로드를 마친 프로필 이미지 key */
   imageKey?: string;
+  /** 내 프로필 공개 여부 (MEMBER 전용) */
+  isProfilePublic?: boolean;
 };
 
 /** 프로필 이미지 업로드 URL 발급 요청 */
 export type PostProfileImagePresignedUrlRequestT = PresignedImageRequestT;
-
-/** 닉네임 중복 체크 응답 */
-export type GetNicknameCheckResponseT = {
-  available: boolean;
-};

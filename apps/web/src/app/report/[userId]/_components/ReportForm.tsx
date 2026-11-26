@@ -1,7 +1,6 @@
 'use client';
 
 import { type FormEvent, useState } from 'react';
-import { toast } from 'sonner';
 
 import { CheckboxEmptyIconFill, CheckboxSelectedIconFill } from '@/assets/icons';
 import BottomCta from '@/components/bottom-cta';
@@ -12,15 +11,26 @@ import { useBackWithFallback } from '@/hooks/useBackWithFallback';
 import { usePageBackground } from '@/hooks/usePageBackground';
 
 import { REPORT_REASONS } from '../_consts/report';
+import { usePostUserReport } from '../_hooks/usePostUserReport';
+import type { ReportReasonT } from '../_types/report';
 import ReportEtcField from './ReportEtcField';
 
-function ReportForm() {
+type ReportFormProps = {
+  userId: string;
+};
+
+function ReportForm({ userId }: ReportFormProps) {
   usePageBackground('var(--color-bg-layer-default)');
 
   const backWithFallback = useBackWithFallback();
 
   const [selectedReason, setSelectedReason] = useState<ReportReasonT | null>(null);
   const [etcReason, setEtcReason] = useState<string>('');
+
+  const { postUserReportMutation, isPostUserReportPending } = usePostUserReport({
+    onSuccess: () => backWithFallback(ROUTES.PROFILE(userId)),
+    onNotFound: () => backWithFallback(ROUTES.HOME),
+  });
 
   const handleReasonChange = (reason: ReportReasonT) => {
     setSelectedReason(prev => (prev === reason ? null : reason));
@@ -30,11 +40,14 @@ function ReportForm() {
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    if (!selectedReason) return;
+    if (!selectedReason || isPostUserReportPending) return;
 
-    /** TEMP: 신고 API 연동 전 목 처리 */
-    toast.success('신고가 접수됐어요');
-    backWithFallback(ROUTES.HOME);
+    const detail = etcReason.trim();
+    postUserReportMutation({
+      userId,
+      reason: selectedReason,
+      ...(selectedReason === 'OTHER' && detail && { detail }),
+    });
   };
 
   return (
@@ -61,7 +74,7 @@ function ReportForm() {
           ))}
         </fieldset>
 
-        {selectedReason === 'ETC' && (
+        {selectedReason === 'OTHER' && (
           <>
             <Spacing size={19} />
             <ReportEtcField value={etcReason} onChange={setEtcReason} />
@@ -70,15 +83,19 @@ function ReportForm() {
       </div>
 
       <BottomCta className="border-t border-gray-50 bg-bg-layer-default">
-        <Button type="submit" variant="primary" size="lg" disabled={!selectedReason}>
+        <Button
+          type="submit"
+          variant="primary"
+          size="lg"
+          disabled={!selectedReason}
+          isLoading={isPostUserReportPending}
+        >
           신고하기
         </Button>
       </BottomCta>
     </form>
   );
 }
-
-type ReportReasonT = (typeof REPORT_REASONS)[number]['value'];
 
 type ReportReasonOptionProps = {
   value: ReportReasonT;

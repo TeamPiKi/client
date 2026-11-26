@@ -1,12 +1,23 @@
-import { queryOptions } from '@tanstack/react-query';
+import { environmentManager, queryOptions } from '@tanstack/react-query';
 
+import { clientApi } from '@/apis/client';
+import { serverApi } from '@/apis/server';
+import { ENDPOINTS } from '@/consts/api';
 import { QUERY_KEYS } from '@/consts/queryKeys';
+import type { ApiResponseT } from '@/types/api';
 
-import { FRIENDS_MOCK } from '../../_common/_consts/exploreMock';
-import type { ExploreFriendT } from '../../_common/_types/explore';
+import type { ExploreFriendT, GetFriendWishesResponseT } from '../../_common/_types/explore';
 
-/** TEMP: API 스펙 확정 전이라 목데이터를 반환함 */
-export const getExploreFriends = async (): Promise<ExploreFriendT[]> => FRIENDS_MOCK;
+/** 친구가 담은 위시 응답에 함께 오는 상단 칩용 친구 목록만 쓰므로 위시는 1개만 받음 */
+export const getExploreFriends = async (): Promise<ExploreFriendT[]> => {
+  const api = environmentManager.isServer() ? serverApi : clientApi;
+  const { data } = await api.get<ApiResponseT<GetFriendWishesResponseT>>(
+    ENDPOINTS.EXPLORE_FRIENDS,
+    { params: { size: 1 } }
+  );
+
+  return data.data.friends;
+};
 
 export const exploreFriendsQueryOptions = queryOptions({
   queryKey: QUERY_KEYS.EXPLORE.FRIENDS,

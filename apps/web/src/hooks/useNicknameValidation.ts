@@ -1,53 +1,25 @@
 import { ERROR_CODE, ERROR_MESSAGE_MAP } from '@piki/core';
 
-import { useGetNicknameCheck } from '@/hooks/useGetNicknameCheck';
-import { getApiErrorMessage } from '@/utils/getApiErrorMessage';
-
+const NICKNAME_MAX_LENGTH = 10;
 const WITHDRAW_PREFIX = '탈퇴';
 const WITHDRAW_PREFIX_ERROR_TEXT = `'탈퇴'로 시작하는 닉네임은 사용할 수 없습니다.`;
-const DUPLICATE_NICKNAME_ERROR_TEXT = ERROR_MESSAGE_MAP[ERROR_CODE.USER_DUPLICATE_NICKNAME];
 
 export const useNicknameValidation = (nickname: string, originalNickname: string) => {
   const trimmedNickname = nickname.trim();
   const isNicknameChanged = trimmedNickname !== originalNickname;
   const hasNickname = trimmedNickname.length > 0;
-  const hasInvalidPrefix = trimmedNickname.startsWith(WITHDRAW_PREFIX);
-  const canCheckNickname = isNicknameChanged && hasNickname && !hasInvalidPrefix;
-
-  const {
-    nicknameCheckData,
-    nicknameCheckError,
-    isNicknameCheckFetching,
-    isGetNicknameCheckSuccess,
-  } = useGetNicknameCheck(nickname, canCheckNickname);
-
-  const isCheckingNickname =
-    isNicknameChanged && hasNickname && !hasInvalidPrefix && isNicknameCheckFetching;
-
-  /** 검사 진행 중에는 에러 표시 X */
-  const isDuplicateConfirmed =
-    canCheckNickname && !isCheckingNickname && nicknameCheckData?.available === false;
 
   let nicknameErrorText: string | null = null;
 
-  if (hasInvalidPrefix) nicknameErrorText = WITHDRAW_PREFIX_ERROR_TEXT;
-  else if (canCheckNickname && nicknameCheckError)
-    nicknameErrorText = getApiErrorMessage(nicknameCheckError);
-  else if (isDuplicateConfirmed) nicknameErrorText = DUPLICATE_NICKNAME_ERROR_TEXT;
+  if (isNicknameChanged) {
+    if (!hasNickname) nicknameErrorText = ERROR_MESSAGE_MAP[ERROR_CODE.USER_NICKNAME_BLANK];
+    else if (trimmedNickname.length > NICKNAME_MAX_LENGTH)
+      nicknameErrorText = ERROR_MESSAGE_MAP[ERROR_CODE.USER_NICKNAME_TOO_LONG];
+    else if (trimmedNickname.startsWith(WITHDRAW_PREFIX))
+      nicknameErrorText = WITHDRAW_PREFIX_ERROR_TEXT;
+  }
 
-  const isNicknameValid =
-    hasNickname &&
-    (!isNicknameChanged ||
-      (canCheckNickname &&
-        isGetNicknameCheckSuccess &&
-        !isNicknameCheckFetching &&
-        nicknameCheckData?.available === true));
+  const isNicknameValid = hasNickname && nicknameErrorText === null;
 
-  return {
-    isCheckingNickname,
-    isNicknameChanged,
-    isNicknameValid,
-    nicknameErrorText,
-    trimmedNickname,
-  };
+  return { isNicknameChanged, isNicknameValid, nicknameErrorText, trimmedNickname };
 };

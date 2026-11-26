@@ -1,4 +1,5 @@
 import { ChevronForwardIconFill, LinkIconFill } from '@/assets/icons';
+import { Z_INDEX } from '@/consts/zIndex';
 
 type ItemLinkBannerProps = {
   sourceUrl: string;
@@ -22,6 +23,7 @@ function ItemLinkBanner({ sourceUrl }: ItemLinkBannerProps) {
       target="_blank"
       rel="noopener noreferrer"
       className="liquid-glass absolute bottom-4 left-4 flex max-w-[calc(100%-32px)] items-center gap-2 rounded-full p-1 pr-2"
+      style={{ zIndex: Z_INDEX.BASE_IMAGE + 1 }}
     >
       <span className="flex size-8 shrink-0 items-center justify-center rounded-full border border-border-neutral-muted bg-bg-layer-default">
         <LinkIconFill className="size-5 text-icon-neutral-primary" />
