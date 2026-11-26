@@ -23,6 +23,18 @@ test('공개 폴더면 폴더 이름과 위시 카드를 보여주고 카드는 
   }
 });
 
+test('이미 내 위시에 있는 상품은 처음부터 하트가 채워져 있다', async ({ page, api }) => {
+  api.get(FOLDER_PATH, MOCK_EXPLORE_FOLDER);
+
+  await page.goto(PAGE_PATH);
+
+  const savedHeart = page.getByRole('button', { name: '내 위시에 담긴 상품' });
+  await expect(savedHeart).toHaveCount(1);
+  await expect(savedHeart).toHaveAttribute('aria-pressed', 'true');
+  await expect(savedHeart).toBeDisabled();
+  await expect(page.getByRole('button', { name: '내 위시로 담기' })).toHaveCount(1);
+});
+
 test('볼 수 없는 폴더면 서버 404 를 안내 화면으로 보여준다', async ({ page, api }) => {
   await setSsrStatus(page, `GET ${FOLDER_PATH}`, 404, 'USER-001');
   api.error('GET', FOLDER_PATH, { status: 404, code: 'USER-001' });
