@@ -36,8 +36,7 @@ const SLEEPY_MONKEY: ExploreFriendT = {
   profileImage: 'https://picsum.photos/seed/piki-friend-3/80',
 };
 
-/** TEMP: 친구 API 연동 전 목데이터 */
-export const FRIENDS_MOCK: ExploreFriendT[] = [SLEEPY_CAT, GRAZING_LLAMA, SLEEPY_MONKEY];
+const FRIENDS_MOCK: ExploreFriendT[] = [SLEEPY_CAT, GRAZING_LLAMA, SLEEPY_MONKEY];
 
 /** TEMP: 친구가 담은 위시 API 연동 전 목데이터 */
 export const FRIEND_WISHES_MOCK: FriendWishT[] = Array.from({ length: 30 }, (_, index) => ({

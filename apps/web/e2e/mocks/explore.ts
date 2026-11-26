@@ -34,6 +34,12 @@ const EXPLORE_FRIEND = {
   profileImage: MOCK_FRIEND_PIKI.profileImage,
 };
 
+const OTHER_EXPLORE_FRIEND = {
+  userId: '00000000-0000-4000-8000-000000000003',
+  nickname: '지은',
+  profileImage: MOCK_IMAGE_URLS.avatar,
+};
+
 /** updatedAt 은 "N분전 업데이트" 표시를 검증하려고 요청 시점 기준 5분 전으로 만든다 */
 export const createRecentWishes = (): GetRecentWishesResponseT => ({
   updatedAt: new Date(Date.now() - 5 * 60 * 1000).toISOString(),
@@ -54,7 +60,7 @@ export const createRecentWishes = (): GetRecentWishesResponseT => ({
 });
 
 export const MOCK_FRIEND_WISHES: GetFriendWishesResponseT = {
-  friends: [EXPLORE_FRIEND],
+  friends: [EXPLORE_FRIEND, OTHER_EXPLORE_FRIEND],
   wishes: [
     {
       wishId: 401,
@@ -62,6 +68,13 @@ export const MOCK_FRIEND_WISHES: GetFriendWishesResponseT = {
       saved: false,
       item: createExploreItem(911, '친구의 니트', '29CM'),
       friend: EXPLORE_FRIEND,
+    },
+    {
+      wishId: 402,
+      addedAt: '2026-11-24T08:00:00+09:00',
+      saved: false,
+      item: createExploreItem(912, '다른 친구의 장갑', '29CM'),
+      friend: OTHER_EXPLORE_FRIEND,
     },
   ],
 };
