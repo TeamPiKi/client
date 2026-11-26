@@ -1,8 +1,12 @@
-import { getIsGuest } from '@/utils/auth';
+import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
+import { notFound } from 'next/navigation';
 
+import { getApiErrorStatus } from '@/utils/apiError';
+import { getIsGuest } from '@/utils/auth';
+import { getQueryClient } from '@/utils/queryClient';
+
+import { getProfile, profileQueryOptions } from './_apis/getProfile';
 import ProfileContent from './_components/ProfileContent';
-import { PROFILE_MOCK } from './_consts/profileMock';
-import type { ProfileT } from './_types/profile';
 
 type ProfilePageProps = {
   params: Promise<{ userId: string }>;
@@ -11,12 +15,25 @@ type ProfilePageProps = {
 async function ProfilePage({ params }: ProfilePageProps) {
   const { userId } = await params;
   const isGuest = await getIsGuest();
+  const queryClient = getQueryClient();
 
-  /** TODO: 프로필 조회 API 연동 시 400(UUID 형식 아님) · 404(없는 사용자)는 notFound 처리 */
-  /** TEMP: 프로필 조회 API 연동 시 서버 조회로 교체 */
-  const profile: ProfileT = { userId, ...PROFILE_MOCK };
+  try {
+    const profileData = await getProfile(userId);
+    queryClient.setQueryData(profileQueryOptions(userId).queryKey, profileData);
+  } catch (error) {
+    const status = getApiErrorStatus(error);
 
-  return <ProfileContent profile={profile} isGuest={isGuest} />;
+    /** 400: UUID 형식 아님 · 404: 없거나 탈퇴한 사용자 */
+    if (status === 400 || status === 404) notFound();
+
+    throw error;
+  }
+
+  return (
+    <HydrationBoundary state={dehydrate(queryClient)}>
+      <ProfileContent userId={userId} isGuest={isGuest} />
+    </HydrationBoundary>
+  );
 }
 
 export default ProfilePage;
