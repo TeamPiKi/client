@@ -1,5 +1,6 @@
 'use client';
 
+import { useQueryClient } from '@tanstack/react-query';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useRef, useState } from 'react';
@@ -14,8 +15,9 @@ import { usePostUserBlock } from '@/hooks/usePostUserBlock';
 import { cn } from '@/utils/cn';
 import { getLoginPath } from '@/utils/loginRedirect';
 
+import { profileQueryOptions } from '../_apis/getProfile';
+import { useGetProfile } from '../_hooks/useGetProfile';
 import { usePostFriend } from '../_hooks/usePostFriend';
-import type { ProfileT } from '../_types/profile';
 import ProfileActions from './ProfileActions';
 import ProfileEmptyState from './ProfileEmptyState';
 import ProfileFolderCard from './ProfileFolderCard';
@@ -23,15 +25,23 @@ import ProfileMenu from './ProfileMenu';
 import ProfileSummary from './ProfileSummary';
 
 type ProfileContentProps = {
-  profile: ProfileT;
+  userId: string;
   isGuest: boolean;
 };
 
-function ProfileContent({ profile, isGuest }: ProfileContentProps) {
+function ProfileContent({ userId, isGuest }: ProfileContentProps) {
   const router = useRouter();
 
-  /** TEMP: 목데이터 친구 추가·삭제·차단 결과 표시용 상태라 API 연동 시 조회 쿼리 갱신으로 교체 */
-  const [relation, setRelation] = useState(profile.relation);
+  const queryClient = useQueryClient();
+  const { profileData: profile } = useGetProfile(userId);
+  const { relation } = profile;
+
+  /** TEMP: 친구 추가 API 연동 전이라 재조회 없이 캐시의 관계만 바꿈 */
+  const setFriendRelation = () =>
+    queryClient.setQueryData(
+      profileQueryOptions(userId).queryKey,
+      prev => prev && { ...prev, relation: 'FRIEND' as const }
+    );
 
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isBlockDialogOpen, setIsBlockDialogOpen] = useState(false);
@@ -66,23 +76,15 @@ function ProfileContent({ profile, isGuest }: ProfileContentProps) {
    * @see https://www.figma.com/design/NlgTPUvrwaHNDcBy33bDf2/%F0%9F%94%B5-%EC%9E%91%EB%8B%B9%EB%AA%A8%EC%9D%98-v2?node-id=4419-32437
    */
   const { postFriendMutation, isPostFriendPending } = usePostFriend({
-    onSuccess: () => setRelation('FRIEND'),
+    onSuccess: setFriendRelation,
   });
   const { deleteFriendMutation, isDeleteFriendPending } = useDeleteFriend({
-    onSuccess: () => {
-      setRelation('NOT_FRIEND');
-      setIsDeleteDialogOpen(false);
-    },
+    onSuccess: () => setIsDeleteDialogOpen(false),
   });
   const { postUserBlockMutation, isPostUserBlockPending } = usePostUserBlock({
-    onSuccess: () => {
-      setRelation('BLOCKED');
-      setIsBlockDialogOpen(false);
-    },
+    onSuccess: () => setIsBlockDialogOpen(false),
   });
-  const { deleteUserBlockMutation, isDeleteUserBlockPending } = useDeleteUserBlock({
-    onSuccess: () => setRelation('NOT_FRIEND'),
-  });
+  const { deleteUserBlockMutation, isDeleteUserBlockPending } = useDeleteUserBlock();
 
   const handleDialogCloseAutoFocus = (event: Event) => {
     const trigger = menuTriggerRef.current;
@@ -119,7 +121,7 @@ function ProfileContent({ profile, isGuest }: ProfileContentProps) {
                   menuTriggerRef.current = trigger;
                   setIsBlockDialogOpen(true);
                 }}
-                onReport={() => router.push(ROUTES.REPORT(profile.userId))}
+                onReport={() => router.push(ROUTES.REPORT(userId))}
               />
             )
           }
@@ -142,9 +144,9 @@ function ProfileContent({ profile, isGuest }: ProfileContentProps) {
               relation={relation}
               isPending={isPostFriendPending || isDeleteUserBlockPending}
               onAddFriend={() =>
-                isGuest ? setIsLoginDialogOpen(true) : postFriendMutation(profile.userId)
+                isGuest ? setIsLoginDialogOpen(true) : postFriendMutation(userId)
               }
-              onUnblock={() => deleteUserBlockMutation(profile.userId)}
+              onUnblock={() => deleteUserBlockMutation(userId)}
             />
           </>
         )}
@@ -175,7 +177,7 @@ function ProfileContent({ profile, isGuest }: ProfileContentProps) {
                 href={
                   relation === 'SELF'
                     ? ROUTES.WISHLIST_FOLDER(folder.folderId)
-                    : ROUTES.EXPLORE_FOLDER(profile.userId, folder.folderId)
+                    : ROUTES.EXPLORE_FOLDER(userId, folder.folderId)
                 }
                 className="block"
               >
@@ -198,7 +200,7 @@ function ProfileContent({ profile, isGuest }: ProfileContentProps) {
         confirmLabel="삭제하기"
         icon={null}
         isPending={isDeleteFriendPending}
-        onConfirm={() => deleteFriendMutation(profile.userId)}
+        onConfirm={() => deleteFriendMutation(userId)}
         onCloseAutoFocus={handleDialogCloseAutoFocus}
       />
       <ConfirmDialog
@@ -209,7 +211,7 @@ function ProfileContent({ profile, isGuest }: ProfileContentProps) {
         confirmLabel="차단하기"
         icon={null}
         isPending={isPostUserBlockPending}
-        onConfirm={() => postUserBlockMutation(profile.userId)}
+        onConfirm={() => postUserBlockMutation(userId)}
         onCloseAutoFocus={handleDialogCloseAutoFocus}
       />
       <ConfirmDialog
@@ -220,7 +222,7 @@ function ProfileContent({ profile, isGuest }: ProfileContentProps) {
         cancelLabel="그냥 볼래요"
         confirmLabel="로그인하기"
         icon={null}
-        onConfirm={() => router.push(getLoginPath(ROUTES.PROFILE(profile.userId)))}
+        onConfirm={() => router.push(getLoginPath(ROUTES.PROFILE(userId)))}
         onCloseAutoFocus={handleDialogCloseAutoFocus}
       />
     </main>

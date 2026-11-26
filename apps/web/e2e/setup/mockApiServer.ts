@@ -26,6 +26,7 @@ import {
   createFriendsResponse,
 } from '../mocks/friend';
 import { MOCK_GUEST_ME, MOCK_MEMBER_ME } from '../mocks/me';
+import { MOCK_PROFILE_FRIEND, MOCK_PROFILE_NOT_FRIEND } from '../mocks/profile';
 import {
   MOCK_GROUP_RESULT,
   MOCK_INVITE_PREVIEW,
@@ -80,6 +81,9 @@ const SSR_MOCK_ROUTES: Record<string, unknown> = {
   [`GET ${ENDPOINTS.FRIENDS}`]: createApiSuccess(createFriendsResponse(MOCK_FRIENDS)),
   [`GET ${ENDPOINTS.BLOCKS}`]: createApiSuccess(createBlocksResponse(MOCK_BLOCKED_USERS)),
   [`GET ${ENDPOINTS.WISHLISTS_COUNT}`]: createApiSuccess({ count: MOCK_WISHLIST_ENTRIES.length }),
+  [`GET ${ENDPOINTS.PROFILE(MOCK_PROFILE_NOT_FRIEND.userId)}`]:
+    createApiSuccess(MOCK_PROFILE_NOT_FRIEND),
+  [`GET ${ENDPOINTS.PROFILE(MOCK_PROFILE_FRIEND.userId)}`]: createApiSuccess(MOCK_PROFILE_FRIEND),
   [`GET ${ENDPOINTS.PROFILE_FOLDER(MOCK_FOLDER_OWNER_ID, MOCK_EXPLORE_FOLDER.folderId)}`]:
     createApiSuccess(MOCK_EXPLORE_FOLDER),
   [`GET ${ENDPOINTS.EXPLORE_RECENT}`]: createApiSuccess(createRecentWishes()),
