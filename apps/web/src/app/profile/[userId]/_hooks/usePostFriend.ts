@@ -1,10 +1,28 @@
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
 
-export const usePostFriend = ({ onSuccess }: { onSuccess?: (userId: string) => void } = {}) => {
+import { QUERY_KEYS } from '@/consts/queryKeys';
+import { isGlobalNetError } from '@/utils/apiError';
+import { getApiErrorMessage } from '@/utils/getApiErrorMessage';
+
+import { postFriend } from '../_apis/postFriend';
+
+export const usePostFriend = () => {
+  const queryClient = useQueryClient();
+
   const { mutate: postFriendMutation, isPending: isPostFriendPending } = useMutation({
-    /** TEMP: 친구 추가 API 연동 전 목 처리 */
-    mutationFn: async (_userId: string) => {},
-    onSuccess: (_, userId) => onSuccess?.(userId),
+    mutationFn: postFriend,
+    onSuccess: async (_, userId) => {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.FRIEND.LIST });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.EXPLORE.FRIENDS });
+      queryClient.invalidateQueries({ queryKey: ['explore', 'friend-wishes'] });
+      await queryClient.invalidateQueries({ queryKey: QUERY_KEYS.PROFILE.DETAIL(userId) });
+    },
+    onError: error => {
+      if (isGlobalNetError(error)) return;
+
+      toast.error(getApiErrorMessage(error));
+    },
   });
 
   return { postFriendMutation, isPostFriendPending };

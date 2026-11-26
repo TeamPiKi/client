@@ -1,6 +1,5 @@
 'use client';
 
-import { useQueryClient } from '@tanstack/react-query';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useRef, useState } from 'react';
@@ -15,7 +14,6 @@ import { usePostUserBlock } from '@/hooks/usePostUserBlock';
 import { cn } from '@/utils/cn';
 import { getLoginPath } from '@/utils/loginRedirect';
 
-import { profileQueryOptions } from '../_apis/getProfile';
 import { useGetProfile } from '../_hooks/useGetProfile';
 import { usePostFriend } from '../_hooks/usePostFriend';
 import ProfileActions from './ProfileActions';
@@ -32,16 +30,8 @@ type ProfileContentProps = {
 function ProfileContent({ userId, isGuest }: ProfileContentProps) {
   const router = useRouter();
 
-  const queryClient = useQueryClient();
   const { profileData: profile } = useGetProfile(userId);
   const { relation } = profile;
-
-  /** TEMP: 친구 추가 API 연동 전이라 재조회 없이 캐시의 관계만 바꿈 */
-  const setFriendRelation = () =>
-    queryClient.setQueryData(
-      profileQueryOptions(userId).queryKey,
-      prev => prev && { ...prev, relation: 'FRIEND' as const }
-    );
 
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isBlockDialogOpen, setIsBlockDialogOpen] = useState(false);
@@ -75,9 +65,7 @@ function ProfileContent({ userId, isGuest }: ProfileContentProps) {
    * TODO: 친구 추가 후 바로 친구 상태로 바뀌는 게 맞는지 확인 후 진행
    * @see https://www.figma.com/design/NlgTPUvrwaHNDcBy33bDf2/%F0%9F%94%B5-%EC%9E%91%EB%8B%B9%EB%AA%A8%EC%9D%98-v2?node-id=4419-32437
    */
-  const { postFriendMutation, isPostFriendPending } = usePostFriend({
-    onSuccess: setFriendRelation,
-  });
+  const { postFriendMutation, isPostFriendPending } = usePostFriend();
   const { deleteFriendMutation, isDeleteFriendPending } = useDeleteFriend({
     onSuccess: () => setIsDeleteDialogOpen(false),
   });
