@@ -3,6 +3,7 @@
 import Link from 'next/link';
 
 import { ROUTES } from '@/consts/route';
+import { SCROLL_NAMESPACE, saveScrollAnchor } from '@/utils/scrollRestoration';
 
 import { useGetFriendWishes } from '../_common/_hooks/useGetFriendWishes';
 import ExploreSectionHeader from './ExploreSectionHeader';
@@ -25,7 +26,18 @@ function FriendWishSection() {
       <ul className="hide-scrollbar flex gap-2.5 overflow-x-auto px-5">
         {friendWishesData.slice(0, MAX_COUNT).map(({ wishId, item, friend }) => (
           <li key={wishId} className="w-[133px] shrink-0">
-            <Link href={ROUTES.EXPLORE_WISH(wishId)} className="block">
+            <Link
+              href={ROUTES.EXPLORE_WISH(wishId)}
+              data-scroll-anchor-id={`friend-${wishId}`}
+              onClick={event =>
+                saveScrollAnchor(
+                  { namespace: SCROLL_NAMESPACE.EXPLORE },
+                  event.currentTarget,
+                  `friend-${wishId}`
+                )
+              }
+              className="block"
+            >
               <FriendWishThumbnailCard item={item} friend={friend} />
             </Link>
           </li>
