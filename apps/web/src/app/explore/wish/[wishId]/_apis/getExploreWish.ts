@@ -17,7 +17,7 @@ export const getExploreWish = async (wishId: number): Promise<ExploreWishDetailT
     const { data } = await api.get<ApiResponseT<GetExploreWishResponseT>>(
       ENDPOINTS.EXPLORE_WISH(wishId)
     );
-    const { saved, savedUserCount, item, owner } = data.data;
+    const { saved, savedWishId, savedUserCount, item, owner } = data.data;
 
     return {
       wishId,
@@ -29,6 +29,7 @@ export const getExploreWish = async (wishId: number): Promise<ExploreWishDetailT
         sourceUrl: item.sourceUrl,
       },
       isInMyWish: saved,
+      savedWishId,
       savedCount: savedUserCount,
       owner: owner && {
         userId: owner.userId,

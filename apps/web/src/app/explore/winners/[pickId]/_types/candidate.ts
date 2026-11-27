@@ -11,6 +11,7 @@ export type GetTournamentCandidatesResponseT = {
     candidateId: number;
     isPick: boolean;
     saved: boolean;
+    savedWishId: number | null;
     item: ExploreItemResponseT;
   }[];
 };

@@ -24,11 +24,12 @@ export const getTournamentCandidates = async (
     return {
       pickId,
       tournament: { id: tournament.tournamentId, title: tournament.name },
-      candidates: candidates.map(({ candidateId, isPick, saved, item }) => ({
+      candidates: candidates.map(({ candidateId, isPick, saved, savedWishId, item }) => ({
         candidateId,
         item,
         isWinner: isPick,
         isInMyWish: saved,
+        savedWishId,
       })),
     };
   } catch (error) {

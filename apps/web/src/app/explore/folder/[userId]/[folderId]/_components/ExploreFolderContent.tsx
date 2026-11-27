@@ -36,12 +36,12 @@ function ExploreFolderContent({ userId, folderId }: ExploreFolderContentProps) {
 
       {exploreFolderData ? (
         <ul className="mt-6 grid grid-cols-2">
-          {exploreFolderData.wishes.map(({ wishId, item, isInMyWish }, index) => (
+          {exploreFolderData.wishes.map(({ wishId, item, isInMyWish, savedWishId }, index) => (
             <li key={wishId} className="relative">
               <Link href={ROUTES.EXPLORE_WISH(wishId)} className="block">
                 <FolderWishGridCard item={item} preload={index < PRELOAD_COUNT} />
               </Link>
-              <WishHeartButton wishId={wishId} isInMyWish={isInMyWish} />
+              <WishHeartButton wishId={wishId} isInMyWish={isInMyWish} savedWishId={savedWishId} />
             </li>
           ))}
         </ul>

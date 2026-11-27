@@ -17,7 +17,7 @@ export const getExplorePick = async (pickId: number): Promise<ExplorePickDetailT
     const { data } = await api.get<ApiResponseT<GetExplorePickResponseT>>(
       ENDPOINTS.EXPLORE_PICK(pickId)
     );
-    const { candidateId, saved, savedUserCount, item, picker, tournament } = data.data;
+    const { candidateId, saved, savedWishId, savedUserCount, item, picker, tournament } = data.data;
 
     return {
       pickId,
@@ -30,6 +30,7 @@ export const getExplorePick = async (pickId: number): Promise<ExplorePickDetailT
         sourceUrl: item.sourceUrl,
       },
       isInMyWish: saved,
+      savedWishId,
       savedCount: savedUserCount,
       owner: {
         userId: picker.userId,

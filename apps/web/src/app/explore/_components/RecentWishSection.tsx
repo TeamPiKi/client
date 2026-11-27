@@ -45,12 +45,12 @@ function RecentWishSection() {
         description={formatUpdatedAgo(recentUpdatedAt ?? latestWish.savedAt)}
       />
       <ul className="grid grid-cols-2">
-        {recentWishesData.map(({ wishId, item, isInMyWish }) => (
+        {recentWishesData.map(({ wishId, item, isInMyWish, savedWishId }) => (
           <li key={wishId} className="relative">
             <Link href={ROUTES.EXPLORE_WISH(wishId)} className="block">
               <RecentWishGridCard item={item} />
             </Link>
-            <WishHeartButton wishId={wishId} isInMyWish={isInMyWish} />
+            <WishHeartButton wishId={wishId} isInMyWish={isInMyWish} savedWishId={savedWishId} />
           </li>
         ))}
       </ul>

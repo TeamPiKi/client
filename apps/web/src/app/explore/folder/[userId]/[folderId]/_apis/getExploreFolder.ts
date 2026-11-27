@@ -26,7 +26,7 @@ export const getExploreFolder = async (
     return {
       folderId,
       name,
-      wishes: wishes.map(({ wishId, saved, item }) => ({
+      wishes: wishes.map(({ wishId, saved, savedWishId, item }) => ({
         wishId,
         item: {
           name: item.name ?? '',
@@ -36,6 +36,7 @@ export const getExploreFolder = async (
           sourcePlatform: item.sourcePlatform,
         },
         isInMyWish: saved,
+        savedWishId,
       })),
     };
   } catch (error) {

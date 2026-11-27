@@ -20,11 +20,12 @@ export const getRecentWishes = async (
     ...data,
     data: {
       updatedAt: data.data.updatedAt,
-      wishes: data.data.wishes.map(({ wishId, addedAt, saved, item }) => ({
+      wishes: data.data.wishes.map(({ wishId, addedAt, saved, savedWishId, item }) => ({
         wishId,
         item,
         savedAt: addedAt,
         isInMyWish: saved,
+        savedWishId,
       })),
     },
   };

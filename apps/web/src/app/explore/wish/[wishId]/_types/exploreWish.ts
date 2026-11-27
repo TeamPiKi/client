@@ -4,6 +4,7 @@ export type GetExploreWishResponseT = {
   wishId: number;
   addedAt: string;
   saved: boolean;
+  savedWishId: number | null;
   savedUserCount: number;
   item: ItemT;
   /** 프로필 비공개·차단 관계면 null */

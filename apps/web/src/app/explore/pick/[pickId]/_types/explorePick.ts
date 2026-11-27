@@ -5,6 +5,7 @@ export type GetExplorePickResponseT = {
   candidateId: number;
   pickedAt: string;
   saved: boolean;
+  savedWishId: number | null;
   savedUserCount: number;
   item: ExploreItemResponseT;
   /** 1위를 고른 사람. 가려지면 1위 전체가 404 */

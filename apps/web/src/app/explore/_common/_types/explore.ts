@@ -21,6 +21,7 @@ export type WinnerWishT = {
   };
   /** 이미 내 위시에 있는 상품인지 */
   isInMyWish: boolean;
+  savedWishId: number | null;
 };
 
 export type ExploreFriendT = {
@@ -43,6 +44,7 @@ export type RecentWishT = {
   savedAt: string;
   /** 이미 내 위시에 있는 상품인지 */
   isInMyWish: boolean;
+  savedWishId: number | null;
 };
 
 export type RecentWishesT = {
@@ -67,6 +69,7 @@ type ExploreWishResponseT = {
   wishId: number;
   addedAt: string;
   saved: boolean;
+  savedWishId: number | null;
   item: ExploreItemResponseT;
 };
 
@@ -92,6 +95,7 @@ export type GetExplorePicksResponseT = {
     candidateId: number;
     pickedAt: string;
     saved: boolean;
+    savedWishId: number | null;
     tournament: ExploreTournamentResponseT;
     item: ExploreItemResponseT;
   }[];
@@ -116,6 +120,7 @@ export type ExploreDetailViewT = {
   };
   /** 이미 내 위시에 있는 상품인지 */
   isInMyWish: boolean;
+  savedWishId: number | null;
   /** 이 상품을 담은 사람 수 */
   savedCount: number;
   /** 위시를 담은 사람 — 프로필을 비공개한 유저면 null */
@@ -163,6 +168,7 @@ export type ExplorePickCandidatesT = {
     item: ExploreItemT;
     isWinner: boolean;
     isInMyWish: boolean;
+    savedWishId: number | null;
   }[];
 };
 
@@ -174,5 +180,6 @@ export type ExploreFolderT = {
     wishId: number;
     item: ExploreItemT;
     isInMyWish: boolean;
+    savedWishId: number | null;
   }[];
 };

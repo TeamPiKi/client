@@ -31,7 +31,7 @@ test('이미 내 위시에 있는 상품은 처음부터 하트가 채워져 있
   const savedHeart = page.getByRole('button', { name: '내 위시에 담긴 상품' });
   await expect(savedHeart).toHaveCount(1);
   await expect(savedHeart).toHaveAttribute('aria-pressed', 'true');
-  await expect(savedHeart).toBeDisabled();
+  await expect(savedHeart).toBeEnabled();
   await expect(page.getByRole('button', { name: '내 위시로 담기' })).toHaveCount(1);
 });
 
