@@ -1,6 +1,9 @@
 import { Header, HeaderIcon } from '@/components/header';
 import Skeleton from '@/components/skeleton';
 
+import FriendTabs from './_components/FriendTabs';
+import { FRIEND_TAB_PANEL_ID } from './_consts/friendTab';
+
 const FRIEND_SKELETON_COUNT = 5;
 
 function FriendsLoading() {
@@ -12,11 +15,9 @@ function FriendsLoading() {
         center={<h1 className="heading-1-bold text-text-neutral-primary">내 친구 목록</h1>}
       />
 
-      <div className="px-5 pt-4">
-        <Skeleton className="h-10 w-full" />
-      </div>
+      <FriendTabs />
 
-      <ul className="flex flex-col gap-1.5 pt-7">
+      <ul id={FRIEND_TAB_PANEL_ID} className="flex flex-col gap-1.5 pt-7">
         {Array.from({ length: FRIEND_SKELETON_COUNT }).map((_, index) => (
           <li key={index} className="flex h-17 items-center gap-3.5 p-5">
             <Skeleton shape="circle" className="size-7.5 shrink-0" />

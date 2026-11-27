@@ -4,24 +4,21 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useRef, useState } from 'react';
 
 import ConfirmDialog from '@/components/common/confirm-dialog';
-import UnderlineTab from '@/components/common/underline-tab';
 import { ROUTES } from '@/consts/route';
 import { useDeleteFriend } from '@/hooks/useDeleteFriend';
 import { useDeleteUserBlock } from '@/hooks/useDeleteUserBlock';
 import { usePostUserBlock } from '@/hooks/usePostUserBlock';
-import { replaceUrlKeepingState } from '@/utils/replaceUrlKeepingState';
 
-import { FRIEND_TAB, FRIEND_TAB_PATH } from '../_consts/friendTab';
+import { FRIEND_TAB, FRIEND_TAB_PANEL_ID } from '../_consts/friendTab';
 import { useGetFriends } from '../_hooks/useGetFriends';
 import { useGetUserBlocks } from '../_hooks/useGetUserBlocks';
-import type { FriendT, FriendTabT } from '../_types/friend';
+import type { FriendT } from '../_types/friend';
 import { parseFriendTabParam } from '../_utils/friendSearchParams';
 import BlockedUserMenu from './BlockedUserMenu';
 import FriendEmptyState from './FriendEmptyState';
 import FriendListItem from './FriendListItem';
 import FriendMenu from './FriendMenu';
-
-const FRIEND_TAB_PANEL_ID = 'friend-tab-panel';
+import FriendTabs from './FriendTabs';
 
 function FriendsContent() {
   const searchParams = useSearchParams();
@@ -62,24 +59,9 @@ function FriendsContent() {
 
   const { deleteUserBlockMutation } = useDeleteUserBlock();
 
-  const handleTabChange = (tab: FriendTabT) => {
-    if (tab !== activeTab) replaceUrlKeepingState(FRIEND_TAB_PATH[tab]);
-  };
-
   return (
     <>
-      <div className="px-5 pt-4">
-        <UnderlineTab
-          tabs={[
-            { value: FRIEND_TAB.FRIENDS, label: `친구 ${friendCount}` },
-            { value: FRIEND_TAB.BLOCKED, label: '차단 목록' },
-          ]}
-          activeTab={activeTab}
-          onTabChange={handleTabChange}
-          idPrefix="friend-tab"
-          panelId={FRIEND_TAB_PANEL_ID}
-        />
-      </div>
+      <FriendTabs friendCount={friendCount} />
 
       <div id={FRIEND_TAB_PANEL_ID} role="tabpanel" aria-labelledby={`friend-tab-${activeTab}`}>
         {activeTab === FRIEND_TAB.FRIENDS &&
