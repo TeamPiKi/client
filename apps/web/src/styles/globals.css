@@ -169,6 +169,18 @@
   --spacing-safe-center: calc(50% + (var(--spacing-safe-left) - var(--spacing-safe-right)) / 2);
 }
 
+/**
+ * 앱 웹뷰의 넓은 화면 (펼친 폴더블 등).
+ * 일반 폰(최대 약 440px)과 PC · 태블릿 브라우저(data-app 없음)는 해당하지 않는다.
+ */
+@custom-variant app-wide {
+  @media (width >= 600px) {
+    html[data-app] & {
+      @slot;
+    }
+  }
+}
+
 @utility hide-scrollbar {
   &::-webkit-scrollbar {
     display: none; /* Chrome, Safari, Edge, Opera */

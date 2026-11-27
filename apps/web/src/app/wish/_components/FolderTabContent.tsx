@@ -71,32 +71,34 @@ function FolderTabContent() {
       {foldersData.length === 0 ? (
         <FolderEmptyState onAdd={handleOpenCreateSheet} />
       ) : (
-        <ul className="grid grid-cols-2 gap-y-8">
-          <li>
-            <FolderAddCard onClick={handleOpenCreateSheet} />
-          </li>
-          {foldersData.map(folder => (
-            <li key={folder.id}>
-              <FolderCard
-                folderId={folder.id}
-                name={folder.name}
-                wishCount={folder.wishCount}
-                thumbnailUrls={folder.coverImageUrls}
-                isPublic={folder.isPublic}
-                onToggleVisibility={() => handleToggleVisibility(folder)}
-                onRename={() => {
-                  setRenameTarget(folder);
-                  setRenameErrorMessage(null);
-                  setIsRenameSheetOpen(true);
-                }}
-                onDelete={() => {
-                  setDeleteTarget(folder);
-                  setIsDeleteDialogOpen(true);
-                }}
-              />
+        <div className="@container">
+          <ul className="grid grid-cols-2 gap-y-8 @xl:grid-cols-3 @3xl:grid-cols-4">
+            <li>
+              <FolderAddCard onClick={handleOpenCreateSheet} />
             </li>
-          ))}
-        </ul>
+            {foldersData.map(folder => (
+              <li key={folder.id}>
+                <FolderCard
+                  folderId={folder.id}
+                  name={folder.name}
+                  wishCount={folder.wishCount}
+                  thumbnailUrls={folder.coverImageUrls}
+                  isPublic={folder.isPublic}
+                  onToggleVisibility={() => handleToggleVisibility(folder)}
+                  onRename={() => {
+                    setRenameTarget(folder);
+                    setRenameErrorMessage(null);
+                    setIsRenameSheetOpen(true);
+                  }}
+                  onDelete={() => {
+                    setDeleteTarget(folder);
+                    setIsDeleteDialogOpen(true);
+                  }}
+                />
+              </li>
+            ))}
+          </ul>
+        </div>
       )}
 
       <FolderNameSheet

@@ -43,7 +43,7 @@ function TournamentClient({ tournamentId, inProgress }: TournamentClientProps) {
   usePreloadMatchImages(remainingItems.map(item => item.imageUrl));
 
   return (
-    <main className="relative flex min-h-dvh flex-col overflow-hidden">
+    <main data-wide-layout className="relative flex min-h-dvh flex-col overflow-hidden">
       {/** 배경 */}
       <div aria-hidden className="pointer-events-none absolute inset-0 bg-[#A2DEFF]">
         {/**
@@ -77,7 +77,7 @@ function TournamentClient({ tournamentId, inProgress }: TournamentClientProps) {
           />
         </div>
 
-        <div className="w-full">
+        <div className="@container w-full">
           {!currentMatch ? (
             <MatchSkeleton />
           ) : (

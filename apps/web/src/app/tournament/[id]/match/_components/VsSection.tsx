@@ -5,8 +5,8 @@ import { useState } from 'react';
 import { Z_INDEX } from '@/consts/zIndex';
 import { cn } from '@/utils/cn';
 
-import type { CardSideT, ProductT } from '../../_common/_types/tournament';
 import { wantedSans } from '../../_common/_consts/font';
+import type { CardSideT, ProductT } from '../../_common/_types/tournament';
 import ProductCard from './ProductCard';
 import VsBadge from './VsBadge';
 import './VsSection.css';
@@ -30,8 +30,9 @@ const CARD_MOVE = {
   loseRight: 'translate-x-[8.5px]',
   /** 결승 */
   finalWin: 'translate-y-[3.5px] scale-[1.11]',
-  finalWinLeft: 'translate-x-[85px]',
-  finalWinRight: '-translate-x-[85px]',
+  /** (카드 너비 + 카드 간격) / 2 만큼 이동해야 가운데. 넓은 화면은 카드 · 간격이 커져 값도 커짐 */
+  finalWinLeft: 'translate-x-[85px] @xl:translate-x-[120px] @3xl:translate-x-[140px]',
+  finalWinRight: '-translate-x-[85px] @xl:-translate-x-[120px] @3xl:-translate-x-[140px]',
   finalLose: 'pointer-events-none translate-y-[30px] opacity-0',
   finalLoseLeft: '-translate-x-[250px] -rotate-[16deg]',
   finalLoseRight: 'translate-x-[250px] rotate-[16deg]',
@@ -76,7 +77,7 @@ function VsSection({ left, right, isFinal = false, onPick, onSelect }: VsSection
   ];
 
   return (
-    <div className="relative isolate flex justify-center gap-[22px]">
+    <div className="relative isolate flex justify-center gap-[22px] @xl:gap-10">
       {sides.map(({ side, product }) => {
         const isPicked = selectedSide === side;
         return (

@@ -14,9 +14,9 @@ function ProductCard({ imageUrl, name, price, onClick }: ProductCardProps) {
     <button
       type="button"
       onClick={onClick}
-      className="flex w-[148px] cursor-pointer flex-col overflow-hidden rounded-[20px] text-left"
+      className="flex w-[148px] cursor-pointer flex-col overflow-hidden rounded-[20px] text-left @xl:w-[200px] @3xl:w-[240px]"
     >
-      <div className="relative h-[123px] w-full shrink-0 bg-gray-50">
+      <div className="relative h-[123px] w-full shrink-0 bg-gray-50 @xl:h-[166px] @3xl:h-[200px]">
         {imageUrl && (
           <BaseImage
             src={imageUrl}
