@@ -17,7 +17,7 @@ function ExploreWishContent({ wishId }: ExploreWishContentProps) {
   const { exploreWishData } = useGetExploreWish(wishId);
   const { postExploreWishMutation, isPostExploreWishPending } = usePostExploreWish();
 
-  /** 레이아웃이 없는 위시를 걸러 내지만 타입상 null 이 남아 한 번 더 막음 */
+  /** 페이지가 없는 위시를 걸러 내지만 타입상 null 이 남아 한 번 더 막음 */
   if (!exploreWishData) notFound();
 
   return (

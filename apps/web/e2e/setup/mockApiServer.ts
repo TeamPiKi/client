@@ -20,6 +20,7 @@ import {
   MOCK_FRIEND_WISHES,
   MOCK_NO_FOLDER_EXPLORE_WISH,
   MOCK_PRIVATE_EXPLORE_WISH,
+  RECENT_CARD_WISH_ID,
   createRecentWishes,
 } from '../mocks/explore';
 import { MOCK_FOLDERS } from '../mocks/folder';
@@ -98,6 +99,11 @@ const SSR_MOCK_ROUTES: Record<string, unknown> = {
     MOCK_EXPLORE_PICK_CANDIDATES
   ),
   [`GET ${ENDPOINTS.EXPLORE_WISH(MOCK_EXPLORE_WISH.wishId)}`]: createApiSuccess(MOCK_EXPLORE_WISH),
+  /** 방금 담긴 위시 첫 카드에서 상세로 들어가는 흐름용 */
+  [`GET ${ENDPOINTS.EXPLORE_WISH(RECENT_CARD_WISH_ID)}`]: createApiSuccess({
+    ...MOCK_EXPLORE_WISH,
+    wishId: RECENT_CARD_WISH_ID,
+  }),
   [`GET ${ENDPOINTS.EXPLORE_WISH(MOCK_NO_FOLDER_EXPLORE_WISH.wishId)}`]: createApiSuccess(
     MOCK_NO_FOLDER_EXPLORE_WISH
   ),
