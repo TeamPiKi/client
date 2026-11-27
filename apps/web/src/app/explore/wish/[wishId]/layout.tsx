@@ -16,7 +16,6 @@ async function ExploreWishLayout({ children, params }: ExploreWishLayoutProps) {
   const wishId = parseIdParam((await params).wishId);
   if (!wishId) notFound();
 
-  /** TODO: API 연동 시 404·비공개 위시 응답을 받아 분기 */
   const exploreWishData = await getExploreWish(wishId);
   if (!exploreWishData) notFound();
 

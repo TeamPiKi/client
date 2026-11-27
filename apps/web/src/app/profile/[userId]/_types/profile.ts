@@ -31,3 +31,5 @@ export type ProfileT = {
   /** 공개 폴더만 */
   folders: ProfileFolderT[];
 };
+
+export type GetProfileResponseT = ProfileT;

@@ -13,9 +13,8 @@ import RecentWishGridCard from './RecentWishGridCard';
 
 const MINUTE_MS = 60 * 1000;
 
-/** TEMP: 업데이트 기준 시각이 API 스펙에 없어 가장 최근 위시가 담긴 시각으로 계산함 */
-const formatUpdatedAgo = (savedAt: string) => {
-  const minutes = Math.max(0, Math.floor((Date.now() - new Date(savedAt).getTime()) / MINUTE_MS));
+const formatUpdatedAgo = (updatedAt: string) => {
+  const minutes = Math.max(0, Math.floor((Date.now() - new Date(updatedAt).getTime()) / MINUTE_MS));
   if (minutes < 60) return `${minutes}분전 업데이트`;
   if (minutes < 60 * 24) return `${Math.floor(minutes / 60)}시간전 업데이트`;
   return `${Math.floor(minutes / (60 * 24))}일전 업데이트`;
@@ -24,6 +23,7 @@ const formatUpdatedAgo = (savedAt: string) => {
 function RecentWishSection() {
   const {
     recentWishesData,
+    recentUpdatedAt,
     fetchNextPage,
     hasNextPage,
     isFetching,
@@ -42,13 +42,13 @@ function RecentWishSection() {
     <section className="flex flex-col gap-4">
       <ExploreSectionHeader
         title="방금 담긴 위시"
-        description={formatUpdatedAgo(latestWish.savedAt)}
+        description={formatUpdatedAgo(recentUpdatedAt ?? latestWish.savedAt)}
       />
       <ul className="grid grid-cols-2">
-        {recentWishesData.map(({ wishId, item, isInMyWish, friend }) => (
+        {recentWishesData.map(({ wishId, item, isInMyWish }) => (
           <li key={wishId} className="relative">
             <Link href={ROUTES.EXPLORE_WISH(wishId)} className="block">
-              <RecentWishGridCard item={item} friend={friend} />
+              <RecentWishGridCard item={item} />
             </Link>
             <WishHeartButton wishId={wishId} isInMyWish={isInMyWish} />
           </li>

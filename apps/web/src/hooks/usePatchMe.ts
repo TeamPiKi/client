@@ -39,7 +39,8 @@ export const usePatchMe = () => {
         ...(typeof isProfilePublic === 'boolean' ? { isProfilePublic } : {}),
       });
     },
-    onSuccess: async () => {
+    onSuccess: async ({ id }) => {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.PROFILE.DETAIL(id) });
       await queryClient.invalidateQueries({ queryKey: QUERY_KEYS.USER.ME });
     },
     onError: error => {

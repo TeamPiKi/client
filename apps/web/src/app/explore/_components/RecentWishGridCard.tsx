@@ -1,18 +1,16 @@
 import ImageIconOutline from '@/assets/icons/outline/image.svg';
 import BaseImage from '@/components/base-image';
 import Skeleton from '@/components/skeleton';
-import { Z_INDEX } from '@/consts/zIndex';
 import formatPrice from '@/utils/formatPrice';
 
 import type { RecentWishT } from '../_common/_types/explore';
 
 type RecentWishGridCardProps = {
   item: RecentWishT['item'];
-  friend: RecentWishT['friend'];
   preload?: boolean;
 };
 
-function RecentWishGridCard({ item, friend, preload = false }: RecentWishGridCardProps) {
+function RecentWishGridCard({ item, preload = false }: RecentWishGridCardProps) {
   const imageFallback = (
     <div className="absolute inset-0 flex items-center justify-center text-gray-200">
       <ImageIconOutline width={32} height={32} />
@@ -34,32 +32,6 @@ function RecentWishGridCard({ item, friend, preload = false }: RecentWishGridCar
           />
         ) : (
           imageFallback
-        )}
-        {friend && (
-          <div
-            className="absolute inset-0 bg-linear-to-b from-transparent to-black/20"
-            style={{ zIndex: Z_INDEX.BASE_IMAGE + 1 }}
-          >
-            <div className="absolute inset-x-3.5 bottom-[13px] flex items-center gap-2">
-              <span className="relative size-4.5 shrink-0 overflow-hidden rounded-full">
-                <BaseImage
-                  src={friend.profileImage}
-                  alt=""
-                  sizes="20px"
-                  className="object-cover"
-                  loadingFallback={<Skeleton shape="circle" className="absolute inset-0" />}
-                />
-                <span
-                  aria-hidden
-                  className="pointer-events-none absolute -inset-[0.4px] rounded-full border-[1.6px] border-white"
-                  style={{ zIndex: Z_INDEX.BASE_IMAGE }}
-                />
-              </span>
-              <span className="truncate caption-1-semibold text-text-neutral-inverse">
-                {friend.nickname}
-              </span>
-            </div>
-          </div>
         )}
       </div>
 

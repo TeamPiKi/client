@@ -10,7 +10,7 @@ import { isGlobalNetError } from '@/utils/apiError';
 import { getApiErrorMessage } from '@/utils/getApiErrorMessage';
 
 import { postExploreWish } from '../_apis/postExploreWish';
-import type { ExploreFolderT, ExploreWishDetailT, RecentWishT } from '../_types/explore';
+import type { ExploreFolderT, ExploreWishDetailT, RecentWishesT } from '../_types/explore';
 
 /** 다른 사람의 위시를 내 전체 위시에 담기 */
 export const usePostExploreWish = () => {
@@ -19,7 +19,7 @@ export const usePostExploreWish = () => {
 
   const { mutate: postExploreWishMutation, isPending: isPostExploreWishPending } = useMutation({
     mutationFn: postExploreWish,
-    onSuccess: (_, wishId) => {
+    onSuccess: ({ alreadySaved }, wishId) => {
       queryClient.invalidateQueries({ queryKey: ['wishlists'] });
       /** 담은 뒤에는 다시 담지 못하도록 상세 캐시를 담은 상태로 바꿈 — 상세를 연 적 없으면 캐시가 없어 그대로 둠 */
       queryClient.setQueryData<ExploreWishDetailT | null>(
@@ -36,20 +36,23 @@ export const usePostExploreWish = () => {
             ),
           }
       );
-      queryClient.setQueryData<InfiniteData<ApiResponseT<RecentWishT[]>>>(
+      queryClient.setQueryData<InfiniteData<ApiResponseT<RecentWishesT>>>(
         QUERY_KEYS.EXPLORE.RECENT,
         prev =>
           prev && {
             ...prev,
             pages: prev.pages.map(page => ({
               ...page,
-              data: page.data.map(wish =>
-                wish.wishId === wishId ? { ...wish, isInMyWish: true } : wish
-              ),
+              data: {
+                ...page.data,
+                wishes: page.data.wishes.map(wish =>
+                  wish.wishId === wishId ? { ...wish, isInMyWish: true } : wish
+                ),
+              },
             })),
           }
       );
-      toast('내 위시에 상품을 담았어요', {
+      toast(alreadySaved ? '이미 내 위시에 있는 상품이에요' : '내 위시에 상품을 담았어요', {
         duration: TOAST_ACTION_DURATION_MS,
         action: { label: '보러가기', onClick: () => router.push(ROUTES.WISHLIST) },
         /** 전역 액션 버튼은 회색이지만 이 토스트는 시안대로 흰색 */

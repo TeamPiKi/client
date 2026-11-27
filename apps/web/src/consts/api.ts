@@ -2,6 +2,7 @@ export const ENDPOINTS = {
   /** 유저 */
   USER: '/api/v1/users/me',
   USER_PROFILE_IMAGE_PRESIGNED: '/api/v1/users/me/profile-image',
+  PROFILE: (userId: string) => `/api/v1/profiles/${userId}`,
 
   /** 인증 */
   AUTH_URL: (provider: string) => `/api/v1/auth/${provider}/url`,
@@ -55,6 +56,12 @@ export const ENDPOINTS = {
   /** 프로필 */
   PROFILE_FOLDER: (userId: string, folderId: number) =>
     `/api/v1/profiles/${userId}/folders/${folderId}`,
+
+  /** 탐색 */
+  EXPLORE_RECENT: '/api/v1/explore/recent',
+  EXPLORE_FRIENDS: '/api/v1/explore/friends',
+  EXPLORE_WISH: (wishId: number) => `/api/v1/explore/wishes/${wishId}`,
+  EXPLORE_WISH_COPY: (wishId: number) => `/api/v1/explore/wishes/${wishId}/copy`,
 
   /** 알림 */
   NOTIFICATIONS_SUBSCRIBE: '/api/v1/notifications/subscribe',

@@ -10,7 +10,14 @@ import {
   REFRESHED_BODY_TOKEN_SUB,
   REFRESHED_COOKIE_TOKEN_SUB,
 } from '../mocks/auth';
-import { MOCK_EXPLORE_FOLDER, MOCK_FOLDER_OWNER_ID } from '../mocks/explore';
+import {
+  MOCK_EXPLORE_FOLDER,
+  MOCK_EXPLORE_WISH,
+  MOCK_FOLDER_OWNER_ID,
+  MOCK_FRIEND_WISHES,
+  MOCK_PRIVATE_EXPLORE_WISH,
+  createRecentWishes,
+} from '../mocks/explore';
 import { MOCK_FOLDERS } from '../mocks/folder';
 import {
   MOCK_BLOCKED_USERS,
@@ -19,6 +26,7 @@ import {
   createFriendsResponse,
 } from '../mocks/friend';
 import { MOCK_GUEST_ME, MOCK_MEMBER_ME } from '../mocks/me';
+import { MOCK_PROFILE_FRIEND, MOCK_PROFILE_NOT_FRIEND } from '../mocks/profile';
 import {
   MOCK_GROUP_RESULT,
   MOCK_INVITE_PREVIEW,
@@ -73,8 +81,16 @@ const SSR_MOCK_ROUTES: Record<string, unknown> = {
   [`GET ${ENDPOINTS.FRIENDS}`]: createApiSuccess(createFriendsResponse(MOCK_FRIENDS)),
   [`GET ${ENDPOINTS.BLOCKS}`]: createApiSuccess(createBlocksResponse(MOCK_BLOCKED_USERS)),
   [`GET ${ENDPOINTS.WISHLISTS_COUNT}`]: createApiSuccess({ count: MOCK_WISHLIST_ENTRIES.length }),
+  [`GET ${ENDPOINTS.PROFILE(MOCK_PROFILE_NOT_FRIEND.userId)}`]:
+    createApiSuccess(MOCK_PROFILE_NOT_FRIEND),
+  [`GET ${ENDPOINTS.PROFILE(MOCK_PROFILE_FRIEND.userId)}`]: createApiSuccess(MOCK_PROFILE_FRIEND),
   [`GET ${ENDPOINTS.PROFILE_FOLDER(MOCK_FOLDER_OWNER_ID, MOCK_EXPLORE_FOLDER.folderId)}`]:
     createApiSuccess(MOCK_EXPLORE_FOLDER),
+  [`GET ${ENDPOINTS.EXPLORE_RECENT}`]: createApiSuccess(createRecentWishes()),
+  [`GET ${ENDPOINTS.EXPLORE_FRIENDS}`]: createApiSuccess(MOCK_FRIEND_WISHES),
+  [`GET ${ENDPOINTS.EXPLORE_WISH(MOCK_EXPLORE_WISH.wishId)}`]: createApiSuccess(MOCK_EXPLORE_WISH),
+  [`GET ${ENDPOINTS.EXPLORE_WISH(MOCK_PRIVATE_EXPLORE_WISH.wishId)}`]:
+    createApiSuccess(MOCK_PRIVATE_EXPLORE_WISH),
 };
 
 const readCookie = (req: http.IncomingMessage, name: string) =>
@@ -114,6 +130,12 @@ const isEmptyRequested = (req: http.IncomingMessage, pathname: string) => {
   if (!cookie) return false;
 
   return decodeURIComponent(cookie).split(',').includes(pathname);
+};
+
+/** 목록이 배열이 아니라 객체로 감싸진 응답의 빈 값 — 등록 안 된 경로는 빈 배열 */
+const SSR_EMPTY_DATA: Record<string, unknown> = {
+  [ENDPOINTS.EXPLORE_RECENT]: { updatedAt: null, wishes: [] },
+  [ENDPOINTS.EXPLORE_FRIENDS]: { friends: [], wishes: [] },
 };
 
 type StatusOverrideT = { status: number; code: string };
@@ -205,7 +227,8 @@ export const startMockApiServer = (port: number) =>
           extraBody: { user: MOCK_GUEST_ME },
         });
       if (routeKey === `GET ${ENDPOINTS.USER}`) return respondJson(res, 200, resolveMe(req));
-      if (isEmptyRequested(req, pathname)) return respondJson(res, 200, createApiSuccess([]));
+      if (isEmptyRequested(req, pathname))
+        return respondJson(res, 200, createApiSuccess(SSR_EMPTY_DATA[pathname] ?? []));
 
       if (!(routeKey in SSR_MOCK_ROUTES)) {
         return respondJson(res, 404, {

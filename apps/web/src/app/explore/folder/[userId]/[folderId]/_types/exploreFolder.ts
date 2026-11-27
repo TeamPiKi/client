@@ -5,6 +5,7 @@ export type GetExploreFolderResponseT = {
   name: string;
   wishes: {
     wishId: number;
+    saved: boolean;
     item: ItemT;
   }[];
 };
