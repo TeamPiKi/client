@@ -18,12 +18,13 @@ export const getWinnerWishes = async (
 
   return {
     ...data,
-    data: data.data.picks.map(({ pickId, candidateId, saved, tournament, item }) => ({
+    data: data.data.picks.map(({ pickId, candidateId, saved, savedWishId, tournament, item }) => ({
       pickId,
       candidateId,
       item,
       tournament: { id: tournament.tournamentId, title: tournament.name },
       isInMyWish: saved,
+      savedWishId,
     })),
   };
 };

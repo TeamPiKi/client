@@ -32,10 +32,15 @@ function TournamentCandidatesContent({ pickId }: TournamentCandidatesContentProp
       />
 
       <ul className="mt-6 grid grid-cols-2">
-        {candidates.map(({ candidateId, item, isWinner, isInMyWish }, index) => (
+        {candidates.map(({ candidateId, item, isWinner, isInMyWish, savedWishId }, index) => (
           <li key={candidateId} className="relative">
             <WinnerWishGridCard item={item} isWinner={isWinner} preload={index < PRELOAD_COUNT} />
-            <PickHeartButton pickId={pickId} candidateId={candidateId} isInMyWish={isInMyWish} />
+            <PickHeartButton
+              pickId={pickId}
+              candidateId={candidateId}
+              isInMyWish={isInMyWish}
+              savedWishId={savedWishId}
+            />
           </li>
         ))}
       </ul>

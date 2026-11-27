@@ -6,6 +6,7 @@ export type GetExploreFolderResponseT = {
   wishes: {
     wishId: number;
     saved: boolean;
+    savedWishId: number | null;
     item: ItemT;
   }[];
 };

@@ -30,19 +30,26 @@ function WinnerWishGrid() {
   return (
     <>
       <ul className="grid grid-cols-2">
-        {winnerWishesData.map(({ pickId, candidateId, item, tournament, isInMyWish }, index) => (
-          <li key={pickId} className="relative">
-            <Link href={ROUTES.EXPLORE_PICK(pickId)} className="block">
-              <WinnerWishGridCard
-                item={item}
-                isWinner
-                caption={tournament.title}
-                preload={index < PRELOAD_COUNT}
+        {winnerWishesData.map(
+          ({ pickId, candidateId, item, tournament, isInMyWish, savedWishId }, index) => (
+            <li key={pickId} className="relative">
+              <Link href={ROUTES.EXPLORE_PICK(pickId)} className="block">
+                <WinnerWishGridCard
+                  item={item}
+                  isWinner
+                  caption={tournament.title}
+                  preload={index < PRELOAD_COUNT}
+                />
+              </Link>
+              <PickHeartButton
+                pickId={pickId}
+                candidateId={candidateId}
+                isInMyWish={isInMyWish}
+                savedWishId={savedWishId}
               />
-            </Link>
-            <PickHeartButton pickId={pickId} candidateId={candidateId} isInMyWish={isInMyWish} />
-          </li>
-        ))}
+            </li>
+          )
+        )}
       </ul>
       <NextPageStatus
         ref={bottomRef}
