@@ -10,6 +10,7 @@ import type { GetExploreWishResponseT } from '@/app/explore/wish/[wishId]/_types
 
 import { MOCK_FRIEND_PIKI } from './friend';
 import { MOCK_IMAGE_URLS } from './images';
+import { MOCK_PROFILE_NOT_FRIEND } from './profile';
 import { MOCK_WISHLIST_ENTRIES } from './wish';
 
 export const MOCK_FOLDER_OWNER_ID = '00000000-0000-4000-8000-000000000002';
@@ -106,6 +107,19 @@ export const MOCK_PRIVATE_EXPLORE_WISH: GetExploreWishResponseT = {
   ...MOCK_EXPLORE_WISH,
   wishId: 502,
   owner: null,
+};
+
+/** 프로필 화면 SSR 목이 있는 사용자가 폴더 없이 담은 위시 */
+export const MOCK_NO_FOLDER_EXPLORE_WISH: GetExploreWishResponseT = {
+  ...MOCK_EXPLORE_WISH,
+  wishId: 503,
+  owner: {
+    userId: MOCK_PROFILE_NOT_FRIEND.userId,
+    nickname: MOCK_PROFILE_NOT_FRIEND.nickname,
+    profileImage: MOCK_PROFILE_NOT_FRIEND.profileImage,
+    relation: 'NOT_FRIEND',
+    folder: null,
+  },
 };
 
 const PICK_TOURNAMENT = { tournamentId: 51, name: '겨울 패딩 뭐 사지' };
