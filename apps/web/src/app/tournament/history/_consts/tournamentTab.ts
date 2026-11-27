@@ -1,3 +1,4 @@
+import type { UnderlineTabItemT } from '@/components/common/underline-tab';
 import { TOURNAMENT_STATUS } from '@/consts/tournament';
 import type { TournamentStatusT } from '@/types/tournament';
 
@@ -12,3 +13,12 @@ export const STATUS_BY_TAB: Record<TournamentStatusTabT, TournamentStatusT[]> = 
   ongoing: [TOURNAMENT_STATUS.PENDING, TOURNAMENT_STATUS.IN_PROGRESS],
   completed: [TOURNAMENT_STATUS.COMPLETED],
 };
+
+export const TOURNAMENT_TAB_ID_PREFIX = 'tournament-tab';
+
+export const TOURNAMENT_TAB_PANEL_ID = 'tournament-tab-panel';
+
+export const TOURNAMENT_STATUS_TABS: UnderlineTabItemT<TournamentStatusTabT>[] = [
+  { value: 'ongoing', label: '진행 중' },
+  { value: 'completed', label: '완료' },
+];

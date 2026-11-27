@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 
-import { EditIconFill, PersonIconFill } from '@/assets/icons';
+import { ChevronForwardIconFill, PersonIconFill } from '@/assets/icons';
 import BaseImage from '@/components/base-image';
 import Skeleton from '@/components/skeleton';
 import { ROUTES } from '@/consts/route';
@@ -30,11 +30,11 @@ function ProfileSection() {
         </Link>
       ) : (
         <Link
-          href={ROUTES.MYPAGE_EDIT}
+          href={ROUTES.PROFILE(userData.id)}
           className="flex items-center gap-4 rounded-xl bg-bg-layer-default p-5"
         >
           <ProfileSummary userData={userData} />
-          <EditIconFill className="size-6 text-icon-neutral-secondary" />
+          <ChevronForwardIconFill aria-hidden className="size-5 text-icon-neutral-secondary" />
         </Link>
       )}
     </section>
@@ -60,9 +60,11 @@ function ProfileSummary({ userData }: ProfileSummaryProps) {
 
       <div className="min-w-0 flex-1">
         <p className="truncate body-1-bold text-text-neutral-primary">{userData.nickname}</p>
-        <p className="truncate body-2-medium text-text-neutral-tertiary" data-sentry-mask>
-          {userData.email}
-        </p>
+        {userData.email && (
+          <p className="truncate body-2-medium text-text-neutral-tertiary" data-sentry-mask>
+            {userData.email}
+          </p>
+        )}
       </div>
     </>
   );
