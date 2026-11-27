@@ -18,8 +18,14 @@ export const usePostExplorePickCandidate = () => {
   const { mutate: postExplorePickCandidateMutation, isPending: isPostExplorePickCandidatePending } =
     useMutation({
       mutationFn: postExplorePickCandidate,
-      onSuccess: ({ alreadySaved }, { candidateId }) => {
+      onSuccess: async ({ alreadySaved }, { candidateId }) => {
         queryClient.invalidateQueries({ queryKey: ['wishlists'] });
+        /** 저장 전에 시작된 조회가 늦게 끝나 담은 상태를 덮어쓰지 않도록 먼저 취소 */
+        await Promise.all([
+          queryClient.cancelQueries({ queryKey: QUERY_KEYS.EXPLORE.WINNERS }),
+          queryClient.cancelQueries({ queryKey: ['explore', 'pick'] }),
+          queryClient.cancelQueries({ queryKey: ['explore', 'candidates'] }),
+        ]);
         /** 같은 토너먼트의 1위는 참여자마다 따로 있어 후보 id 가 같은 캐시를 모두 담은 상태로 바꿈 */
         queryClient.setQueryData<InfiniteData<ApiResponseT<WinnerWishT[]>>>(
           QUERY_KEYS.EXPLORE.WINNERS,
