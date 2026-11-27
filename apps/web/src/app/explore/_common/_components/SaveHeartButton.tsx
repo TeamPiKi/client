@@ -1,5 +1,6 @@
 'use client';
 
+import { HAPTIC_STYLE } from '@piki/core';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 
@@ -7,6 +8,7 @@ import { HeartIconFill, HeartIconOutline } from '@/assets/icons';
 import { GUEST_BLOCK_LOCATION } from '@/consts/guestBlockLocation';
 import { Z_INDEX } from '@/consts/zIndex';
 import { useGetMe } from '@/hooks/useGetMe';
+import { triggerHaptic } from '@/utils/haptic';
 
 import GuestLoginSheet from './GuestLoginSheet';
 
@@ -30,6 +32,7 @@ function SaveHeartButton({ isInMyWish, isPending, onSave }: SaveHeartButtonProps
       return;
     }
 
+    triggerHaptic(HAPTIC_STYLE.LIGHT);
     onSave();
   };
 
