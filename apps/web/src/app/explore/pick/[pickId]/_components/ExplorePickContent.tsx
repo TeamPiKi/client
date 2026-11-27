@@ -18,7 +18,7 @@ function ExplorePickContent({ pickId }: ExplorePickContentProps) {
   const { postExplorePickCandidateMutation, isPostExplorePickCandidatePending } =
     usePostExplorePickCandidate();
 
-  /** 레이아웃이 없는 1위를 걸러 내지만 타입상 null 이 남아 한 번 더 막음 */
+  /** 페이지가 없는 1위를 걸러 내지만 타입상 null 이 남아 한 번 더 막음 */
   if (!explorePickData) notFound();
 
   return (

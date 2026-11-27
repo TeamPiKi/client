@@ -49,12 +49,15 @@ const OTHER_EXPLORE_FRIEND = {
   profileImage: MOCK_IMAGE_URLS.avatar,
 };
 
+/** 방금 담긴 위시 첫 카드의 위시 id */
+export const RECENT_CARD_WISH_ID = 301;
+
 /** updatedAt 은 "N분전 업데이트" 표시를 검증하려고 요청 시점 기준 5분 전으로 만든다 */
 export const createRecentWishes = (): GetRecentWishesResponseT => ({
   updatedAt: new Date(Date.now() - 5 * 60 * 1000).toISOString(),
   wishes: [
     {
-      wishId: 301,
+      wishId: RECENT_CARD_WISH_ID,
       addedAt: '2026-11-24T09:58:30+09:00',
       saved: false,
       item: createExploreItem(901, '탐색 가디건', 'musinsa'),
