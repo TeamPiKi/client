@@ -12,6 +12,8 @@ export const SCROLL_NAMESPACE = {
   WISHLIST_FOLDER: 'wishlistFolder',
   TOURNAMENT_HISTORY: 'tournamentHistory',
   EXPLORE: 'explore',
+  EXPLORE_WINNERS: 'exploreWinners',
+  EXPLORE_FRIENDS: 'exploreFriends',
 } as const;
 
 type ScrollAnchorT = {

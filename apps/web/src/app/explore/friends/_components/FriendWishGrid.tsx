@@ -6,6 +6,8 @@ import Basket from '@/components/common/basket';
 import NextPageStatus from '@/components/common/next-page-status';
 import { ROUTES } from '@/consts/route';
 import useIntersectionObserver from '@/hooks/useIntersectionObserver';
+import { useScrollRestoration } from '@/hooks/useScrollRestoration';
+import { SCROLL_NAMESPACE, saveScrollAnchor } from '@/utils/scrollRestoration';
 
 import { useGetFriendWishes } from '../../_common/_hooks/useGetFriendWishes';
 import FriendWishGridCard from './FriendWishGridCard';
@@ -29,6 +31,11 @@ function FriendWishGrid({ friendId }: FriendWishGridProps) {
     fetchNextPage,
     hasNextPage && !isFetching && !isFetchNextPageError
   );
+  const scrollRestoration = {
+    namespace: SCROLL_NAMESPACE.EXPLORE_FRIENDS,
+    scope: friendId ?? 'all',
+  };
+  useScrollRestoration(scrollRestoration);
 
   if (friendWishesData.length === 0) {
     return (
@@ -46,7 +53,14 @@ function FriendWishGrid({ friendId }: FriendWishGridProps) {
       <ul className="grid grid-cols-2">
         {friendWishesData.map(({ wishId, item, friend }, index) => (
           <li key={wishId}>
-            <Link href={ROUTES.EXPLORE_WISH(wishId)} className="block">
+            <Link
+              href={ROUTES.EXPLORE_WISH(wishId)}
+              data-scroll-anchor-id={wishId}
+              onClick={event =>
+                saveScrollAnchor(scrollRestoration, event.currentTarget, String(wishId))
+              }
+              className="block"
+            >
               <FriendWishGridCard item={item} friend={friend} preload={index < PRELOAD_COUNT} />
             </Link>
           </li>
