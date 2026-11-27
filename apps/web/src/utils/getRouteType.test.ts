@@ -11,6 +11,8 @@ describe('getRouteType', () => {
     expect(getRouteType('/wish')).toBe('MEMBER_ONLY');
     expect(getRouteType('/wish/3')).toBe('MEMBER_ONLY');
     expect(getRouteType('/wish/folder/3')).toBe('MEMBER_ONLY');
+    expect(getRouteType('/report/3')).toBe('MEMBER_ONLY');
+    expect(getRouteType('/friends')).toBe('MEMBER_ONLY');
     expect(getRouteType('/wishlist')).toBeNull(); // 올바르지 않은 경로 테스트
   });
 
@@ -53,5 +55,11 @@ describe('getRouteType', () => {
     expect(getRouteType('/mypage')).toBe('MEMBER_AND_GUEST');
     expect(getRouteType('/mypage/edit')).toBe('MEMBER_ONLY');
     expect(getRouteType('/mypage/unknown')).toBeNull();
+  });
+
+  it('프로필은 userId 세그먼트 하나만 게스트에게도 허용한다', () => {
+    expect(getRouteType('/profile/3')).toBe('MEMBER_AND_GUEST');
+    expect(getRouteType('/profile')).toBeNull();
+    expect(getRouteType('/profile/3/extra')).toBeNull();
   });
 });

@@ -14,6 +14,7 @@ import { CLIENT_TYPE } from '@/consts/webBridge';
 import { usePostNotificationsRead } from '@/hooks/usePostNotificationsRead';
 import type { NotificationSsePayloadT, SilentSyncSsePayloadT } from '@/types/notification';
 import { getApiErrorCode, getApiErrorStatus } from '@/utils/apiError';
+import { captureError } from '@/utils/captureError';
 import { getCookie } from '@/utils/cookie';
 import { handleSessionExpired } from '@/utils/handleSessionExpired';
 import { refreshClientToken } from '@/utils/refreshClientToken';
@@ -234,8 +235,8 @@ export const useNotificationSSE = (enabled: boolean) => {
                   }
                   break;
               }
-            } catch {
-              // malformed JSON — 무시
+            } catch (error) {
+              captureError(error, { tags: { source: 'notification-sse', event: event.event } });
             }
             return;
           }
@@ -301,8 +302,8 @@ export const useNotificationSSE = (enabled: boolean) => {
                 default:
                   showNotificationToastAndMarkRead('info');
               }
-            } catch {
-              // malformed JSON — 무시
+            } catch (error) {
+              captureError(error, { tags: { source: 'notification-sse', event: event.event } });
             }
           }
         },

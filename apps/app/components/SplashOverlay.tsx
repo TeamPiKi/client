@@ -25,7 +25,7 @@ function SplashOverlay() {
 
 const styles = StyleSheet.create({
   container: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     alignItems: 'center',
     backgroundColor: SPLASH_BACKGROUND_COLOR,
     justifyContent: 'center',

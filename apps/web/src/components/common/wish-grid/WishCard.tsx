@@ -1,11 +1,17 @@
-import { BadgeIconFill } from '@/assets/icons';
+import type { ReactNode } from 'react';
+
+import { BadgeIconFill, WarningIconFill } from '@/assets/icons';
 import ImageIconOutline from '@/assets/icons/outline/image.svg';
 import BaseImage from '@/components/base-image';
 import Skeleton from '@/components/skeleton';
+import Spinner from '@/components/spinner';
+import { ITEM_STATUS } from '@/consts/item';
 import { Z_INDEX } from '@/consts/zIndex';
+import type { ItemStatusT } from '@/types/item';
 import formatPrice from '@/utils/formatPrice';
 
 type WishCardProps = {
+  status: ItemStatusT;
   name: string | null;
   price: number | null;
   imageUrl: string | null;
@@ -22,8 +28,29 @@ const imageFallback = (
   </div>
 );
 
+const STATUS_CARD_CONTENT: Record<
+  ItemStatusT<'PARSING' | 'INCOMPLETE' | 'FAILED'>,
+  { thumbnail: ReactNode; title: string; description?: string }
+> = {
+  [ITEM_STATUS.PARSING]: {
+    thumbnail: <Spinner size={40} />,
+    title: '상품을 담고 있어요.',
+  },
+  [ITEM_STATUS.INCOMPLETE]: {
+    thumbnail: <WarningIconFill className="size-10 text-icon-warning" aria-hidden />,
+    title: '일부 정보만 가져왔어요',
+    description: '직접 수정할 수 있어요.',
+  },
+  [ITEM_STATUS.FAILED]: {
+    thumbnail: <WarningIconFill className="size-10 text-icon-error" aria-hidden />,
+    title: '불러오기에 실패했어요',
+    description: '직접 입력해 주세요.',
+  },
+};
+
 /** 3열 그리드용 위시 카드 */
 function WishCard({
+  status,
   name,
   price,
   imageUrl,
@@ -32,6 +59,24 @@ function WishCard({
   isWinner = false,
   preload = false,
 }: WishCardProps) {
+  if (status !== ITEM_STATUS.READY) {
+    const { thumbnail, title, description } = STATUS_CARD_CONTENT[status];
+
+    return (
+      <div className="flex flex-col">
+        <div className="flex aspect-[133/140] w-full items-center justify-center bg-gray-75">
+          {thumbnail}
+        </div>
+        <div className="flex flex-col gap-1 p-3">
+          <p className="caption-1-semibold text-text-neutral-primary">{title}</p>
+          {description && (
+            <p className="caption-1-regular text-text-neutral-secondary">{description}</p>
+          )}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col">
       <div className="relative aspect-[133/140] w-full bg-gray-75">

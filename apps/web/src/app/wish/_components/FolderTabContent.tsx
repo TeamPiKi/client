@@ -13,6 +13,7 @@ import { useDeleteFolder } from '../_common/_hooks/useDeleteFolder';
 import { usePatchFolder } from '../_common/_hooks/usePatchFolder';
 import { usePostFolder } from '../_common/_hooks/usePostFolder';
 import { WISH_TAB } from '../_consts/wishTab';
+import { usePatchFolderVisibility } from '../_hooks/usePatchFolderVisibility';
 import FolderAddCard from './FolderAddCard';
 import FolderCard from './FolderCard';
 import FolderEmptyState from './FolderEmptyState';
@@ -39,6 +40,7 @@ function FolderTabContent() {
     onSuccess: () => setIsRenameSheetOpen(false),
     onNameError: setRenameErrorMessage,
   });
+  const { patchFolderVisibilityMutation } = usePatchFolderVisibility();
   const { deleteFolderMutation, isDeleteFolderPending } = useDeleteFolder({
     onSuccess: () => setIsDeleteDialogOpen(false),
   });
@@ -54,6 +56,14 @@ function FolderTabContent() {
 
   const handleDelete = () => {
     if (deleteTarget) deleteFolderMutation(deleteTarget.id);
+  };
+
+  const handleToggleVisibility = (folder: FolderT) => {
+    patchFolderVisibilityMutation({
+      folderId: folder.id,
+      name: folder.name,
+      isPublic: !folder.isPublic,
+    });
   };
 
   return (
@@ -73,6 +83,8 @@ function FolderTabContent() {
                   name={folder.name}
                   wishCount={folder.wishCount}
                   thumbnailUrls={folder.coverImageUrls}
+                  isPublic={folder.isPublic}
+                  onToggleVisibility={() => handleToggleVisibility(folder)}
                   onRename={() => {
                     setRenameTarget(folder);
                     setRenameErrorMessage(null);

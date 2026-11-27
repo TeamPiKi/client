@@ -9,6 +9,7 @@ import Skeleton from '@/components/skeleton';
 import { ANALYTICS_EVENT } from '@/consts/analytics';
 import { useInstagramStoryShare } from '@/hooks/useInstagramStoryShare';
 import { logAnalyticsEvent } from '@/utils/analytics';
+import { captureNonApiError } from '@/utils/captureError';
 import { isWebview } from '@/utils/webBridge';
 
 import type { RankedProductT } from '../../../_common/_types/tournament';
@@ -74,8 +75,10 @@ function ReceiptShareDialog({
         objectUrl = URL.createObjectURL(blob);
         setImageBlob(blob);
         setPreviewUrl(objectUrl);
-      } catch {
-        if (isActive) toast.error('영수증 이미지를 만들지 못했어요');
+      } catch (error) {
+        if (!isActive) return;
+        captureNonApiError(error);
+        toast.error('영수증 이미지를 만들지 못했어요');
       }
     };
 

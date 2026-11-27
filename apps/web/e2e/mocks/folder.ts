@@ -8,6 +8,7 @@ export const MOCK_FOLDER: FolderT = {
   wishCount: 7,
   coverImageUrls: [MOCK_IMAGE_URLS.product, null, MOCK_IMAGE_URLS.product],
   createdAt: '2026-10-20T13:02:11',
+  isPublic: true,
 };
 
 export const MOCK_FOLDERS: FolderT[] = [
@@ -18,5 +19,6 @@ export const MOCK_FOLDERS: FolderT[] = [
     wishCount: 0,
     coverImageUrls: [],
     createdAt: '2026-10-21T09:10:00',
+    isPublic: true,
   },
 ];

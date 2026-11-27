@@ -23,13 +23,8 @@ function EditForm() {
   const [nickname, setNickname] = useState(userData.nickname);
   const [profileImageFile, setProfileImageFile] = useState<File | null>(null);
 
-  const {
-    isCheckingNickname,
-    isNicknameChanged,
-    isNicknameValid,
-    nicknameErrorText,
-    trimmedNickname,
-  } = useNicknameValidation(nickname, userData.nickname);
+  const { isNicknameChanged, isNicknameValid, nicknameErrorText, trimmedNickname } =
+    useNicknameValidation(nickname, userData.nickname);
 
   const hasProfileImageChange = profileImageFile !== null;
   const hasChanges = isNicknameChanged || hasProfileImageChange;
@@ -69,7 +64,6 @@ function EditForm() {
         <NicknameField
           value={nickname}
           onChange={handleNicknameChange}
-          isChecking={isCheckingNickname}
           {...(nicknameErrorText ? { errorText: nicknameErrorText } : {})}
         />
       </div>
