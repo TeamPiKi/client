@@ -8,7 +8,7 @@ function StageBadge() {
 
   return (
     <div
-      className="pointer-events-none fixed inset-x-0 top-0 mx-auto max-w-120"
+      className="pointer-events-none fixed top-0 right-safe-right left-safe-left mx-auto max-w-120"
       style={{ zIndex: Z_INDEX.STAGE_BADGE }}
     >
       <span className="absolute top-[env(safe-area-inset-top)] right-0 bg-gray-950/60 px-2 py-1 caption-1-semibold text-base-50 uppercase select-none">

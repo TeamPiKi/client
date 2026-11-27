@@ -7,6 +7,7 @@ import {
 import type { ImagePickerAsset } from 'expo-image-picker';
 import { launchImageLibraryAsync, requestMediaLibraryPermissionsAsync } from 'expo-image-picker';
 
+import { captureError } from '@/utils/captureError';
 import { WebBridge } from '@/utils/webBridge';
 
 const DEFAULT_MIME_TYPE = 'image/jpeg';
@@ -101,7 +102,8 @@ export const handleOpenImagePicker = async ({ requestId, maxCount }: OpenImagePi
         skippedCount,
       },
     });
-  } catch {
+  } catch (error) {
+    captureError(error, { tags: { source: 'webBridge', action: 'openImagePicker' } });
     WebBridge.postMessage({
       type: WEBBRIDGE_MESSAGE_TYPE.APP_RES_IMAGE_PICKER_ERROR,
       payload: {

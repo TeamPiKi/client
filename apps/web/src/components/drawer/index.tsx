@@ -50,7 +50,7 @@ function DrawerContent({
       <DrawerPrimitive.Content
         data-slot="drawer-content"
         className={cn(
-          'group/drawer-content fixed flex h-auto w-full flex-col rounded-t-[20px] bg-white data-[vaul-drawer-direction=bottom]:bottom-0 data-[vaul-drawer-direction=bottom]:left-1/2 data-[vaul-drawer-direction=bottom]:max-w-120 data-[vaul-drawer-direction=bottom]:-translate-x-1/2',
+          'group/drawer-content fixed flex h-auto w-full flex-col rounded-t-[20px] bg-white data-[vaul-drawer-direction=bottom]:right-safe-right data-[vaul-drawer-direction=bottom]:bottom-0 data-[vaul-drawer-direction=bottom]:left-safe-left data-[vaul-drawer-direction=bottom]:mx-auto data-[vaul-drawer-direction=bottom]:w-auto data-[vaul-drawer-direction=bottom]:max-w-120',
           className
         )}
         style={{ zIndex: Z_INDEX.DRAWER, ...props.style }}

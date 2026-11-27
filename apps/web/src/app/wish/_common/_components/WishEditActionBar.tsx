@@ -95,7 +95,7 @@ function WishEditActionBar({
       <div
         data-bottom-cta
         data-hide-bottom-tab-bar
-        className="fixed right-0 bottom-0 left-0 mx-auto flex w-full max-w-120 items-center justify-center gap-10 rounded-t-2xl bg-white px-2.5 pt-6 pb-9"
+        className="fixed right-safe-right bottom-0 left-safe-left mx-auto flex max-w-120 items-center justify-center gap-10 rounded-t-2xl bg-white px-2.5 pt-6 pb-9"
         style={{ zIndex: Z_INDEX.BOTTOM_CTA }}
       >
         <ActionButton

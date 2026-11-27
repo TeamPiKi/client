@@ -19,6 +19,8 @@ export const useFolderWishes = (folderId: number | null) => {
     wishesData: folderWishes.data?.pages.flatMap(page => page.data) ?? [],
     fetchNextPage: folderWishes.fetchNextPage,
     hasNextPage: folderWishes.hasNextPage,
+    isFetching: folderWishes.isFetching,
     isFetchingNextPage: folderWishes.isFetchingNextPage,
+    isFetchNextPageError: folderWishes.isFetchNextPageError,
   };
 };

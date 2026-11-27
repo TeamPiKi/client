@@ -1,15 +1,13 @@
 import { EditIconFill } from '@/assets/icons';
 import Input from '@/components/input';
-import Spinner from '@/components/spinner';
 
 type NicknameFieldProps = {
   value: string;
   onChange: (value: string) => void;
-  isChecking: boolean;
   errorText?: string;
 };
 
-function NicknameField({ value, onChange, isChecking, errorText }: NicknameFieldProps) {
+function NicknameField({ value, onChange, errorText }: NicknameFieldProps) {
   const isError = !!errorText;
 
   return (
@@ -22,13 +20,7 @@ function NicknameField({ value, onChange, isChecking, errorText }: NicknameField
         onChange={event => onChange(event.target.value)}
         aria-invalid={isError}
         {...(errorText ? { helperText: errorText } : {})}
-        right={
-          isChecking ? (
-            <Spinner size={20} />
-          ) : (
-            <EditIconFill className="size-5 text-icon-neutral-secondary" />
-          )
-        }
+        right={<EditIconFill className="size-5 text-icon-neutral-secondary" />}
       />
     </div>
   );
