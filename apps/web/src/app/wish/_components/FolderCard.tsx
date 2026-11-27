@@ -40,7 +40,7 @@ function FolderCard({
     saveScrollAnchor(
       { namespace: SCROLL_NAMESPACE.WISHLIST, scope: WISH_TAB.FOLDER },
       event.currentTarget,
-      folderId
+      String(folderId)
     );
   };
 

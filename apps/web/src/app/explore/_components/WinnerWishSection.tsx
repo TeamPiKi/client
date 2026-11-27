@@ -3,6 +3,7 @@
 import Link from 'next/link';
 
 import { ROUTES } from '@/consts/route';
+import { SCROLL_NAMESPACE, saveScrollAnchor } from '@/utils/scrollRestoration';
 
 import { useGetWinnerWishes } from '../_common/_hooks/useGetWinnerWishes';
 import ExploreSectionHeader from './ExploreSectionHeader';
@@ -26,7 +27,18 @@ function WinnerWishSection() {
       <ul className="hide-scrollbar flex gap-2.5 overflow-x-auto px-5">
         {winnerWishesData.slice(0, MAX_COUNT).map(({ pickId, item }, index) => (
           <li key={pickId} className="w-[133px] shrink-0">
-            <Link href={ROUTES.EXPLORE_PICK(pickId)} className="block">
+            <Link
+              href={ROUTES.EXPLORE_PICK(pickId)}
+              data-scroll-anchor-id={`winner-${pickId}`}
+              onClick={event =>
+                saveScrollAnchor(
+                  { namespace: SCROLL_NAMESPACE.EXPLORE },
+                  event.currentTarget,
+                  `winner-${pickId}`
+                )
+              }
+              className="block"
+            >
               <WinnerWishThumbnailCard item={item} preload={index < 3} />
             </Link>
           </li>

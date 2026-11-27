@@ -45,7 +45,7 @@ function TournamentCard({
     /** 새 탭/새 창 열기는 현재 페이지를 떠나지 않으므로 스크롤 위치를 저장하지 않는다 */
     if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
 
-    saveScrollAnchor(scrollRestoration, event.currentTarget, tournamentId);
+    saveScrollAnchor(scrollRestoration, event.currentTarget, String(tournamentId));
   };
 
   const HREF = {

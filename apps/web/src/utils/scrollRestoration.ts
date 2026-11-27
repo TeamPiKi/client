@@ -11,10 +11,14 @@ export const SCROLL_NAMESPACE = {
   WISHLIST: 'wishlist',
   WISHLIST_FOLDER: 'wishlistFolder',
   TOURNAMENT_HISTORY: 'tournamentHistory',
+  EXPLORE: 'explore',
+  EXPLORE_WINNERS: 'exploreWinners',
+  EXPLORE_FRIENDS: 'exploreFriends',
+  EXPLORE_FOLDER: 'exploreFolder',
 } as const;
 
 type ScrollAnchorT = {
-  anchorId: number;
+  anchorId: string;
   offset: number;
 };
 
@@ -46,7 +50,7 @@ export const getAnchorOffset = (container: HTMLElement, anchor: HTMLElement) =>
 export const saveScrollAnchor = (
   target: ScrollRestorationTargetT,
   element: HTMLElement,
-  anchorId: number
+  anchorId: string
 ) => {
   const scroller = getScrollContainer();
   if (!scroller) return;
@@ -66,7 +70,7 @@ export const readScrollAnchor = (target: ScrollRestorationTargetT): ScrollAnchor
     if (!raw) return null;
 
     const { anchorId, offset }: Record<string, unknown> = JSON.parse(raw);
-    if (typeof anchorId !== 'number' || typeof offset !== 'number') return null;
+    if (typeof anchorId !== 'string' || typeof offset !== 'number') return null;
 
     return { anchorId, offset };
   } catch {
