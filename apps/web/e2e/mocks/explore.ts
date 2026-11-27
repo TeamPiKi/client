@@ -10,6 +10,7 @@ import type { GetExploreWishResponseT } from '@/app/explore/wish/[wishId]/_types
 
 import { MOCK_FRIEND_PIKI } from './friend';
 import { MOCK_IMAGE_URLS } from './images';
+import { MOCK_PROFILE_NOT_FRIEND } from './profile';
 import { MOCK_WISHLIST_ENTRIES } from './wish';
 
 export const MOCK_FOLDER_OWNER_ID = '00000000-0000-4000-8000-000000000002';
@@ -48,12 +49,15 @@ const OTHER_EXPLORE_FRIEND = {
   profileImage: MOCK_IMAGE_URLS.avatar,
 };
 
+/** 방금 담긴 위시 첫 카드의 위시 id */
+export const RECENT_CARD_WISH_ID = 301;
+
 /** updatedAt 은 "N분 전 업데이트" 표시를 검증하려고 요청 시점 기준 5분 전으로 만든다 */
 export const createRecentWishes = (): GetRecentWishesResponseT => ({
   updatedAt: new Date(Date.now() - 5 * 60 * 1000).toISOString(),
   wishes: [
     {
-      wishId: 301,
+      wishId: RECENT_CARD_WISH_ID,
       addedAt: '2026-11-24T09:58:30+09:00',
       saved: false,
       item: createExploreItem(901, '탐색 가디건', 'musinsa'),
@@ -106,6 +110,19 @@ export const MOCK_PRIVATE_EXPLORE_WISH: GetExploreWishResponseT = {
   ...MOCK_EXPLORE_WISH,
   wishId: 502,
   owner: null,
+};
+
+/** 프로필 화면 SSR 목이 있는 사용자가 폴더 없이 담은 위시 */
+export const MOCK_NO_FOLDER_EXPLORE_WISH: GetExploreWishResponseT = {
+  ...MOCK_EXPLORE_WISH,
+  wishId: 503,
+  owner: {
+    userId: MOCK_PROFILE_NOT_FRIEND.userId,
+    nickname: MOCK_PROFILE_NOT_FRIEND.nickname,
+    profileImage: MOCK_PROFILE_NOT_FRIEND.profileImage,
+    relation: 'NOT_FRIEND',
+    folder: null,
+  },
 };
 
 const PICK_TOURNAMENT = { tournamentId: 51, name: '겨울 패딩 뭐 사지' };

@@ -18,3 +18,6 @@ export const SSR_EMPTY_COOKIE = 'e2e-ssr-empty';
 
 /** SSR 스텁이 한 라우트를 에러 status 로 응답할 때 쓰는 쿠키 이름 — 값은 `METHOD /path=status` (helpers/ssrStatus.ts) */
 export const SSR_STATUS_COOKIE = 'e2e-ssr-status';
+
+/** SSR 스텁이 한 라우트를 늦게 응답할 때 쓰는 쿠키 이름 — 값은 `METHOD /path=ms` (helpers/ssrDelay.ts) */
+export const SSR_DELAY_COOKIE = 'e2e-ssr-delay';
