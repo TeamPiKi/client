@@ -14,6 +14,7 @@ export const SCROLL_NAMESPACE = {
   EXPLORE: 'explore',
   EXPLORE_WINNERS: 'exploreWinners',
   EXPLORE_FRIENDS: 'exploreFriends',
+  EXPLORE_FOLDER: 'exploreFolder',
 } as const;
 
 type ScrollAnchorT = {

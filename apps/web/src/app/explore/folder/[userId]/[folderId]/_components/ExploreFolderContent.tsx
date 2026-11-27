@@ -4,6 +4,8 @@ import Link from 'next/link';
 
 import { Header, HeaderIcon } from '@/components/header';
 import { ROUTES } from '@/consts/route';
+import { useScrollRestoration } from '@/hooks/useScrollRestoration';
+import { SCROLL_NAMESPACE, saveScrollAnchor } from '@/utils/scrollRestoration';
 
 import WishHeartButton from '../../../../_common/_components/WishHeartButton';
 import { useGetExploreFolder } from '../_hooks/useGetExploreFolder';
@@ -19,6 +21,12 @@ type ExploreFolderContentProps = {
 
 function ExploreFolderContent({ userId, folderId }: ExploreFolderContentProps) {
   const { exploreFolderData } = useGetExploreFolder(userId, folderId);
+
+  const scrollRestoration = {
+    namespace: SCROLL_NAMESPACE.EXPLORE_FOLDER,
+    scope: String(folderId),
+  };
+  useScrollRestoration(scrollRestoration);
 
   return (
     <>
@@ -38,7 +46,14 @@ function ExploreFolderContent({ userId, folderId }: ExploreFolderContentProps) {
         <ul className="mt-6 grid grid-cols-2">
           {exploreFolderData.wishes.map(({ wishId, item, isInMyWish }, index) => (
             <li key={wishId} className="relative">
-              <Link href={ROUTES.EXPLORE_WISH(wishId)} className="block">
+              <Link
+                href={ROUTES.EXPLORE_WISH(wishId)}
+                data-scroll-anchor-id={wishId}
+                onClick={event =>
+                  saveScrollAnchor(scrollRestoration, event.currentTarget, String(wishId))
+                }
+                className="block"
+              >
                 <FolderWishGridCard item={item} preload={index < PRELOAD_COUNT} />
               </Link>
               <WishHeartButton wishId={wishId} isInMyWish={isInMyWish} />
