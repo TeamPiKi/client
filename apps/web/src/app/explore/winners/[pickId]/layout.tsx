@@ -9,19 +9,18 @@ import { getTournamentCandidates } from './_apis/getTournamentCandidates';
 
 type TournamentCandidatesLayoutProps = {
   children: React.ReactNode;
-  params: Promise<{ tournamentId: string }>;
+  params: Promise<{ pickId: string }>;
 };
 
 async function TournamentCandidatesLayout({ children, params }: TournamentCandidatesLayoutProps) {
-  const tournamentId = parseIdParam((await params).tournamentId);
-  if (!tournamentId) notFound();
+  const pickId = parseIdParam((await params).pickId);
+  if (!pickId) notFound();
 
-  /** TODO: API 연동 시 404 응답을 받아 분기 */
-  const tournamentCandidatesData = await getTournamentCandidates(tournamentId);
+  const tournamentCandidatesData = await getTournamentCandidates(pickId);
   if (!tournamentCandidatesData) notFound();
 
   const queryClient = getQueryClient();
-  queryClient.setQueryData(QUERY_KEYS.EXPLORE.CANDIDATES(tournamentId), tournamentCandidatesData);
+  queryClient.setQueryData(QUERY_KEYS.EXPLORE.CANDIDATES(pickId), tournamentCandidatesData);
 
   return <HydrationBoundary state={dehydrate(queryClient)}>{children}</HydrationBoundary>;
 }

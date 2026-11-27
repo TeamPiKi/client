@@ -8,6 +8,7 @@ import { serverPrefetch } from '@/utils/serverPrefetch';
 
 import { recentWishesInfiniteQueryOptions } from './_apis/getRecentWishes';
 import { friendWishesInfiniteQueryOptions } from './_common/_apis/getFriendWishes';
+import { winnerWishesInfiniteQueryOptions } from './_common/_apis/getWinnerWishes';
 import ExploreProfileLink from './_components/ExploreProfileLink';
 import FriendWishSection from './_components/FriendWishSection';
 import RecentWishSection from './_components/RecentWishSection';
@@ -19,6 +20,7 @@ async function ExplorePage() {
   const queryClient = getQueryClient();
 
   await Promise.all([
+    serverPrefetch(() => queryClient.fetchInfiniteQuery(winnerWishesInfiniteQueryOptions)),
     serverPrefetch(() => queryClient.fetchInfiniteQuery(friendWishesInfiniteQueryOptions(null))),
     serverPrefetch(() => queryClient.fetchInfiniteQuery(recentWishesInfiniteQueryOptions)),
   ]);

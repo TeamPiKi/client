@@ -1,13 +1,13 @@
 import TournamentCandidatesContent from './_components/TournamentCandidatesContent';
 
 type TournamentCandidatesPageProps = {
-  params: Promise<{ tournamentId: string }>;
+  params: Promise<{ pickId: string }>;
 };
 
 async function TournamentCandidatesPage({ params }: TournamentCandidatesPageProps) {
-  const { tournamentId } = await params;
+  const { pickId } = await params;
 
-  return <TournamentCandidatesContent tournamentId={Number(tournamentId)} />;
+  return <TournamentCandidatesContent pickId={Number(pickId)} />;
 }
 
 export default TournamentCandidatesPage;

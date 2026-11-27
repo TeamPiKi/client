@@ -8,14 +8,19 @@ export type ExploreItemT = {
   sourcePlatform?: string | null;
 };
 
-/** 토너먼트에서 1위를 차지한 위시 */
+/** 토너먼트에서 1위를 차지한 상품 */
 export type WinnerWishT = {
-  wishId: number;
+  /** 1위 기록 id — 위시 id 가 아님 */
+  pickId: number;
+  /** 1위 후보 id — 하트로 담을 때 사용 */
+  candidateId: number;
   item: ExploreItemT;
   tournament: {
     id: number;
     title: string;
   };
+  /** 이미 내 위시에 있는 상품인지 */
+  isInMyWish: boolean;
 };
 
 export type ExploreFriendT = {
@@ -46,7 +51,7 @@ export type RecentWishesT = {
   wishes: RecentWishT[];
 };
 
-type ExploreItemResponseT = {
+export type ExploreItemResponseT = {
   id: number;
   name: string;
   price: number;
@@ -75,6 +80,23 @@ export type GetFriendWishesResponseT = {
   wishes: (ExploreWishResponseT & { friend: ExploreFriendT })[];
 };
 
+export type ExploreTournamentResponseT = {
+  tournamentId: number;
+  name: string;
+};
+
+export type GetExplorePicksResponseT = {
+  updatedAt: string | null;
+  picks: {
+    pickId: number;
+    candidateId: number;
+    pickedAt: string;
+    saved: boolean;
+    tournament: ExploreTournamentResponseT;
+    item: ExploreItemResponseT;
+  }[];
+};
+
 export type PostExploreWishResponseT = {
   /** 내 위시 id — 이미 가진 상품이면 원래 위시 id */
   wishId: number;
@@ -82,9 +104,8 @@ export type PostExploreWishResponseT = {
   alreadySaved: boolean;
 };
 
-/** 탐색 위시 상세 */
-export type ExploreWishDetailT = {
-  wishId: number;
+/** 탐색 위시 상세·1위 상세가 함께 쓰는 화면 값 */
+export type ExploreDetailViewT = {
   item: {
     name: string;
     price: number;
@@ -109,13 +130,40 @@ export type ExploreWishDetailT = {
     id: number;
     name: string;
   } | null;
-  /** 1위를 차지한 토너먼트 — 1위 위시가 아니면 null */
+  /** 1위를 차지한 토너먼트 — 1위 상세가 아니면 null */
   winnerTournament: {
-    id: number;
+    pickId: number;
     title: string;
     candidateCount: number;
     candidateImageUrls: string[];
   } | null;
+};
+
+/** 탐색 위시 상세 */
+export type ExploreWishDetailT = ExploreDetailViewT & {
+  wishId: number;
+};
+
+/** 토너먼트 1위 상세 */
+export type ExplorePickDetailT = ExploreDetailViewT & {
+  pickId: number;
+  candidateId: number;
+};
+
+/** 1위가 나온 토너먼트의 후보 목록 */
+export type ExplorePickCandidatesT = {
+  pickId: number;
+  tournament: {
+    id: number;
+    title: string;
+  };
+  /** 1위가 맨 앞 */
+  candidates: {
+    candidateId: number;
+    item: ExploreItemT;
+    isWinner: boolean;
+    isInMyWish: boolean;
+  }[];
 };
 
 /** 다른 사람 공개 폴더 상세 */
@@ -125,7 +173,6 @@ export type ExploreFolderT = {
   wishes: {
     wishId: number;
     item: ExploreItemT;
-    /** TODO: 서버 공개 폴더 응답에 없는 값이라 API 연동 시 협의 필요 */
     isInMyWish: boolean;
   }[];
 };

@@ -14,6 +14,8 @@ const MAX_COUNT = 20;
 function WinnerWishSection() {
   const { winnerWishesData } = useGetWinnerWishes();
 
+  if (winnerWishesData.length === 0) return null;
+
   return (
     <section className="flex flex-col gap-4">
       <ExploreSectionHeader
@@ -22,9 +24,9 @@ function WinnerWishSection() {
         moreHref={ROUTES.EXPLORE_WINNERS}
       />
       <ul className="hide-scrollbar flex gap-2.5 overflow-x-auto px-5">
-        {winnerWishesData.slice(0, MAX_COUNT).map(({ wishId, item }, index) => (
-          <li key={wishId} className="w-[133px] shrink-0">
-            <Link href={ROUTES.EXPLORE_WISH(wishId)} className="block">
+        {winnerWishesData.slice(0, MAX_COUNT).map(({ pickId, item }, index) => (
+          <li key={pickId} className="w-[133px] shrink-0">
+            <Link href={ROUTES.EXPLORE_PICK(pickId)} className="block">
               <WinnerWishThumbnailCard item={item} preload={index < 3} />
             </Link>
           </li>

@@ -6,6 +6,7 @@ import NextPageStatus from '@/components/common/next-page-status';
 import { ROUTES } from '@/consts/route';
 import useIntersectionObserver from '@/hooks/useIntersectionObserver';
 
+import PickHeartButton from '../../_common/_components/PickHeartButton';
 import { useGetWinnerWishes } from '../../_common/_hooks/useGetWinnerWishes';
 import WinnerWishGridCard from './WinnerWishGridCard';
 
@@ -29,9 +30,9 @@ function WinnerWishGrid() {
   return (
     <>
       <ul className="grid grid-cols-2">
-        {winnerWishesData.map(({ wishId, item, tournament }, index) => (
-          <li key={wishId}>
-            <Link href={ROUTES.EXPLORE_WISH(wishId)} className="block">
+        {winnerWishesData.map(({ pickId, candidateId, item, tournament, isInMyWish }, index) => (
+          <li key={pickId} className="relative">
+            <Link href={ROUTES.EXPLORE_PICK(pickId)} className="block">
               <WinnerWishGridCard
                 item={item}
                 isWinner
@@ -39,6 +40,7 @@ function WinnerWishGrid() {
                 preload={index < PRELOAD_COUNT}
               />
             </Link>
+            <PickHeartButton pickId={pickId} candidateId={candidateId} isInMyWish={isInMyWish} />
           </li>
         ))}
       </ul>

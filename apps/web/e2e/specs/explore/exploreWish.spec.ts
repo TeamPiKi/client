@@ -3,7 +3,11 @@ import { ROUTES } from '@/consts/route';
 
 import { expect, test } from '@e2e/fixtures/mockApiFixture';
 import { setSsrStatus } from '@e2e/helpers/ssrStatus';
-import { MOCK_EXPLORE_WISH, MOCK_PRIVATE_EXPLORE_WISH } from '@e2e/mocks/explore';
+import {
+  MOCK_EXPLORE_WISH,
+  MOCK_NO_FOLDER_EXPLORE_WISH,
+  MOCK_PRIVATE_EXPLORE_WISH,
+} from '@e2e/mocks/explore';
 
 test('위시 상세는 담은 사람 수와 담은 사람·공개 폴더를 보여준다', async ({ page }) => {
   await page.goto(ROUTES.EXPLORE_WISH(MOCK_EXPLORE_WISH.wishId));
@@ -24,6 +28,17 @@ test('위시 상세는 담은 사람 수와 담은 사람·공개 폴더를 보�
       MOCK_EXPLORE_WISH.owner?.folder?.folderId ?? 0
     )
   );
+});
+
+test('폴더 없는 위시는 담은 사람 카드 빈 곳을 눌러도 프로필로 이동한다', async ({ page }) => {
+  const owner = MOCK_NO_FOLDER_EXPLORE_WISH.owner!;
+  await page.goto(ROUTES.EXPLORE_WISH(MOCK_NO_FOLDER_EXPLORE_WISH.wishId));
+
+  const card = page.getByRole('link', { name: `${owner.nickname} 프로필` }).locator('..');
+  const box = (await card.boundingBox())!;
+  await card.click({ position: { x: box.width - 24, y: box.height / 2 } });
+
+  await expect(page).toHaveURL(ROUTES.PROFILE(owner.userId));
 });
 
 test('담은 사람을 볼 수 없으면 비공개된 유저로 보여준다', async ({ page }) => {

@@ -12,9 +12,13 @@ import {
 } from '../mocks/auth';
 import {
   MOCK_EXPLORE_FOLDER,
+  MOCK_EXPLORE_PICK,
+  MOCK_EXPLORE_PICKS,
+  MOCK_EXPLORE_PICK_CANDIDATES,
   MOCK_EXPLORE_WISH,
   MOCK_FOLDER_OWNER_ID,
   MOCK_FRIEND_WISHES,
+  MOCK_NO_FOLDER_EXPLORE_WISH,
   MOCK_PRIVATE_EXPLORE_WISH,
   createRecentWishes,
 } from '../mocks/explore';
@@ -88,7 +92,15 @@ const SSR_MOCK_ROUTES: Record<string, unknown> = {
     createApiSuccess(MOCK_EXPLORE_FOLDER),
   [`GET ${ENDPOINTS.EXPLORE_RECENT}`]: createApiSuccess(createRecentWishes()),
   [`GET ${ENDPOINTS.EXPLORE_FRIENDS}`]: createApiSuccess(MOCK_FRIEND_WISHES),
+  [`GET ${ENDPOINTS.EXPLORE_PICKS}`]: createApiSuccess(MOCK_EXPLORE_PICKS),
+  [`GET ${ENDPOINTS.EXPLORE_PICK(MOCK_EXPLORE_PICK.pickId)}`]: createApiSuccess(MOCK_EXPLORE_PICK),
+  [`GET ${ENDPOINTS.EXPLORE_PICK_CANDIDATES(MOCK_EXPLORE_PICK.pickId)}`]: createApiSuccess(
+    MOCK_EXPLORE_PICK_CANDIDATES
+  ),
   [`GET ${ENDPOINTS.EXPLORE_WISH(MOCK_EXPLORE_WISH.wishId)}`]: createApiSuccess(MOCK_EXPLORE_WISH),
+  [`GET ${ENDPOINTS.EXPLORE_WISH(MOCK_NO_FOLDER_EXPLORE_WISH.wishId)}`]: createApiSuccess(
+    MOCK_NO_FOLDER_EXPLORE_WISH
+  ),
   [`GET ${ENDPOINTS.EXPLORE_WISH(MOCK_PRIVATE_EXPLORE_WISH.wishId)}`]:
     createApiSuccess(MOCK_PRIVATE_EXPLORE_WISH),
 };
@@ -136,6 +148,7 @@ const isEmptyRequested = (req: http.IncomingMessage, pathname: string) => {
 const SSR_EMPTY_DATA: Record<string, unknown> = {
   [ENDPOINTS.EXPLORE_RECENT]: { updatedAt: null, wishes: [] },
   [ENDPOINTS.EXPLORE_FRIENDS]: { friends: [], wishes: [] },
+  [ENDPOINTS.EXPLORE_PICKS]: { updatedAt: null, picks: [] },
 };
 
 type StatusOverrideT = { status: number; code: string };

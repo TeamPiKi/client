@@ -5,21 +5,22 @@ import { useState } from 'react';
 import BottomCta from '@/components/bottom-cta';
 import Button from '@/components/button';
 import { GUEST_BLOCK_LOCATION } from '@/consts/guestBlockLocation';
-import { ROUTES } from '@/consts/route';
 import { useGetMe } from '@/hooks/useGetMe';
 
-import GuestLoginSheet from '../../../_common/_components/GuestLoginSheet';
-import { usePostExploreWish } from '../../../_common/_hooks/usePostExploreWish';
+import GuestLoginSheet from './GuestLoginSheet';
 
-type AddToMyWishButtonProps = {
-  wishId: number;
+type SaveToMyWishCtaProps = {
   isInMyWish: boolean;
+  isPending: boolean;
+  onSave: () => void;
+  /** 게스트가 로그인 후 돌아올 경로 */
+  redirectPath: string;
 };
 
-function AddToMyWishButton({ wishId, isInMyWish }: AddToMyWishButtonProps) {
+/** 상세 하단 [내 위시로 담기] — 게스트는 로그인 시트, 회원은 onSave */
+function SaveToMyWishCta({ isInMyWish, isPending, onSave, redirectPath }: SaveToMyWishCtaProps) {
   const { userData } = useGetMe();
   const [isLoginSheetOpen, setIsLoginSheetOpen] = useState(false);
-  const { postExploreWishMutation, isPostExploreWishPending } = usePostExploreWish();
 
   const handleClick = () => {
     if (userData.identityType === 'GUEST') {
@@ -27,18 +28,13 @@ function AddToMyWishButton({ wishId, isInMyWish }: AddToMyWishButtonProps) {
       return;
     }
 
-    postExploreWishMutation(wishId);
+    onSave();
   };
 
   return (
     <>
       <BottomCta hasGradient>
-        <Button
-          size="lg"
-          disabled={isInMyWish}
-          isLoading={isPostExploreWishPending}
-          onClick={handleClick}
-        >
+        <Button size="lg" disabled={isInMyWish} isLoading={isPending} onClick={handleClick}>
           내 위시로 담기
         </Button>
       </BottomCta>
@@ -46,11 +42,11 @@ function AddToMyWishButton({ wishId, isInMyWish }: AddToMyWishButtonProps) {
       <GuestLoginSheet
         open={isLoginSheetOpen}
         onOpenChange={setIsLoginSheetOpen}
-        redirectPath={ROUTES.EXPLORE_WISH(wishId)}
+        redirectPath={redirectPath}
         location={GUEST_BLOCK_LOCATION.EXPLORE_WISH_SAVE}
       />
     </>
   );
 }
 
-export default AddToMyWishButton;
+export default SaveToMyWishCta;

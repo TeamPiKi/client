@@ -7,11 +7,11 @@ import { ROUTES } from '@/consts/route';
 import { Z_INDEX } from '@/consts/zIndex';
 import { cn } from '@/utils/cn';
 
-import type { ExploreWishDetailT } from '../../../_common/_types/explore';
+import type { ExploreDetailViewT } from '../_types/explore';
 
 type WishOwnerCardProps = {
-  owner: NonNullable<ExploreWishDetailT['owner']>;
-  folder: ExploreWishDetailT['folder'];
+  owner: NonNullable<ExploreDetailViewT['owner']>;
+  folder: ExploreDetailViewT['folder'];
 };
 
 function WishOwnerCard({ owner, folder }: WishOwnerCardProps) {
@@ -19,10 +19,18 @@ function WishOwnerCard({ owner, folder }: WishOwnerCardProps) {
 
   return (
     <div className="relative flex items-center gap-5 rounded-2xl bg-bg-layer-default p-4">
-      {folder && (
+      {/* 카드 빈 곳 탭 — 폴더가 있으면 폴더 상세, 없으면 프로필. 프로필 링크는 사진·닉네임과 겹쳐 스크린리더에서 숨김 */}
+      {folder ? (
         <Link
           href={ROUTES.EXPLORE_FOLDER(owner.userId, folder.id)}
           aria-label={`${folder.name} 폴더보기`}
+          className="absolute inset-0 cursor-pointer rounded-2xl"
+        />
+      ) : (
+        <Link
+          href={profileHref}
+          aria-hidden
+          tabIndex={-1}
           className="absolute inset-0 cursor-pointer rounded-2xl"
         />
       )}
