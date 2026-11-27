@@ -112,6 +112,9 @@ export const ERROR_MESSAGE_MAP = {
   'FRIENDSHIP-001': '친구 기능은 회원만 쓸 수 있어요.',
   'FRIENDSHIP-002': '자기 자신은 친구로 추가할 수 없어요.',
 
+  /** EXPLORE */
+  'EXPLORE-001': '토너먼트 결과를 찾을 수 없어요.',
+
   /** REPORT */
   'REPORT-001': '신고는 회원만 할 수 있어요.',
   'REPORT-002': '자기 자신은 신고할 수 없어요.',
@@ -270,6 +273,9 @@ export const ERROR_CODE = {
   /** 친구 */
   FRIENDSHIP_GUEST_CANNOT_USE: 'FRIENDSHIP-001',
   FRIENDSHIP_SELF_NOT_ALLOWED: 'FRIENDSHIP-002',
+
+  /** 탐색 */
+  EXPLORE_PICK_NOT_FOUND: 'EXPLORE-001',
 
   /** 신고 */
   REPORT_GUEST_CANNOT_USE: 'REPORT-001',

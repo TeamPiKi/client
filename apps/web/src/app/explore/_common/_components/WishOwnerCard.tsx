@@ -7,11 +7,11 @@ import { ROUTES } from '@/consts/route';
 import { Z_INDEX } from '@/consts/zIndex';
 import { cn } from '@/utils/cn';
 
-import type { ExploreWishDetailT } from '../../../_common/_types/explore';
+import type { ExploreDetailViewT } from '../_types/explore';
 
 type WishOwnerCardProps = {
-  owner: NonNullable<ExploreWishDetailT['owner']>;
-  folder: ExploreWishDetailT['folder'];
+  owner: NonNullable<ExploreDetailViewT['owner']>;
+  folder: ExploreDetailViewT['folder'];
 };
 
 function WishOwnerCard({ owner, folder }: WishOwnerCardProps) {
