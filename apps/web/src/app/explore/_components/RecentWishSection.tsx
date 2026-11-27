@@ -15,9 +15,10 @@ const MINUTE_MS = 60 * 1000;
 
 const formatUpdatedAgo = (updatedAt: string) => {
   const minutes = Math.max(0, Math.floor((Date.now() - new Date(updatedAt).getTime()) / MINUTE_MS));
-  if (minutes < 60) return `${minutes}분전 업데이트`;
-  if (minutes < 60 * 24) return `${Math.floor(minutes / 60)}시간전 업데이트`;
-  return `${Math.floor(minutes / (60 * 24))}일전 업데이트`;
+  if (minutes < 1) return '방금 전 업데이트';
+  if (minutes < 60) return `${minutes}분 전 업데이트`;
+  if (minutes < 60 * 24) return `${Math.floor(minutes / 60)}시간 전 업데이트`;
+  return `${Math.floor(minutes / (60 * 24))}일 전 업데이트`;
 };
 
 function RecentWishSection() {

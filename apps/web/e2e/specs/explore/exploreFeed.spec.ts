@@ -18,7 +18,7 @@ test('방금 담긴 위시는 서버 갱신 시각과 카드를 보여주고 카
   const recentSection = page.locator('section').filter({
     has: page.getByRole('heading', { name: '방금 담긴 위시' }),
   });
-  await expect(recentSection.getByText(/^\d+분전 업데이트$/)).toBeVisible();
+  await expect(recentSection.getByText(/^\d+분 전 업데이트$/)).toBeVisible();
   for (const { wishId, item } of recentWishes.wishes) {
     const card = recentSection.getByRole('link').filter({ hasText: item.name });
     await expect(card).toHaveAttribute('href', ROUTES.EXPLORE_WISH(wishId));
