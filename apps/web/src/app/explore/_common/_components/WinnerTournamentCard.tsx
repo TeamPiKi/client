@@ -6,17 +6,17 @@ import Basket from '@/components/common/basket';
 import Skeleton from '@/components/skeleton';
 import { ROUTES } from '@/consts/route';
 
-import type { ExploreWishDetailT } from '../../../_common/_types/explore';
+import type { ExploreDetailViewT } from '../_types/explore';
 
 type WinnerTournamentCardProps = {
-  tournament: NonNullable<ExploreWishDetailT['winnerTournament']>;
+  tournament: NonNullable<ExploreDetailViewT['winnerTournament']>;
 };
 
 /** 위시가 1위를 차지한 토너먼트 */
 function WinnerTournamentCard({ tournament }: WinnerTournamentCardProps) {
   return (
     <Link
-      href={ROUTES.EXPLORE_WINNER_CANDIDATES(tournament.id)}
+      href={ROUTES.EXPLORE_WINNER_CANDIDATES(tournament.pickId)}
       className="flex cursor-pointer flex-col gap-4 rounded-2xl bg-bg-layer-default p-4"
     >
       <div className="flex items-start justify-between">

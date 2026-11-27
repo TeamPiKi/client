@@ -40,8 +40,10 @@ export const QUERY_KEYS = {
     FRIENDS: ['explore', 'friends'] as const,
     /** 방금 담긴 위시 목록 */
     RECENT: ['explore', 'recent'] as const,
-    /** 1위 위시가 나온 토너먼트의 후보 목록 */
-    CANDIDATES: (tournamentId: number) => ['explore', 'candidates', tournamentId] as const,
+    /** 1위가 나온 토너먼트의 후보 목록 */
+    CANDIDATES: (pickId: number) => ['explore', 'candidates', pickId] as const,
+    /** 토너먼트 1위 상세 */
+    PICK: (pickId: number) => ['explore', 'pick', pickId] as const,
     /** 다른 사람 공개 폴더 상세 */
     FOLDER: (userId: string, folderId: number) => ['explore', 'folder', userId, folderId] as const,
     /** 탐색 위시 상세 */

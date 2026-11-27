@@ -62,6 +62,11 @@ export const ENDPOINTS = {
   EXPLORE_FRIENDS: '/api/v1/explore/friends',
   EXPLORE_WISH: (wishId: number) => `/api/v1/explore/wishes/${wishId}`,
   EXPLORE_WISH_COPY: (wishId: number) => `/api/v1/explore/wishes/${wishId}/copy`,
+  EXPLORE_PICKS: '/api/v1/explore/picks',
+  EXPLORE_PICK: (pickId: number) => `/api/v1/explore/picks/${pickId}`,
+  EXPLORE_PICK_CANDIDATES: (pickId: number) => `/api/v1/explore/picks/${pickId}/candidates`,
+  EXPLORE_PICK_CANDIDATE_COPY: (pickId: number, candidateId: number) =>
+    `/api/v1/explore/picks/${pickId}/candidates/${candidateId}/copy`,
 
   /** 알림 */
   NOTIFICATIONS_SUBSCRIBE: '/api/v1/notifications/subscribe',

@@ -1,21 +1,19 @@
 import { type InfiniteData, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
-import { TOAST_ACTION_DURATION_MS } from '@/components/toast/toast.const';
 import { QUERY_KEYS } from '@/consts/queryKeys';
-import { ROUTES } from '@/consts/route';
 import type { ApiResponseT } from '@/types/api';
 import { isGlobalNetError } from '@/utils/apiError';
 import { getApiErrorMessage } from '@/utils/getApiErrorMessage';
 
 import { postExploreWish } from '../_apis/postExploreWish';
 import type { ExploreFolderT, ExploreWishDetailT, RecentWishesT } from '../_types/explore';
+import { useExploreSaveToast } from './useExploreSaveToast';
 
 /** 다른 사람의 위시를 내 전체 위시에 담기 */
 export const usePostExploreWish = () => {
-  const router = useRouter();
   const queryClient = useQueryClient();
+  const showSaveToast = useExploreSaveToast();
 
   const { mutate: postExploreWishMutation, isPending: isPostExploreWishPending } = useMutation({
     mutationFn: postExploreWish,
@@ -52,12 +50,7 @@ export const usePostExploreWish = () => {
             })),
           }
       );
-      toast(alreadySaved ? '이미 내 위시에 있는 상품이에요' : '내 위시에 상품을 담았어요', {
-        duration: TOAST_ACTION_DURATION_MS,
-        action: { label: '보러가기', onClick: () => router.push(ROUTES.WISHLIST) },
-        /** 전역 액션 버튼은 회색이지만 이 토스트는 시안대로 흰색 */
-        classNames: { actionButton: '[&[data-button]]:!text-text-neutral-inverse' },
-      });
+      showSaveToast(alreadySaved);
     },
     onError: error => {
       if (isGlobalNetError(error)) return;

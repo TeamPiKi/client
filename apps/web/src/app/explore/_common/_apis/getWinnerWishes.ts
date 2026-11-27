@@ -1,25 +1,30 @@
-import { infiniteQueryOptions } from '@tanstack/react-query';
+import { environmentManager, infiniteQueryOptions } from '@tanstack/react-query';
 
+import { clientApi } from '@/apis/client';
+import { serverApi } from '@/apis/server';
+import { ENDPOINTS } from '@/consts/api';
 import { QUERY_KEYS } from '@/consts/queryKeys';
 import type { ApiResponseT } from '@/types/api';
 
-import { WINNER_WISHES_MOCK } from '../_consts/exploreMock';
-import type { WinnerWishT } from '../_types/explore';
+import type { GetExplorePicksResponseT, WinnerWishT } from '../_types/explore';
 
-const PAGE_SIZE = 20;
-
-/** TEMP: API 스펙 확정 전이라 목데이터를 커서 페이지네이션 응답 형태로 잘라 반환함 */
 export const getWinnerWishes = async (
   cursor: string | null = null
 ): Promise<ApiResponseT<WinnerWishT[]>> => {
-  const start = cursor ? Number(cursor) : 0;
-  const end = start + PAGE_SIZE;
-  const hasNext = end < WINNER_WISHES_MOCK.length;
+  const api = environmentManager.isServer() ? serverApi : clientApi;
+  const { data } = await api.get<ApiResponseT<GetExplorePicksResponseT>>(ENDPOINTS.EXPLORE_PICKS, {
+    params: { size: 20, ...(cursor ? { cursor } : {}) },
+  });
 
   return {
-    data: WINNER_WISHES_MOCK.slice(start, end),
-    code: null,
-    pageResponse: { hasNext, nextCursor: hasNext ? String(end) : null },
+    ...data,
+    data: data.data.picks.map(({ pickId, candidateId, saved, tournament, item }) => ({
+      pickId,
+      candidateId,
+      item,
+      tournament: { id: tournament.tournamentId, title: tournament.name },
+      isInMyWish: saved,
+    })),
   };
 };
 
