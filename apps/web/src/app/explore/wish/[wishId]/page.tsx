@@ -1,25 +1,35 @@
-import { Header, HeaderIcon } from '@/components/header';
+import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
+import { notFound } from 'next/navigation';
 
+import { QUERY_KEYS } from '@/consts/queryKeys';
+import { parseIdParam } from '@/utils/parseIdParam';
+import { getQueryClient } from '@/utils/queryClient';
+
+import ExploreDetailFrame from '../../_common/_components/ExploreDetailFrame';
+import { getExploreWish } from './_apis/getExploreWish';
 import ExploreWishContent from './_components/ExploreWishContent';
 
 type ExploreWishPageProps = {
   params: Promise<{ wishId: string }>;
 };
 
+/** 조회가 끝날 때까지 같은 경로의 loading.tsx 가 화면 틀과 스켈레톤을 먼저 보여줌 */
 async function ExploreWishPage({ params }: ExploreWishPageProps) {
-  const { wishId } = await params;
+  const wishId = parseIdParam((await params).wishId);
+  if (!wishId) notFound();
+
+  const exploreWishData = await getExploreWish(wishId);
+  if (!exploreWishData) notFound();
+
+  const queryClient = getQueryClient();
+  queryClient.setQueryData(QUERY_KEYS.EXPLORE.WISH(wishId), exploreWishData);
 
   return (
-    <main className="flex min-h-dvh flex-col bg-linear-to-b from-bg-layer-default to-bg-layer-basement px-5 pt-padding-top pb-[calc(var(--spacing-bottom-cta)+--spacing(9))]">
-      <Header
-        left={<HeaderIcon name="BACK" />}
-        center={<h1 className="heading-1-bold text-text-neutral-primary">위시 정보</h1>}
-      />
-
-      <div className="mt-6">
-        <ExploreWishContent wishId={Number(wishId)} />
-      </div>
-    </main>
+    <HydrationBoundary state={dehydrate(queryClient)}>
+      <ExploreDetailFrame>
+        <ExploreWishContent wishId={wishId} />
+      </ExploreDetailFrame>
+    </HydrationBoundary>
   );
 }
 

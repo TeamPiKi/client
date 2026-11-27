@@ -2,7 +2,7 @@ import http from 'node:http';
 
 import { ENDPOINTS } from '@/consts/api';
 
-import { SSR_EMPTY_COOKIE, SSR_STATUS_COOKIE } from '../consts';
+import { SSR_DELAY_COOKIE, SSR_EMPTY_COOKIE, SSR_STATUS_COOKIE } from '../consts';
 import { createApiError, createApiSuccess } from '../helpers/apiResponse';
 import { createFakeJwt } from '../helpers/fakeJwt';
 import {
@@ -20,6 +20,7 @@ import {
   MOCK_FRIEND_WISHES,
   MOCK_NO_FOLDER_EXPLORE_WISH,
   MOCK_PRIVATE_EXPLORE_WISH,
+  RECENT_CARD_WISH_ID,
   createRecentWishes,
 } from '../mocks/explore';
 import { MOCK_FOLDERS } from '../mocks/folder';
@@ -98,6 +99,11 @@ const SSR_MOCK_ROUTES: Record<string, unknown> = {
     MOCK_EXPLORE_PICK_CANDIDATES
   ),
   [`GET ${ENDPOINTS.EXPLORE_WISH(MOCK_EXPLORE_WISH.wishId)}`]: createApiSuccess(MOCK_EXPLORE_WISH),
+  /** 방금 담긴 위시 첫 카드에서 상세로 들어가는 흐름용 */
+  [`GET ${ENDPOINTS.EXPLORE_WISH(RECENT_CARD_WISH_ID)}`]: createApiSuccess({
+    ...MOCK_EXPLORE_WISH,
+    wishId: RECENT_CARD_WISH_ID,
+  }),
   [`GET ${ENDPOINTS.EXPLORE_WISH(MOCK_NO_FOLDER_EXPLORE_WISH.wishId)}`]: createApiSuccess(
     MOCK_NO_FOLDER_EXPLORE_WISH
   ),
@@ -169,6 +175,18 @@ const readStatusOverride = (
   return Number.isInteger(parsedStatus) ? { status: parsedStatus, code } : null;
 };
 
+/** 테스트가 `setSsrDelay` 로 심은 쿠키가 이 라우트를 가리키면 늦출 시간(ms) — 로딩 화면 검증용 */
+const readDelayOverride = (req: http.IncomingMessage, routeKey: string) => {
+  const cookie = readCookie(req, SSR_DELAY_COOKIE);
+  if (!cookie) return 0;
+
+  const [delayedRouteKey, delayMs] = decodeURIComponent(cookie).split('=');
+  if (delayedRouteKey !== routeKey) return 0;
+
+  const parsedDelayMs = Number(delayMs);
+  return Number.isInteger(parsedDelayMs) ? parsedDelayMs : 0;
+};
+
 const TOKEN_TTL_SECONDS = 60 * 60;
 
 type AuthTokensResponseT = {
@@ -212,7 +230,7 @@ const respondJson = (res: http.ServerResponse, status: number, body: unknown) =>
  */
 export const startMockApiServer = (port: number) =>
   new Promise<http.Server | null>((resolve, reject) => {
-    const server = http.createServer((req, res) => {
+    const handleRequest = (req: http.IncomingMessage, res: http.ServerResponse) => {
       const pathname = new URL(req.url ?? '/', `http://127.0.0.1:${port}`).pathname;
       const routeKey = `${req.method} ${pathname}`;
 
@@ -251,6 +269,14 @@ export const startMockApiServer = (port: number) =>
       }
 
       return respondJson(res, 200, SSR_MOCK_ROUTES[routeKey]);
+    };
+
+    const server = http.createServer((req, res) => {
+      const pathname = new URL(req.url ?? '/', `http://127.0.0.1:${port}`).pathname;
+      const delayMs = readDelayOverride(req, `${req.method} ${pathname}`);
+      if (delayMs > 0) return void setTimeout(() => handleRequest(req, res), delayMs);
+
+      return handleRequest(req, res);
     });
 
     /** 유휴 keep-alive 소켓을 서버가 닫는 순간 serverApi 가 재사용하면 ECONNRESET 이 나 SSR 이 에러 화면으로 떨어진다 */
