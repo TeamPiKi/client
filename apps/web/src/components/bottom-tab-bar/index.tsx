@@ -80,6 +80,13 @@ const indexToLeft = (index: number) => BAR_PADDING + index * TAB_STEP;
 const leftToIndex = (left: number) =>
   clamp(Math.round((left - BAR_PADDING) / TAB_STEP), 0, TABS.length - 1);
 
+/** 좁은 화면에서 줄인 탭바 배율. 드래그 좌표를 탭바 기준 px 로 되돌릴 때 사용 */
+const getFitScale = (element: HTMLElement | null) => {
+  if (!element) return 1;
+  const scale = Number.parseFloat(getComputedStyle(element).scale);
+  return Number.isFinite(scale) && scale > 0 ? scale : 1;
+};
+
 const isEdgeIndex = (index: number) => index === 0 || index === TABS.length - 1;
 
 const getBubbleOrigin = (index: number) => {
@@ -92,6 +99,7 @@ function BottomTabBar() {
   const pathname = usePathname();
   const router = useRouter();
 
+  const fitRef = useRef<HTMLDivElement>(null);
   const barRef = useRef<HTMLDivElement>(null);
   const indicatorRef = useRef<HTMLDivElement>(null);
   const bubbleRef = useRef<HTMLDivElement>(null);
@@ -129,7 +137,8 @@ function BottomTabBar() {
     const indicator = indicatorRef.current;
     if (!bar || !indicator || activeIndex < 0) return;
 
-    const pressX = event.clientX - bar.getBoundingClientRect().left;
+    const fitScale = getFitScale(fitRef.current);
+    const pressX = (event.clientX - bar.getBoundingClientRect().left) / fitScale;
     const pressIndex = leftToIndex(pressX - TAB_WIDTH / 2);
     const pressLeft = indexToLeft(pressIndex);
 
@@ -163,11 +172,16 @@ function BottomTabBar() {
         if (Math.abs(e.clientX - event.clientX) < DRAG_THRESHOLD) return;
         isDraggedRef.current = true;
         // 슬라이드 도중 드래그가 시작되면 현재 렌더 위치에서 이어받아 점프 방지
-        anchorLeft = indicator.getBoundingClientRect().left - bar.getBoundingClientRect().left;
+        anchorLeft =
+          (indicator.getBoundingClientRect().left - bar.getBoundingClientRect().left) / fitScale;
         anchorX = e.clientX;
       }
 
-      left = clamp(anchorLeft + (e.clientX - anchorX), BAR_PADDING, indexToLeft(TABS.length - 1));
+      left = clamp(
+        anchorLeft + (e.clientX - anchorX) / fitScale,
+        BAR_PADDING,
+        indexToLeft(TABS.length - 1)
+      );
       indicator.style.transition = 'none';
       indicator.style.left = `${left}px`;
       indicator.style.right = `${BAR_WIDTH - left - TAB_WIDTH}px`;
@@ -180,7 +194,7 @@ function BottomTabBar() {
           bubbleRef.current.style.transformOrigin = getBubbleOrigin(hoverIndex);
       }
 
-      const velocity = clamp(e.clientX - lastX, -10, 10);
+      const velocity = clamp((e.clientX - lastX) / fitScale, -10, 10);
       const speed = Math.abs(velocity);
       const bubble = bubbleRef.current;
       if (bubble) {
@@ -265,84 +279,92 @@ function BottomTabBar() {
   return (
     <div
       data-bottom-tab-bar // NOTE: 탭바가 렌더된 페이지에서 토스트가 탭바 위에 뜨도록 하는 마커
-      className="fixed bottom-8 left-1/2 -translate-x-1/2"
+      className="@container pointer-events-none fixed right-safe-right bottom-8 left-safe-left flex justify-center"
       style={{ zIndex: Z_INDEX.BOTTOM_TAB_BAR }}
     >
+      {/* NOTE: 폴더블 레일로 쓸 수 있는 너비가 탭바보다 좁으면 축소. 일반 폰(360px 이상)은 원래 크기 */}
       <div
-        ref={barRef}
-        onPointerDown={handlePointerDown}
-        onPointerUp={() => setIsPressed(false)}
-        onPointerLeave={() => !isGrabbingRef.current && setIsPressed(false)}
-        onPointerCancel={() => !isGrabbingRef.current && setIsPressed(false)}
-        onClickCapture={e => {
-          // 제스처 내비게이션은 pointerup 에서 처리하므로 Link 클릭은 차단
-          if (!isDraggedRef.current) return;
-          isDraggedRef.current = false;
-          e.preventDefault();
-          e.stopPropagation();
-        }}
-        className={cn(
-          'liquid-glass inline-flex h-[58px] touch-none items-center rounded-full p-1 shadow-[0px_6px_24px_0px_rgba(0,0,0,0.16)] transition-transform duration-200 ease-out select-none',
-          isGrabbing && 'liquid-glass-active',
-          isPressed && 'scale-102'
-        )}
+        ref={fitRef}
+        className="pointer-events-auto relative origin-bottom @max-[352px]:scale-90 @max-[320px]:scale-80 @max-[288px]:scale-70"
       >
-        {/* 활성 탭 인디케이터 — 드래그로 옮길 수 있는 버블 */}
-        {activeIndex >= 0 && (
-          <div
-            ref={indicatorRef}
-            aria-hidden
-            className={cn(
-              'pointer-events-none absolute top-1 bottom-1',
-              isGrabbing ? 'z-10' : '-z-10'
-            )}
-            style={{
-              left: indexToLeft(activeIndex),
-              right: BAR_WIDTH - indexToLeft(activeIndex) - TAB_WIDTH,
-            }}
-          >
+        <div
+          ref={barRef}
+          onPointerDown={handlePointerDown}
+          onPointerUp={() => setIsPressed(false)}
+          onPointerLeave={() => !isGrabbingRef.current && setIsPressed(false)}
+          onPointerCancel={() => !isGrabbingRef.current && setIsPressed(false)}
+          onClickCapture={e => {
+            // 제스처 내비게이션은 pointerup 에서 처리하므로 Link 클릭은 차단
+            if (!isDraggedRef.current) return;
+            isDraggedRef.current = false;
+            e.preventDefault();
+            e.stopPropagation();
+          }}
+          className={cn(
+            'liquid-glass inline-flex h-[58px] touch-none items-center rounded-full p-1 shadow-[0px_6px_24px_0px_rgba(0,0,0,0.16)] transition-transform duration-200 ease-out select-none',
+            isGrabbing && 'liquid-glass-active',
+            isPressed && 'scale-102'
+          )}
+        >
+          {/* 활성 탭 인디케이터 — 드래그로 옮길 수 있는 버블 */}
+          {activeIndex >= 0 && (
             <div
-              ref={bubbleRef}
+              ref={indicatorRef}
+              aria-hidden
               className={cn(
-                'relative size-full overflow-hidden rounded-full transition-[scale,transform,background-color,box-shadow,backdrop-filter] duration-300',
-                isGrabbing ? 'scale-125 liquid-glass-lens' : 'bg-black/8'
+                'pointer-events-none absolute top-1 bottom-1',
+                isGrabbing ? 'z-10' : '-z-10'
               )}
-              style={{ transitionTimingFunction: SPRING_EASE }}
+              style={{
+                left: indexToLeft(activeIndex),
+                right: BAR_WIDTH - indexToLeft(activeIndex) - TAB_WIDTH,
+              }}
             >
               <div
-                ref={glintRef}
+                ref={bubbleRef}
                 className={cn(
-                  'absolute inset-0 rounded-full transition-[translate,opacity] duration-200 ease-out liquid-glass-glint',
-                  isGrabbing ? 'opacity-100' : 'opacity-0'
+                  'relative size-full overflow-hidden rounded-full transition-[scale,transform,background-color,box-shadow,backdrop-filter] duration-300',
+                  isGrabbing ? 'scale-125 liquid-glass-lens' : 'bg-black/8'
                 )}
-              />
-            </div>
-          </div>
-        )}
-        {TABS.map(({ label, activeIcon: ActiveIcon, inactiveIcon: InactiveIcon, href }, index) => {
-          const isActive = index === activeIndex;
-          const Icon = isActive ? ActiveIcon : InactiveIcon;
-          return (
-            <Link
-              key={label}
-              href={href}
-              prefetch={!isActive}
-              draggable={false}
-              className={cn(
-                'flex h-full w-[68px] cursor-pointer flex-col items-center justify-center rounded-full p-2 transition-colors',
-                isActive ? 'text-gray-900' : 'text-gray-800'
-              )}
-            >
-              <Icon className="size-5.5 shrink-0" />
-              <span
-                className="text-[10px] leading-[18px] font-medium tracking-[-0.4px]"
-                style={{ fontFeatureSettings: "'ss10' on" }}
+                style={{ transitionTimingFunction: SPRING_EASE }}
               >
-                {label}
-              </span>
-            </Link>
-          );
-        })}
+                <div
+                  ref={glintRef}
+                  className={cn(
+                    'absolute inset-0 rounded-full transition-[translate,opacity] duration-200 ease-out liquid-glass-glint',
+                    isGrabbing ? 'opacity-100' : 'opacity-0'
+                  )}
+                />
+              </div>
+            </div>
+          )}
+          {TABS.map(
+            ({ label, activeIcon: ActiveIcon, inactiveIcon: InactiveIcon, href }, index) => {
+              const isActive = index === activeIndex;
+              const Icon = isActive ? ActiveIcon : InactiveIcon;
+              return (
+                <Link
+                  key={label}
+                  href={href}
+                  prefetch={!isActive}
+                  draggable={false}
+                  className={cn(
+                    'flex h-full w-[68px] cursor-pointer flex-col items-center justify-center rounded-full p-2 transition-colors',
+                    isActive ? 'text-gray-900' : 'text-gray-800'
+                  )}
+                >
+                  <Icon className="size-5.5 shrink-0" />
+                  <span
+                    className="text-[10px] leading-[18px] font-medium tracking-[-0.4px]"
+                    style={{ fontFeatureSettings: "'ss10' on" }}
+                  >
+                    {label}
+                  </span>
+                </Link>
+              );
+            }
+          )}
+        </div>
       </div>
     </div>
   );

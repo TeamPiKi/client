@@ -18,7 +18,7 @@ function BottomCta({
     <div
       data-bottom-cta={height}
       className={cn(
-        'fixed right-0 bottom-0 left-0 mx-auto flex w-full max-w-120 items-center gap-2.5 bg-bg-layer-basement px-5 pt-3 pb-8',
+        'fixed right-safe-right bottom-0 left-safe-left mx-auto flex max-w-120 items-center gap-2.5 bg-bg-layer-basement px-5 pt-3 pb-8',
         className
       )}
       style={{ zIndex: Z_INDEX.BOTTOM_CTA }}

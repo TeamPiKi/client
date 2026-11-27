@@ -14,7 +14,7 @@ function TournamentFab() {
           icon="only"
           aria-label="토너먼트 만들기"
           style={{ zIndex: Z_INDEX.FAB }}
-          className="fixed right-[max(20px,calc(50%-480px/2+20px))] bottom-[103px]"
+          className="fixed right-[calc(var(--spacing-safe-right)+max(20px,calc((100%-var(--spacing-safe-x)-480px)/2+20px)))] bottom-[103px]"
         >
           <AddIconFill width={33.101} height={33.101} />
         </Button>

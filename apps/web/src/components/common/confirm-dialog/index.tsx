@@ -50,7 +50,10 @@ function ConfirmDialog({
       <DialogContent
         showCloseButton={false}
         onCloseAutoFocus={onCloseAutoFocus}
-        className={cn('w-[calc(min(100vw,480px)-72px)] max-w-none text-center', !icon && 'pt-8')}
+        className={cn(
+          'w-[calc(min(100vw-var(--spacing-safe-x),480px)-72px)] max-w-none text-center',
+          !icon && 'pt-8'
+        )}
       >
         {icon && <div className="flex justify-center">{icon}</div>}
         <DialogHeader className={cn('gap-1', icon && 'mt-4')}>

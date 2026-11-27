@@ -160,6 +160,13 @@
   --spacing-padding-top: max(env(safe-area-inset-top), 47px);
 
   --spacing-bottom-cta: 98px;
+
+  /** NOTE: 폴더블 세로 레일 등 좌우 안전 영역. 레일 없는 기기에서는 0 */
+  --spacing-safe-left: env(safe-area-inset-left, 0px);
+  --spacing-safe-right: env(safe-area-inset-right, 0px);
+  --spacing-safe-x: calc(var(--spacing-safe-left) + var(--spacing-safe-right));
+  /** 좌우 안전 영역을 뺀 영역의 가운데. `left-1/2` 대신 사용 */
+  --spacing-safe-center: calc(50% + (var(--spacing-safe-left) - var(--spacing-safe-right)) / 2);
 }
 
 @utility hide-scrollbar {
