@@ -11,3 +11,5 @@ export const FRIEND_TAB_PATH: Record<FriendTabT, string> = {
   [FRIEND_TAB.FRIENDS]: ROUTES.FRIENDS,
   [FRIEND_TAB.BLOCKED]: ROUTES.FRIENDS_BLOCKED_TAB,
 };
+
+export const FRIEND_TAB_PANEL_ID = 'friend-tab-panel';
