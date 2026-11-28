@@ -12,6 +12,7 @@ import type {
   WebViewHttpErrorEvent,
   WebViewNavigation,
   WebViewNavigationEvent,
+  WebViewOpenWindowEvent,
   WebViewRenderProcessGoneEvent,
   WebViewTerminatedEvent,
 } from 'react-native-webview/lib/WebViewTypes';
@@ -29,6 +30,7 @@ import { captureError } from '@/utils/captureError';
 import { handleHaptic } from '@/utils/handleHaptic';
 import { handleOpenImagePicker } from '@/utils/handleImage';
 import { handleShareInstagramStory } from '@/utils/handleInstagramStory';
+import { handleOpenExternalUrl } from '@/utils/handleOpenExternalUrl';
 import { handleOpenStore } from '@/utils/handleOpenStore';
 import {
   handleRequestPushPermission,
@@ -204,6 +206,11 @@ function Page() {
     }
   }, []);
 
+  /** 새 창 링크는 WebView 안에서 열지 않음 — iOS 는 핸들러가 없으면 같은 WebView 로 이동해 버림 */
+  const handleOpenWindow = useCallback((event: WebViewOpenWindowEvent) => {
+    handleOpenExternalUrl(event.nativeEvent.targetUrl);
+  }, []);
+
   const handleNavigationStateChange = useCallback((navigation: WebViewNavigation) => {
     lastUrlRef.current = navigation.url.split('?')[0] ?? null;
   }, []);
@@ -248,6 +255,7 @@ function Page() {
         onError={handleWebViewError}
         onHttpError={handleWebViewHttpError}
         onNavigationStateChange={handleNavigationStateChange}
+        onOpenWindow={handleOpenWindow}
         onContentProcessDidTerminate={handleContentProcessDidTerminate}
         onRenderProcessGone={handleRenderProcessGone}
         allowsBackForwardNavigationGestures
